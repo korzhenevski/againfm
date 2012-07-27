@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ sitename }} - {{ _('Radio') }}</title>
+        <meta charset="utf-8" />
+        <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
+
+        <link href="{{ STATIC_URL }}css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="main">
+            <div class="wrapper-left">
+                <div class="wrapper-left-content">
+                    <img src="{{ STATIC_URL }}i/logo.png" width="308" height="135" class="logo" alt="logo" />
+                    <div class="radio-controls">
+                        <div class="radio-control radio-control-valign">
+                            <span class="radio-control-prev" title="{{ _('previous radio') }}"></span>
+                        </div>
+                        <div class="radio-control">
+                            <span class="radio-control-play"></span>
+                        </div>
+                        <div class="radio-control radio-control-valign">
+                            <span class="radio-control-next" title="{{ _('next radio') }}"></span>
+                        </div>
+                        <div class="radio-controls-status">
+                            <div class="inner">
+                                <div class="radio-control-sound"></div>
+                                <div class="radio-control-slider"></div>
+                                <!--div class="radio-control-hd radio-control-hd-on">HD</div-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrapper-right">
+                <div class="wrapper-right-content">
+                    <div class="box-holder">
+                        <form class="head-form login hidden">
+                            <div class="form-input">
+                                <input type="text" tabindex="10" class="input" name="login" placeholder="{{ _('Email') }}" />
+                                <span class="pseudo-link register">{{ _('sign up') }}</span>
+                            </div>
+                            <div class="form-input">
+                                <input type="password" tabindex="11" class="input" name="password" placeholder="{{ _('Password') }}" />
+                                <span class="pseudo-link amnesia">{{ _('forgot password?') }}</span>
+                            </div>
+                            <input type="submit" tabindex="12" value="{{ _('Login') }}" />
+                            <div class="notice hidden">
+                                <p><!-- --></p>
+                            </div>
+                        </form>
+                        <div class="user-profile hidden"></div>
+                    </div>
+                    <div class="radio-now"></div>
+                    <div class="user-panel"></div>
+                </div>
+            </div>
+            <div class="wrapper-wide">
+                <div class="radio-display">
+                    <div class="radio-display-head">
+                        <ul class="filters"></ul>
+                    </div>
+                </div>
+                <div class="radio-scale">
+                    <div class="about-box"></div>
+                    <div class="scale-inner"></div>
+                    <div class="scale-slider"></div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>{{ sitename}} {{ _('is irrelevant and is not responsible for any radio ads.') }}</p>
+            <p class="left-shift">
+                &copy; 2012, {{ sitename }} &middot; {{ _('made in Russia') }}
+                &middot; <span class="pseudo-link about">{{ _('about') }}</span> &middot; <span class="pseudo-link tos">{{ _('terms of service') }}</span>
+            </p>
+        </div>
+        </div>
+        <div id="player-container"></div>
+        <canvas id="spectrum"></canvas>
+
+        {% raw %}
+        <script id="about" type="text/html">
+                <img src="{{static_url "i/small-logo.png"}}" alt="small logo" />
+                <p>{{#trans}}an incredible team{{/trans}}:</p>
+                <dl>
+                    <dt>{{#trans}}founder and developer{{/trans}}</dt>
+                    <dd>{{#trans}}Yura Korjenevsky{{/trans}}</dd>
+
+                    <dt>{{#trans}}usability and design{{/trans}}</dt>
+                    <dd>{{#trans}}Roman Zolotorevich{{/trans}}</dd>
+
+                    <dt>{{#trans}}logotype{{/trans}}</dt>
+                    <dd>{{#trans}}Alexandr Malinovsky{{/trans}}</dd>
+
+                    <dt>{{#trans}}special thanks{{/trans}}</dt>
+                    <dd>
+                        {{#trans}}Vera Pavlova{{/trans}},
+                        {{#trans}}Alexandr Dyakonov{{/trans}}
+                    </dd>
+                </dl>
+        </script>
+
+        <script id="filter_item" type="text/html">
+            <li>
+                <span class="nav-link {{role}}-link{{#if is_active}} active {{role}}-active{{/if}}">{{title}}</span>
+            </li>
+        </script>
+
+        <script id="radio_now" type="text/html">
+            <img src="{{image_url}}" width="78" height="78" />
+            <div class="radio-now-glare"></div>
+            <div class="radio-now-content">
+                <h1 title="{{title}}">
+                    <span class="title-inner">{{title}}</span>
+                </h2>
+                <h2 title="{{caption}}">{{caption}}</h2>
+                <p class="station">{{station_title}}</p>
+            </div>
+            <div class="{{star_class}}" data-meta-id="{{meta_id}}"></div>
+        </script>
+
+        <script id="user_profile" type="text/html">
+            <img src="http://www.gravatar.com/avatar/{{user.gravatar_hash}}?s=50" width="50" height="50" alt="avatar" class="avatar" />
+            <div class="content">
+                <p>{{#if user.name}}{{user.name}}{{else}}{{user.email}}{{/if}}</p>
+                <ul>
+                    <li class="favorites"><a href="#" class="link">{{#trans}}favorites{{/trans}}</a></li>
+                    <li class="settings"><a href="#" class="link">{{#trans}}settings{{/trans}}</a></li>
+                </ul>
+            </div>
+            <div class="logout" title="{{#trans}}logout{{/trans}}"></div>
+        </script>
+
+        <script id="top_holder" type="text/html">
+            <div class="form-holder {{class}}">
+                <div class="wrapper-left">
+                    <div class="wrapper-left-content">
+                        <h1>{{title}}</h1>
+                    </div>
+                </div>
+                <div class="wrapper-right">
+                    <div class="wrapper-right-content">{{&content}}</div>
+                    <div class="close-box hidden">
+                        <div class="close"></div>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+        <script id="user_amnesia" type="text/html">
+            <form class="head-form amnesia" data-title="{{#trans}}Reset password{{/trans}}">
+                <div class="form-input">
+                    <input type="text" tabindex="30" class="input" name="email" placeholder="{{#trans}}Your email{{/trans}}" />
+                </div>
+                <input type="submit" tabindex="31" value="{{#trans}}Send{{/trans}}" />
+                <div class="notice">
+                    <p>{{#trans}}you will get a new password by email{{/trans}}</p>
+                </div>
+            </form>
+        </script>
+
+        <script id="user_register" type="text/html">
+            <form class="head-form register" data-title="{{#trans}}Sign up{{/trans}}">
+                <div class="form-input">
+                    <input type="text" tabindex="20" class="input" name="email" placeholder="{{#trans}}Email{{/trans}}" />
+                </div>
+                <div class="form-input">
+                    <input type="password" tabindex="21" class="input" name="password" placeholder="{{#trans}}Desired password{{/trans}}" />
+                </div>
+                <input type="submit" tabindex="22" value="{{#trans}}Start{{/trans}}" />
+                <div class="notice">
+                    <p>{{#trans}}no spam, you do not need to confirm{{/trans}}</p>
+                </div>
+            </form>
+        </script>
+
+        <script id="user_panel" type="text/html">
+            <h1>{{title}}</h1>
+            {{&content}}
+            <div class="close"></div>
+        </script>
+
+        <script id="tos" type="text/html">
+            <div class="tos" data-title="{{#trans}}Terms of Service{{/trans}}">
+                <div class="text">
+                <p>Just vinyl, just hardcore :)</p>
+                </div>
+            </div>
+        </script>
+
+        <script id="user_favorites" type="text/html">
+            <div class="user-favorites" data-title="{{#trans}}Favorites{{/trans}}">
+                {{#if showHelp}}
+                    <div class="help">
+                        <p>
+                            {{#trans}}You can store favorite songs here<br /> and find them quickly in Last.FM or Google.{{/trans}}
+                        </p>
+                        <img src="{{static_url "i/radionow.png"}}" width="386" height="100" alt=": )" />
+                        <p>
+                            {{#trans}}Click on a star to add a song to favorite.<br /> It is no longer your trouble. The player remember your favorite songs{{/trans}}
+                            :)
+                        </p>
+                    </div>
+                {{/if}}
+                {{#key_value favorites}}
+                <fieldset><legend>{{key}}</legend></fieldset>
+                <table class="favorites">
+                    {{#each value}}
+                    <tr class="{{#if this.is_deleted}}deleted{{/if}}" data-id="{{this.id}}">
+                        <td class="state">{{this._time}}</td>
+                        <td class="content">
+                            <h2>{{this.title}}</h2>
+                            <h3>@ {{this.station_title}}</h3>
+                        </td>
+                        <td>
+                            <!-- buttons -->
+                        </td>
+                    </tr>
+                    {{/each}}
+                </table>
+                {{/key_value}}
+            </div>
+        </script>
+
+        <script id="user_settings" type="text/html">
+            <div class="user-settings" data-title="{{#trans}}Settings{{/trans}}">
+                <fieldset>
+                    <legend>{{#trans}}Playback{{/trans}}</legend>
+                </fieldset>
+                <ul class="checkbox-shift">
+                    <li>
+                        {{checkbox settings.throttle_traffic}}
+                        <label>
+                            {{#trans}}Disable covers and lowering the sound quality to save bandwidth{{/trans}}
+                            <small>{{#trans}}turn it on in case slow or expensive internet{{/trans}}</small>
+                        </label>
+                    </li>
+                    <li>
+                        {{checkbox settings.limit_night_volume}}
+                        <label>
+                            {{#trans}}Limit the startup sound at night{{/trans}}
+                            <small>{{#trans}}to protect the ears volume will be set at 30%{{/trans}}</small>
+                        </label>
+                    </li>
+                    <li>
+                        {{checkbox settings.fading_sound}}
+                        <label>{{#trans}}Fading the sound when the player is turned off{{/trans}}</label>
+                    </li>
+                </ul>
+                <!--fieldset>
+                    <legend>{{#trans}}Social networks{{/trans}}</legend>
+                </fieldset>
+                <ul>
+                    
+                </ul-->
+                <fieldset>
+                    <legend>{{#trans}}Personal info{{/trans}}</legend>
+                </fieldset>
+                <ul>
+                    <li>
+                        {{#trans}}Email{{/trans}}: <strong>{{email}}</strong> <!--span class="pseudo-link change-email">{{#trans}}change{{/trans}}</span-->
+                    </li>
+ 
+                    <li>
+                        {{#trans}}Display name{{/trans}}:
+                        <input type="text" class="name" value="{{name}}" maxlength="30" autocomplete="off" />
+                        <button class="btn change-name" data-changing-text="{{#trans}}changing...{{/trans}}">{{#trans}}change{{/trans}}</button>
+                    </li>
+                   <li>
+                        {{#trans}}Password{{/trans}}: 
+                        <span class="password-holder">
+                            ************
+                            <span class="pseudo-link show-password-change">{{#trans}}change{{/trans}}</span>
+                        </span>
+                        <span class="password-block hidden">
+                            <input type="password"  class="password" value="" maxlength="128" placeholder="{{#trans}}Desired password{{/trans}}" autocomplete="off" />
+                            <button class="btn change-password" data-changing-text="{{#trans}}changing...{{/trans}}">{{#trans}}change{{/trans}}</button>
+                        </span>
+                        <span class="pseudo-link password-reset" class="btn" data-sending-text="{{#trans}}sending...{{/trans}}" data-sent-text="{{#trans}}A new password has been sent.{{/trans}}">{{#trans}}send new password to email{{/trans}}</span>
+                    </li>
+                    <!--li>
+                        <span class="pseudo-link delete-account">{{#trans}}Delete account{{/trans}}</span>
+                        <small>before removal will be asked to export the data available</small>
+                    </li-->
+                </ul>
+            </div>
+        </script>
+
+        <script id="password_reset" type="text/html">
+            <div class="notice">
+                <p>
+                    <strong>{{#trans}}A new password has been sent.{{/trans}}</strong>
+                    {{#if email_provider}}
+                    <a href="http://{{email_provider}}/" target="_blank">{{#trans}}Check email{{/trans}}</a> ({{#trans}}opens in new window{{/trans}})
+                    {{else}}
+                    {{#trans}}Check email{{/trans}}.
+                    {{/if}}
+                </p>
+            </div>
+        </script>
+        {% endraw %}
+
+        <script src="http://yandex.st/jquery/1.7.2/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.watermark.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.validate.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap-button.js"></script>
+        <script src="{{ STATIC_URL }}js/underscore.js"></script>
+        <script src="{{ STATIC_URL }}js/backbone.js"></script>
+        <script src="{{ STATIC_URL }}js/handlebars.js"></script>
+        <script src="{{ STATIC_URL }}js/render.js"></script>
+        <script src="{{ STATIC_URL }}js/utils.js"></script>
+        <script src="{{ STATIC_URL }}js/main.js"></script>
+
+        <script>
+            $(function(){
+                App.settings = {
+                    DEFAULT_VOLUME: 80,
+                    NIGHT_VOLUME: 30,
+                    PLAYER_API_HOST: 'service.' + document.domain,
+                    STATIC_URL: '/static/',
+                    LIVESTREAM_URL: 'http://live.' + document.domain
+                }
+
+                App.setup({{ bootstrap|tojson|safe }});
+
+                _.each(['small-logo.png', 'radionow.png'], function(img){
+                    preloadImage(App.settings.STATIC_URL + 'i/' + img);
+                });
+            });
+        </script>
+    </body>
+</html>
+
+

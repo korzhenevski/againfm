@@ -1,0 +1,2 @@
+from validictory import validate
+

@@ -1,0 +1,775 @@
+/*
+  Welcome to Compass.
+  In this file you should write your main styles. (or centralize your imports)
+  Import this file using the following HTML or equivalent:
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import compass/reset
+@import compass/css3/images
+@import compass/css3/box-shadow
+@import compass/css3/border-radius
+@import compass/css3/opacity
+
+@import "display/home*.png"
+@import "controls/*.png"
+@import "profile/*.png"
+@import "bbstar/*.png"
+@import "checkbox/*.png"
+
+html, body
+  height: 100%
+
+body
+  background: #111
+  +background(linear-gradient(#2a2e31, #000000))
+  font-size: 1em
+  line-height: 1.2em
+  color: #fff
+  font-family: Helvetica,Arial,sans-serif
+
+button, input, select, textarea, p
+  font-size: 0.8em
+  line-height: 1.4em
+  color: #fff
+
+input[disabled], button[disabled]
+  +opacity(0.65)
+
+.hidden
+  display: none
+
+/*.logo
+  visibility: hidden */
+.pseudo-link
+  cursor: pointer
+  font-size: 0.8em
+  text-decoration: underline
+  color: #999
+  &:hover
+    color: #fe7b2c
+
+a
+  &:link
+    color: #999
+  &:visited
+    color: #666
+  &:active, &:hover
+    color: #fe7b2c
+  &.fm
+    text-decoration: none
+    border-bottom: 1px #999 dotted
+    text-shadow: 1px 1px 0px #000
+    &:link
+      color: #999
+    &:visited
+      color: #666
+      border-color: #666
+    &:active, &:hover
+      color: #fe7b2c
+      border-color: #fe7b2c
+  &.logo
+    line-height: 0px
+    height: 0px
+    font-size: 0px
+    border: none
+
+.wrapper
+  background-image: url('../i/background_pattern.png')
+  position: relative
+  min-height: 100%
+
+.main
+  padding-bottom: 3em
+
+.wrapper-left
+  overflow: hidden
+  float: left
+  width: 420px
+  height: 340px
+
+.wrapper-left, .wrapper-right
+  padding-top: 40px
+
+.wrapper-left-content
+  margin-left: 10%
+  .logo
+    margin-left: 40px
+
+.wrapper-right
+  overflow: hidden
+  height: 340px
+
+.wrapper-right-content
+  margin: 45px 0 20px 85px
+
+.head-form
+  top: 86px
+  overflow: hidden
+  input
+    &[type=text], &[type=password]
+      width: 185px
+    &[type=submit]
+      width: 70px
+  a, label, p
+    font-size: 0.8em
+    line-height: 1.6em
+  .notice p
+    margin-left: 13px
+    clear: both
+    color: #666
+  .notice-error p
+    color: #cb0101
+  .notice-ok p
+    color: #7ad81c
+
+.wrapper-wide
+  width: 100%
+  overflow: hidden
+  clear: both
+
+.box-holder
+  overflow: hidden
+  height: 70px
+
+
+.form-holder
+  background-color: black
+  width: 100%
+  height: 200px
+  position: absolute
+  top: 0px
+  left: 0px
+  margin-top: -200px
+  display: none
+  z-index: 1000
+  +background(linear-gradient(#2a2e31, #000000))
+  .wrapper-left h1
+    font-size: 3.5em
+    line-height: 2em
+  .close-box
+    bottom: -48px
+    right: 63%
+    padding-top: 16px
+    position: absolute 
+    @include profile-sprite(holder-close)
+    .close
+      +border-radius(15px)
+      height: 32px
+      width: 32px
+      cursor: pointer
+
+.input
+  background-color: #666
+  height: 30px
+  border: none
+  margin: 0
+  border-radius: 5px
+  padding-left: 12px
+  outline: none
+
+input[type=submit]
+  height: 32px
+  margin: 0px
+  padding: 0px
+  border: 1px solid #333
+  color: #333
+  border-radius: 5px
+  background-color: #666
+  +background(linear-gradient(#c4c4c4, #9b9b9b))
+  text-shadow: 0px 1px 0px #cfcfcf
+  font-weight: bold
+  text-align: center
+  cursor: pointer
+  float: left
+
+.loading
+  margin-left: 10px
+
+.form-input
+  width: 200px
+  float: left
+  margin-right: 10px
+  .pseudo-link, label
+    display: inline-block
+    margin-left: 13px
+  label.error, input.error
+    color: #ab0101
+  label.valid, input.valid
+    color: #7ad81c
+
+.amnesia
+  input
+    &[type=text]
+      width: 280px
+    &[type=submit]
+      width: 100px
+  .form-input
+    width: 290px
+  .notice
+    a
+      font-size: 1em
+      color: #03cbfd
+    strong
+      color: #fff
+
+
+.amnesia-holder h1
+  font-size: 3.2em !important
+  line-height: 2.2em !important
+
+
+.radio-controls
+  margin-left: 55px
+  margin-top: 40px
+
+.radio-control
+  float: left
+  padding: 0 5px
+  span
+    cursor: pointer
+    display: inline-block
+
+.radio-controls-status
+  clear: both
+  width: 255px
+  margin-left: 50px
+  .inner
+    margin-top: 4px
+
+.radio-control-play
+  width: 96px
+  height: 96px
+  +border-radius(46px)
+  @include controls-sprite(play)
+
+.radio-control-prev, .radio-control-next
+  width: 71px
+  height: 71px
+  +border-radius(30px)
+
+.radio-control-prev
+  @include controls-sprite(pre)
+
+.radio-control-next
+  @include controls-sprite(next)
+
+.radio-control-valign
+  padding-top: 15px
+
+.radio-control-slider
+  float: left
+  width: 100px
+  height: 9px
+  background-color: #030404
+  +background(linear-gradient(#030404, #1f2224))
+  /* FF3.6+
+    border: none */
+  position: relative
+  text-align: left
+  border-radius: 4px
+  margin: 3px 5px
+  margin-top: 4px
+  margin-right: 7px
+  .ui-slider-range
+    left: 0
+    height: 100%
+    top: 0
+    background-position: 0 0
+    display: block
+    font-size: 0.7em
+    position: absolute
+    border-radius: 4px
+    padding-left: 4px
+    +background(linear-gradient(#4d4e50, #828486))
+    /* FF3.6+ */
+  .ui-slider-handle
+    margin-left: -10px
+    margin-top: -4px
+    cursor: default
+    position: absolute
+    outline: none
+    width: 19px
+    height: 19px
+    @include controls-sprite(slider)
+    cursor: pointer
+
+.radio-control-sound, .radio-control-slider
+  margin-right: 9px
+
+.radio-control-sound
+  float: left
+  width: 24px
+  height: 16px
+  cursor: pointer
+  @include controls-sprite(sound)
+  display: none
+
+.radio-control-sound-off
+  @include controls-sprite(sound_off)
+
+.radio-control-hd
+  padding-left: 5px
+  cursor: pointer
+  margin-top: -1px
+  float: left
+  font-size: 1em
+  font-weight: bold
+  color: #666
+  text-shadow: 1px 1px 0px #000
+
+.radio-control-hd-on
+  color: #71cd15
+  text-shadow: 0px 0px 2px #71cd15
+
+.radio-now
+  margin-left: 60px
+  margin-top: 70px
+  clear: both
+  overflow: hidden
+  border: none
+  +opacity(0.8)
+  height: 82px
+  width: 364px
+  position: relative
+  background-image: url('../i/blackberry/nowplaying/background.png')
+  background-repeat: no-repeat
+  display: none
+  img
+    margin-top: 2px
+    margin-left: 2px
+    border-top-left-radius: 3px
+    border-bottom-left-radius: 4px
+    .loading
+      background-image: url('../i/display/loading.png')
+      background-repeat: no-repeat
+      display: block
+  .star
+    position: absolute
+    top: 6px
+    right: 8px
+    width: 25px
+    height: 24px
+    cursor: pointer
+    @include bbstar-sprite(star-add)
+    &:hover
+      @include bbstar-sprite(star-hover)
+  .star-selected
+    @include bbstar-sprite(star-selected)
+    &:hover
+      @include bbstar-sprite(star-selected)
+
+.radio-now-glare
+  border-top-left-radius: 4px
+  display: block
+  height: 80px
+  width: 80px
+  left: 1px
+  top: 2px
+  position: absolute
+  background-image: url('../i/blackberry/nowplaying/glare.png')
+  display: none
+
+.radio-now-content
+  position: absolute
+  top: 0
+  left: 80px
+  padding-left: 20px
+  padding-top: 0.4em
+  height: 80px
+  h1
+    font-size: 1.1em
+    font-weight: bold
+    line-height: 1.4em
+    color: #fff
+    text-shadow: 1px 1px 0px #000
+  p
+    font-size: 0.9em
+    color: #999
+    text-shadow: 1px 1px 0px #000
+  h1, h2, p
+    overflow: hidden
+    max-width: 225px
+    white-space: nowrap
+    margin: 0
+  h2
+    margin-top: -0.2em
+    font-size: 0.8em
+    text-overflow: ellipsis
+  p.station
+    position: absolute
+    bottom: 0.9em
+
+/* content limiter */
+
+.radio-display-head
+  background-image: url('../i/display/background.png')
+  height: 40px
+
+.filters
+  list-style-type: none
+  margin: 0
+  padding: 0
+  width: 80%
+  float: left
+  li
+    float: left
+    margin: 0
+    padding: 0
+    padding-left: 12px
+    line-height: 40px
+  span
+    font-size: 0.8em
+    color: #999
+    cursor: pointer
+  .active
+    color: #f8d222
+    text-shadow: 0px 0px 3px #f8d222
+  .home-link
+    text-indent: -9999px
+    width: 19px
+    height: 19px
+    display: inline-block
+    top: 5px
+    position: relative
+    @include display-sprite(home)
+
+.radio-display-search
+  border: 1px solid #000
+  border-radius: 12px
+  padding-left: 22px
+  max-width: 306px
+  top: 10px
+  right: 12px
+  position: relative
+  width: 17%
+  float: right
+  input
+    background-color: transparent
+    border: none
+    color: #666
+
+.radio-scale
+  background: #f8d202
+  background-image: url('../i/scale/background.png')
+  background-repeat: repeat-x
+  +box-shadow(rgba(white, .4) 0 0 12px 12px inset)
+  height: 200px
+  position: relative
+  .active-station
+    font-weight: bold
+  .scale-inner
+    padding: 20px 0
+  .scale-slider
+    background-image: url('../i/scale/slider.png')
+    background-repeat: repeat-y
+    position: absolute
+    top: 0
+    width: 25px
+    height: 100%
+    left: -25px
+    display: none
+  .empty-line
+    background: none
+    border-bottom: 1px solid #666
+  ul
+    padding: 0
+    margin: 0
+    height: 1em
+    margin-bottom: 30px
+    background-repeat: repeat-x
+    background-position: bottom center
+    background-image: url('../i/scale/line.png')
+    clear: both
+    li
+      text-shadow: 0px 1px 1px #fff
+      float: left
+      padding: 0 5px
+      margin: 0 1em
+      overflow: hidden
+      white-space: nowrap 
+      margin-top: 1px
+      background-image: url('../i/scale/background.png')
+      position: absolute
+      color: #000
+      cursor: pointer
+
+  .line1 li
+    background-position: 0 -20px
+  .line2 li
+    background-position: 0 -66px
+  .line3 li
+    background-position: 0 -112px
+  .line4 li
+    background-position: 0 -158px
+
+.footer
+  position: absolute
+  bottom: 0
+  height: 3em
+  margin-left: 1.5em
+  .left-shift
+    margin-left: -1.2em
+  p
+    line-height: 1.5em
+    color: #666
+  .pseudo-link
+    font-size: 1em
+
+#player-container
+  position: absolute
+  top: -10000px
+  left: -10000px
+
+.realplexor
+  display: none
+
+#spectrum
+  position: absolute
+  top: 190px
+  height: 176px
+  width: 100%
+  left: 0
+  background-color: transparent
+  z-index: -10
+
+.user-profile
+  margin-left: 65px
+  width: 350px
+  height: 50px
+  background-color: #414141
+  border: 1px solid #1d1d1d
+  position: relative
+  +border-radius(4px)
+  +box-shadow(rgba(#1d1d1d, .6) 0 0 3px 2px inset)
+  overflow: hidden
+  .avatar
+    +border-top-left-radius(4px)
+    +border-bottom-left-radius(4px)
+    +box-shadow(rgba(#1d1d1d, .6) 0 0 3px 2px inset)
+    position: absolute
+    top: 0px
+    left: 0px
+    float: left
+  .logout
+    display: block
+    position: absolute
+    right: 0
+    top: 0
+    width: 20px
+    height: 20px
+    cursor: pointer
+    @include profile-sprite(logout)
+    &:hover
+      @include profile-sprite(logout-hover)
+  .content
+    padding: 6px 0
+    margin-left: 10px
+    width: 290px
+    float: right
+    p
+      font-size: 1em
+      line-height: 1.1em
+      text-shadow: 0px 1px 1px #111
+    .favorites
+      @include profile-sprite(favorites)
+    .history
+      @include profile-sprite(history)
+    .settings
+      @include profile-sprite(settings)
+    ul
+      margin-top: 0.4em
+      li
+        float: left
+        margin-right: 10px
+        height: 13px
+        line-height: 8px
+        background-repeat: no-repeat
+        padding-left: 16px
+    a
+      font-size: 0.8em
+      color: #fff
+      text-decoration: none
+      border-bottom: 1px solid #fff
+
+.user-panel
+  width: 52%
+  max-width: 700px
+  background-color: #fff
+  background-image: url('../i/favorites/back.jpg')
+  color: #000
+  position: absolute
+  z-index: 1500
+  top: 60px
+  display: none
+  border: 1px solid #aaa
+  p
+    color: #000
+  .text
+    padding-left: 60px
+    color: #000
+    padding-bottom: 2em
+
+  .close
+    width: 24px
+    height: 24px
+    display: block
+    position: absolute
+    right: -45px
+    top: 0px
+    background-image: url('../i/favorites/close.png')
+    background-repeat: no-repeat
+    cursor: pointer
+    +border-radius(15px)
+  h1
+    font-weight: bold
+    margin-top: 0.5em
+    font-size: 1.6em
+    line-height: 2.5em
+    padding-left: 60px
+    color: #000
+  fieldset
+    padding-top: 5px
+    padding-left: 60px
+    border-top: 1px solid #c1c1c1
+  legend
+    padding: 0 4px
+    font-size: 0.9em
+    margin-left: -4px
+ 
+.user-favorites
+  overflow: auto
+  max-height: 480px
+  .help
+    text-align: center
+    margin: 1em 0 2em 0
+    img
+      margin-top: 2em
+      margin-bottom: 0.5em
+      margin-left: 1em
+    p
+      font-size: 0.95em
+      font-weight: bold
+  table
+    width: 100%
+    background-image: url('../i/favorites/back.jpg')
+    margin-bottom: 1em
+  tr
+    border: 1px solid transparent
+    &:hover
+      .state
+        text-indent: -2000px
+        background-image: url('../i/bbstar/star-selected.png')
+        background-position: center center
+        background-repeat: no-repeat
+        background-color: #fff
+      td
+        background-color: #fff
+  .deleted
+    &:hover
+      .state
+        background-image: url('../i/bbstar/star-deleted.png')
+    h2
+      text-decoration: line-through
+        
+  td
+    padding: 0.5em 0
+    cursor: pointer
+  .state
+    width: 60px
+    text-align: center
+    color: #999
+    font-size: 0.9em
+  h2, h3
+    line-height: 1.2em
+  h2
+    font-weight: bold
+  h3
+    color: #999
+    font-size: 0.9em
+  h2, p, dl
+    color: #000
+
+.user-settings
+  p
+    color: #000
+    font-size: 1em
+  input
+    color: #000
+    font-size: 1em
+    border: 1px solid #ccc
+    padding: 2px 4px
+    +border-radius(3px)
+  button
+    color: #fff
+    border: 1px solid #ccc
+    font-size: 1em
+    +border-radius(5px)
+    +background(linear-gradient(#eb5504, #c14d03))
+  label
+    display: inline-block
+    margin-left: 9px
+    cursor: pointer
+  small
+    font-size: 0.9em
+    color: #666
+    display: block
+    cursor: default
+  li
+    font-size: 0.9em
+    padding-left: 60px
+    margin-bottom: 1em
+  .checkbox-shift li
+    padding-left: 35px
+  .checkbox
+    height: 16px
+    width: 16px
+    display: block
+    float: left
+    clear: left
+    margin-top: 0.14em
+    cursor: pointer
+    @include checkbox-sprite(default)
+    &[data-checked]
+      @include checkbox-sprite(checked) 
+    &[data-disabled]
+      cursor: default
+      @include checkbox-sprite(disabled)
+  .pseudo-link
+    font-size: 1em
+    color: #3366cc
+    margin: 0 0.2em 0.1em
+  .delete-account
+    margin: 0
+  strong
+    font-weight: bold
+
+.about-box
+  text-align: center
+  color: #000
+  font-weight: 0.9em
+  margin: auto 25%
+  width: 50%
+  .pseudo-link
+    color: #000
+    font-size: 1em
+    font-weight: bold
+  img
+    margin-top: 3px
+  p
+    font-size: 0.9em
+    color: #000
+  dl
+    margin-bottom: 0.3em
+    overflow: hidden
+  dt, dd
+    font-size: 0.9em
+    line-height: 1.4em
+  dt
+    text-align: right
+    float: left
+    width: 50%
+  dd
+    font-weight: bold
+    width: 49%
+    text-align: left
+    float: right

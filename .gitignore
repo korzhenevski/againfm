@@ -1,4 +1,6 @@
 *.py[co]
+.idea
+.sass-cache
 
 # Packages
 *.egg
