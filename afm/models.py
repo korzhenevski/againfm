@@ -1,10 +1,15 @@
+# -*- coding: utf-8 -*-
+
 import string
 from . import app, login_manager, db
-from flask.ext.mongokit import Document
+try:
+    from flask.ext.mongokit import Document
+except ImportError:
+    from mongokit import Document
 from hashlib import md5
-#from mongokit import Document
 from bson.objectid import ObjectId
 from random import choice
+from datetime import datetime
 
 def md5hash(data):
     hashed = md5()
@@ -16,10 +21,12 @@ def load_user(user_id):
     user = db.User.get_from_id(ObjectId(user_id))
     return user
 
-@db.register
-class User(Document):
-    __collection__ = 'users'
+class BaseDocument(Document):
     use_dot_notation = True
+
+@db.register
+class User(BaseDocument):
+    __collection__ = 'users'
 
     structure = {
         'name': unicode,
@@ -106,24 +113,109 @@ class User(Document):
             return True
         return False
 
-"""
-class Station(Document):
+@db.register
+class Station(BaseDocument):
     __collection__ = 'stations'
-    use_dot_notation = True
-
     structure = {
         'title': unicode,
-        'website': unicode,
-        'genres': [{}]
+        'website': unicode
     }
 
-class Favorite(Document):
-    __collection__ = 'favorites'
-    use_dot_notation = True
+    def get_public_data(self):
+        return {
+            'id': unicode(self._id),
+            'title': self.title
+        }
+
+@db.register
+class Stream(BaseDocument):
+    __collection__ = 'streams'
     use_autorefs = True
 
     structure = {
-        'user': User,
-        'station': unicode,
+        'station': Station,
+        'url': unicode,
+        'bitrate': int
     }
-"""
+
+@db.register
+class Category(BaseDocument):
+    __collection__ = 'categories'
+    use_autorefs = True
+
+    structure = {
+        'title': unicode,
+        'stations': [Station],
+        'is_public': bool
+    }
+
+    def get_public_data(self):
+        return {
+            'id': unicode(self._id),
+            'title': self.title
+        }
+
+@db.register
+class Track(BaseDocument):
+    __collection__ = 'tracks'
+
+    structure = {
+        'artist': unicode,
+        'name': unicode,
+        'title': unicode,
+        'cover_url': unicode,
+        'tags': [unicode],
+        'mbid': unicode,
+        'created_at': datetime,
+    }
+
+    default_values = {
+        'created_at': datetime.utcnow,
+    }
+
+@db.register
+class StreamTitle(BaseDocument):
+    __collection__ = 'stream_titles'
+    use_autorefs = True
+
+    structure = {
+        # сырой заголовок из потока
+        'title': unicode,
+        # нормализованный трек из внешней базы (last.fm, etc.)
+        'track': {
+            'id': ObjectId,
+            'title': unicode,
+            'cover_url': unicode,
+        },
+        'stream_id': ObjectId,
+        'created_at': datetime,
+    }
+
+    default_values = {
+        'created_at': datetime.utcnow,
+    }
+
+@db.register
+class Favorite(BaseDocument):
+    __collection__ = 'favorites'
+    use_autorefs = True
+
+    structure = {
+        'station': Station,
+        'stream_title': StreamTitle,
+        'user_id': ObjectId,
+        'created_at': datetime,
+        # mongodb hack
+        # вместо bool, мы увеличиваем значение
+        # и активными считаются все active % 2 == 0
+        'active': int
+    }
+
+    default_values = {
+        'created_at': datetime.utcnow,
+        'active': 0
+    }
+
+    @property
+    def is_active(self):
+        return not self.active % 2

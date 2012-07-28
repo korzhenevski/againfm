@@ -105,22 +105,28 @@ def login():
     else:
         return jsonify({'error': 'No such account'}), 401
 
+@app.route('/api/playlist/<ObjectId:category_id>')
+def playlist(category_id):
+    category = db.Category.get_from_id(category_id)
+    stations = [station.get_public_data() for station in category.stations]
+    return jsonify({'objects': stations})
+
 @app.route('/')
 def index():
+    categories = [category.get_public_data() for category in db.Category.find({'is_public': True})]
+    bootstrap = {
+        'user': {},
+        'settings': {},
+        'categories': categories,
+    }
+    if current_user.is_authenticated():
+        bootstrap['user'] = current_user.get_public_data()
+        bootstrap['settings'] = current_user.settings
+
     context = {
         'sitename': 'Again.FM',
         'STATIC_URL': '/static/',
-        'bootstrap': {
-            'user': {},
-            'settings': {}
-        }
+        'bootstrap': bootstrap
     }
-    if current_user.is_authenticated():
-        context['bootstrap']['user'] = current_user.get_public_data()
-        context['bootstrap']['settings'] = current_user.settings
     return render_template('index.html', **context)
 
-@app.route('/queue')
-def queue():
-    send_mail.delay(subject='blabla', email='blabla@testingfdsgdf.com', body='bogus')
-    return 'ok'
