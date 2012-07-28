@@ -9,11 +9,6 @@ manager = Manager(app)
 
 @manager.command
 def test():
-    for i in xrange(10):
-        cat = db.Category.find_random()
-        cat.is_public = True
-        cat.save()
-        print cat.title
     """
     user = db.User.find_one({'email': 'yura.nevsky@gmail.com'})
     for fav in db.Favorite.find({'user_id': user._id}):
@@ -76,7 +71,12 @@ def gen():
             cat.stations.append(choice(stations))
         cat.save()
         print cat._id
-        #print db.User.find_one({'email': 'yura.nevsky@gmail.com'})
+
+    for i in xrange(10):
+        cat = db.Category.find_random()
+        cat.is_public = True
+        cat.save()
+        print cat.title
 
 @manager.command
 def clear():

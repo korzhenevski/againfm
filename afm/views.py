@@ -1,10 +1,17 @@
-from . import app, db, login_manager
+from . import app, db, login_manager, tasks
 from .forms import RegisterForm
-from .tasks import send_mail
 from flask import jsonify, request, render_template, redirect, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
+from collections import defaultdict
+from random import choice
 
 # TODO: guards
+
+def send_mail(**kwargs):
+    if app.debug:
+        # don't send mail in debug env
+        return
+    return tasks.send_mail.delay(**kwargs)
 
 @login_manager.unauthorized_handler
 def unauthorized():
@@ -31,7 +38,7 @@ def password_reset():
     if user:
         password, token = user.generate_new_password()
         body = render_template('mail/password_reset.html', user=user, password=password, token=token)
-        send_mail.delay(subject='Reset password on Again.FM', email=user.email, body=body)
+        send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
         email_provider = get_email_provider(user.email)
         return jsonify({'email_provider': email_provider, 'status': True})
     return jsonify({'error': {'email': 'No such user'}})
@@ -52,7 +59,7 @@ def register():
     login_user(user)
     # send welcome email
     body = render_template('mail/welcome.html', user=user)
-    send_mail.delay(subject='Welcome to Again.FM', email=user.email, body=body)
+    send_mail(subject='Welcome to Again.FM', email=user.email, body=body)
     return jsonify(user.get_public_data())
 
 @app.route('/api/user/logout', methods=['DELETE'])
@@ -107,7 +114,7 @@ def login():
 
 @app.route('/api/playlist/<ObjectId:category_id>')
 def playlist(category_id):
-    category = db.Category.get_from_id(category_id)
+    category = db.Category.get_or_404(category_id)
     stations = [station.get_public_data() for station in category.stations]
     return jsonify({'objects': stations})
 
@@ -130,3 +137,23 @@ def index():
     }
     return render_template('index.html', **context)
 
+@app.route('/api/station/<ObjectId:station_id>')
+def station_detail(station_id):
+    station = db.Station.get_or_404(station_id)
+    return jsonify(station.get_public_data())
+
+# http://service.againfm.local/listen/5013ea731d41c80efe0cc300?redirect=true
+@app.route('/api/listen/<ObjectId:station_id>')
+def listen(station_id):
+    #station = db.Station.get_or_404(station_id)
+    streams = defaultdict(list)
+    for stream in db.Stream.find({'station.$id': station_id}):
+        streams[stream.bitrate].append(stream.web_url)
+    if not streams:
+        return jsonify({'error': 'no active streams'}), 404
+    low_bitrate = bool(request.args.get('low_bitrate'))
+    streams = sorted(streams.iteritems(), reverse=low_bitrate)
+    stream_url = choice(streams.pop()[1])
+    if request.args.get('redirect'):
+        return redirect(stream_url)
+    return jsonify({'stream_url': stream_url})

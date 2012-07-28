@@ -30,7 +30,7 @@
 
             return val.length > 0;
         },
-        html5_support: function () {
+        html5_support: function() {
             var i = document.createElement('input');
             return 'placeholder' in i;
         }

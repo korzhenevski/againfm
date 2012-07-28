@@ -135,7 +135,22 @@ class Stream(BaseDocument):
     structure = {
         'station': Station,
         'url': unicode,
+        'is_shoutcast': bool,
         'bitrate': int
+    }
+
+    @property
+    def web_url(self):
+        # если поток вешается через шауткаст,
+        # то для веб-плееров добавляем ";"
+        # иначе показывается страница статистики
+        if self.is_shoutcast:
+            return self.url + u';'
+        return self.url
+
+    default_values = {
+        'is_shoutcast': False,
+        'bitrate': 0
     }
 
 @db.register

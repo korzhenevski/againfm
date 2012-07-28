@@ -410,7 +410,8 @@ App.UserSettingsView = App.UserPanelView.extend({
         'click .change-name': 'changeName',
         'click .password-reset': 'passwordReset',
         'click .show-password-change': 'showPasswordChange',
-        'click .change-password': 'changePassword'
+        'click .change-password': 'changePassword',
+        'keyup .name': 'nameKeyup'
     },
 
     initialize: function() {
@@ -448,15 +449,31 @@ App.UserSettingsView = App.UserPanelView.extend({
         return false;
     },
 
-    changeName: function(e) {
+    nameKeyup: function(e) {
+        var $button = this.$el.find('button.change-name');
+        var el = e.target;
+        var $name = $(el);
+        if (e.which == 13 && !$button.is(':disabled')) {
+            this.changeName();
+            return;
+        }
+        if (!$.data(el, 'lastval') || $.data(el, 'lastval') != $name.val()) {
+            $.data(el, 'lastval', $name.val());
+            $button.enable();
+        }
+    },
+
+    changeName: function() {
         var $name = this.$el.find('input.name');
         var name = $.trim($name.val());
         var $button = this.$el.find('button.change-name');
         // check new name presence and difference
         if (name) {
             $button.button('changing').disable();
+            $name.val(name).disable();
             var act = App.user.changeName(name).always(_.delay(function() {
-                $button.button('reset').disable();
+                $button.button('reset');
+                $name.enable();
             }, 1000));
         }
         return false;
@@ -731,8 +748,9 @@ App.Playlist = App.Collection.extend({
 
 App.Filter = App.Model.extend({
     defaults: {
+        order: 10,
         role: 'category',
-        hidden: false
+        hidden: false,
     },
     show: function() {
         this.set('hidden', false);
@@ -752,6 +770,7 @@ App.Filter = App.Model.extend({
 
 App.HomeFilter = App.Filter.extend({
     defaults: {
+        order: 0,
         id: 'home',
         role: 'home',
         is_active: true
@@ -760,6 +779,7 @@ App.HomeFilter = App.Filter.extend({
 
 App.HistoryFilter = App.Filter.extend({
     defaults: {
+        order: 5,
         title: gettext('History'),
         id: 'history',
         role: 'history',
@@ -771,7 +791,7 @@ App.Filters = App.Collection.extend({
     model: App.Filter,
     url: '/api/playlist/categories/',
     comparator: function(model) {
-        return model.get('title');
+        return model.get('order');
     },
     unselect: function() {
         return _.invoke(this.where({'is_active': true}), 'unselect');
@@ -1484,7 +1504,6 @@ App.setup = function(bootstrap) {
     $.getCachedScript(App.settings.STATIC_URL + 'js/swfobject.js').done(function() {
         App.player.embedTo('player-container', {
             volume: App.controls.volume,
-            api_host: App.settings.PLAYER_API_HOST,
             process_spectrum: App.spectrum.isSupported(),
             throttle_traffic: App.user.settings.trafficThrottling()
         });

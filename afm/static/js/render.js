@@ -62,7 +62,7 @@ Handlebars.registerHelper('trans', function(fn) {
 
 Handlebars.registerHelper('checkbox', function(option) {
     if (! (option && option.name) ) return;
-    var html = '<div class="checkbox" data-name="'+option.name+'"';
+    var html = '<div class="checkbox" id="'+option.name+'" data-name="'+option.name+'"';
     html += (option.value ? ' data-checked="true"' : '');
     html += '></div>';
     return new Handlebars.SafeString(html);

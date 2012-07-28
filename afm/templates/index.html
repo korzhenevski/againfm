@@ -15,13 +15,13 @@
                     <img src="{{ STATIC_URL }}i/logo.png" width="308" height="135" class="logo" alt="logo" />
                     <div class="radio-controls">
                         <div class="radio-control radio-control-valign">
-                            <span class="radio-control-prev" title="{{ _('previous radio') }}"></span>
+                            <span class="radio-control-prev"></span>
                         </div>
                         <div class="radio-control">
                             <span class="radio-control-play"></span>
                         </div>
                         <div class="radio-control radio-control-valign">
-                            <span class="radio-control-next" title="{{ _('next radio') }}"></span>
+                            <span class="radio-control-next"></span>
                         </div>
                         <div class="radio-controls-status">
                             <div class="inner">
@@ -233,21 +233,23 @@
                 <ul class="checkbox-shift">
                     <li>
                         {{checkbox settings.throttle_traffic}}
-                        <label>
+                        <label for="throttle_traffic">
                             {{#trans}}Disable covers and lowering the sound quality to save bandwidth{{/trans}}
                             <small>{{#trans}}turn it on in case slow or expensive internet{{/trans}}</small>
                         </label>
                     </li>
                     <li>
                         {{checkbox settings.limit_night_volume}}
-                        <label>
+                        <label for="limit_night_volume">
                             {{#trans}}Limit the startup sound at night{{/trans}}
                             <small>{{#trans}}to protect the ears volume will be set at 30%{{/trans}}</small>
                         </label>
                     </li>
                     <li>
                         {{checkbox settings.fading_sound}}
-                        <label>{{#trans}}Fading the sound when the player is turned off{{/trans}}</label>
+                        <label for="fading_sound">
+                            {{#trans}}Fading the sound when the player is turned off{{/trans}}
+                        </label>
                     </li>
                 </ul>
                 <!--fieldset>
@@ -321,7 +323,6 @@
                 App.settings = {
                     DEFAULT_VOLUME: 80,
                     NIGHT_VOLUME: 30,
-                    PLAYER_API_HOST: 'service.' + document.domain,
                     STATIC_URL: '/static/',
                     LIVESTREAM_URL: 'http://live.' + document.domain
                 }

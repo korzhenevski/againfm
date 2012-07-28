@@ -76,8 +76,7 @@ $.fn.enable = function() {
 $.fn.placeholder = function() {
     return this.find('input:text,input:password').watermark('', {
         color: '#999',
-        left: -3,
-        fallback: $.browser.webkit
+        left: -3
     });
 };
 

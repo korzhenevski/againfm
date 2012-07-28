@@ -103,7 +103,7 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .radio-controls { margin-left: 55px; margin-top: 40px; }
 
 .radio-control { float: left; padding: 0 5px; }
-.radio-control span { cursor: pointer; display: inline-block; }
+.radio-control span { display: inline-block; }
 
 .radio-controls-status { clear: both; width: 255px; margin-left: 50px; }
 .radio-controls-status .inner { margin-top: 4px; }
@@ -123,22 +123,22 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 
 .radio-control-slider { float: left; width: 100px; height: 9px; background-color: #030404; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #030404), color-stop(100%, #1f2224)); background: -webkit-linear-gradient(#030404, #1f2224); background: -moz-linear-gradient(#030404, #1f2224); background: -o-linear-gradient(#030404, #1f2224); background: -ms-linear-gradient(#030404, #1f2224); background: linear-gradient(#030404, #1f2224); /* FF3.6+ border: none */ position: relative; text-align: left; border-radius: 4px; margin: 3px 5px; margin-top: 4px; margin-right: 7px; }
 .radio-control-slider .ui-slider-range { left: 0; height: 100%; top: 0; background-position: 0 0; display: block; font-size: 0.7em; position: absolute; border-radius: 4px; padding-left: 4px; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4d4e50), color-stop(100%, #828486)); background: -webkit-linear-gradient(#4d4e50, #828486); background: -moz-linear-gradient(#4d4e50, #828486); background: -o-linear-gradient(#4d4e50, #828486); background: -ms-linear-gradient(#4d4e50, #828486); background: linear-gradient(#4d4e50, #828486); /* FF3.6+ */ }
-.radio-control-slider .ui-slider-handle { margin-left: -10px; margin-top: -4px; cursor: default; position: absolute; outline: none; width: 19px; height: 19px; background-position: 0 -476px; cursor: pointer; }
+.radio-control-slider .ui-slider-handle { margin-left: -10px; margin-top: -4px; cursor: default; position: absolute; outline: none; width: 19px; height: 19px; background-position: 0 -476px; }
 
 .radio-control-sound, .radio-control-slider { margin-right: 9px; }
 
-.radio-control-sound { float: left; width: 24px; height: 16px; cursor: pointer; background-position: 0 -495px; display: none; }
+.radio-control-sound { float: left; width: 24px; height: 16px; background-position: 0 -495px; display: none; }
 
 .radio-control-sound-off { background-position: 0 -511px; }
 
-.radio-control-hd { padding-left: 5px; cursor: pointer; margin-top: -1px; float: left; font-size: 1em; font-weight: bold; color: #666666; text-shadow: 1px 1px 0px black; }
+.radio-control-hd { padding-left: 5px; margin-top: -1px; float: left; font-size: 1em; font-weight: bold; color: #666666; text-shadow: 1px 1px 0px black; }
 
 .radio-control-hd-on { color: #71cd15; text-shadow: 0px 0px 2px #71cd15; }
 
 .radio-now { margin-left: 60px; margin-top: 70px; clear: both; overflow: hidden; border: none; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); opacity: 0.8; height: 82px; width: 364px; position: relative; background-image: url("../i/blackberry/nowplaying/background.png"); background-repeat: no-repeat; display: none; }
 .radio-now img { margin-top: 2px; margin-left: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 4px; }
 .radio-now img .loading { background-image: url("../i/display/loading.png"); background-repeat: no-repeat; display: block; }
-.radio-now .star { position: absolute; top: 6px; right: 8px; width: 25px; height: 24px; cursor: pointer; background-position: 0 0; }
+.radio-now .star { position: absolute; top: 6px; right: 8px; width: 25px; height: 24px; background-position: 0 0; }
 .radio-now .star:hover { background-position: 0 -48px; }
 .radio-now .star-selected { background-position: 0 -72px; }
 .radio-now .star-selected:hover { background-position: 0 -72px; }
@@ -202,7 +202,7 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .user-profile .content ul li { float: left; margin-right: 10px; height: 13px; line-height: 8px; background-repeat: no-repeat; padding-left: 16px; }
 .user-profile .content a { font-size: 0.8em; color: white; text-decoration: none; border-bottom: 1px solid white; }
 
-.user-panel { width: 52%; max-width: 700px; background-color: white; background-image: url("../i/favorites/back.jpg"); color: black; position: absolute; z-index: 1500; top: 60px; display: none; border: 1px solid #aaaaaa; }
+.user-panel { width: 52%; max-width: 700px; background-color: white; background-image: url("../i/favorites/back.jpg"); color: black; position: absolute; z-index: 1500; top: 60px; display: none; border: 1px solid #aaaaaa; padding-bottom: 1em; }
 .user-panel p { color: black; }
 .user-panel .text { padding-left: 60px; color: black; padding-bottom: 2em; }
 .user-panel .close { width: 24px; height: 24px; display: block; position: absolute; right: -45px; top: 0px; background-image: url("../i/favorites/close.png"); background-repeat: no-repeat; cursor: pointer; -moz-border-radius: 15px; -webkit-border-radius: 15px; -o-border-radius: 15px; -ms-border-radius: 15px; -khtml-border-radius: 15px; border-radius: 15px; }
