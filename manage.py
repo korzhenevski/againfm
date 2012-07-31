@@ -67,8 +67,8 @@ def gen():
     for i in xrange(20):
         cat = db.Category()
         cat.title = u'cat %s' % i
-        for i2 in xrange(100):
-            cat.stations.append(choice(stations))
+        for i2 in xrange(500):
+            cat.stations.append(choice(stations)._id)
         cat.save()
         print cat._id
 

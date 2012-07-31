@@ -5,7 +5,7 @@
         <meta charset="utf-8" />
         <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
 
-        <link href="{{ STATIC_URL }}css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+        <link href="{{ STATIC_URL }}css/screen.css" media="screen, projection" rel="stylesheet" />
     </head>
     <body>
         <div class="wrapper">
@@ -63,13 +63,21 @@
                         <ul class="filters"></ul>
                     </div>
                 </div>
-                <div class="radio-scale">
-                    <div class="about-box"></div>
-                    <div class="scale-inner"></div>
-                    <div class="scale-slider"></div>
+                <div class="radio-scroll">
+                    <div class="radio-scale viewport">
+                        <div class="scale-inner overview"></div>
+                        <div class="scale-slider"></div>
+                    </div>
+                    <div class="scrollbar">
+                        <div class="track">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
+
         <div class="footer">
             <p>{{ sitename}} {{ _('is irrelevant and is not responsible for any radio ads.') }}</p>
             <p class="left-shift">
@@ -310,6 +318,7 @@
         <script src="{{ STATIC_URL }}js/jquery.watermark.js"></script>
         <script src="{{ STATIC_URL }}js/jquery.validate.js"></script>
         <script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.tinyscrollbar.js"></script>
         <script src="{{ STATIC_URL }}js/bootstrap-button.js"></script>
         <script src="{{ STATIC_URL }}js/underscore.js"></script>
         <script src="{{ STATIC_URL }}js/backbone.js"></script>
@@ -332,6 +341,7 @@
                 _.each(['small-logo.png', 'radionow.png'], function(img){
                     preloadImage(App.settings.STATIC_URL + 'i/' + img);
                 });
+
             });
         </script>
     </body>

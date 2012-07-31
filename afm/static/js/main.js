@@ -750,7 +750,7 @@ App.Filter = App.Model.extend({
     defaults: {
         order: 10,
         role: 'category',
-        hidden: false,
+        hidden: false
     },
     show: function() {
         this.set('hidden', false);
@@ -847,7 +847,22 @@ App.RadioDisplayView = App.View.extend({
         this.playlist.on('reset', this.toggleSliderVisibility, this);
         this.playlist.on('reset', this.render, this);
         this.playlist.on('change_station', this.select, this);
+        /*this.iscroll = new iScroll('radio-scale', {
+            'bounce': false,
+            'momentum': false,
+            'fadeScrollbar': false,
+            'vScroll': false
+        });*/
+        this.setupScroll();
         this.$slider = $(options.slider);
+    },
+
+    setupScroll: function() {
+        $('.radio-scroll').tinyscrollbar({axis: 'x'});
+    },
+
+    updateScroll: function() {
+        $('.radio-scroll').tinyscrollbar_update();
     },
 
     render: function() {
@@ -856,8 +871,7 @@ App.RadioDisplayView = App.View.extend({
             MAX_LINES = 4;
 
         var space = 150 - Math.round(Math.log(this.playlist.length) * 20);
-        var maxWidth = this.$el.parent().width() - space;
-        var maxLimit = Math.round(maxWidth / SLIDER_SIZE);
+        var maxLimit = Math.round(this.playlist.length * SLIDER_SIZE);
         var lines = 4;
 
         /*
@@ -866,7 +880,8 @@ App.RadioDisplayView = App.View.extend({
          * lines > MAX_LINES && (lines = MAX_LINES); lines || (lines = 1);
          **/
         for (var limits = [], linesHTML = [], i = 1; i <= lines; i++) {
-            limits.push(0), linesHTML.push('<ul class="line' + i + '"></ul>');
+            limits.push(0);
+            linesHTML.push('<ul class="line' + i + '"></ul>');
         }
 
         this.$el.html(linesHTML.join(''));
@@ -905,6 +920,15 @@ App.RadioDisplayView = App.View.extend({
                 $line.addClass('empty-line');
             }
         });
+
+        var scrollable = (_.max(limits) > $(window).width());
+        if (scrollable) {
+            this.$el.css('width', _.max(limits));
+        } else {
+            this.$el.css('width', '100%');
+        }
+        $('.radio-scale').toggleClass('movable', scrollable);
+        this.updateScroll();
 
         // TODO: dirty hack
         if (this.playlist.currentId) {

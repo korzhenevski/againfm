@@ -160,7 +160,7 @@ class Category(BaseDocument):
 
     structure = {
         'title': unicode,
-        'stations': [Station],
+        'stations': [ObjectId],
         'is_public': bool
     }
 

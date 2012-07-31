@@ -51,7 +51,7 @@ a.logo { line-height: 0px; height: 0px; font-size: 0px; border: none; }
 
 .wrapper { background-image: url("../i/background_pattern.png"); position: relative; min-height: 100%; }
 
-.main { padding-bottom: 3em; }
+.main { padding-bottom: 5em; }
 
 .wrapper-left { overflow: hidden; float: left; width: 420px; height: 340px; }
 
@@ -153,11 +153,13 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .radio-now-content p.station { position: absolute; bottom: 0.9em; }
 
 /* content limiter */
+.radio-display { -moz-user-select: none; -webkit-user-select: none; -khtml-user-select: none; user-select: none; }
+
 .radio-display-head { background-image: url("../i/display/background.png"); height: 40px; }
 
 .filters { list-style-type: none; margin: 0; padding: 0; width: 80%; float: left; }
 .filters li { float: left; margin: 0; padding: 0; padding-left: 12px; line-height: 40px; }
-.filters span { font-size: 0.8em; color: #999999; cursor: pointer; }
+.filters span { font-size: 12px; color: #999999; cursor: pointer; }
 .filters .active { color: #f8d222; text-shadow: 0px 0px 3px #f8d222; }
 .filters .home-link { text-indent: -9999px; width: 19px; height: 19px; display: inline-block; top: 5px; position: relative; background-position: 0 0; }
 .filters .home-link:hover, .filters .home-link.home_hover, .filters .home-link.home-hover { background-position: 0 -38px; }
@@ -166,16 +168,19 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .radio-display-search { border: 1px solid black; border-radius: 12px; padding-left: 22px; max-width: 306px; top: 10px; right: 12px; position: relative; width: 17%; float: right; }
 .radio-display-search input { background-color: transparent; border: none; color: #666666; }
 
-.radio-scale { background: #f8d202; background-image: url("../i/scale/background.png"); background-repeat: repeat-x; -moz-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; -webkit-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; -o-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; height: 200px; position: relative; }
+.movable { cursor: move; }
+
+.radio-scale { background: #f8d202; background-image: url("../i/scale/background.png"); background-repeat: repeat-x; height: 200px; position: relative; width: 100%; overflow: hidden; -moz-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; -webkit-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; -o-box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; box-shadow: rgba(255, 255, 255, 0.4) 0 0 12px 12px inset; -moz-user-select: none; -webkit-user-select: none; -khtml-user-select: none; user-select: none; }
 .radio-scale .active-station { font-weight: bold; }
 .radio-scale .scale-inner { padding: 20px 0; }
 .radio-scale .scale-slider { background-image: url("../i/scale/slider.png"); background-repeat: repeat-y; position: absolute; top: 0; width: 25px; height: 100%; left: -25px; display: none; }
 .radio-scale .empty-line { background: none; border-bottom: 1px solid #666666; }
 .radio-scale ul { padding: 0; margin: 0; height: 1em; margin-bottom: 30px; background-repeat: repeat-x; background-position: bottom center; background-image: url("../i/scale/line.png"); clear: both; }
-.radio-scale ul li { text-shadow: 0px 1px 1px white; float: left; padding: 0 5px; margin: 0 1em; overflow: hidden; white-space: nowrap; margin-top: 1px; background-image: url("../i/scale/background.png"); position: absolute; color: black; cursor: pointer; }
+.radio-scale ul li { text-shadow: 0px 1px 1px white; float: left; padding: 0 5px; margin: 0 1em; overflow: hidden; white-space: nowrap; margin-top: 1px; background-image: url("../i/scale/background.png"); position: absolute; color: black; cursor: pointer; font-size: 14px; }
 .radio-scale .line1 li { background-position: 0 -20px; }
 .radio-scale .line2 li { background-position: 0 -66px; }
 .radio-scale .line3 li { background-position: 0 -112px; }
+.radio-scale .line4 { margin-bottom: 0; }
 .radio-scale .line4 li { background-position: 0 -158px; }
 
 .footer { position: absolute; bottom: 0; height: 3em; margin-left: 1.5em; }
@@ -249,3 +254,12 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .about-box dt, .about-box dd { font-size: 0.9em; line-height: 1.4em; }
 .about-box dt { text-align: right; float: left; width: 50%; }
 .about-box dd { font-weight: bold; width: 49%; text-align: left; float: right; }
+
+.scroller { position: absolute; z-index: 1; }
+
+.radio-scroll { position: absolute; width: 100%; }
+.radio-scroll .overview { position: absolute; }
+.radio-scroll .scrollbar { position: relative; float: right; width: 15px; }
+.radio-scroll .track { margin-top: -10px; background-color: #d8eefd; height: 100%; width: 13px; position: relative; display: none; }
+.radio-scroll .thumb { background-color: black; -moz-border-radius: 5px; -webkit-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; -khtml-border-radius: 5px; border-radius: 5px; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40); opacity: 0.4; height: 7px; width: 13px; cursor: pointer; overflow: hidden; position: absolute; top: 0; }
+.radio-scroll .disable { display: none; }

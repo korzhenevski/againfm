@@ -4,6 +4,7 @@ from flask import jsonify, request, render_template, redirect, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from collections import defaultdict
 from random import choice
+from random import randint
 
 # TODO: guards
 
@@ -115,7 +116,8 @@ def login():
 @app.route('/api/playlist/<ObjectId:category_id>')
 def playlist(category_id):
     category = db.Category.get_or_404(category_id)
-    stations = [station.get_public_data() for station in category.stations]
+    #stations = [station.get_public_data() for station in category.stations]
+    stations = [{'id': randint(10000, 999999), 'title': unicode(category_id)} for i in xrange(100)]
     return jsonify({'objects': stations})
 
 @app.route('/')
