@@ -20,7 +20,6 @@ App.Model = Backbone.Model.extend({
     }
 });
 
-
 App.View = Backbone.View.extend({
     show: function() {
         this.$el.show();
@@ -515,7 +514,7 @@ App.TopHolderView = App.View.extend({
     show: function() {
         this.$el.show().animate({
             'margin-top': 0
-        }, 500, _.bind(function() {
+        }, 300, 'linear', _.bind(function() {
             this.$el.find(':text:first').focus();
             this.$el.find('.close-box').fadeIn();
         }, this));
@@ -525,7 +524,7 @@ App.TopHolderView = App.View.extend({
         this.$el.find('.close-box').fadeOut();
         this.$el.animate({
             'margin-top': this.$el.height() * -1
-        }, 500, _.bind(function() {
+        }, 300, 'linear', _.bind(function() {
             this.$el.hide();
         }, this));
     },
@@ -658,21 +657,42 @@ App.UserAmnesiaView = App.TopHolderView.extend({
     }
 });
 
+App.PlayMediator = App.Model.extend({
+    setStation: function(station) {
+        this.station = station;
+        this.selectStream();
+        this.trigger('change_station', this);
+    },
+
+    setStream: function(stream) {
+        this.stream = stream;
+        this.trigger('change_stream', this);
+    },
+
+    selectStream: function() {
+        if (!this.station) {
+            return;
+        }
+        var self = this;
+        $.getJSON('/api/stream_for_station/' + this.station.get('id'), {
+            'low_bitrate': App.user.settings.trafficThrottling()
+        }).success(function(stream){
+            self.setStream(stream);
+        }).error(function(){
+            self.setStream(null);
+        });
+    },
+
+    getStatusChannel: function() {
+        return this.station.get('id') + '_' + this.station.get('id');
+    }
+});
 
 App.Station = App.Model.extend({
     urlRoot: '/api/station/',
     defaults: {
         title: gettext('Untitled'),
         image: ''
-    },
-    // TODO: refactoring
-    assign: function(model) {
-        if (!model || model.id == this.id) {
-            return;
-        }
-        this.set(model.attributes, {silent: true}).fetch();
-        App.player.loadStreamById(model.id, true);
-        this.trigger('assign', model);
     }
 });
 
@@ -847,12 +867,6 @@ App.RadioDisplayView = App.View.extend({
         this.playlist.on('reset', this.toggleSliderVisibility, this);
         this.playlist.on('reset', this.render, this);
         this.playlist.on('change_station', this.select, this);
-        /*this.iscroll = new iScroll('radio-scale', {
-            'bounce': false,
-            'momentum': false,
-            'fadeScrollbar': false,
-            'vScroll': false
-        });*/
         this.setupScroll();
         this.$slider = $(options.slider);
     },
@@ -985,13 +999,14 @@ _.extend(App.Player.prototype, Backbone.Events, {
                 }, this);
             }
         }, this);
+        var self = this;
         var settings = App.user.settings;
         settings.on('change:fading_sound', function(obj, value) {
-            this.fading = value;
+            self.fading = value;
         }, this);
-        settings.on('change:throttle_traffic', function(obj, value) {
-            this.throttleTraffic(value);
-        }, this);
+        App.play.on('change_stream', function(mediator) {
+            self.loadStreamByUrl(mediator.stream['url'], true);
+        });
     },
     pauseStream: function() {
         this._player[this.fading ? 'pauseStreamWithFade' : 'pauseStream']();
@@ -999,8 +1014,8 @@ _.extend(App.Player.prototype, Backbone.Events, {
     stopStream: function() {
         this._player[this.fading ? 'stopStreamWithFade' : 'stopStream']();
     },
-    loadStreamById: function(streamId, startPlay) {
-        this._player.loadStreamById(streamId, startPlay);
+    loadStreamByUrl: function(url, startPlay) {
+        this._player.loadStreamByUrl(url, startPlay);
     },
     setVolume: function(volume) {
         this._player.setVolume(volume);
@@ -1060,8 +1075,7 @@ App.RadioNowView = App.View.extend({
         this.content.on('change', this.stopUnavailableTimer, this);
         this.content.on('change', this.render);
 
-        this.station = options.station;
-        this.station.on('change', this.stationChanged);
+        App.play.on('change_station', this.stationChanged);
 
         var user = App.user;
         user.on('logged logout', this.render);
@@ -1073,20 +1087,18 @@ App.RadioNowView = App.View.extend({
         preloadImage(this.imageNotfound, this.imageLoading);
     },
 
-    stationChanged: function(station) {
-        this.content.set({station_title: station.get('title')}, {silent: true});
-        if (station.onair) {
-            this.statusUpdate(station.onair);
-        } else {
-            this.content.set({
-                title: gettext('Loading...'),
-                caption: '',
-                image_url: this.imageLoading,
-                meta_id: null
-            });
-            this.startUnavailableTimer();
-        }
-        this.subscribeStatusUpdate(station, this.statusUpdate);
+    stationChanged: function(mediator) {
+        this.content.set({
+            station_title: mediator.station.get('title')
+        }, {silent: true});
+        this.content.set({
+            title: gettext('Loading...'),
+            caption: '',
+            image_url: this.imageLoading,
+            meta_id: null
+        });
+        this.startUnavailableTimer();
+        this.subscribeStatusUpdate(mediator.getStatusChannel(), this.statusUpdate);
     },
 
     startUnavailableTimer: function() {
@@ -1100,26 +1112,18 @@ App.RadioNowView = App.View.extend({
         }
     },
 
-    subscribeStatusUpdate: function(station, onStatusUpdate) {
-        var live = App.live;
-        if (!live) {
+    subscribeStatusUpdate: function(channel, onStatusUpdate) {
+        var livestream = App.livestream;
+        if (!livestream) {
             return;
         }
-        var prevChannel = station.previous('channel');
-        if (prevChannel) {
-            live.unsubscribe(prevChannel);
-        }
-        var onair = station.onair;
-        var cursor = (onair && onair.id) ? onair.id : 0;
-        var channel = station.get('channel');
-        live.setCursor(channel, cursor);
-        live.subscribe(channel, onStatusUpdate);
-        live.execute();
+        var params = App.user.isLogged() ? {'user_id': App.user.get('id')} : {};
+        livestream.subscribe(channel, params, onStatusUpdate);
     },
 
     statusUpdate: function(status) {
         var data = {};
-        if (!status.station_id || status.station_id == this.station.get('id')) {
+        if (!status.station_id) {
             if (status.artist && status.trackname) {
                 data.title = status.trackname;
                 data.caption = status.artist;
@@ -1153,9 +1157,6 @@ App.RadioNowView = App.View.extend({
     },
 
     render: function() {
-        if (!this.station.has('id')) {
-            return;
-        }
         var html = render.radio_now(this.getContent());
         this.$el.show().html(html);
         this.marqueeTitle();
@@ -1353,6 +1354,7 @@ App.RadioControlsView = App.View.extend({
     },
 
     initialize: function() {
+        App.play.on('change_stream', _.bind(this.toggleHdIndicator, this));
         var vol = $.cookie('volume');
         var isNightLimit = App.user.settings.hasNightVolumeLimit();
         if (vol !== null) {
@@ -1363,6 +1365,15 @@ App.RadioControlsView = App.View.extend({
         this.$el.find('.radio-control-sound').toggleClass('radio-control-sound-off', this.volume === 0).show();
         this.isMuted = false;
         this.render();
+    },
+
+    toggleHdIndicator: function(mediator) {
+        var $indicator = this.$el.find('.radio-control-hd');
+        if (mediator.stream.is_hd) {
+            $indicator.show();
+        } else {
+            $indicator.hide();
+        }
     },
 
     render: function() {
@@ -1455,7 +1466,7 @@ App.TosView = App.UserPanelView.extend({
 App.PlayHistory = App.Collection.extend({
     model: App.Station,
     initialize: function() {
-        App.current_station.on('assign', this.add, this);
+        App.play.on('change_station', this.add, this);
     }
 });
 
@@ -1498,6 +1509,7 @@ App.Router = Backbone.Router.extend({
 });
 
 App.setup = function(bootstrap) {
+    App.livestream = new Comet(App.settings['COMET_URL']);
     App.filters = new App.Filters();
     App.playlist = new App.Playlist();
     App.user = new App.User(bootstrap.user);
@@ -1516,6 +1528,7 @@ App.setup = function(bootstrap) {
         slider: $('.scale-slider')
     });
 
+    App.play = new App.PlayMediator();
     App.current_station = new App.Station();
     App.controls = new App.RadioControlsView();
 
@@ -1528,22 +1541,20 @@ App.setup = function(bootstrap) {
     $.getCachedScript(App.settings.STATIC_URL + 'js/swfobject.js').done(function() {
         App.player.embedTo('player-container', {
             volume: App.controls.volume,
-            process_spectrum: App.spectrum.isSupported(),
-            throttle_traffic: App.user.settings.trafficThrottling()
+            process_spectrum: App.spectrum.isSupported()
         });
     });
 
 
     App.now = new App.RadioNowView({
-        station: App.current_station,
         player: App.player
     });
 
-    App.filters.reset(bootstrap.categories || {});
+    App.filters.reset(bootstrap.categories);
     App.filters.unshift(new App.HistoryFilter());
     App.filters.unshift(new App.HomeFilter());
 
-    App.playlist.reset(bootstrap.playlist || {});
+    App.playlist.reset(bootstrap.playlist);
     App.playHistory = new App.PlayHistory();
     App.playHistory.on('add change', function(history){
         if (this.length > 1) {
@@ -1560,7 +1571,7 @@ App.setup = function(bootstrap) {
     });
  
     App.playlist.on('change_station', function(station) {
-        App.current_station.assign(station);
+        App.play.setStation(station);
     });
 
     App.footer = new App.FooterView();

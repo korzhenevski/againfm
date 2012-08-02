@@ -85,7 +85,7 @@ a
 .wrapper-left
   overflow: hidden
   float: left
-  width: 420px
+  width: 500px
   height: 340px
 
 .wrapper-left, .wrapper-right
@@ -101,7 +101,7 @@ a
   height: 340px
 
 .wrapper-right-content
-  margin: 45px 0 20px 85px
+  margin: 45px 0 20px 0
 
 .head-form
   top: 86px
@@ -128,10 +128,14 @@ a
   overflow: hidden
   clear: both
 
+.wrapper-right
+  .head-form, .box-holder
+    width: 500px
+    margin: 0 auto
+
 .box-holder
   overflow: hidden
   height: 70px
-
 
 .form-holder
   background-color: black
@@ -180,7 +184,6 @@ input[type=submit]
   text-shadow: 0px 1px 0px #cfcfcf
   font-weight: bold
   text-align: center
-  cursor: pointer
   float: left
 
 .loading
@@ -312,21 +315,17 @@ input[type=submit]
   font-size: 1em
   font-weight: bold
   color: #666
-  text-shadow: 1px 1px 0px #000
-
-.radio-control-hd-on
   color: #71cd15
   text-shadow: 0px 0px 2px #71cd15
 
 .radio-now
-  margin-left: 60px
-  margin-top: 70px
+  margin: 70px auto 0 auto
   clear: both
   overflow: hidden
   border: none
   +opacity(0.8)
   height: 82px
-  width: 364px
+  width: 430px
   position: relative
   background-image: url('../i/blackberry/nowplaying/background.png')
   background-repeat: no-repeat
@@ -541,7 +540,7 @@ input[type=submit]
   z-index: -10
 
 .user-profile
-  margin-left: 65px
+  margin-left: 40px
   width: 350px
   height: 50px
   background-color: #414141
@@ -600,7 +599,7 @@ input[type=submit]
       border-bottom: 1px solid #fff
 
 .user-panel
-  width: 52%
+  width: 50%
   max-width: 700px
   background-color: #fff
   background-image: url('../i/favorites/back.jpg')
@@ -611,6 +610,7 @@ input[type=submit]
   display: none
   border: 1px solid #aaa
   padding-bottom: 1em
+  right: 100px
   p
     color: #000
   .text
@@ -814,3 +814,4 @@ input[type=submit]
     top: 0
   .disable
     display: none
+

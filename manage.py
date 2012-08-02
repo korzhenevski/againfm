@@ -8,6 +8,20 @@ from pprint import pprint
 manager = Manager(app)
 
 @manager.command
+def gen_station():
+    station = db.Station()
+    station.title = u'AH.FM'
+    station.website = u'http://ah.fm/'
+    station.save()
+    print 'station: %s' % station._id
+    stream = db.Stream()
+    stream.url = u'http://ru.ah.fm/'
+    stream.is_shoutcast = True
+    stream.station = station
+    stream.save()
+    print 'stream: %s' % stream._id
+
+@manager.command
 def test():
     """
     user = db.User.find_one({'email': 'yura.nevsky@gmail.com'})

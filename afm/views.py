@@ -1,10 +1,10 @@
+import pymongo
 from . import app, db, login_manager, tasks
 from .forms import RegisterForm
-from flask import jsonify, request, render_template, redirect, url_for
+from flask import jsonify, request, render_template, redirect, abort
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from collections import defaultdict
-from random import choice
-from random import randint
+from bson.objectid import ObjectId
 
 # TODO: guards
 
@@ -116,8 +116,8 @@ def login():
 @app.route('/api/playlist/<ObjectId:category_id>')
 def playlist(category_id):
     category = db.Category.get_or_404(category_id)
-    #stations = [station.get_public_data() for station in category.stations]
-    stations = [{'id': randint(10000, 999999), 'title': unicode(category_id)} for i in xrange(100)]
+    stations = [db.Station.get_from_id(station_id).get_public_data() for station_id in category.stations]
+    #stations = [{'id': randint(10000, 999999), 'title': unicode(category_id)} for i in xrange(100)]
     return jsonify({'objects': stations})
 
 @app.route('/')
@@ -127,11 +127,13 @@ def index():
         'user': {},
         'settings': {},
         'categories': categories,
+        'playlist': {}
     }
     if current_user.is_authenticated():
         bootstrap['user'] = current_user.get_public_data()
         bootstrap['settings'] = current_user.settings
 
+    bootstrap['playlist'] = [db.Station.get_from_id(ObjectId('501a8ffc1d41c82c22355830')).get_public_data()]
     context = {
         'sitename': 'Again.FM',
         'STATIC_URL': '/static/',
@@ -142,20 +144,20 @@ def index():
 @app.route('/api/station/<ObjectId:station_id>')
 def station_detail(station_id):
     station = db.Station.get_or_404(station_id)
+    station = station.get_public_data()
     return jsonify(station.get_public_data())
 
-# http://service.againfm.local/listen/5013ea731d41c80efe0cc300?redirect=true
-@app.route('/api/listen/<ObjectId:station_id>')
-def listen(station_id):
-    #station = db.Station.get_or_404(station_id)
+# http://againfm.local/api/listen/5013ea731d41c80efe0cc300
+@app.route('/api/stream_for_station/<ObjectId:station_id>')
+def stream_for_station(station_id):
     streams = defaultdict(list)
-    for stream in db.Stream.find({'station.$id': station_id}):
-        streams[stream.bitrate].append(stream.web_url)
-    if not streams:
-        return jsonify({'error': 'no active streams'}), 404
-    low_bitrate = bool(request.args.get('low_bitrate'))
-    streams = sorted(streams.iteritems(), reverse=low_bitrate)
-    stream_url = choice(streams.pop()[1])
-    if request.args.get('redirect'):
-        return redirect(stream_url)
-    return jsonify({'stream_url': stream_url})
+    if request.args.get('low_bitrate'):
+        sort_direction = pymongo.ASCENDING
+    else:
+        sort_direction = pymongo.DESCENDING
+    stream = db.Stream.find_one({'station.$id': station_id}, sort=[('bitrate', sort_direction)])
+    if not stream:
+        abort(404)
+    data = stream.get_public_data()
+    data['is_hd'] = 320
+    return jsonify(data)

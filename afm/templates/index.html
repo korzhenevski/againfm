@@ -6,6 +6,7 @@
         <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
 
         <link href="{{ STATIC_URL }}css/screen.css" media="screen, projection" rel="stylesheet" />
+        <link rel="shortcut icon" href="{{ STATIC_URL }}i/favicon.ico" />
     </head>
     <body>
         <div class="wrapper">
@@ -27,7 +28,7 @@
                             <div class="inner">
                                 <div class="radio-control-sound"></div>
                                 <div class="radio-control-slider"></div>
-                                <!--div class="radio-control-hd radio-control-hd-on">HD</div-->
+                                <div class="radio-control-hd hidden">HD</div>
                             </div>
                         </div>
                     </div>
@@ -314,6 +315,7 @@
         {% endraw %}
 
         <script src="http://yandex.st/jquery/1.7.2/jquery.min.js"></script>
+        <script src="http://comet.againfm.local/static/comet.js"></script>
         <script src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
         <script src="{{ STATIC_URL }}js/jquery.watermark.js"></script>
         <script src="{{ STATIC_URL }}js/jquery.validate.js"></script>
@@ -333,7 +335,7 @@
                     DEFAULT_VOLUME: 80,
                     NIGHT_VOLUME: 30,
                     STATIC_URL: '/static/',
-                    LIVESTREAM_URL: 'http://live.' + document.domain
+                    COMET_URL: 'http://comet.' + document.domain
                 }
 
                 App.setup({{ bootstrap|tojson|safe }});
@@ -341,7 +343,6 @@
                 _.each(['small-logo.png', 'radionow.png'], function(img){
                     preloadImage(App.settings.STATIC_URL + 'i/' + img);
                 });
-
             });
         </script>
     </body>

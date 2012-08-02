@@ -35,14 +35,13 @@ package {
         private var _startVolume:Number;
         private var _isPaused:Boolean = true;
         private var _spectrumTimer:Timer;
-        private var _throttle_traffic:Boolean;
         private var _process_spectrum:Boolean;
 
         public function Player() {
             Security.allowDomain("*");
             var params:Object = LoaderInfo(this.root.loaderInfo).parameters;
 
-            ExternalInterface.addCallback("loadStreamById", loadStreamById);
+            ExternalInterface.addCallback("loadStreamByUrl", loadStreamByUrl);
             ExternalInterface.addCallback("playStream", playStream);
             ExternalInterface.addCallback("pauseStream", pauseStream);
             ExternalInterface.addCallback("stopStream", stopStream);
@@ -53,16 +52,12 @@ package {
             ExternalInterface.addCallback("mute", mute);
             ExternalInterface.addCallback("unmute", unmute);
             ExternalInterface.addCallback("isPaused", isPaused);
-            ExternalInterface.addCallback("throttleTraffic", throttleTraffic);
             ExternalInterface.addCallback("processSpectrum", processSpectrum);
 
             _volume = (params['volume'] != undefined) ? (parseFloat(params['volume']) / 100) : _volume;
-            _throttle_traffic = (params['throttle_traffic'] == 'true');
             _process_spectrum = (params['process_spectrum'] == 'true');
 
-            debug('volume: '+_volume+
-                ', throttle_traffic: '+_throttle_traffic+
-                ', process_spectrum: '+_process_spectrum);
+            debug('volume: '+_volume+', process_spectrum: '+_process_spectrum);
 
             if (_process_spectrum) {
                 _spectrumTimer = new Timer(100);
@@ -97,16 +92,8 @@ package {
             setSpectrum(spectrum);
         }
 
-        public function loadStreamById(id:String, startPlay:Boolean) {
+        public function loadStreamByUrl(url:String, startPlay:Boolean) {
             stopStream()
-
-            // maybe later, add checksum protection
-            // as c=xxxxxxxx, where xxxxxx == md5(url + 'salt')
-            var url:String = '/api/listen/' + id + '?redirect=true';
-            
-            if (_throttle_traffic) {
-                url += '&low_bitrate=true';
-            }
             debug('stream url: '+url)
             
             // TODO: make additional request and receive stream URL as plain text
@@ -174,10 +161,6 @@ package {
         public function sendEvent() {
             // send via setTimeout(zero) 
             // performance reasons
-        }
-
-        public function throttleTraffic(throttle:Boolean): void {
-            _throttle_traffic = throttle;
         }
 
         public function processSpectrum(process:Boolean): void {

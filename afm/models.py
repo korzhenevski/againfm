@@ -148,6 +148,17 @@ class Stream(BaseDocument):
             return self.url + u';'
         return self.url
 
+    @property
+    def is_hd(self):
+        return self.bitrate >= 192
+
+    def get_public_data(self):
+        return {
+            'id': unicode(self._id),
+            'url': self.web_url,
+            'is_hd': self.is_hd
+        }
+
     default_values = {
         'is_shoutcast': False,
         'bitrate': 0
