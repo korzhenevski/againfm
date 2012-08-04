@@ -1092,10 +1092,10 @@ App.RadioNowView = App.View.extend({
             station_title: mediator.station.get('title')
         }, {silent: true});
         this.content.set({
+            id: null,
             title: gettext('Loading...'),
             caption: '',
-            image_url: this.imageLoading,
-            meta_id: null
+            image_url: this.imageLoading
         });
         this.startUnavailableTimer();
         this.subscribeStatusUpdate(mediator.getStatusChannel(), this.statusUpdate);
@@ -1127,12 +1127,12 @@ App.RadioNowView = App.View.extend({
             if (status.artist && status.trackname) {
                 data.title = status.trackname;
                 data.caption = status.artist;
-            } else if (status.current_song) {
-                data.title = status.current_song;
+            } else if (status.title) {
+                data.title = status.title;
             }
         }
         data.image_url = status.image_url || this.imageNotfound;
-        data.meta_id = status.meta_id || 0;
+        data.id = status.id || 0;
         this.content.set(data);
         return this;
     },
@@ -1141,9 +1141,9 @@ App.RadioNowView = App.View.extend({
         var content = this.content.toJSON();
         var user = App.user;
         if (user.isLogged()) {
-            if (content.meta_id) {
+            if (content.id) {
                 content.star_class = 'star';
-                var favorite = user.favorites.lookup(content.meta_id);
+                var favorite = user.favorites.lookup(content.id);
                 if (favorite && !favorite.isDeleted()) {
                     content.star_class += ' star-selected';
                 }

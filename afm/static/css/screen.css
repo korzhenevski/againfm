@@ -87,6 +87,8 @@ a.logo { line-height: 0px; height: 0px; font-size: 0px; border: none; }
 
 input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid #333333; color: #333333; border-radius: 5px; background-color: #666666; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c4c4c4), color-stop(100%, #9b9b9b)); background: -webkit-linear-gradient(#c4c4c4, #9b9b9b); background: -moz-linear-gradient(#c4c4c4, #9b9b9b); background: -o-linear-gradient(#c4c4c4, #9b9b9b); background: -ms-linear-gradient(#c4c4c4, #9b9b9b); background: linear-gradient(#c4c4c4, #9b9b9b); text-shadow: 0px 1px 0px #cfcfcf; font-weight: bold; text-align: center; float: left; }
 
+input[type=submit]:hover { -moz-box-shadow: rgba(252, 102, 34, 0.4) 0px 1px 1px 1px; -webkit-box-shadow: rgba(252, 102, 34, 0.4) 0px 1px 1px 1px; -o-box-shadow: rgba(252, 102, 34, 0.4) 0px 1px 1px 1px; box-shadow: rgba(252, 102, 34, 0.4) 0px 1px 1px 1px; }
+
 .loading { margin-left: 10px; }
 
 .form-input { width: 200px; float: left; margin-right: 10px; }
@@ -263,3 +265,8 @@ input[type=submit] { height: 32px; margin: 0px; padding: 0px; border: 1px solid 
 .radio-scroll .track { margin-top: -10px; background-color: #d8eefd; height: 100%; width: 13px; position: relative; display: none; }
 .radio-scroll .thumb { background-color: black; -moz-border-radius: 5px; -webkit-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; -khtml-border-radius: 5px; border-radius: 5px; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40); opacity: 0.4; height: 7px; width: 13px; cursor: pointer; overflow: hidden; position: absolute; top: 0; }
 .radio-scroll .disable { display: none; }
+
+.feedback { position: absolute; top: 0; left: 0; height: 100px; width: 300px; }
+
+.feedback-inner { position: relative; padding: 10px; color: white; background-color: #f3f3f3; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; }
+.feedback-inner:after { content: ""; position: absolute; bottom: -20px; left: 20px; border-width: 20px 10px 0 0; border-style: solid; border-color: #f3f3f3 transparent; display: block; width: 0; }

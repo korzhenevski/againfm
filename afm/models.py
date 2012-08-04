@@ -196,7 +196,7 @@ class Track(BaseDocument):
     }
 
     default_values = {
-        'created_at': datetime.utcnow,
+        'created_at': datetime.now,
     }
 
 @db.register
@@ -218,7 +218,7 @@ class StreamTitle(BaseDocument):
     }
 
     default_values = {
-        'created_at': datetime.utcnow,
+        'created_at': datetime.now,
     }
 
 @db.register
@@ -238,7 +238,7 @@ class Favorite(BaseDocument):
     }
 
     default_values = {
-        'created_at': datetime.utcnow,
+        'created_at': datetime.now,
         'active': 0
     }
 

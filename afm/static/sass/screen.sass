@@ -186,6 +186,10 @@ input[type=submit]
   text-align: center
   float: left
 
+input[type=submit]
+  &:hover
+    +box-shadow(rgba(#fc6622, .4) 0px 1px 1px 1px)
+
 .loading
   margin-left: 10px
 
@@ -815,3 +819,25 @@ input[type=submit]
   .disable
     display: none
 
+.feedback
+  position: absolute
+  top: 0
+  left: 0
+  height: 100px
+  width: 300px
+.feedback-inner
+  position: relative
+  padding: 10px
+  color: #fff
+  background-color: #f3f3f3
+  +border-radius(3px)
+  &:after
+    content: ""
+    position: absolute
+    bottom: -20px
+    left: 20px
+    border-width: 20px 10px 0 0
+    border-style: solid
+    border-color: #f3f3f3 transparent
+    display: block
+    width: 0
