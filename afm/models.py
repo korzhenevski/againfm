@@ -186,34 +186,12 @@ class Track(BaseDocument):
     __collection__ = 'tracks'
 
     structure = {
+        'title': unicode,
+        'rawtitle': unicode,
         'artist': unicode,
         'name': unicode,
-        'title': unicode,
-        'cover_url': unicode,
+        'image_url': unicode,
         'tags': [unicode],
-        'mbid': unicode,
-        'created_at': datetime,
-    }
-
-    default_values = {
-        'created_at': datetime.now,
-    }
-
-@db.register
-class StreamTitle(BaseDocument):
-    __collection__ = 'stream_titles'
-    use_autorefs = True
-
-    structure = {
-        # сырой заголовок из потока
-        'title': unicode,
-        # нормализованный трек из внешней базы (last.fm, etc.)
-        'track': {
-            'id': ObjectId,
-            'title': unicode,
-            'cover_url': unicode,
-        },
-        'stream_id': ObjectId,
         'created_at': datetime,
     }
 
@@ -224,11 +202,11 @@ class StreamTitle(BaseDocument):
 @db.register
 class Favorite(BaseDocument):
     __collection__ = 'favorites'
-    use_autorefs = True
 
     structure = {
-        'station': Station,
-        'stream_title': StreamTitle,
+        'title': unicode,
+        'station_title': unicode,
+        'track_id': ObjectId,
         'user_id': ObjectId,
         'created_at': datetime,
         # mongodb hack
@@ -245,3 +223,14 @@ class Favorite(BaseDocument):
     @property
     def is_active(self):
         return not self.active % 2
+
+    def get_public_data(self):
+        date = self.created_at
+        return {
+            'title': self.title,
+            'station_title': self.station_title,
+            # unixtime
+            'date': date.strftime('%s'),
+            '_time': date.strftime('%H:%M'),
+            '_date': date.strftime('%Y %m %d')
+        }

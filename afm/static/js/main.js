@@ -669,22 +669,22 @@ App.PlayMediator = App.Model.extend({
         this.trigger('change_stream', this);
     },
 
-    selectStream: function() {
+    selectStream: function(onSuccess) {
         if (!this.station) {
             return;
         }
         var self = this;
-        $.getJSON('/api/stream_for_station/' + this.station.get('id'), {
+        return $.getJSON('/api/stream_for_station/' + this.station.get('id'), {
             'low_bitrate': App.user.settings.trafficThrottling()
         }).success(function(stream){
             self.setStream(stream);
         }).error(function(){
             self.setStream(null);
-        });
+        })
     },
 
     getStatusChannel: function() {
-        return this.station.get('id') + '_' + this.station.get('id');
+        return this.station.get('id') + '_' + this.stream.get('id');
     }
 });
 
@@ -1066,7 +1066,7 @@ App.RadioNowView = App.View.extend({
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'stationChanged', 'statusUpdate', 'setUnavailableRadio');
+        _.bindAll(this, 'render', 'stationChanged', 'streamChanged', 'statusUpdate', 'setUnavailableRadio');
 
         this.player = options.player;
         this.player.on('error', this.setUnavailableRadio);
@@ -1076,6 +1076,7 @@ App.RadioNowView = App.View.extend({
         this.content.on('change', this.render);
 
         App.play.on('change_station', this.stationChanged);
+        App.play.on('change_stream', this.streamChanged);
 
         var user = App.user;
         user.on('logged logout', this.render);
@@ -1098,7 +1099,11 @@ App.RadioNowView = App.View.extend({
             image_url: this.imageLoading
         });
         this.startUnavailableTimer();
-        this.subscribeStatusUpdate(mediator.getStatusChannel(), this.statusUpdate);
+    },
+
+    streamChanged: function(mediator) {
+        var channel = mediator.station.get('id') + '_' + mediator.stream['id'];
+        this.subscribeStatusUpdate(channel, this.statusUpdate);
     },
 
     startUnavailableTimer: function() {

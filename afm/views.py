@@ -159,5 +159,18 @@ def stream_for_station(station_id):
     if not stream:
         abort(404)
     data = stream.get_public_data()
-    data['is_hd'] = 320
     return jsonify(data)
+
+@app.route('/api/user/favorites')
+@login_required
+def favorites_list():
+    """
+    fav = db.Favorite()
+    fav.title = u'Test title'
+    fav.station_title = u'bla bla fm'
+    fav.user_id = current_user._id
+    fav.save()
+    """
+    favorites = db.Favorite.find({'user_id': current_user._id})
+    favorites = [fav.get_public_data() for fav in favorites]
+    return jsonify({'objects': favorites})
