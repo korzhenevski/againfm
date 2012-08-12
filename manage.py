@@ -97,9 +97,27 @@ def clear():
     from pymongo import Connection
     connection = Connection()
     db = connection['againfm']
-    for col in ('stations','streams','stream_titles','favorites','categories'):
+    for col in ('users','stations','streams','stream_titles','favorites','categories','object_ids'):
         print 'clear %s' % col
         db[col].remove()
+
+
+@manager.command
+def import_dump():
+    with open('./afm.txt', 'r') as dump:
+        for line in dump:
+            station_title, streams = line.strip().split('\t')
+            station = db.Station()
+            station['title'] = station_title.decode('utf8')
+            station.save()
+            for stream_url in streams.split(','):
+                stream = db.Stream()
+                stream['url'] = unicode(stream_url.strip())
+                stream['station_id'] = station['id']
+                #stream['is_shoutcast'] = True
+                stream.save()
+                print '- %s: %s' % (stream['_id'], stream_url)
+            print station['_id']
 
 if __name__ == "__main__":
     manager.run()

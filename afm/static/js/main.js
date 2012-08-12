@@ -1066,7 +1066,7 @@ App.RadioNowView = App.View.extend({
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'stationChanged', 'streamChanged', 'statusUpdate', 'setUnavailableRadio');
+        _.bindAll(this, 'render', 'stationChanged', 'streamChanged', 'trackUpdate', 'setUnavailableRadio');
 
         this.player = options.player;
         this.player.on('error', this.setUnavailableRadio);
@@ -1102,8 +1102,10 @@ App.RadioNowView = App.View.extend({
     },
 
     streamChanged: function(mediator) {
-        var channel = mediator.station.get('id') + '_' + mediator.stream['id'];
-        this.subscribeStatusUpdate(channel, this.statusUpdate);
+        this.subscribeTrackUpdate({
+            'station_id': mediator.station.get('id'),
+            'stream_id': mediator.stream['id']
+        }, this.trackUpdate);
     },
 
     startUnavailableTimer: function() {
@@ -1117,27 +1119,27 @@ App.RadioNowView = App.View.extend({
         }
     },
 
-    subscribeStatusUpdate: function(channel, onStatusUpdate) {
-        var livestream = App.livestream;
-        if (!livestream) {
+    subscribeTrackUpdate: function(params, onUpdate) {
+        var cometfm = App.cometfm;
+        if (!cometfm) {
             return;
         }
-        var params = App.user.isLogged() ? {'user_id': App.user.get('id')} : {};
-        livestream.subscribe(channel, params, onStatusUpdate);
+        if (App.user.isLogged()) {
+            params['user_id'] = App.user.get('id')
+        }
+        cometfm.subscribe(params, onUpdate);
     },
 
-    statusUpdate: function(status) {
+    trackUpdate: function(track) {
         var data = {};
-        if (!status.station_id) {
-            if (status.artist && status.trackname) {
-                data.title = status.trackname;
-                data.caption = status.artist;
-            } else if (status.title) {
-                data.title = status.title;
-            }
+        if (track.artist && track.name) {
+            data.title = track.name;
+            data.caption = track.artist;
+        } else if (track.title) {
+            data.title = track.title;
         }
-        data.image_url = status.image_url || this.imageNotfound;
-        data.id = status.id || 0;
+        data.image_url = track.image_url || this.imageNotfound;
+        data.id = track.id || 0;
         this.content.set(data);
         return this;
     },
@@ -1162,6 +1164,9 @@ App.RadioNowView = App.View.extend({
     },
 
     render: function() {
+        if (!this.content.get('station_title')) {
+            return;
+        }
         var html = render.radio_now(this.getContent());
         this.$el.show().html(html);
         this.marqueeTitle();
@@ -1514,7 +1519,8 @@ App.Router = Backbone.Router.extend({
 });
 
 App.setup = function(bootstrap) {
-    App.livestream = new Comet(App.settings['COMET_URL']);
+    App.cometfm = new Comet(App.settings['COMET_URL']);
+
     App.filters = new App.Filters();
     App.playlist = new App.Playlist();
     App.user = new App.User(bootstrap.user);

@@ -51,8 +51,9 @@ Comet._iframeLoaded = function(id)
 // Subscribe a new callback to specified ID.
 // To apply changes and reconnect to the server, call execute()
 // after a sequence of subscribe() calls.
-Comet.prototype.subscribe = function(id, params, callback) {
-    this.callback = {id: id, params: $.param(params), callback: callback};
+Comet.prototype.subscribe = function(params, callback) {
+    this.callback = {params: $.param(params), callback: callback};
+    console.log(params);
     this.execute();
 }
 

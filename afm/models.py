@@ -11,24 +11,33 @@ from bson.objectid import ObjectId
 from random import choice
 from datetime import datetime
 
+@login_manager.user_loader
+def load_user(user_id):
+    return db.User.find_one({'id': user_id})
+
 def md5hash(data):
     hashed = md5()
     hashed.update(data)
     return hashed.hexdigest()
 
-@login_manager.user_loader
-def load_user(user_id):
-    user = db.User.get_from_id(ObjectId(user_id))
-    return user
-
 class BaseDocument(Document):
     use_dot_notation = True
+
+    def save(self, *args, **kwargs):
+        # additional monotonic integer object_id
+        if 'id' in self.structure:
+            self['id'] = self.db.object_ids.find_and_modify(
+                query={'_id': self.collection.name},
+                update={'$inc': {'next': 1}},
+                new=True, upsert=True)['next']
+        return super(BaseDocument, self).save(*args, **kwargs)
 
 @db.register
 class User(BaseDocument):
     __collection__ = 'users'
 
     structure = {
+        'id': int,
         'name': unicode,
         'login': unicode,
         'email': unicode,
@@ -42,6 +51,8 @@ class User(BaseDocument):
         }
     }
 
+    indexes = [{'fields': 'id', 'unique': True}]
+
     default_values = {
         'login': u'',
         'is_active': True,
@@ -51,10 +62,10 @@ class User(BaseDocument):
     }
 
     def check_password(self, raw_password):
-        if not self.password:
+        if not self['password']:
             return False
         hashed = self._password_hash(raw_password)
-        return hashed == self.password
+        return hashed == self['password']
 
     def set_password(self, raw_password):
         password = self._password_hash(raw_password)
@@ -73,42 +84,42 @@ class User(BaseDocument):
         return False
 
     def get_id(self):
-        return unicode(self._id)
+        return unicode(self['id'])
 
     def get_public_data(self):
         return {
-            'id': unicode(self._id),
-            'email': self.email,
-            'name': self.name,
-            'gravatar_hash': self.gravatar_hash
+            'id': self['id'],
+            'email': self['email'],
+            'name': self['name'],
+            'gravatar_hash': self.gravatar_hash,
         }
 
     @property
     def gravatar_hash(self):
-        return md5hash(self.email.lower())
+        return md5hash(self['email'].lower())
 
     def generate_new_password(self, length=8):
         chars = string.letters + string.digits
         password = [choice(chars) for i in xrange(length)]
         password = string.join(password, '')
-        self.new_password = self._password_hash(password).decode('utf-8')
+        self['new_password'] = self._password_hash(password).decode('utf-8')
         self.save()
         return password, self.new_password_token()
 
     def new_password_token(self):
-        if not self.new_password:
+        if not self['new_password']:
             return False
         # double hashing
-        return self._password_hash(self.new_password)
+        return self._password_hash(self['new_password'])
 
     def confirm_new_password(self, password_or_token):
-        if not self.new_password:
+        if not self['new_password']:
             return False
-        password_match = (self.new_password == self._password_hash(password_or_token))
+        password_match = (self['new_password'] == self._password_hash(password_or_token))
         token_match = (password_or_token == self.new_password_token())
         if password_match or token_match:
-            self.password = self.new_password
-            self.new_password = u''
+            self['password'] = self['new_password']
+            self['new_password'] = u''
             self.save()
             return True
         return False
@@ -117,30 +128,39 @@ class User(BaseDocument):
 class Station(BaseDocument):
     __collection__ = 'stations'
     structure = {
+        'id': int,
         'title': unicode,
         'website': unicode
     }
 
+    indexes = [{'fields': 'id', 'unique': True}]
+
     def get_public_data(self):
         return {
-            'id': unicode(self._id),
-            'title': self.title
+            'id': self['id'],
+            'title': self['title']
         }
 
 @db.register
 class Stream(BaseDocument):
     __collection__ = 'streams'
-    use_autorefs = True
 
     structure = {
-        'station': Station,
+        'id': int,
         'url': unicode,
+        'station_id': int,
+        'bitrate': int,
         'is_shoutcast': bool,
-        'bitrate': int
+        'created_at': datetime,
     }
 
-    @property
-    def web_url(self):
+    indexes = [{'fields': 'id', 'unique': True}, {'fields': 'station_id'}]
+
+    default_values = {
+        'created_at': datetime.now
+    }
+
+    def get_web_url(self):
         # если поток вешается через шауткаст,
         # то для веб-плееров добавляем ";"
         # иначе показывается страница статистики
@@ -148,15 +168,14 @@ class Stream(BaseDocument):
             return self.url + u';'
         return self.url
 
-    @property
     def is_hd(self):
         return self.bitrate >= 192
 
     def get_public_data(self):
         return {
-            'id': unicode(self._id),
-            'url': self.web_url,
-            'is_hd': self.is_hd
+            'id': self['id'],
+            'url': self.get_web_url(),
+            'is_hd': self.is_hd(),
         }
 
     default_values = {
@@ -171,7 +190,7 @@ class Category(BaseDocument):
 
     structure = {
         'title': unicode,
-        'stations': [ObjectId],
+        #'stations': [ObjectId],
         'is_public': bool
     }
 
@@ -186,6 +205,7 @@ class Track(BaseDocument):
     __collection__ = 'tracks'
 
     structure = {
+        'id': int,
         'title': unicode,
         'rawtitle': unicode,
         'artist': unicode,
@@ -194,6 +214,8 @@ class Track(BaseDocument):
         'tags': [unicode],
         'created_at': datetime,
     }
+
+    indexes = [{'fields': 'id', 'unique': True}, {'fields': 'rawtitle', 'unique': True}]
 
     default_values = {
         'created_at': datetime.now,
@@ -204,10 +226,11 @@ class Favorite(BaseDocument):
     __collection__ = 'favorites'
 
     structure = {
+        'id': int,
         'title': unicode,
         'station_title': unicode,
-        'track_id': ObjectId,
-        'user_id': ObjectId,
+        #'track_id': ObjectId,
+        #'user_id': ObjectId,
         'created_at': datetime,
         # mongodb hack
         # вместо bool, мы увеличиваем значение
