@@ -951,6 +951,9 @@ App.RadioDisplayView = App.View.extend({
     },
 
     stationClick: function(e) {
+        setTimeout(function(){
+            App.spectrum.render();
+        }, 1000);
         var $el = $(e.target);
         this.playlist.changeStation($el.data().stationId);
     },
@@ -982,9 +985,9 @@ App.RadioDisplayView = App.View.extend({
 App.Player = function() {
     this.initialize.apply(this, arguments);
 };
+
 _.extend(App.Player.prototype, Backbone.Events, {
     _player: null,
-    _spectrum: null,
     fading: true,
     initialize: function() {
         var proxiedMethods = 'getVolume,mute,unmute,playStream,isPaused'.split(',');
@@ -1024,6 +1027,11 @@ _.extend(App.Player.prototype, Backbone.Events, {
         throttle = !!throttle;
         this._player.throttleTraffic(throttle);
     },
+
+    getSpectrum: function(points) {
+        return this._player.getSpectrum(points);
+    },
+
     embedTo: function(id, params) {
         var params = params || {};
         // Callback events
@@ -1039,13 +1047,6 @@ _.extend(App.Player.prototype, Backbone.Events, {
         } else {
             console.error('player load fail');
         }
-    },
-    setSpectrum: function(spectrum) {
-        this._spectrum = null;
-        this._spectrum = spectrum;
-    },
-    getSpectrum: function() {
-        return this._spectrum;
     }
 });
 
@@ -1227,6 +1228,7 @@ App.RadioNowView = App.View.extend({
     }
 });
 
+/*
 App.RadioSpectrumView = App.View.extend({
     el: '#spectrum',
     initialize: function(options) {
@@ -1242,6 +1244,7 @@ App.RadioSpectrumView = App.View.extend({
     },
 
     isSupported: function() {
+        return false;
         return !!(this.el.getContext && this.el.getContext('2d'));
     },
 
@@ -1353,6 +1356,145 @@ App.RadioSpectrumView = App.View.extend({
         requestAnimFrame(_.bind(this.render, this));
     }
 });
+*/
+
+App.SpectrumView = App.View.extend({
+    el: '#spectrum',
+
+    initialize: function(options) {
+        this.player = options.player;
+        this.ctx = this.el.getContext('2d');
+        this.width = this.$el.width();
+        this.height = this.$el.height();
+    },
+
+    render: function() {
+        var spectrumLimit = 600;
+        var player = this.player;
+        var spectrum = [];
+        var spectrumPoints = [];
+        for (var i = 0; i < spectrumLimit; i++) {
+            spectrumPoints[i] = 0;
+            spectrum[i] = 0;
+        }
+        console.log(spectrumPoints);
+
+        var lastTime = +new Date();
+        var colors = ['#d86b26', '#d72f2e', '#0f9ac5'];
+        var drawCurvyLine = _.bind(this.drawCurvyLine, this);
+        var width = this.width;
+        var height = this.height;
+        var clear = _.bind(function() {
+            this.ctx.clearRect(0, 0, this.width, this.height);
+        }, this);
+
+        var chunk = Math.floor(spectrumLimit / colors.length);
+        var step = Math.round(width / chunk);
+
+        var draw = function() {
+            clear();
+            for (var lineIndex = 0; lineIndex < colors.length; lineIndex++) {
+                var points = [];
+                var lim = (lineIndex + 1) * chunk;
+                var pos = 0;
+                for (var i = lineIndex * chunk; i < lim; i++) {
+                    var val = (spectrumPoints[i]) - 30;
+                    if (val > height) {
+                        val = height;
+                    }
+                    if (val < 0) {
+                        val = 0;
+                    }
+                    points.push([pos, val]);
+                    pos = pos + step;
+                }
+                //console.log([lineIndex, points]);
+                drawCurvyLine(points, 0.5, colors[lineIndex], 2);
+            }
+        }
+
+        var animation = function(time) {
+            //console.log('animation');
+            var completed = 0;
+            var spectrumSize = spectrum.length;
+            for (var i = 0; i < spectrumSize; i++) {
+                var diff = spectrum[i] - spectrumPoints[i];
+                //console.log(diff);
+                if (Math.abs(diff) > 0) {
+                    var newval = spectrumPoints[i] + diff * 0.1;
+                    if (Math.round(newval) >= spectrum[i]) {
+                        newval = spectrum[i];
+                        ++completed;
+                    }
+                    spectrumPoints[i] = newval;
+                } else {
+                    ++completed;
+                }
+            }
+            draw();
+            //console.log(spectrumPoints);
+            //console.log(completed);
+            if (completed) {
+                //spectrumPoints = spectrum;
+                //spectrumPoints = spectrum;
+                spectrum = player.getSpectrum(spectrumLimit);
+            }
+            //lastTime = time;
+            setTimeout(animation, 100);
+        }
+
+        setTimeout(animation, 0);
+        //requestAnimFrame(animation);
+    },
+
+    drawCurvyLine: function(coords, factor, color, linewidth) {
+        var ctx = this.ctx;
+        ctx.beginPath();
+
+        ctx.shadowColor = color;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 5;
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = linewidth;
+        var len = coords.length;
+
+        for (var i = 0; i < len; ++i) {
+            if (coords[i] && typeof(coords[i][1]) == 'number' && coords[i + 1] && typeof(coords[i + 1][1]) == 'number') {
+                var coordX = coords[i][0];
+                var coordY = coords[i][1];
+                var nextX = coords[i + 1][0];
+                var nextY = coords[i + 1][1];
+                var prevX = coords[i - 1] ? coords[i - 1][0] : null;
+                var prevY = coords[i - 1] ? coords[i - 1][1] : null;
+                var offsetX = (coords[i + 1][0] - coords[i][0]) * factor;
+                var offsetY = (coords[i + 1][1] - coords[i][1]) * factor;
+
+                if (i == 0) {
+                    ctx.moveTo(coordX, coordY);
+                    ctx.lineTo(nextX - offsetX, nextY - offsetY);
+                } else if (nextY == null) {
+                    ctx.lineTo(coordX, coordY);
+                } else if (prevY == null) {
+                    ctx.moveTo(coordX, coordY);
+                } else if (coordY == null) {
+                    ctx.moveTo(nextX, nextY);
+                } else {
+                    ctx.quadraticCurveTo(coordX, coordY, coordX + offsetX, coordY + offsetY);
+                    if (nextY) {
+                        ctx.lineTo(nextX - offsetX, nextY - offsetY);
+                    } else {
+                        ctx.lineTo(coordX, coordY);
+                    }
+                }
+            } else if (typeof(coords[i][1]) == 'number') {
+                ctx.lineTo(coords[i][0], coords[i][1]);
+            }
+        }
+        ctx.stroke();
+    }
+})
 
 App.RadioControlsView = App.View.extend({
     el: '.radio-controls',
@@ -1506,15 +1648,12 @@ App.FooterView = App.View.extend({
 
 App.Router = Backbone.Router.extend({
     routes: {
-        'station/:id': 'station'
+        'station/:id': 'selectStation'
     },
 
-    station: function(id) {
-        var station = App.playlist.get(id);
-        if (station) {
-            App.current_station.set(station.attributes, {silent: true}).fetch();
-            App.player.loadStreamById(station.id, true);
-        }
+    selectStation: function(station_id) {
+        var station = new App.Station({id: station_id});
+        App.play.setStation(station);
     }
 });
 
@@ -1545,17 +1684,17 @@ App.setup = function(bootstrap) {
 
     App.player = new App.Player();
 
-    App.spectrum = new App.RadioSpectrumView({
+    App.spectrum = new App.SpectrumView({
         player: App.player
     });
 
-    $.getCachedScript(App.settings.STATIC_URL + 'js/swfobject.js').done(function() {
-        App.player.embedTo('player-container', {
-            volume: App.controls.volume,
-            process_spectrum: App.spectrum.isSupported()
-        });
-    });
+    App.player.embedTo('player-container', {volume: App.controls.volume});
 
+    /*
+    setTimeout(function(){
+        App.spectrum.render();
+        App.router.navigate('station/1', {trigger: true});
+    }, 3000);*/
 
     App.now = new App.RadioNowView({
         player: App.player
@@ -1572,6 +1711,7 @@ App.setup = function(bootstrap) {
             App.filters.getByRole('history').show();
         }
     });
+
     App.filters.on('select', function(filter){
         var role = filter.get('role');
         if (role == 'history') {
@@ -1587,7 +1727,6 @@ App.setup = function(bootstrap) {
 
     App.footer = new App.FooterView();
 
-    /*
     App.router = new App.Router();
-    Backbone.history.start({pushState: true});*/
+    Backbone.history.start({pushState: true});
 };

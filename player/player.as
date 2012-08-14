@@ -34,8 +34,6 @@ package {
         private var _isMuted:Boolean = false;
         private var _startVolume:Number;
         private var _isPaused:Boolean = true;
-        private var _spectrumTimer:Timer;
-        private var _process_spectrum:Boolean;
 
         public function Player() {
             Security.allowDomain("*");
@@ -52,17 +50,10 @@ package {
             ExternalInterface.addCallback("mute", mute);
             ExternalInterface.addCallback("unmute", unmute);
             ExternalInterface.addCallback("isPaused", isPaused);
-            ExternalInterface.addCallback("processSpectrum", processSpectrum);
+            ExternalInterface.addCallback("getSpectrum", getSpectrum);
 
             _volume = (params['volume'] != undefined) ? (parseFloat(params['volume']) / 100) : _volume;
-            _process_spectrum = (params['process_spectrum'] == 'true');
-
-            debug('volume: '+_volume+', process_spectrum: '+_process_spectrum);
-
-            if (_process_spectrum) {
-                _spectrumTimer = new Timer(100);
-                _spectrumTimer.addEventListener(TimerEvent.TIMER, computeSpectrum);
-            }
+            debug('volume: '+_volume);
 
             _soundTransform = new SoundTransform(_volume);
             ExternalInterface.call('player.trigger', 'ready');
@@ -72,24 +63,24 @@ package {
             ExternalInterface.call('console.log', 'Player: ' + vars);
         }
 
-        private function computeSpectrum(event:Event): void {
-            if (isPaused() || _sound == null || !_process_spectrum) {
-                return;
+        public function getSpectrum(points:Number) {
+            var spectrum:Array = [];
+            if (isPaused() || _sound == null) {
+                return spectrum;
             }
 
-            var spectrum:Array = [];
             var bytes:ByteArray = new ByteArray();
             var i:int = 0;
             var val:Number = 0;
 
-            _sound.extract(bytes, 512);
+            _sound.extract(bytes, points);
             bytes.position = 0;
             while(bytes.bytesAvailable > 0) {
-                spectrum.push(bytes.readFloat());
-                bytes.readFloat();
+               spectrum.push(100 + bytes.readFloat() * 100);
+               bytes.readFloat();
             }
 
-            setSpectrum(spectrum);
+            return spectrum;
         }
 
         public function loadStreamByUrl(url:String, startPlay:Boolean) {
@@ -146,25 +137,11 @@ package {
 
         public function setPaused(paused:Boolean): void {
             _isPaused = paused;
-            if (_isPaused) {
-                setSpectrum([]);
-                if (_spectrumTimer != undefined) {
-                    _spectrumTimer.stop();
-                }
-            } else {
-                if (_spectrumTimer != undefined) {
-                    _spectrumTimer.start();
-                }
-            }
         }
 
         public function sendEvent() {
             // send via setTimeout(zero) 
             // performance reasons
-        }
-
-        public function processSpectrum(process:Boolean): void {
-            _process_spectrum = process;
         }
 
         public function setVolume(volume:Number):void {
@@ -219,10 +196,6 @@ package {
        
             debug('io-error: '+event.text);
             ExternalInterface.call('player.trigger', 'error', event.text);
-        }
-
-        public function setSpectrum(spectrum:Array): void {
-            ExternalInterface.call('App.player.setSpectrum', spectrum);
         }
     }
 }

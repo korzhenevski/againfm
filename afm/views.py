@@ -171,6 +171,7 @@ def stream_for_station(station_id):
     if not stream:
         abort(404)
     data = stream.get_public_data()
+    data['url'] = 'http://ru.ah.fm/;'
     return jsonify(data)
 
 @app.route('/api/user/favorites')
@@ -186,3 +187,7 @@ def favorites_list():
     favorites = db.Favorite.find({'user_id': current_user._id})
     favorites = [fav.get_public_data() for fav in favorites]
     return jsonify({'objects': favorites})
+
+@app.route('/station/<int:station_id>')
+def ajax_show_station(**kwargs):
+    return redirect('/#%s' % request.path)
