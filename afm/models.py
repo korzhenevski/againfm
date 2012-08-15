@@ -150,14 +150,27 @@ class Stream(BaseDocument):
         'url': unicode,
         'station_id': int,
         'bitrate': int,
+        'perform_check': bool,
         'is_shoutcast': bool,
+        'is_online': bool,
+        'check_error': unicode,
+        'checked_at': int,
         'created_at': datetime,
     }
 
-    indexes = [{'fields': 'id', 'unique': True}, {'fields': 'station_id'}]
+    indexes = [
+        {'fields': 'id', 'unique': True},
+        {'fields': ['checked_at', 'perform_check']},
+        {'fields': ['station_id', 'is_online']}
+    ]
 
     default_values = {
-        'created_at': datetime.now
+        'created_at': datetime.now,
+        'bitrate': 0,
+        'checked_at': 0,
+        'perform_check': True,
+        'is_online': True,
+        'is_shoutcast': False,
     }
 
     def get_web_url(self):
@@ -177,11 +190,6 @@ class Stream(BaseDocument):
             'url': self.get_web_url(),
             'is_hd': self.is_hd(),
         }
-
-    default_values = {
-        'is_shoutcast': False,
-        'bitrate': 0
-    }
 
 @db.register
 class Category(BaseDocument):

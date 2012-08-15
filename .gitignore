@@ -2,6 +2,9 @@
 .idea
 .sass-cache
 
+.webassets-cache
+packed.*.js
+
 # Packages
 *.egg
 *.egg-info

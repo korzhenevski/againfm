@@ -315,20 +315,9 @@
         {% endraw %}
 
         <script src="http://yandex.st/jquery/1.7.2/jquery.min.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.watermark.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.validate.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.tinyscrollbar.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap-button.js"></script>
-        <script src="{{ STATIC_URL }}js/underscore.js"></script>
-        <script src="{{ STATIC_URL }}js/backbone.js"></script>
-        <script src="{{ STATIC_URL }}js/handlebars.js"></script>
-        <script src="{{ STATIC_URL }}js/render.js"></script>
-        <script src="{{ STATIC_URL }}js/utils.js"></script>
-        <script src="{{ STATIC_URL }}js/comet.js"></script>
-        <script src="{{ STATIC_URL }}js/swfobject.js"></script>
-        <script src="{{ STATIC_URL }}js/main.js"></script>
+        {% assets "js_all" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
 
         <!--div class="feedback">
             <div class="feedback-inner">This only needs one HTML element.</div>

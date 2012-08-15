@@ -167,11 +167,10 @@ def stream_for_station(station_id):
         sort_direction = pymongo.ASCENDING
     else:
         sort_direction = pymongo.DESCENDING
-    stream = db.Stream.find_one({'station_id': station_id}, sort=[('bitrate', sort_direction)])
+    stream = db.Stream.find_one({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
     if not stream:
         abort(404)
     data = stream.get_public_data()
-    data['url'] = 'http://ru.ah.fm/;'
     return jsonify(data)
 
 @app.route('/api/user/favorites')

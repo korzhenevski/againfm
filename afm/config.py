@@ -1,4 +1,6 @@
-DEBUG = True
+DEBUG = False
+
+ASSETS_DEBUG = DEBUG
 SECRET_KEY = 'secret_key'
 CSRF_ENABLED = False
 
