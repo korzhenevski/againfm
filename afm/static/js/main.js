@@ -951,9 +951,6 @@ App.RadioDisplayView = App.View.extend({
     },
 
     stationClick: function(e) {
-        setTimeout(function(){
-            App.spectrum.render();
-        }, 1000);
         var $el = $(e.target);
         this.playlist.changeStation($el.data().stationId);
     },
@@ -1228,84 +1225,112 @@ App.RadioNowView = App.View.extend({
     }
 });
 
-/*
-App.RadioSpectrumView = App.View.extend({
-    el: '#spectrum',
-    initialize: function(options) {
-        this.player = options.player;
-        if (this.isSupported()) {
-            this.ctx = this.el.getContext('2d');
-            this.width = this.$el.width();
-            this.height = this.$el.height();
-            this.frameRender();
-        } else {
-            console.warn('Browser not support canvas. Spectrum render disabled.');
+App.Spectrum = function() {
+    this.initialize.apply(this, arguments);
+}
+
+_.extend(App.Spectrum.prototype, {
+    initialize: function() {
+        this.$el = $('#spectrum');
+        this.ctx = this.$el.get(0).getContext('2d');
+        this.limit = 600;
+        this.running = false;
+        this.colors = ['#d86b26', '#d72f2e', '#0f9ac5'];
+        this.animateInterval = 100;
+        App.player.on('play', _.bind(this.start, this));
+        App.player.on('paused', _.bind(this.stop, this));
+        App.play.on('change_station', _.bind(this.stop, this));
+        this._updateSize();
+        $(window).resize(_.throttle(_.bind(this._updateSize, this), 200));
+    },
+
+    _updateSize: function() {
+        this.width = this.$el.width();
+        this.height = this.$el.height();
+        this.lineSize = Math.floor(this.limit / this.colors.length);
+        this.renderStep = Math.round(this.width / this.lineSize);
+    },
+
+    start: function() {
+        this._clear();
+        this.spectrum = [];
+        this.points = [];
+        this.running = true;
+        for (var i = 0; i < this.limit; ++i) {
+            this.points[i] = 90;
+        }
+        this._animate();
+        setInterval(_.bind(this._pullSpectrum, this), 100);
+        console.log('start');
+    },
+
+    stop: function() {
+        console.log('stop');
+        this._clear()
+        this.running = false;
+    },
+
+    _animate: function() {
+        var completed = 0;
+        var size = this.spectrum.length;
+        if (!size) {
+            this._pullSpectrum();
+        }
+        for (var i = 0; i < size; i++) {
+            var diff = this.spectrum[i] - this.points[i];
+            if (Math.abs(diff) > 0) {
+                var val = this.points[i] + diff * 0.1;
+                if (Math.round(val) >= this.spectrum[i]) {
+                    val = this.spectrum[i];
+                    ++completed;
+                }
+                this.points[i] = val;
+            } else {
+                ++completed;
+            }
+        }
+
+        if (size) {
+            this._render();
+        }
+
+        if (completed == size) {
+        //    this._pullSpectrum();
+        }
+
+        if (this.running) {
+            setTimeout(_.bind(this._animate, this), this.animateInterval);
         }
     },
 
-    isSupported: function() {
-        return false;
-        return !!(this.el.getContext && this.el.getContext('2d'));
-    },
+    _render: function() {
+        this._clear();
 
-    render: function() {
-        var spectrum = this.player.getSpectrum();
-        if (spectrum === null) {
-            this.frameRender();
-            return;
-        }
-        var spectrumSize = spectrum.length;
-        var halfHeight = Math.floor(this.height / 2) - 20;
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        if (!spectrumSize) {
-            this.drawEmptyLine('#f3f3f3', 1, halfHeight);
-            this.frameRender();
-            return;
-        }
-
-        var chunk = Math.floor(spectrumSize / 3);
-        var step = Math.round(this.width / chunk);
-
-        $.each(['#d86b26', '#d72f2e', '#0f9ac5'], _.bind(function(c, color) {
-            var points = [];
-            var lim = chunk * (c + 1);
-            var pos = 0;
-            for (var i = (chunk * c); i < lim; i++) {
-                var val = halfHeight + Math.round(spectrum[i] * halfHeight);
-                if (val > this.height) {
-                    val = this.height;
+        for(var lineIndex = 0; lineIndex < this.colors.length; lineIndex++) {
+            var pos = 0,
+                points = [],
+                lim = (lineIndex + 1) * this.lineSize;
+            var maxVal = this.height - 10;
+            for (var i = lineIndex * this.lineSize; i < lim; i++) {
+                var val = (this.points[i]) - 20;
+                if (val > maxVal) {
+                    val = maxVal;
                 }
                 if (val < 0) {
-                    val = 0;
+                    val = 10;
                 }
                 points.push([pos, val]);
-                pos += step;
+                pos = pos + this.renderStep;
             }
-            this.drawCurvyLine(points, 0.5, color, 2);
-            points = null;
-        }, this));
-        spectrum = null;
 
-        this.frameRender();
+            this._drawCurve(points, this.colors[lineIndex]);
+        }
     },
 
-    drawEmptyLine: function(color, linewidth, height) {
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = linewidth;
-
-        this.ctx.shadowColor = color;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        this.ctx.shadowBlur = 5;
-
-        this.ctx.moveTo(0, height);
-        this.ctx.lineTo(this.width, height);
-        this.ctx.stroke();
-    },
-
-    drawCurvyLine: function(coords, factor, color, linewidth) {
-        var ctx = this.ctx;
+    _drawCurve: function(points, color) {
+        var factor = 0.4,
+            linewidth = 1,
+            ctx = this.ctx;
         ctx.beginPath();
 
         ctx.shadowColor = color;
@@ -1315,18 +1340,18 @@ App.RadioSpectrumView = App.View.extend({
 
         ctx.strokeStyle = color;
         ctx.lineWidth = linewidth;
-        var len = coords.length;
+        var len = points.length;
 
         for (var i = 0; i < len; ++i) {
-            if (coords[i] && typeof(coords[i][1]) == 'number' && coords[i + 1] && typeof(coords[i + 1][1]) == 'number') {
-                var coordX = coords[i][0];
-                var coordY = coords[i][1];
-                var nextX = coords[i + 1][0];
-                var nextY = coords[i + 1][1];
-                var prevX = coords[i - 1] ? coords[i - 1][0] : null;
-                var prevY = coords[i - 1] ? coords[i - 1][1] : null;
-                var offsetX = (coords[i + 1][0] - coords[i][0]) * factor;
-                var offsetY = (coords[i + 1][1] - coords[i][1]) * factor;
+            if (points[i] && typeof(points[i][1]) == 'number' && points[i + 1] && typeof(points[i + 1][1]) == 'number') {
+                var coordX = points[i][0];
+                var coordY = points[i][1];
+                var nextX = points[i + 1][0];
+                var nextY = points[i + 1][1];
+                var prevX = points[i - 1] ? points[i - 1][0] : null;
+                var prevY = points[i - 1] ? points[i - 1][1] : null;
+                var offsetX = (points[i + 1][0] - points[i][0]) * factor;
+                var offsetY = (points[i + 1][1] - points[i][1]) * factor;
 
                 if (i == 0) {
                     ctx.moveTo(coordX, coordY);
@@ -1345,18 +1370,22 @@ App.RadioSpectrumView = App.View.extend({
                         ctx.lineTo(coordX, coordY);
                     }
                 }
-            } else if (typeof(coords[i][1]) == 'number') {
-                ctx.lineTo(coords[i][0], coords[i][1]);
+            } else if (typeof(points[i][1]) == 'number') {
+                ctx.lineTo(points[i][0], points[i][1]);
             }
         }
         ctx.stroke();
     },
 
-    frameRender: function() {
-        requestAnimFrame(_.bind(this.render, this));
+    _clear: function() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+    },
+
+    _pullSpectrum: function() {
+        this.spectrum = App.player.getSpectrum(this.limit);
     }
-});
-*/
+})
+
 
 App.SpectrumView = App.View.extend({
     el: '#spectrum',
@@ -1445,54 +1474,6 @@ App.SpectrumView = App.View.extend({
 
         setTimeout(animation, 0);
         //requestAnimFrame(animation);
-    },
-
-    drawCurvyLine: function(coords, factor, color, linewidth) {
-        var ctx = this.ctx;
-        ctx.beginPath();
-
-        ctx.shadowColor = color;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 5;
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = linewidth;
-        var len = coords.length;
-
-        for (var i = 0; i < len; ++i) {
-            if (coords[i] && typeof(coords[i][1]) == 'number' && coords[i + 1] && typeof(coords[i + 1][1]) == 'number') {
-                var coordX = coords[i][0];
-                var coordY = coords[i][1];
-                var nextX = coords[i + 1][0];
-                var nextY = coords[i + 1][1];
-                var prevX = coords[i - 1] ? coords[i - 1][0] : null;
-                var prevY = coords[i - 1] ? coords[i - 1][1] : null;
-                var offsetX = (coords[i + 1][0] - coords[i][0]) * factor;
-                var offsetY = (coords[i + 1][1] - coords[i][1]) * factor;
-
-                if (i == 0) {
-                    ctx.moveTo(coordX, coordY);
-                    ctx.lineTo(nextX - offsetX, nextY - offsetY);
-                } else if (nextY == null) {
-                    ctx.lineTo(coordX, coordY);
-                } else if (prevY == null) {
-                    ctx.moveTo(coordX, coordY);
-                } else if (coordY == null) {
-                    ctx.moveTo(nextX, nextY);
-                } else {
-                    ctx.quadraticCurveTo(coordX, coordY, coordX + offsetX, coordY + offsetY);
-                    if (nextY) {
-                        ctx.lineTo(nextX - offsetX, nextY - offsetY);
-                    } else {
-                        ctx.lineTo(coordX, coordY);
-                    }
-                }
-            } else if (typeof(coords[i][1]) == 'number') {
-                ctx.lineTo(coords[i][0], coords[i][1]);
-            }
-        }
-        ctx.stroke();
     }
 })
 
@@ -1683,10 +1664,7 @@ App.setup = function(bootstrap) {
     App.controls = new App.RadioControlsView();
 
     App.player = new App.Player();
-
-    App.spectrum = new App.SpectrumView({
-        player: App.player
-    });
+    App.spectrum = new App.Spectrum();
 
     App.player.embedTo('player-container', {volume: App.controls.volume});
 

@@ -53,7 +53,6 @@ Comet._iframeLoaded = function(id)
 // after a sequence of subscribe() calls.
 Comet.prototype.subscribe = function(params, callback) {
     this.callback = {params: $.param(params), callback: callback};
-    console.log(params);
     this.execute();
 }
 

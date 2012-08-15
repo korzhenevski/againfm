@@ -76,7 +76,7 @@ package {
             _sound.extract(bytes, points);
             bytes.position = 0;
             while(bytes.bytesAvailable > 0) {
-               spectrum.push(100 + bytes.readFloat() * 100);
+               spectrum.push((176 + bytes.readFloat() * 176) / 2);
                bytes.readFloat();
             }
 
@@ -137,6 +137,7 @@ package {
 
         public function setPaused(paused:Boolean): void {
             _isPaused = paused;
+            ExternalInterface.call('App.player.trigger', paused ? 'paused' : 'play');
         }
 
         public function sendEvent() {
@@ -195,7 +196,7 @@ package {
             _isPaused = true;
        
             debug('io-error: '+event.text);
-            ExternalInterface.call('player.trigger', 'error', event.text);
+            ExternalInterface.call('App.player.trigger', 'error', event.text);
         }
     }
 }
