@@ -220,10 +220,14 @@ class Track(BaseDocument):
         'name': unicode,
         'image_url': unicode,
         'tags': [unicode],
+        'hash': int,
         'created_at': datetime,
     }
 
-    indexes = [{'fields': 'id', 'unique': True}, {'fields': 'rawtitle', 'unique': True}]
+    indexes = [
+        {'fields': 'id', 'unique': True},
+        {'fields': ['hash', 'rawtitle'], 'unique': True},
+    ]
 
     default_values = {
         'created_at': datetime.now,
