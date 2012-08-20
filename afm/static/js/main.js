@@ -1233,7 +1233,7 @@ _.extend(App.Spectrum.prototype, {
     initialize: function() {
         this.$el = $('#spectrum');
         this.ctx = this.$el.get(0).getContext('2d');
-        this.limit = 600;
+        this.limit = 390;
         this.running = false;
         this.colors = ['#d86b26', '#d72f2e', '#0f9ac5'];
         this.animateInterval = 100;
@@ -1336,7 +1336,7 @@ _.extend(App.Spectrum.prototype, {
         ctx.shadowColor = color;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 5;
+        ctx.shadowBlur = 4;
 
         ctx.strokeStyle = color;
         ctx.lineWidth = linewidth;

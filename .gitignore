@@ -4,6 +4,8 @@
 
 .webassets-cache
 packed.*.js
+*.zip
+*.txt
 
 # Packages
 *.egg

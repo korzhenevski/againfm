@@ -84,7 +84,7 @@ class User(BaseDocument):
         return False
 
     def get_id(self):
-        return unicode(self['id'])
+        return self['id']
 
     def get_public_data(self):
         return {
@@ -269,3 +269,19 @@ class Favorite(BaseDocument):
             '_time': date.strftime('%H:%M'),
             '_date': date.strftime('%Y %m %d')
         }
+
+@db.register
+class OnairTag(BaseDocument):
+    __collection__ = 'onair_tags'
+
+    structure = {
+        '_id': {
+            'station_id': int,
+            'tag': unicode
+        },
+        'value': int,
+    }
+
+    indexes = [
+        {'fields': ['_id.tag', '_id.station_id']},
+    ]
