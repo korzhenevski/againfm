@@ -127,9 +127,14 @@ def login():
 
 @app.route('/api/playlist/<int:category_id>')
 def playlist(category_id):
-    category = db.Category.get_or_404(category_id)
-    stations = [db.Station.get_from_id(station_id).get_public_data() for station_id in category.stations]
-    #stations = [{'id': randint(10000, 999999), 'title': unicode(category_id)} for i in xrange(100)]
+    category = db.Category.find_one({'id': category_id})
+    if not category:
+        abort(404)
+    stations = []
+    for tag in db.OnairTag.find({'_id.tag': {'$in': category.tags}}):
+        station = db.Station.find_one({'id': tag['_id']['station_id']})
+        if station:
+            stations.append(station.get_public_data())
     return jsonify({'objects': stations})
 
 @app.route('/')

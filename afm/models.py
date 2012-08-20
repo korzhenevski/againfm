@@ -194,18 +194,22 @@ class Stream(BaseDocument):
 @db.register
 class Category(BaseDocument):
     __collection__ = 'categories'
-    use_autorefs = True
 
     structure = {
+        'id': int,
         'title': unicode,
-        #'stations': [ObjectId],
+        'tags': [unicode],
         'is_public': bool
     }
 
+    indexes = [
+        {'fields': 'id', 'unique': True},
+    ]
+
     def get_public_data(self):
         return {
-            'id': unicode(self._id),
-            'title': self.title
+            'id': self['id'],
+            'title': self['title']
         }
 
 @db.register
@@ -284,4 +288,18 @@ class OnairTag(BaseDocument):
 
     indexes = [
         {'fields': ['_id.tag', '_id.station_id']},
+        {'fields': ['value']},
+    ]
+
+@db.register
+class OnairTopTag(BaseDocument):
+    __collection__ = 'onair_top_tags'
+
+    structure = {
+        '_id': unicode,
+        'value': int,
+    }
+
+    indexes = [
+        {'fields': ['_id', 'value']},
     ]

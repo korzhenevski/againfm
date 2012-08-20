@@ -758,10 +758,7 @@ App.Playlist = App.Collection.extend({
     },
 
     comparator: function(model) {
-        if (this.id.substr(0, 8) == 'category') {
-            return model.get('order');
-        }
-        return model.id;
+        return model.get('order');
     }
 });
 

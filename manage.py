@@ -16,6 +16,31 @@ def fasthash(data):
     return crc32(data) & 0xffffffff
 
 @manager.command
+def init_categories():
+    def create_category(title, tags):
+        cat = db.Category()
+        cat.title = title
+        cat.tags = tags
+        cat.is_public = True
+        cat.save()
+        return cat
+
+    db.categories.remove()
+
+    categories = [
+        ('Drum and Bass', ['dnb', 'drum and bass']),
+        ('Trance', ['trance', 'progressive trance']),
+        ('House', ['progressive house', 'house']),
+        ('Relax', ['chillout', 'ambient']),
+    ]
+
+    for title, tags in categories:
+        print create_category(unicode(title), map(unicode, tags))
+
+    #for tag in db.OnairTopTag.find({'value': {'$gt': 10}}):
+    #    print tag
+
+@manager.command
 def import_megadump():
     import csv
     def csv_reader(filename):
@@ -119,8 +144,25 @@ def rebuild_onair_tags():
     }
     """)
     result = db.onair_history.map_reduce(mapper, reducer, 'onair_tags')
-    result.ensure_index([('_id.tag', 1), ('_id.station_id', 1)], unique=True)
-    print result.count()
+    print 'tags %s' % result.count()
+
+    mapper = Code("""
+    function() {
+        emit(this._id.tag, 1);
+    }
+    """)
+    reducer = Code("""
+    function(key, values) {
+        var total = 0;
+        for(var i = 0; i < values.length; i++) {
+            total += values[i];
+        }
+        return total;
+    }
+    """)
+    result = db.onair_tags.map_reduce(mapper, reducer, 'onair_top_tags')
+    print 'top tags %s' % result.count()
+
 
 @manager.command
 def import_dump():
