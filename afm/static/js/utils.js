@@ -81,9 +81,8 @@ $.fn.placeholder = function() {
 };
 
 window.requestAnimFrame = (function() {
-    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-    function(/* function */ callback, /* DOMElement */ element) {
-        window.setTimeout(callback, 80); // floor 1000 / 20 fps
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(/* function */ callback, /* DOMElement */ element) {
+        window.setTimeout(callback, 100); // floor 1000 / 20 fps
     };
 })();
 

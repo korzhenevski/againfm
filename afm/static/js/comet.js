@@ -56,6 +56,11 @@ Comet.prototype.subscribe = function(params, callback) {
     this.execute();
 }
 
+Comet.prototype.unsubscribe = function() {
+    this.callback = null;
+    this.execute();
+}
+
 // Reconnect to the server and listen for all specified IDs.
 // You should call this method after a number of calls to subscribe().
 Comet.prototype.execute = function() {

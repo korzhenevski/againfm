@@ -1061,10 +1061,13 @@ App.RadioNowView = App.View.extend({
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'stationChanged', 'streamChanged', 'trackUpdate', 'setUnavailableRadio');
+        _.bindAll(this, 'render', 'stationChanged', 'streamChanged',
+                        'trackUpdate', 'radioUnavailable', 'subscribeTrackUpdate', 'stopTrackUpdate');
 
         this.player = options.player;
-        this.player.on('error', this.setUnavailableRadio);
+        this.player.on('error', this.radioUnavailable);
+        this.player.on('play', this.subscribeTrackUpdate);
+        this.player.on('paused', this.stopTrackUpdate);
 
         this.content = new App.RadioNow();
         this.content.on('change', this.stopUnavailableTimer, this);
@@ -1078,9 +1081,9 @@ App.RadioNowView = App.View.extend({
         user.favorites.on('favorite:toggle', this.render);
 
         this.statusUnavailableTimeout = 20000;
-        this.imageNotfound = App.settings.STATIC_URL + 'i/display/notfound.png';
-        this.imageLoading = App.settings.STATIC_URL + 'i/display/loading.png';
-        preloadImage(this.imageNotfound, this.imageLoading);
+        this.notfoundIcon = App.settings.STATIC_URL + 'i/display/notfound.png';
+        this.loadingIcon = App.settings.STATIC_URL + 'i/display/loading.png';
+        preloadImage(this.notfoundIcon, this.loadingIcon);
     },
 
     stationChanged: function(mediator) {
@@ -1091,7 +1094,7 @@ App.RadioNowView = App.View.extend({
             id: null,
             title: gettext('Loading...'),
             caption: '',
-            image_url: this.imageLoading
+            image_url: this.loadingIcon
         });
         this.startUnavailableTimer();
     },
@@ -1100,12 +1103,12 @@ App.RadioNowView = App.View.extend({
         this.subscribeTrackUpdate({
             'station_id': mediator.station.get('id'),
             'stream_id': mediator.stream['id']
-        }, this.trackUpdate);
+        });
     },
 
     startUnavailableTimer: function() {
         this.stopUnavailableTimer();
-        this._unavailableStatusTimer = setTimeout(_.bind(this.setUnavailableStatus, this), this.statusUnavailableTimeout);
+        this._unavailableStatusTimer = setTimeout(_.bind(this.infoUnavailable, this), this.statusUnavailableTimeout);
     },
 
     stopUnavailableTimer: function() {
@@ -1114,15 +1117,27 @@ App.RadioNowView = App.View.extend({
         }
     },
 
-    subscribeTrackUpdate: function(params, onUpdate) {
+    stopTrackUpdate: function() {
+        App.cometfm.unsubscribe();
+    },
+
+    subscribeTrackUpdate: function(params) {
+        if (params) {
+            this._cometParams = params
+        } else {
+            params = this._cometParams;
+        }
+
         var cometfm = App.cometfm;
         if (!cometfm) {
             return;
         }
+
         if (App.user.isLogged()) {
             params['user_id'] = App.user.get('id')
         }
-        cometfm.subscribe(params, onUpdate);
+
+        cometfm.subscribe(params, this.trackUpdate);
     },
 
     trackUpdate: function(track) {
@@ -1133,7 +1148,7 @@ App.RadioNowView = App.View.extend({
         } else if (track.title) {
             data.title = track.title;
         }
-        data.image_url = track.image_url || this.imageNotfound;
+        data.image_url = track.image_url || this.notfoundIcon;
         data.id = track.id || 0;
         this.content.set(data);
         return this;
@@ -1153,7 +1168,7 @@ App.RadioNowView = App.View.extend({
         }
         // skip image loading, if traffic throttling active
         if (user.settings.trafficThrottling()) {
-            content.image_url = this.imageNotfound;
+            content.image_url = this.notfoundIcon;
         }
         return content;
     },
@@ -1174,33 +1189,33 @@ App.RadioNowView = App.View.extend({
             $title.stop();
             $title.parent().addClass('shadow');
             var marquee = function(delta) {
-                    var data = {};
-                    data['margin-left'] = delta < 0 ? 0 : -1 * delta;
-                    $title.delay(1000).animate(data, Math.abs(delta) * 35, 'linear', function() {
-                        marquee(-delta);
-                    });
-                }
+                var data = {};
+                data['margin-left'] = delta < 0 ? 0 : -1 * delta;
+                $title.delay(1000).animate(data, Math.abs(delta) * 35, 'linear', function() {
+                    marquee(-delta);
+                });
+            }
             marquee(delta);
         } else {
             $title.parent().removeClass('shadow');
         }
     },
 
-    setUnavailableStatus: function() {
+    infoUnavailable: function() {
         this.content.set({
             'title': gettext('Info unavailable'),
             'caption': '',
-            'image_url': this.imageNotfound,
-            'meta_id': null
+            'image_url': this.notfoundIcon,
+            'id': null
         });
     },
 
-    setUnavailableRadio: function() {
+    radioUnavailable: function() {
         this.content.set({
             'title': gettext('Radio unavailable'),
             'caption': '',
-            'image_url': this.imageNotfound,
-            'meta_id': null
+            'image_url': this.notfoundIcon,
+            'id': null
         });
     },
 
@@ -1230,15 +1245,16 @@ _.extend(App.Spectrum.prototype, {
     initialize: function() {
         this.$el = $('#spectrum');
         this.ctx = this.$el.get(0).getContext('2d');
-        this.limit = 390;
+        this.limit = 300;
         this.running = false;
         this.colors = ['#d86b26', '#d72f2e', '#0f9ac5'];
         this.animateInterval = 100;
+        _.bindAll(this, '_animate', 'pullSpectrum', '_updateSize', 'drawBlankLine');
         App.player.on('play', _.bind(this.start, this));
         App.player.on('paused', _.bind(this.stop, this));
         App.play.on('change_station', _.bind(this.stop, this));
         this._updateSize();
-        $(window).resize(_.throttle(_.bind(this._updateSize, this), 200));
+        $(window).resize(_.throttle(this._updateSize, 200));
     },
 
     _updateSize: function() {
@@ -1249,34 +1265,54 @@ _.extend(App.Spectrum.prototype, {
     },
 
     start: function() {
-        this._clear();
+        this.running = true;
+        this.clear();
+
         this.spectrum = [];
         this.points = [];
-        this.running = true;
         for (var i = 0; i < this.limit; ++i) {
-            this.points[i] = 90;
+            this.points[i] = 68;
         }
+
         this._animate();
-        setInterval(_.bind(this._pullSpectrum, this), 100);
-        console.log('start');
+        requestAnimFrame(this.pullSpectrum);
     },
 
     stop: function() {
-        console.log('stop');
-        this._clear()
         this.running = false;
+        this.clear();
+        requestAnimFrame(this.drawBlankLine);
+    },
+
+    drawBlankLine: function() {
+        this.clear();
+        var ctx = this.ctx,
+            color = '#f3f3f3',
+            height = 68;
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+
+        ctx.shadowColor = color;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 5;
+
+        ctx.moveTo(0, height);
+        ctx.lineTo(this.width, height);
+        ctx.stroke();
     },
 
     _animate: function() {
         var completed = 0;
         var size = this.spectrum.length;
         if (!size) {
-            this._pullSpectrum();
+            this.spectrum = App.player.getSpectrum(this.limit);
         }
         for (var i = 0; i < size; i++) {
             var diff = this.spectrum[i] - this.points[i];
             if (Math.abs(diff) > 0) {
-                var val = this.points[i] + diff * 0.1;
+                var val = this.points[i] + diff * 0.02;
                 if (Math.round(val) >= this.spectrum[i]) {
                     val = this.spectrum[i];
                     ++completed;
@@ -1288,20 +1324,16 @@ _.extend(App.Spectrum.prototype, {
         }
 
         if (size) {
-            this._render();
-        }
-
-        if (completed == size) {
-        //    this._pullSpectrum();
+            this.render();
         }
 
         if (this.running) {
-            setTimeout(_.bind(this._animate, this), this.animateInterval);
+            requestAnimFrame(_.bind(this._animate, this));
         }
     },
 
-    _render: function() {
-        this._clear();
+    render: function() {
+        this.clear();
 
         for(var lineIndex = 0; lineIndex < this.colors.length; lineIndex++) {
             var pos = 0,
@@ -1309,7 +1341,7 @@ _.extend(App.Spectrum.prototype, {
                 lim = (lineIndex + 1) * this.lineSize;
             var maxVal = this.height - 10;
             for (var i = lineIndex * this.lineSize; i < lim; i++) {
-                var val = (this.points[i]) - 20;
+                var val = this.points[i];
                 if (val > maxVal) {
                     val = maxVal;
                 }
@@ -1320,11 +1352,11 @@ _.extend(App.Spectrum.prototype, {
                 pos = pos + this.renderStep;
             }
 
-            this._drawCurve(points, this.colors[lineIndex]);
+            this.drawCurve(points, this.colors[lineIndex]);
         }
     },
 
-    _drawCurve: function(points, color) {
+    drawCurve: function(points, color) {
         var factor = 0.4,
             linewidth = 1,
             ctx = this.ctx;
@@ -1374,12 +1406,15 @@ _.extend(App.Spectrum.prototype, {
         ctx.stroke();
     },
 
-    _clear: function() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+    pullSpectrum: function() {
+        this.spectrum = App.player.getSpectrum(this.limit);
+        if (this.running) {
+            requestAnimFrame(this.pullSpectrum);
+        }
     },
 
-    _pullSpectrum: function() {
-        this.spectrum = App.player.getSpectrum(this.limit);
+    clear: function() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
     }
 })
 

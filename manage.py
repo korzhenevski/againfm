@@ -126,42 +126,65 @@ def ensure_indexes():
 @manager.command
 def rebuild_onair_tags():
     from bson.code import Code
-    mapper = Code("""
-    function() {
+    mapper = Code("""function() {
         var station_id = this.station_id;
         this.tags.forEach(function(tag){
             emit({station_id: station_id, tag: tag}, 1);
         });
-    }
-    """)
-    reducer = Code("""
-    function(key, values) {
-        var total = 0;
-        for(var i = 0; i < values.length; i++) {
-            total += values[i];
-        }
-        return total;
-    }
-    """)
-    result = db.onair_history.map_reduce(mapper, reducer, 'onair_tags')
-    print 'tags %s' % result.count()
+    }""")
 
-    mapper = Code("""
-    function() {
-        emit(this._id.tag, 1);
-    }
-    """)
-    reducer = Code("""
-    function(key, values) {
+    reducer = Code("""function(key, values) {
         var total = 0;
         for(var i = 0; i < values.length; i++) {
             total += values[i];
         }
         return total;
-    }
-    """)
-    result = db.onair_tags.map_reduce(mapper, reducer, 'onair_top_tags')
-    print 'top tags %s' % result.count()
+    }""")
+
+    #result = db.onair_history.map_reduce(mapper, reducer, 'onair_tags')
+    #print 'tags %s' % result.count()
+
+    mapper = Code("""function() {
+        emit(this._id.tag, 1);
+    }""")
+    reducer = Code("""function(key, values) {
+        var total = 0;
+        for(var i = 0; i < values.length; i++) {
+            total += values[i];
+        }
+        return total;
+    }""")
+    #result = db.onair_tags.map_reduce(mapper, reducer, 'onair_top_tags')
+    #print 'top tags %s' % result.count()
+
+    mapper = Code("""function() {
+        emit(this._id.station_id, {tag: this._id.tag, count: this.value});
+    }""")
+    reducer = Code("""function(key, values) {
+        var result = values[0];
+        for(var i = 1; i < values.length; i++) {
+            if (values[i].count > result.count) {
+                result = values[i];
+            }
+        }
+        return result;
+    }""")
+    #result = db.onair_tags.map_reduce(mapper, reducer, 'station_tags')
+    #print 'station tags %s' % result.count()
+
+    mapper = Code("""function() {
+        emit(this.value.tag, 1);
+    }""")
+    reducer = Code("""function(key, values) {
+        var total = 0;
+        for(var i = 0; i < values.length; i++) {
+            total += values[i];
+        }
+        return total;
+    }""")
+    #result = db.station_tags.map_reduce(mapper, reducer, 'station_top_tags')
+    #for doc in result.find({'value': {'$gte': 2}}, sort=[('value', -1)]):
+    #    print doc
 
 
 @manager.command
