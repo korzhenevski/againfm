@@ -21,7 +21,7 @@ celery.conf.add_defaults(app.config)
 assets = Environment(app)
 
 js = Bundle(
-    'js/jquery-ui-1.8.16.custom.min.js',
+    'js/jquery-ui-1.8.23.custom.min.js',
     'js/jquery.watermark.js',
     'js/jquery.validate.js',
     'js/jquery.cookie.js',
@@ -35,7 +35,7 @@ js = Bundle(
     'js/comet.js',
     'js/swfobject.js',
     'js/main.js',
-    filters='uglifyjs', output='js/packed.%(version)s.js')
+    filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
 assets.register('js_all', js)
 
 #toolbar = DebugToolbarExtension(app)

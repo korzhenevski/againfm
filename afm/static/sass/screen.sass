@@ -80,7 +80,7 @@ a
   min-height: 100%
 
 .main
-  padding-bottom: 5em
+  height: 630px
 
 .wrapper-left
   overflow: hidden
@@ -132,6 +132,7 @@ a
   .head-form, .box-holder
     width: 500px
     margin: 0 auto
+    padding-top: 2px
 
 .box-holder
   overflow: hidden
@@ -165,10 +166,10 @@ a
 
 .input
   background-color: #666
-  height: 30px
   border: none
   margin: 0
   border-radius: 5px
+  padding: 7px 0px
   padding-left: 12px
   outline: none
 
@@ -185,10 +186,8 @@ input[type=submit]
   font-weight: bold
   text-align: center
   float: left
-
-input[type=submit]
   &:hover
-    +box-shadow(rgba(#fc6622, .4) 0px 1px 1px 1px)
+    +box-shadow(rgba(#fc6622, .4) 0px 0px 2px 2px)
 
 .loading
   margin-left: 10px
@@ -200,6 +199,7 @@ input[type=submit]
   .pseudo-link, label
     display: inline-block
     margin-left: 13px
+    margin-top: 3px
   label.error, input.error
     color: #ab0101
   label.valid, input.valid
@@ -514,10 +514,11 @@ input[type=submit]
       background-position: 0 -158px
 
 .footer
-  position: absolute
+  position: relative
   bottom: 0
   height: 3em
   margin-left: 1.5em
+  margin-top: -3em
   .left-shift
     margin-left: -1.2em
   p

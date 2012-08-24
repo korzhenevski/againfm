@@ -38,6 +38,7 @@ App.View = Backbone.View.extend({
         this.show();
     }
 });
+
 App.Collection = Backbone.Collection.extend({});
 App.User = App.Model.extend({
     url: '/api/user/',
@@ -173,7 +174,7 @@ App.UserLoginView = App.View.extend({
 
     hideForm: function() {
         this.$el.hide();
-        this.$el.find(':text,:password').val('').trigger('change.jq_watermark');
+        //this.$el.find(':text,:password').val('').trigger('change.jq_watermark');
         this.changeNotice('', false).hide();
     },
 
@@ -544,7 +545,7 @@ App.UserRegisterView = App.TopHolderView.extend({
             this.validator.resetForm();
             // TODO: fix valid unhighlight in validator.resetForm
             this.getForm().find('.valid').removeClass('valid');
-            this.getForm().find(':text,:password').val('').trigger('change.jq_watermark');
+            //this.getForm().find(':text,:password').val('').trigger('change.jq_watermark');
         }, this));
         user.on('register.error', _.bind(function(rawErrors) {
             var errors = {};
@@ -841,6 +842,7 @@ App.RadioDisplayView = App.View.extend({
 
     setupScroll: function() {
         $('.radio-scroll').tinyscrollbar({axis: 'x'});
+        $(window).resize(_.throttle(_.bind(this.updateScroll, this), 200))
     },
 
     updateScroll: function() {
@@ -887,12 +889,11 @@ App.RadioDisplayView = App.View.extend({
                     break;
                 }
                 var stationId = station.get('id');
-                this.map[stationId] = $('<li>').html(station.escape('title')).attr({
+                var $station = $('<li>').html(station.escape('title')).attr({
                     'class': 'station-link',
-                    'id': 'radio-station-' + station.id
+                    'id': 'station-' + station.id
                 }).data('station-id', station.id).css('left', spot + (m ? 15 : 0)).appendTo($lines[ml]);
-                var width = this.map[stationId].width();
-                limits[ml] = spot + width + space;
+                limits[ml] = spot + $station.width() + space;
             }
         } while (spots.length);
 
@@ -923,11 +924,12 @@ App.RadioDisplayView = App.View.extend({
         this.playlist.changeStation($el.data().stationId);
     },
 
-    select: function(stationId, duration) {
-        var $station = this.map[stationId.id ? stationId.id : stationId];
+    select: function(station, duration) {
+        var stationId = station.id ? station.id : station;
+        var $station = $('#station-'+stationId);
         if ($station) {
             this.$slider.show().animate({
-                'left': $station.position().left + 13
+                'left': $station.scrollLeft() + $station.position().left + 13
             }, duration);
             this.$el.find('.active-station').removeClass('active-station');
             $station.addClass('active-station');
@@ -954,6 +956,7 @@ App.Player = function() {
 _.extend(App.Player.prototype, Backbone.Events, {
     _player: null,
     fading: true,
+
     initialize: function() {
         var proxiedMethods = 'getVolume,mute,unmute,playStream,isPaused'.split(',');
         _.each(proxiedMethods, function(method) {
@@ -967,6 +970,10 @@ _.extend(App.Player.prototype, Backbone.Events, {
                 }, this);
             }
         }, this);
+        this.setupEvents();
+    },
+
+    setupEvents: function() {
         var self = this;
         var settings = App.user.settings;
         settings.on('change:fading_sound', function(obj, value) {
@@ -976,6 +983,7 @@ _.extend(App.Player.prototype, Backbone.Events, {
             self.loadStreamByUrl(mediator.stream['url'], true);
         });
     },
+
     pauseStream: function() {
         this._player[this.fading ? 'pauseStreamWithFade' : 'pauseStream']();
     },
@@ -1128,13 +1136,10 @@ App.RadioNowView = App.View.extend({
     getContent: function() {
         var content = this.content.toJSON();
         var user = App.user;
-        if (user.isLogged()) {
-            if (content.id) {
-                content.star_class = 'star';
-                var favorite = user.favorites.lookup(content.id);
-                if (favorite && !favorite.isDeleted()) {
-                    content.star_class += ' star-selected';
-                }
+        if (user.isLogged() && content.id) {
+            content.star_class = 'star';
+            if (content['faved']) {
+                content.star_class += ' star-selected';
             }
         }
         // skip image loading, if traffic throttling active
@@ -1267,7 +1272,7 @@ _.extend(App.Spectrum.prototype, {
         ctx.shadowColor = color;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 5;
+        ctx.shadowBlur = 4;
 
         ctx.moveTo(0, height);
         ctx.lineTo(this.width, height);
@@ -1387,98 +1392,7 @@ _.extend(App.Spectrum.prototype, {
     clear: function() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
-})
-
-
-App.SpectrumView = App.View.extend({
-    el: '#spectrum',
-
-    initialize: function(options) {
-        this.player = options.player;
-        this.ctx = this.el.getContext('2d');
-        this.width = this.$el.width();
-        this.height = this.$el.height();
-    },
-
-    render: function() {
-        var spectrumLimit = 600;
-        var player = this.player;
-        var spectrum = [];
-        var spectrumPoints = [];
-        for (var i = 0; i < spectrumLimit; i++) {
-            spectrumPoints[i] = 0;
-            spectrum[i] = 0;
-        }
-        console.log(spectrumPoints);
-
-        var lastTime = +new Date();
-        var colors = ['#d86b26', '#d72f2e', '#0f9ac5'];
-        var drawCurvyLine = _.bind(this.drawCurvyLine, this);
-        var width = this.width;
-        var height = this.height;
-        var clear = _.bind(function() {
-            this.ctx.clearRect(0, 0, this.width, this.height);
-        }, this);
-
-        var chunk = Math.floor(spectrumLimit / colors.length);
-        var step = Math.round(width / chunk);
-
-        var draw = function() {
-            clear();
-            for (var lineIndex = 0; lineIndex < colors.length; lineIndex++) {
-                var points = [];
-                var lim = (lineIndex + 1) * chunk;
-                var pos = 0;
-                for (var i = lineIndex * chunk; i < lim; i++) {
-                    var val = (spectrumPoints[i]) - 30;
-                    if (val > height) {
-                        val = height;
-                    }
-                    if (val < 0) {
-                        val = 0;
-                    }
-                    points.push([pos, val]);
-                    pos = pos + step;
-                }
-                //console.log([lineIndex, points]);
-                drawCurvyLine(points, 0.5, colors[lineIndex], 2);
-            }
-        }
-
-        var animation = function(time) {
-            //console.log('animation');
-            var completed = 0;
-            var spectrumSize = spectrum.length;
-            for (var i = 0; i < spectrumSize; i++) {
-                var diff = spectrum[i] - spectrumPoints[i];
-                //console.log(diff);
-                if (Math.abs(diff) > 0) {
-                    var newval = spectrumPoints[i] + diff * 0.1;
-                    if (Math.round(newval) >= spectrum[i]) {
-                        newval = spectrum[i];
-                        ++completed;
-                    }
-                    spectrumPoints[i] = newval;
-                } else {
-                    ++completed;
-                }
-            }
-            draw();
-            //console.log(spectrumPoints);
-            //console.log(completed);
-            if (completed) {
-                //spectrumPoints = spectrum;
-                //spectrumPoints = spectrum;
-                spectrum = player.getSpectrum(spectrumLimit);
-            }
-            //lastTime = time;
-            setTimeout(animation, 100);
-        }
-
-        setTimeout(animation, 0);
-        //requestAnimFrame(animation);
-    }
-})
+});
 
 App.RadioControlsView = App.View.extend({
     el: '.radio-controls',
@@ -1505,7 +1419,8 @@ App.RadioControlsView = App.View.extend({
 
     toggleBitrateIndicator: function(mediator) {
         var $indicator = this.$el.find('.radio-control-hd');
-        if (mediator.stream.is_hd) {
+        console.log(mediator.stream);
+        if (mediator.stream['is_hd']) {
             $indicator.show();
         } else {
             $indicator.hide();
@@ -1602,7 +1517,7 @@ App.TosView = App.UserPanelView.extend({
 App.PlayHistory = App.Collection.extend({
     model: App.Station,
     initialize: function() {
-        App.play.on('change_station', this.add, this);
+        App.radio.on('change_station', this.add, this);
     }
 });
 
@@ -1637,7 +1552,7 @@ App.Router = Backbone.Router.extend({
 
     selectStation: function(station_id) {
         var station = new App.Station({id: station_id});
-        App.play.setStation(station);
+        App.radio.setStation(station);
     }
 });
 
@@ -1695,8 +1610,21 @@ App.setup = function(bootstrap) {
         }
     });
 
+    App.radio.on('change_stream', function(){
+        setFavicon(App.settings.STATIC_URL + 'i/favicon_play.ico');
+    });
+
+    App.player.on('play', function(){
+        setFavicon(App.settings.STATIC_URL + 'i/favicon_play.ico');
+    });
+
+
+    App.player.on('paused', function(){
+        setFavicon(App.settings.STATIC_URL + 'i/favicon.ico');
+    });
+
     App.playlist.on('change_station', function(station) {
-        App.play.setStation(station);
+        App.radio.setStation(station);
     });
 
     App.footer = new App.FooterView();

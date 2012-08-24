@@ -73,11 +73,11 @@ $.fn.enable = function() {
     return this.removeAttr('disabled');
 }
 
+$.watermark.options.useNative = false;
+
 $.fn.placeholder = function() {
-    return this.find('input:text,input:password').watermark('', {
-        color: '#999',
-        left: -3
-    });
+    $.watermark.show('input:text, input:password');
+    //return this.find('input:text, input:password').watermark();
 };
 
 window.requestAnimFrame = (function() {
@@ -85,6 +85,12 @@ window.requestAnimFrame = (function() {
         window.setTimeout(callback, 100); // floor 1000 / 20 fps
     };
 })();
+
+function setFavicon(url) {
+    //$('head link[rel$=icon]').replaceWith('');
+    $('#favicon').attr('href', url);
+    //$('head').append($('<link rel="shortcut icon" type="image/x-icon"/>').attr('href', url));
+}
 
 /*
 window.onerror = function(e) {

@@ -100,6 +100,7 @@ package {
         public function playStream() {
             if (_sound != null) {
                 _soundChannel = _sound.play();
+                ExternalInterface.call('App.player.trigger', 'play');
                 _soundChannel.soundTransform = _soundTransform;
                 setPaused(false);
             } else {
@@ -109,6 +110,7 @@ package {
 
         // TODO: refactor tweener copypast
         public function pauseStreamWithFade() {
+            setPaused(true);
             if (_soundChannel) {
                 new EazeTween(_soundChannel).onComplete(pauseStream).to(_fadingTime, {volume: 0});
             }
@@ -122,6 +124,7 @@ package {
         }
 
         public function stopStreamWithFade() {
+            setPaused(true);
             if (_soundChannel) {
                 new EazeTween(_soundChannel).onComplete(stopStream).to(_fadingTime, {volume: 0});
             }
@@ -136,8 +139,11 @@ package {
         }
 
         public function setPaused(paused:Boolean): void {
-            _isPaused = paused;
-            ExternalInterface.call('App.player.trigger', paused ? 'paused' : 'play');
+            // if state changed
+            if (paused != _isPaused) {
+               ExternalInterface.call('App.player.trigger', paused ? 'paused' : 'play');
+               _isPaused = paused;
+            }
         }
 
         public function sendEvent() {
@@ -191,9 +197,9 @@ package {
         }
 
         private function onIOError(event:Event): void {
+            setPaused(true);
             _soundChannel = null;
             _sound = null;
-            _isPaused = true;
        
             debug('io-error: '+event.text);
             ExternalInterface.call('App.player.trigger', 'error', event.text);

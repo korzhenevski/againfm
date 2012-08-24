@@ -3,7 +3,7 @@
 .sass-cache
 
 .webassets-cache
-packed.*.js
+afm/static/js/deploy
 *.zip
 *.txt
 
