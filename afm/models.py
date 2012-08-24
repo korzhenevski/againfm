@@ -39,6 +39,7 @@ class User(BaseDocument):
     structure = {
         'id': int,
         'name': unicode,
+        'sex': unicode,
         'login': unicode,
         'email': unicode,
         'password': unicode,
@@ -55,6 +56,7 @@ class User(BaseDocument):
 
     default_values = {
         'login': u'',
+        'sex': u'',
         'is_active': True,
         'settings.throttle_traffic': False,
         'settings.fading_sound': True,
@@ -86,17 +88,18 @@ class User(BaseDocument):
     def get_id(self):
         return self['id']
 
+    @property
+    def gravatar_hash(self):
+        return md5hash(self['email'].lower())
+
     def get_public_data(self):
         return {
             'id': self['id'],
             'email': self['email'],
             'name': self['name'],
+            'sex': self['sex'],
             'gravatar_hash': self.gravatar_hash,
         }
-
-    @property
-    def gravatar_hash(self):
-        return md5hash(self['email'].lower())
 
     def generate_new_password(self, length=8):
         chars = string.letters + string.digits

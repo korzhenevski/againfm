@@ -1,4 +1,4 @@
-window.App = {};
+var App = {};
 
 App.Model = Backbone.Model.extend({
     // TODO: migrate from options callbacks to deferred promise
@@ -645,7 +645,7 @@ App.Radio = App.Model.extend({
         this.trigger('change_stream', this);
     },
 
-    selectStream: function(onSuccess) {
+    selectStream: function() {
         if (!this.station) {
             return;
         }
@@ -976,26 +976,34 @@ _.extend(App.Player.prototype, Backbone.Events, {
     setupEvents: function() {
         var self = this;
         var settings = App.user.settings;
+
         settings.on('change:fading_sound', function(obj, value) {
             self.fading = value;
         }, this);
+
         App.radio.on('change_stream', function(mediator) {
-            self.loadStreamByUrl(mediator.stream['url'], true);
+            _.defer(function(){
+                self.loadStreamByUrl(mediator.stream['url'], true);
+            });
         });
     },
 
     pauseStream: function() {
         this._player[this.fading ? 'pauseStreamWithFade' : 'pauseStream']();
     },
+
     stopStream: function() {
         this._player[this.fading ? 'stopStreamWithFade' : 'stopStream']();
     },
+
     loadStreamByUrl: function(url, startPlay) {
         this._player.loadStreamByUrl(url, startPlay);
     },
+
     setVolume: function(volume) {
         this._player.setVolume(volume);
     },
+
     throttleTraffic: function(throttle) {
         throttle = !!throttle;
         this._player.throttleTraffic(throttle);
@@ -1010,10 +1018,11 @@ _.extend(App.Player.prototype, Backbone.Events, {
         // Callback events
         // * ready - SWF ready
         // * error - radio load error
-        swfobject.embedSWF(App.settings.STATIC_URL + 'swf/player.swf', id, 1, 1, '10', '', params, {
+        swfobject.embedSWF(App.config.static_url + 'swf/player.swf', id, 1, 1, '10', '', params, {
             'allowscriptaccess': 'always'
         }, {}, _.bind(this._onLoad, this));
     },
+
     _onLoad: function(e) {
         if (e.success) {
             this._player = e.ref;
@@ -1060,8 +1069,8 @@ App.RadioNowView = App.View.extend({
         user.favorites.on('favorite:toggle', this.render);
 
         this.statusUnavailableTimeout = 20000;
-        this.notfoundIcon = App.settings.STATIC_URL + 'i/display/notfound.png';
-        this.loadingIcon = App.settings.STATIC_URL + 'i/display/loading.png';
+        this.notfoundIcon = App.config.static_url + 'i/display/notfound.png';
+        this.loadingIcon = App.config.static_url + 'i/display/loading.png';
         preloadImage(this.notfoundIcon, this.loadingIcon);
     },
 
@@ -1408,9 +1417,9 @@ App.RadioControlsView = App.View.extend({
         var vol = $.cookie('volume');
         var isNightLimit = App.user.settings.hasNightVolumeLimit();
         if (vol !== null) {
-            this.volume = isNightLimit ? App.settings.NIGHT_VOLUME : vol;
+            this.volume = isNightLimit ? App.config.night_volume : vol;
         } else {
-            this.volume = App.settings.DEFAULT_VOLUME;
+            this.volume = App.config.default_volume;
         }
         this.$el.find('.radio-control-sound').toggleClass('radio-control-sound-off', this.volume === 0).show();
         this.isMuted = false;
@@ -1455,11 +1464,14 @@ App.RadioControlsView = App.View.extend({
     },
 
     controlPlay: function() {
-        if (App.player.isPaused()) {
-            App.player.playStream();
-        } else {
-            App.player.pauseStream();
-        }
+        var player = App.player;
+        _.defer(function(){
+            if (player.isPaused()) {
+                player.playStream();
+            } else {
+                player.stopStream();
+            }
+        });
         return false;
     },
 
@@ -1557,7 +1569,7 @@ App.Router = Backbone.Router.extend({
 });
 
 App.setup = function(bootstrap) {
-    App.cometfm = new Comet(App.settings['COMET_URL']);
+    App.cometfm = new Comet(App.config.comet_server);
 
     App.filters = new App.Filters();
     App.playlist = new App.Playlist();
@@ -1581,7 +1593,9 @@ App.setup = function(bootstrap) {
     App.controls = new App.RadioControlsView();
 
     App.player = new App.Player();
-    App.spectrum = new App.Spectrum();
+    if (App.config.spectrum) {
+        App.spectrum = new App.Spectrum();
+    }
 
     App.player.embedTo('player-container', {volume: App.controls.volume});
 
@@ -1611,16 +1625,15 @@ App.setup = function(bootstrap) {
     });
 
     App.radio.on('change_stream', function(){
-        setFavicon(App.settings.STATIC_URL + 'i/favicon_play.ico');
+        setFavicon(App.config.static_url + 'i/favicon_play.ico');
     });
 
     App.player.on('play', function(){
-        setFavicon(App.settings.STATIC_URL + 'i/favicon_play.ico');
+        setFavicon(App.config.static_url + 'i/favicon_play.ico');
     });
 
-
     App.player.on('paused', function(){
-        setFavicon(App.settings.STATIC_URL + 'i/favicon.ico');
+        setFavicon(App.config.static_url + 'i/favicon.ico');
     });
 
     App.playlist.on('change_station', function(station) {

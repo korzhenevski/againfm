@@ -28,7 +28,7 @@ package {
         private var _soundChannel:SoundChannel;
         private var _sound:Sound;
 
-        private var _fadingTime:Number = 1; //secs
+        private var _fadingTime:Number = 0.5; //secs
         private var _volume:Number = 0.6;
         private var _preMuteVolume:Number = 0;
         private var _isMuted:Boolean = false;
@@ -84,16 +84,21 @@ package {
         }
 
         public function loadStreamByUrl(url:String, startPlay:Boolean) {
-            stopStream()
-            debug('stream url: '+url)
-            
-            // TODO: make additional request and receive stream URL as plain text
-            _sound = new Sound();
-            _sound.load(new URLRequest(url));
-            _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError, false, 0, true);
+            try {
+               stopStream()
+               debug('stream url: '+url)
+               
+               // TODO: make additional request and receive stream URL as plain text
+               _sound = new Sound();
+               _sound.load(new URLRequest(url));
+               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError, false, 0, true);
 
-            if (startPlay == true) {
-                playStream()
+               if (startPlay == true) {
+                   playStream()
+               }
+            } catch(e:Error) {
+               debug(e.message);
+               ExternalInterface.call('App.player.trigger', 'error', e.message);
             }
         }
 

@@ -43,8 +43,16 @@
 })());
 
 Handlebars.registerHelper('static_url', function(res) {
-  return App.settings.STATIC_URL + res;
+  return App.config.static_url + res;
 });
+
+Handlebars.registerHelper('user_gravatar_url', function(user) {
+    var url = 'http://www.gravatar.com/avatar/'+user.gravatar_hash+'?s=50';
+    var avatar_name = (user.sex == 'female') ? 'avatar_female.png' : 'avatar.png';
+    url += '&d=' + encodeURIComponent(App.config.full_static_url + 'i/' + avatar_name);
+    return url;
+});
+
 
 Handlebars.registerHelper("key_value", function(obj, fn) {
     var buffer = '', key;

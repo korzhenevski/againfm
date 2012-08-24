@@ -5,15 +5,15 @@
         <meta charset="utf-8" />
         <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
 
-        <link href="{{ STATIC_URL }}css/screen.css" media="screen, projection" rel="stylesheet" />
-        <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ STATIC_URL }}i/favicon.ico" />
+        <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet" />
+        <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico" />
     </head>
     <body>
         <div class="wrapper">
             <div class="main">
             <div class="wrapper-left">
                 <div class="wrapper-left-content">
-                    <img src="{{ STATIC_URL }}i/logo_rus.png" width="308" height="135" class="logo" alt="logo" />
+                    <img src="{{ static_url }}i/logo_rus.png" width="308" height="135" class="logo" alt="logo" />
                     <div class="radio-controls">
                         <div class="radio-control radio-control-valign">
                             <span class="radio-control-prev"></span>
@@ -83,11 +83,17 @@
         </div>
 
         <div class="footer">
+            <div class="left">
             <p>{{ sitename}} {{ _('is irrelevant and is not responsible for any radio ads.') }}</p>
             <p class="left-shift">
                 &copy; 2012, {{ sitename }} &middot; {{ _('made in Russia') }}
                 &middot; <span class="pseudo-link about">{{ _('about') }}</span> &middot; <span class="pseudo-link tos">{{ _('terms of service') }}</span>
             </p>
+            </div>
+            <div class="right">
+                <p>дизайн - <a href="http://www.zolotorevich.com/">Rei Z</a></p>
+                <p><a href="">информация о сайте</a></p>
+            </div>
         </div>
 
         <div id="player-container"></div>
@@ -135,7 +141,7 @@
         </script>
 
         <script id="user_profile" type="text/html">
-            <img src="http://www.gravatar.com/avatar/{{user.gravatar_hash}}?s=50" width="50" height="50" alt="avatar" class="avatar" />
+            <img src="{{user_gravatar_url user}}" width="50" height="50" alt="" class="avatar" />
             <div class="content">
                 <p>{{#if user.name}}{{user.name}}{{else}}{{user.email}}{{/if}}</p>
                 <ul>
@@ -154,9 +160,11 @@
                     </div>
                 </div>
                 <div class="wrapper-right">
-                    <div class="wrapper-right-content">{{&content}}</div>
-                    <div class="close-box hidden">
-                        <div class="close"></div>
+                    <div class="wrapper-right-content">
+                        {{&content}}
+                        <div class="close-box hidden">
+                            <div class="close"><span class="pseudo-link">отмена</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -327,17 +335,11 @@
         </div-->
         <script>
             $(function(){
-                App.settings = {
-                    DEFAULT_VOLUME: 80,
-                    NIGHT_VOLUME: 30,
-                    STATIC_URL: '/static/',
-                    COMET_URL: 'http://comet.' + document.domain
-                }
-
-                App.setup({{ bootstrap|tojson|safe }});
+                App.config = {{ app_config|tojson|safe }};
+                App.setup({{ app_bootstrap|tojson|safe }});
 
                 _.each(['small-logo.png', 'radionow.png', 'favicon_play.ico'], function(img){
-                    preloadImage(App.settings.STATIC_URL + 'i/' + img);
+                    preloadImage(App.config.static_url + 'i/' + img);
                 });
             });
         </script>

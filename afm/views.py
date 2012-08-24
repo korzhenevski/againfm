@@ -3,20 +3,8 @@
 import pymongo
 from . import app, db, login_manager, tasks
 from .forms import RegisterForm
-from flask import jsonify, request, render_template, redirect, abort
+from flask import jsonify, request, render_template, redirect, abort, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from collections import defaultdict
-
-
-"""
-
-    Перевести все айдишники на Int
-    запустить платформу - пусть собирает теги
-    - в идеале, импортировать инфу по тегам
-    - избранное + сометсервер
-
-"""
-
 
 # TODO: guards
 
@@ -139,24 +127,7 @@ def playlist(category_id):
 
 @app.route('/')
 def index():
-    categories = [category.get_public_data() for category in db.Category.find({'is_public': True})]
-    bootstrap = {
-        'user': {},
-        'settings': {},
-        'categories': categories,
-        'playlist': {}
-    }
-    if current_user.is_authenticated():
-        bootstrap['user'] = current_user.get_public_data()
-        bootstrap['settings'] = current_user.settings
-
-    bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
-    context = {
-        'sitename': 'Again.FM',
-        'STATIC_URL': '/static/',
-        'bootstrap': bootstrap
-    }
-    return render_template('index.html', **context)
+    return render_template('index.html')
 
 @app.route('/api/station/<int:station_id>')
 def station_detail(station_id):
@@ -167,7 +138,6 @@ def station_detail(station_id):
 # http://againfm.local/api/listen/5013ea731d41c80efe0cc300
 @app.route('/api/stream_for_station/<int:station_id>')
 def stream_for_station(station_id):
-    streams = defaultdict(list)
     if request.args.get('low_bitrate'):
         sort_direction = pymongo.ASCENDING
     else:
@@ -181,13 +151,6 @@ def stream_for_station(station_id):
 @app.route('/api/user/favorites')
 @login_required
 def favorites_list():
-    """
-    fav = db.Favorite()
-    fav.title = u'Test title'
-    fav.station_title = u'bla bla fm'
-    fav.user_id = current_user._id
-    fav.save()
-    """
     favorites = db.Favorite.find({'user_id': current_user._id})
     favorites = [fav.get_public_data() for fav in favorites]
     return jsonify({'objects': favorites})
@@ -195,3 +158,35 @@ def favorites_list():
 @app.route('/station/<int:station_id>')
 def ajax_show_station(**kwargs):
     return redirect('/#%s' % request.path)
+
+@app.context_processor
+def app_bootstrap():
+    categories = [category.get_public_data() for category in db.Category.find({'is_public': True})]
+    bootstrap = {
+        'user': {},
+        'settings': {},
+        'categories': categories,
+        'playlist': {}
+    }
+    if current_user.is_authenticated():
+        bootstrap['user'] = current_user.get_public_data()
+        bootstrap['settings'] = current_user.settings
+    bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
+    return dict(app_bootstrap=bootstrap)
+
+@app.context_processor
+def app_config():
+    static_url = url_for('.static', filename='')
+    context = {
+        'sitename': 'Again.FM',
+        'app_config': {
+            'spectrum': False,
+            'default_volume': 80,
+            'night_volume': 30,
+            'comet_server': app.config['COMET_SERVER'],
+            'static_url': static_url,
+            'full_static_url': url_for('.static', filename='', _external=True),
+        },
+        'static_url': static_url,
+    }
+    return context

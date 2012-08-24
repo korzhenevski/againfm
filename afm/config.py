@@ -30,3 +30,5 @@ EMAIL_PROVIDERS = {
     'mail.google.com': ['gmail.com', 'googlemail.com'],
     'mail.again.fm': ['again.fm', 'afm.fm']
 }
+
+COMET_SERVER = 'http://comet.againfm.local/'

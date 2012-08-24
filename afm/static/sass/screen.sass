@@ -149,20 +149,22 @@ a
   display: none
   z-index: 1000
   +background(linear-gradient(#2a2e31, #000000))
+  .wrapper-left,  .wrapper-right
+    height: 200px
   .wrapper-left h1
     font-size: 3.5em
     line-height: 2em
   .close-box
-    bottom: -48px
-    right: 63%
-    padding-top: 16px
-    position: absolute 
-    @include profile-sprite(holder-close)
+    width: 500px
+    margin: 0 auto
+    position: relative
+    bottom: -58px
     .close
-      +border-radius(15px)
-      height: 32px
-      width: 32px
-      cursor: pointer
+      display: inline
+      height: 20px
+      background-color: #000
+      +border-radius(10px)
+      padding: 6px 13px
 
 .input
   background-color: #666
@@ -519,6 +521,14 @@ input[type=submit]
   height: 3em
   margin-left: 1.5em
   margin-top: -3em
+  .left
+    float: left
+    width: 50%
+    height: 45px
+  .right
+    text-align: right
+    margin-right: 15px
+    height: 45px
   .left-shift
     margin-left: -1.2em
   p
