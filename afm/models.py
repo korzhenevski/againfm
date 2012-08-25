@@ -2,6 +2,8 @@
 
 import string
 from . import app, login_manager, db
+from afm.helpers import naturalday
+
 try:
     from flask.ext.mongokit import Document
 except ImportError:
@@ -246,36 +248,42 @@ class Favorite(BaseDocument):
 
     structure = {
         'id': int,
-        'title': unicode,
-        'station_title': unicode,
-        #'track_id': ObjectId,
-        #'user_id': ObjectId,
-        'created_at': datetime,
-        # mongodb hack
-        # вместо bool, мы увеличиваем значение
-        # и активными считаются все active % 2 == 0
-        'active': int
+        'ts': datetime,
+        'track_ids': [int],
+        'tracks': [
+            {
+                'id': int,
+                'title': unicode,
+                'station_id': int,
+                'station_title': unicode,
+                'ts': datetime,
+                'deleted': int,
+            }
+        ]
     }
 
     default_values = {
-        'created_at': datetime.now,
-        'active': 0
+        'ts': datetime.now
     }
 
-    @property
-    def is_active(self):
-        return not self.active % 2
-
     def get_public_data(self):
-        date = self.created_at
-        return {
-            'title': self.title,
-            'station_title': self.station_title,
-            # unixtime
-            'date': date.strftime('%s'),
-            '_time': date.strftime('%H:%M'),
-            '_date': date.strftime('%Y %m %d')
+        data = {
+            'id': self['id'],
+            'date': naturalday(self['ts'], '%Y %m %d'),
+            'tracks': []
         }
+
+        for track in self['tracks']:
+            data['tracks'].append({
+                'id': track['id'],
+                'title': track['title'],
+                'station_title': track['station_title'],
+                'station_id': track['station_id'],
+                'time': track['ts'].strftime('%H:%M'),
+                'is_deleted': bool(track['deleted'] % 2)
+            })
+
+        return data
 
 @db.register
 class OnairTag(BaseDocument):

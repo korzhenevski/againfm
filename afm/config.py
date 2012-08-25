@@ -14,6 +14,13 @@ MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_DATABASE = 'againfm'
 
+# params passed to Redis constructor
+REDIS = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 0
+}
+
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'mongodb'
 CELERY_MONGODB_BACKEND_SETTINGS = {

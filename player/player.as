@@ -56,7 +56,7 @@ package {
             debug('volume: '+_volume);
 
             _soundTransform = new SoundTransform(_volume);
-            ExternalInterface.call('player.trigger', 'ready');
+            ExternalInterface.call('App.player.trigger', 'ready');
         }
 
         public function debug(vars:Object): void {

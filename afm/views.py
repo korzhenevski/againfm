@@ -6,13 +6,14 @@ from .forms import RegisterForm
 from flask import jsonify, request, render_template, redirect, abort, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
 
-# TODO: guards
-
 def send_mail(**kwargs):
     if app.debug:
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)
+
+#def get_favorite_by_track(track_id):
+#    app.redis.
 
 @login_manager.unauthorized_handler
 def unauthorized():
@@ -151,13 +152,18 @@ def stream_for_station(station_id):
 @app.route('/api/user/favorites')
 @login_required
 def favorites_list():
-    favorites = db.Favorite.find({'user_id': current_user._id})
-    favorites = [fav.get_public_data() for fav in favorites]
-    return jsonify({'objects': favorites})
+    query = {'user_id': current_user._id}
+    last_id = request.args.get('last_id', 0, type=int)
+    if last_id:
+        query['id'] = {'$lt': last_id}
+    favorite = db.Favorite.find(query).sort('id', pymongo.DESCENDING).limit(1)
+    if not favorite:
+        return jsonify({})
+    return jsonify(favorite.get_public_data())
 
-@app.route('/station/<int:station_id>')
-def ajax_show_station(**kwargs):
-    return redirect('/#%s' % request.path)
+@app.route('/api/user/favorites/<int:track_id>/toggle', methods=['POST'])
+def toggle_favorite(track_id):
+    pass
 
 @app.context_processor
 def app_bootstrap():
@@ -190,3 +196,11 @@ def app_config():
         'static_url': static_url,
     }
     return context
+
+@app.route('/station/<int:station_id>')
+def play_station(station_id):
+    station = db.Station.find_one({'id': station_id})
+    if not station:
+        redirect('/')
+
+    return render_template('index.html', station=station.get_public_data())

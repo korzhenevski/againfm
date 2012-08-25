@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{ sitename }} - {{ _('Radio') }}</title>
         <meta charset="utf-8" />
-        <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
-
+        {% if station %}
+            <title>{{ station.title }} - {{ sitename }}</title>
+            <meta name="description" content="Listen {{ station.title }} on {{ sitename }}" />
+        {% else %}
+            <title>{{ sitename }} - {{ _('Radio') }}</title>
+            <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
+        {% endif %}
         <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet" />
         <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico" />
     </head>
@@ -137,7 +141,7 @@
                 <h2 title="{{caption}}">{{caption}}</h2>
                 <p class="station">{{station_title}}</p>
             </div>
-            <div class="{{star_class}}" data-meta-id="{{meta_id}}"></div>
+            <div class="{{star_class}}" data-id="{{id}}"></div>
         </script>
 
         <script id="user_profile" type="text/html">
@@ -211,6 +215,24 @@
             </div>
         </script>
 
+        <script id="user_favorites_group" type="text/html">
+            <fieldset><legend>{{day}}</legend></fieldset>
+            <table class="favorites">
+                {{#each value}}
+                <tr class="{{#if this.is_deleted}}deleted{{/if}}" data-id="{{this.id}}">
+                    <td class="state">{{this.time}}</td>
+                    <td class="content">
+                        <h2>{{this.title}}</h2>
+                        <h3>@ {{this.station_title}}</h3>
+                    </td>
+                    <td>
+                        <!-- buttons -->
+                    </td>
+                </tr>
+                {{/each}}
+            </table>
+        </script>
+
         <script id="user_favorites" type="text/html">
             <div class="user-favorites" data-title="{{#trans}}Favorites{{/trans}}">
                 {{#if showHelp}}
@@ -225,23 +247,6 @@
                         </p>
                     </div>
                 {{/if}}
-                {{#key_value favorites}}
-                <fieldset><legend>{{key}}</legend></fieldset>
-                <table class="favorites">
-                    {{#each value}}
-                    <tr class="{{#if this.is_deleted}}deleted{{/if}}" data-id="{{this.id}}">
-                        <td class="state">{{this._time}}</td>
-                        <td class="content">
-                            <h2>{{this.title}}</h2>
-                            <h3>@ {{this.station_title}}</h3>
-                        </td>
-                        <td>
-                            <!-- buttons -->
-                        </td>
-                    </tr>
-                    {{/each}}
-                </table>
-                {{/key_value}}
             </div>
         </script>
 
@@ -330,13 +335,17 @@
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
-        <!--div class="feedback">
-            <div class="feedback-inner">This only needs one HTML element.</div>
-        </div-->
         <script>
             $(function(){
                 App.config = {{ app_config|tojson|safe }};
                 App.setup({{ app_bootstrap|tojson|safe }});
+
+                {% if station %}
+                App.player.on('ready', function(){
+                    App.radio.setStation(new App.Station({{ station|tojson|safe }}));
+                });
+                {% endif %}
+                App.start();
 
                 _.each(['small-logo.png', 'radionow.png', 'favicon_play.ico'], function(img){
                     preloadImage(App.config.static_url + 'i/' + img);

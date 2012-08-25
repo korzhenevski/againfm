@@ -5,12 +5,14 @@ from flask.ext.babel import Babel
 from celery import Celery
 from flask.ext.assets import Environment, Bundle
 from flask_debugtoolbar import DebugToolbarExtension
+from redis import Redis
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
 db = MongoKit(app)
 babel = Babel(app)
+redis = Redis(**app.config['REDIS'])
 
 login_manager = LoginManager()
 login_manager.setup_app(app)
@@ -34,8 +36,12 @@ js = Bundle(
     'js/utils.js',
     'js/comet.js',
     'js/swfobject.js',
-    'js/main.js',
-    filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
+    'js/app/base.js',
+    'js/app/radio.js',
+    'js/app/user.js',
+    'js/app/site.js',
+    'js/app/setup.js',
+filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
 assets.register('js_all', js)
 
 #toolbar = DebugToolbarExtension(app)

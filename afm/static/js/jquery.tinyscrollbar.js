@@ -128,7 +128,7 @@
             if( ! touchEvents )
             {
                 oContent.obj.bind( 'mousedown', start );
-                oContent.obj.bind( 'mouseup', drag );
+                //oContent.obj.bind( 'mouseup', drag );
                 oThumb.obj.bind( 'mousedown', start );
                 oTrack.obj.bind( 'mouseup', drag );
             }
