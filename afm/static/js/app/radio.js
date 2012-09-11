@@ -465,7 +465,7 @@ App.RadioNowView = App.View.extend({
         }, {silent: true});
         this.content.set({
             id: null,
-            title: gettext('Loading...'),
+            title: $.t('radio.loading'),
             caption: '',
             image_url: this.loadingIcon
         });
@@ -577,7 +577,7 @@ App.RadioNowView = App.View.extend({
 
     infoUnavailable: function() {
         this.content.set({
-            'title': gettext('Info unavailable'),
+            'title': $.t('radio.error.info_unavailable'),
             'caption': '',
             'image_url': this.notfoundIcon,
             'id': null
@@ -586,7 +586,7 @@ App.RadioNowView = App.View.extend({
 
     radioUnavailable: function() {
         this.content.set({
-            'title': gettext('Radio unavailable'),
+            'title': $.t('radio.error.radio_unavailable'),
             'caption': '',
             'image_url': this.notfoundIcon,
             'id': null

@@ -452,7 +452,7 @@ App.TopHolderView = App.View.extend({
     show: function() {
         this.$el.show().animate({
             'margin-top': 0
-        }, 300, 'linear', _.bind(function() {
+        }, 400, 'swing', _.bind(function() {
             this.$el.find(':text:first').focus();
             this.$el.find('.close-box').fadeIn();
         }, this));
@@ -462,7 +462,7 @@ App.TopHolderView = App.View.extend({
         this.$el.find('.close-box').fadeOut();
         this.$el.animate({
             'margin-top': this.$el.height() * -1
-        }, 300, 'linear', _.bind(function() {
+        }, 400, 'swing', _.bind(function() {
             this.$el.hide();
         }, this));
     },
@@ -520,19 +520,9 @@ App.UserRegisterView = App.TopHolderView.extend({
 
     _validator: function() {
         this.setupValidator({
-                email: {required: true, email: true},
-                password: {required: true, minlength: 6}
-            },
-            {
-                email: {
-                    required: gettext('enter email'),
-                    email: gettext('enter a valid email, please')
-                },
-                password: {
-                    required: gettext('choose a password'),
-                    minlength: gettext('at least six characters, please')
-                }
-            });
+            email: {required: true, email: true},
+            password: {required: true, minlength: 6}
+        }, $.t('register.validation', {returnObjectTrees: true}));
     },
 
     getRender: function() {
@@ -584,13 +574,8 @@ App.UserAmnesiaView = App.TopHolderView.extend({
 
     _validator: function() {
         this.setupValidator({
-                email: {required: true, email: true}
-            },
-            {
-                email: {
-                    required: gettext('enter email'),
-                    email: gettext('enter a valid email, please')
-                }
-            });
+            email: {required: true, email: true}
+        },
+        $.t('amnesia.validation', {returnObjectTrees: true}));
     }
 });

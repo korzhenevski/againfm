@@ -10,100 +10,54 @@ from collections import namedtuple
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
 from datetime import datetime
-from zlib import crc32
-
-def fasthash(data):
-    return crc32(data) & 0xffffffff
 
 @manager.command
-def init_categories():
-    def create_category(title, tags):
-        cat = db.Category()
-        cat.title = title
-        cat.tags = tags
-        cat.is_public = True
-        cat.save()
-        return cat
-
-    db.categories.remove()
-
-    categories = [
-        ('Drum and Bass', ['dnb', 'drum and bass']),
-        ('Trance', ['trance', 'progressive trance']),
-        ('House', ['progressive house', 'house']),
-        ('Relax', ['chillout', 'ambient']),
+def rebuild_tags():
+    from collections import defaultdict
+    pipeline = [
+        {'$project': {
+            'tag': '$tags',
+            'station_id': 1
+        }},
+        {'$unwind': '$tag'},
+        {'$group': {
+            '_id': {'tag':'$tag', 'station_id':'$station_id'},
+            'count': {'$sum': 1}
+        }},
+        {'$sort': {'count': -1}},
+        {'$group': {
+            '_id': '$_id.station_id',
+            'tag': {'$first': '$_id.tag'}
+        }},
+        {'$project': {
+            '_id': 0, 'station_id': '$_id', 'tag': 1
+        }}
     ]
 
-    for title, tags in categories:
-        print create_category(unicode(title), map(unicode, tags))
+    data = db.onair_history.aggregate(pipeline)
+    if not data['ok'] and data['errmsg']:
+        print 'aggregate error: {}'.format(data['errmsg'])
+        return
 
-    #for tag in db.OnairTopTag.find({'value': {'$gt': 10}}):
-    #    print tag
-
-@manager.command
-def import_megadump():
-    import csv
-    def csv_reader(filename):
-        return csv.reader(open(filename, "rb"), delimiter=',', quoting=csv.QUOTE_ALL, quotechar='"', escapechar="\\")
-
-    StationRecord = namedtuple('Station', ['id','url','title','parent_id',
-                                       'is_public','lft','rght','tree_id',
-                                       'level','text','slug','long_title'])
-    StreamRecord = namedtuple('Stream', ['id','url','station_id','ping','ping_job_id',
-                                     'relay','publish_history','relay_on_demand','relay_metadata'])
-    StationHistoryRecord = namedtuple('StationHistory', ['id','station_id','stream_id','title','title_hash',
-                                                    'artist','trackname','public','track_id','created_at'])
-    TrackRecord = namedtuple('Track', ['id','name','artist','artist_mbid','duration','lastfm_url','lastfm_image',
-                                   'lastfm_playcount','lastfm_listeners','lastfm_data','album','album_mbid','tags',
-                                   'title_hash','mbid','created_at'])
-
-    station_lookup = {}
-    stations = db.stations
-    for station_data in map(StationRecord._make, csv_reader('./stations.txt')):
-        station = stations.find_one({'title': station_data.title})
-        if station:
-            station_lookup[station_data.id] = station['id']
-
-    stream_lookup = {}
-    streams = db.streams
-    for stream_data in map(StreamRecord._make, csv_reader("./streams.txt")):
-        stream = streams.find_one({'url': stream_data.url})
-        if stream:
-            stream_lookup[stream_data.id] = stream['id']
-
-    track_lookup = {}
-    tags_lookup = {}
-    track_cls = db.Track
-    for track_data in map(TrackRecord._make, csv_reader("./tracks.txt")):
-        print 'track %s' % track_data.id
-        track = track_cls()
-        track['artist'] = track_data.artist.decode('utf8')
-        track['name'] = track_data.name.decode('utf8')
-        track['title'] = unicode(' - '.join([track['artist'], track['name']]))
-        track['rawtitle'] = track['title']
-        track['image_url'] = track_data.lastfm_image.decode('utf8')
-        if track_data.tags:
-            track['tags'] = map(lambda x: x.decode('utf8'), track_data.tags.split(','))
-        else:
-            track['tags'] = []
-        track['hash'] = fasthash(track['title'].encode('utf8').lower())
-        track['created_at'] = datetime.strptime(track_data.created_at, '%Y-%m-%d %H:%M:%S')
-        track.save()
-        tags_lookup[track_data.id] = tuple(track.tags)
-        track_lookup[track_data.id] = track['id']
-
-    onair_history = db.onair_history
-    for station_history in map(StationHistoryRecord._make, csv_reader("./station_history.txt")):
-        if station_history.track_id not in track_lookup:
-            continue
-        print 'onair %s' % station_history.id
-        onair_history.insert({
-            'station_id': station_lookup[station_history.station_id],
-            'stream_id': stream_lookup[station_history.stream_id],
-            'track_id': track_lookup[station_history.track_id],
-            'tags': list(tags_lookup[station_history.track_id]),
-            'created_at': datetime.strptime(station_history.created_at, '%Y-%m-%d %H:%M:%S')
+    tags = defaultdict(int)
+    for result in data['result']:
+        tags[result['tag']] += 1
+        db.stations.find_and_modify({'id': result['station_id']}, {
+            '$set': {'tag': result['tag']}
         })
+        print 'station {station_id}: tag {tag}'.format(**result)
+
+    for tag, tag_count in tags.iteritems():
+        station_tag = db.StationTag.find_one({'tag': tag})
+        if station_tag:
+            station_tag['count'] = tag_count
+            station_tag['updated_at'] = datetime.now()
+        else:
+            station_tag = db.StationTag()
+            station_tag['tag'] = tag
+            station_tag['count'] = tag_count
+        station_tag.save()
+        print 'tag {}: count {}'.format(tag, tag_count)
 
 @manager.command
 def ensure_indexes():
@@ -122,86 +76,6 @@ def ensure_indexes():
             print '- %s (unique: %s)' % (print_fields, index.get('unique', False))
             collection.ensure_index(fields, unique=index.get('unique'), dropDups=True)
         print ''
-
-@manager.command
-def rebuild_onair_tags():
-    from bson.code import Code
-    mapper = Code("""function() {
-        var station_id = this.station_id;
-        this.tags.forEach(function(tag){
-            emit({station_id: station_id, tag: tag}, 1);
-        });
-    }""")
-
-    reducer = Code("""function(key, values) {
-        var total = 0;
-        for(var i = 0; i < values.length; i++) {
-            total += values[i];
-        }
-        return total;
-    }""")
-
-    #result = db.onair_history.map_reduce(mapper, reducer, 'onair_tags')
-    #print 'tags %s' % result.count()
-
-    mapper = Code("""function() {
-        emit(this._id.tag, 1);
-    }""")
-    reducer = Code("""function(key, values) {
-        var total = 0;
-        for(var i = 0; i < values.length; i++) {
-            total += values[i];
-        }
-        return total;
-    }""")
-    #result = db.onair_tags.map_reduce(mapper, reducer, 'onair_top_tags')
-    #print 'top tags %s' % result.count()
-
-    mapper = Code("""function() {
-        emit(this._id.station_id, {tag: this._id.tag, count: this.value});
-    }""")
-    reducer = Code("""function(key, values) {
-        var result = values[0];
-        for(var i = 1; i < values.length; i++) {
-            if (values[i].count > result.count) {
-                result = values[i];
-            }
-        }
-        return result;
-    }""")
-    #result = db.onair_tags.map_reduce(mapper, reducer, 'station_tags')
-    #print 'station tags %s' % result.count()
-
-    mapper = Code("""function() {
-        emit(this.value.tag, 1);
-    }""")
-    reducer = Code("""function(key, values) {
-        var total = 0;
-        for(var i = 0; i < values.length; i++) {
-            total += values[i];
-        }
-        return total;
-    }""")
-    #result = db.station_tags.map_reduce(mapper, reducer, 'station_top_tags')
-    #for doc in result.find({'value': {'$gte': 2}}, sort=[('value', -1)]):
-    #    print doc
-
-
-@manager.command
-def import_dump():
-    with open('./afm.txt') as dump:
-        for line in dump:
-            station_title, streams = line.strip().split('\t')
-            station = db.Station()
-            station['title'] = station_title.decode('utf8')
-            station.save()
-            for stream_url in streams.split(','):
-                stream = db.Stream()
-                stream['url'] = unicode(stream_url.strip())
-                stream['station_id'] = station['id']
-                stream.save()
-                print '- %s: %s' % (stream['_id'], stream_url)
-            print station['_id']
 
 @manager.command
 def clear():

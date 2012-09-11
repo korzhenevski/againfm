@@ -135,10 +135,14 @@ class Station(BaseDocument):
     structure = {
         'id': int,
         'title': unicode,
-        'website': unicode
+        'website': unicode,
+        'tag': unicode,
     }
 
-    indexes = [{'fields': 'id', 'unique': True}]
+    indexes = [
+        {'fields': 'id', 'unique': True},
+        {'fields': 'tag'},
+    ]
 
     def get_public_data(self):
         return {
@@ -194,27 +198,6 @@ class Stream(BaseDocument):
             'id': self['id'],
             'url': self.get_web_url(),
             'is_hd': self.is_hd(),
-        }
-
-@db.register
-class Category(BaseDocument):
-    __collection__ = 'categories'
-
-    structure = {
-        'id': int,
-        'title': unicode,
-        'tags': [unicode],
-        'is_public': bool
-    }
-
-    indexes = [
-        {'fields': 'id', 'unique': True},
-    ]
-
-    def get_public_data(self):
-        return {
-            'id': self['id'],
-            'title': self['title']
         }
 
 @db.register
@@ -286,31 +269,30 @@ class Favorite(BaseDocument):
         return data
 
 @db.register
-class OnairTag(BaseDocument):
-    __collection__ = 'onair_tags'
+class StationTag(BaseDocument):
+    __collection__ = 'stations_tags'
 
     structure = {
-        '_id': {
-            'station_id': int,
-            'tag': unicode
-        },
-        'value': int,
+        'id': int,
+        'tag': unicode,
+        'count': int,
+        'is_public': bool,
+        'updated_at': datetime
+    }
+
+    default_values = {
+        'is_public': False,
+        'updated_at': datetime.now,
     }
 
     indexes = [
-        {'fields': ['_id.tag', '_id.station_id']},
-        {'fields': ['value']},
+        {'fields': 'id', 'unique': True},
+        {'fields': 'tag', 'unique': True},
+        {'fields': 'is_public'},
     ]
 
-@db.register
-class OnairTopTag(BaseDocument):
-    __collection__ = 'onair_top_tags'
-
-    structure = {
-        '_id': unicode,
-        'value': int,
-    }
-
-    indexes = [
-        {'fields': ['_id', 'value']},
-    ]
+    def get_public_data(self):
+        return {
+            'id': self['id'],
+            'title': self['tag'],
+        }

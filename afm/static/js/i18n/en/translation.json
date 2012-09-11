@@ -1,0 +1,94 @@
+{
+    "site": {
+        "description": "Lets you listen to the radio, and save your favorite songs.",
+        "footer": {
+            "made_in": "made in Russia",
+            "about": "about",
+            "tos": "terms of service",
+            "disclaimer": "is irrelevant and is not responsible for any radio ads.",
+            "designer": {
+                "label": "designed by",
+                "info_label":  "site information"
+            }
+        }
+    },
+
+    "user": {
+        "favorites": "favorites",
+        "settings": "settings"
+    },
+
+    "register": {
+        "title": "Sign up",
+        "button": "Start",
+        "notice": "no spam, you do not need to confirm",
+        "placeholder": {
+            "email": "Email",
+            "password": "Desired password"
+        },
+        "validation": {
+            "email": {
+                "required": "enter email",
+                "email": "enter a valid email, please"
+            },
+            "password": {
+                "required": "choose a password",
+                "minlength": "at least six characters, please"
+            }
+        }
+    },
+
+    "login": {
+        "placeholder": {
+            "login": "Email",
+            "password": "Password"
+        },
+        "button": "Login",
+        "register": "sign-up",
+        "amnesia": "forgot password?"
+    },
+
+    "amnesia": {
+        "title": "Reset password",
+        "placeholder": "Your email",
+        "button": "Send",
+        "notice": "you will get a new password by email",
+        "validation": {
+            "email": {
+                "required": "enter email",
+                "email": "enter a valid email, please"
+            }
+        }
+    },
+
+    "search": {
+        "placeholder": "radio search"
+    },
+
+    "topholder": {
+        "cancel": "cancel"
+    },
+
+    "tos": {
+        "title": "Terms of Service"
+    },
+
+    "favorites": {
+        "title": "Favorites",
+        "helptext1": "You can store favorite songs here<br /> and find them quickly in Last.FM or Google.",
+        "helptext2": "Click on a star to add a song to favorite.<br /> It is no longer your trouble. The player remember your favorite songs"
+    },
+
+    "settings": {
+        "title": "Settings",
+        "playback": "Playback",
+    },
+
+    "radio": {
+        "loading": "Loading...",
+        "error": {
+            "info_unavailable": "Info unavailable",
+            "radio_unavailable": "Radio unavailable"
+        }
+    }
+}

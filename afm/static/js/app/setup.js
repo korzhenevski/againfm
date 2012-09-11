@@ -66,5 +66,5 @@ App.setup = function(bootstrap) {
 };
 
 App.start = function() {
-    App.player.embedTo('player-container', {volume: App.controls.volume});
+    //App.player.embedTo('player-container', {volume: App.controls.volume});
 };

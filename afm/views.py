@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import pymongo
-from . import app, db, login_manager, tasks
+import requests
+import json
+from . import app, db, login_manager, tasks, i18n
 from .forms import RegisterForm
 from flask import jsonify, request, render_template, redirect, abort, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
@@ -11,9 +13,6 @@ def send_mail(**kwargs):
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)
-
-#def get_favorite_by_track(track_id):
-#    app.redis.
 
 @login_manager.unauthorized_handler
 def unauthorized():
@@ -116,14 +115,10 @@ def login():
 
 @app.route('/api/playlist/<int:category_id>')
 def playlist(category_id):
-    category = db.Category.find_one({'id': category_id})
-    if not category:
+    tag = db.StationTag.find_one({'id': category_id})
+    if not tag:
         abort(404)
-    stations = []
-    for tag in db.OnairTag.find({'_id.tag': {'$in': category.tags}}):
-        station = db.Station.find_one({'id': tag['_id']['station_id']})
-        if station:
-            stations.append(station.get_public_data())
+    stations = [station.get_public_data() for station in db.Station.find({'tag': tag['tag']})]
     return jsonify({'objects': stations})
 
 @app.route('/')
@@ -162,12 +157,12 @@ def favorites_list():
     return jsonify(favorite.get_public_data())
 
 @app.route('/api/user/favorites/<int:track_id>/toggle', methods=['POST'])
-def toggle_favorite(track_id):
+def add_favorite(track_id):
     pass
 
 @app.context_processor
 def app_bootstrap():
-    categories = [category.get_public_data() for category in db.Category.find({'is_public': True})]
+    categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
     bootstrap = {
         'user': {},
         'settings': {},
@@ -204,3 +199,40 @@ def play_station(station_id):
         redirect('/')
 
     return render_template('index.html', station=station.get_public_data())
+
+@app.route('/api/search')
+def search():
+    term = request.args.get('term', '')
+    if not term:
+        abort(400)
+    term = term.strip().strip('*:')[0:64]
+
+    resp = requests.get(app.config['SEARCH_BACKEND_URL'], params={'q': '%s*' % term}, )
+    if not (resp.ok and resp.json):
+        abort(503)
+
+    hits = resp.json.get('hits', {}).get('hits', [])
+
+    results = []
+    for res in hits:
+        station = res['_source']
+        results.append({
+            'id': station['id'],
+            'label': station['title'],
+            'tag': station.get('tag', ''),
+        })
+
+    results = results[0:3]
+
+    return jsonify({'results': results})
+
+@app.template_filter('i18n')
+def i18n_template_filter(key):
+    return i18n.translate(key)
+
+@app.context_processor
+def i18n_context():
+    return {
+        '_': i18n_template_filter,
+        'sitelang': 'en',
+    }

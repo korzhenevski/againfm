@@ -24,8 +24,8 @@ html, body
 body
   background: #111
   +background(linear-gradient(#2a2e31, #000000))
-  font-size: 1em
-  line-height: 1.2em
+  font-size: 15px
+  line-height: 1.3em
   color: #fff
   font-family: Helvetica,Arial,sans-serif
 
@@ -39,6 +39,9 @@ input[disabled], button[disabled]
 
 .hidden
   display: none
+
+.watermark
+  color: #666 !important
 
 /*.logo
   visibility: hidden */
@@ -159,7 +162,7 @@ a
     width: 500px
     margin: 0 auto
     position: relative
-    bottom: -58px
+    top: 58px
     .close
       display: inline
       height: 20px
@@ -189,8 +192,6 @@ input[type=submit]
   font-weight: bold
   text-align: center
   float: left
-  &:hover
-    +box-shadow(rgba(#fc6622, .4) 0px 0px 2px 2px)
 
 .loading
   margin-left: 10px
@@ -414,7 +415,7 @@ input[type=submit]
   list-style-type: none
   margin: 0
   padding: 0
-  width: 80%
+  width: 70%
   float: left
   li
     float: left
@@ -438,20 +439,68 @@ input[type=submit]
     position: relative
     @include display-sprite(home)
 
-.radio-display-search
-  border: 1px solid #000
-  border-radius: 12px
-  padding-left: 22px
-  max-width: 306px
-  top: 10px
-  right: 12px
-  position: relative
-  width: 17%
+.search
   float: right
-  input
-    background-color: transparent
-    border: none
-    color: #666
+  max-width: 300px
+  width: 30%
+
+.search-input
+  position: relative
+  margin-top: 8px
+  border: none
+  outline: none
+  padding: 4px 9px
+  padding-left: 24px
+  color: #666 !important
+  width: 78%
+  padding-right: 10px
+  z-index: 1000
+  +box-shadow(#111 0 0 1px 1px inset)
+  +border-radius(12px)
+  +background(linear-gradient(#1a1c20, #303338))
+
+.ui-autocomplete
+  width: 78%
+  z-index: 1 !important
+  background-color: #1f1f1f
+  padding-top: 11px
+  border: 1px solid #000
+  +border-radius(5px)
+
+.ui-menu-item
+  border-bottom: 1px solid #363636
+  margin: 0 5px 0 23px
+  a
+    cursor: pointer
+    line-height: 1.4em
+    font-size: 0.8em
+    padding: 8px 5px 8px 23px
+    display: block
+    color: #999
+    margin: 0 -5px 0 -23px
+  .ui-state-hover
+    background-color: #e06c00
+    color: #111
+    strong
+      color: #000
+  strong
+    font-size: 15px
+    font-weight: bold
+    color: #fff
+
+/*.ui-autocomplete-loading
+  background: red*/
+
+.search-icon
+  background-image: url('../i/display/search_icon.png')
+  background-repeat: no-repeat
+  height: 19px
+  width: 19px
+  position: relative
+  top: 11px
+  float: left
+  right: -22px
+  z-index: 1100
 
 .movable
   cursor: move

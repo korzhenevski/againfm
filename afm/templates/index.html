@@ -6,8 +6,8 @@
             <title>{{ station.title }} - {{ sitename }}</title>
             <meta name="description" content="Listen {{ station.title }} on {{ sitename }}" />
         {% else %}
-            <title>{{ sitename }} - {{ _('Radio') }}</title>
-            <meta name="description" content="{{ _('Lets you listen to the radio, and save your favorite songs.') }}" />
+            <title>{{ sitename }}</title>
+            <meta name="description" content="{{ _('site.description') }}" />
         {% endif %}
         <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet" />
         <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico" />
@@ -44,14 +44,14 @@
                     <div class="box-holder">
                         <form class="head-form login hidden">
                             <div class="form-input">
-                                <input type="text" tabindex="10" class="input" name="login" placeholder="{{ _('Email') }}" />
-                                <span class="pseudo-link register">{{ _('sign up') }}</span>
+                                <input type="text" tabindex="10" class="input" name="login" placeholder="{{ _('login.placeholder.login') }}" />
+                                <span class="pseudo-link register">{{ _('login.register') }}</span>
                             </div>
                             <div class="form-input">
-                                <input type="password" tabindex="11" class="input" name="password" placeholder="{{ _('Password') }}" />
-                                <span class="pseudo-link amnesia">{{ _('forgot password?') }}</span>
+                                <input type="password" tabindex="11" class="input" name="password" placeholder="{{ _('login.placeholder.password') }}" />
+                                <span class="pseudo-link amnesia">{{ _('login.amnesia') }}</span>
                             </div>
-                            <input type="submit" tabindex="12" value="{{ _('Login') }}" />
+                            <input type="submit" tabindex="12" value="{{ _('login.button') }}" />
                             <div class="notice hidden">
                                 <p><!-- --></p>
                             </div>
@@ -66,6 +66,10 @@
                 <div class="radio-display">
                     <div class="radio-display-head">
                         <ul class="filters"></ul>
+                        <div class="search">
+                            <div class="search-icon"></div>
+                            <input type="text" placeholder="{{ _('search.placeholder') }}" autocomplete="off" class="search-input" name="q" />
+                        </div>
                     </div>
                 </div>
                 <div class="radio-scroll">
@@ -79,7 +83,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -88,15 +91,15 @@
 
         <div class="footer">
             <div class="left">
-            <p>{{ sitename}} {{ _('is irrelevant and is not responsible for any radio ads.') }}</p>
+            <p>{{ sitename}} {{ _('site.footer.disclaimer') }}</p>
             <p class="left-shift">
-                &copy; 2012, {{ sitename }} &middot; {{ _('made in Russia') }}
-                &middot; <span class="pseudo-link about">{{ _('about') }}</span> &middot; <span class="pseudo-link tos">{{ _('terms of service') }}</span>
+                &copy; 2012, {{ sitename }} &middot; {{ _('site.footer.made_in') }}
+                &middot; <span class="pseudo-link about">{{ _('site.footer.about') }}</span> &middot; <span class="pseudo-link tos">{{ _('site.footer.tos') }}</span>
             </p>
             </div>
             <div class="right">
-                <p>дизайн - <a href="http://www.zolotorevich.com/">Rei Z</a></p>
-                <p><a href="">информация о сайте</a></p>
+                <p>{{ _('site.footer.designer.label') }} <a href="http://www.zolotorevich.com/">Rei Z</a></p>
+                <p><a href="">{{ _('site.footer.designer.info_label') }}</a></p>
             </div>
         </div>
 
@@ -105,24 +108,6 @@
 
         {% raw %}
         <script id="about" type="text/html">
-                <img src="{{static_url "i/small-logo.png"}}" alt="small logo" />
-                <p>{{#trans}}an incredible team{{/trans}}:</p>
-                <dl>
-                    <dt>{{#trans}}founder and developer{{/trans}}</dt>
-                    <dd>{{#trans}}Yura Korjenevsky{{/trans}}</dd>
-
-                    <dt>{{#trans}}usability and design{{/trans}}</dt>
-                    <dd>{{#trans}}Roman Zolotorevich{{/trans}}</dd>
-
-                    <dt>{{#trans}}logotype{{/trans}}</dt>
-                    <dd>{{#trans}}Alexandr Malinovsky{{/trans}}</dd>
-
-                    <dt>{{#trans}}special thanks{{/trans}}</dt>
-                    <dd>
-                        {{#trans}}Vera Pavlova{{/trans}},
-                        {{#trans}}Alexandr Dyakonov{{/trans}}
-                    </dd>
-                </dl>
         </script>
 
         <script id="filter_item" type="text/html">
@@ -149,11 +134,11 @@
             <div class="content">
                 <p>{{#if user.name}}{{user.name}}{{else}}{{user.email}}{{/if}}</p>
                 <ul>
-                    <li class="favorites"><a href="#" class="link">{{#trans}}favorites{{/trans}}</a></li>
-                    <li class="settings"><a href="#" class="link">{{#trans}}settings{{/trans}}</a></li>
+                    <li class="favorites"><a href="#" class="link">{{t "user.favorites" }}</a></li>
+                    <li class="settings"><a href="#" class="link">{{t "user.settings" }}</a></li>
                 </ul>
             </div>
-            <div class="logout" title="{{#trans}}logout{{/trans}}"></div>
+            <div class="logout"></div>
         </script>
 
         <script id="top_holder" type="text/html">
@@ -167,7 +152,7 @@
                     <div class="wrapper-right-content">
                         {{&content}}
                         <div class="close-box hidden">
-                            <div class="close"><span class="pseudo-link">отмена</span></div>
+                            <div class="close"><span class="pseudo-link">{{t "topholder.cancel" }}</span></div>
                         </div>
                     </div>
                 </div>
@@ -175,28 +160,28 @@
         </script>
 
         <script id="user_amnesia" type="text/html">
-            <form class="head-form amnesia" data-title="{{#trans}}Reset password{{/trans}}">
+            <form class="head-form amnesia" data-title="{{t "amnesia.title" }}">
                 <div class="form-input">
-                    <input type="text" tabindex="30" class="input" name="email" placeholder="{{#trans}}Your email{{/trans}}" />
+                    <input type="text" tabindex="30" class="input" name="email" placeholder="{{t "amnesia.placeholder" }}" />
                 </div>
-                <input type="submit" tabindex="31" value="{{#trans}}Send{{/trans}}" />
+                <input type="submit" tabindex="31" value="{{t "amnesia.button" }}" />
                 <div class="notice">
-                    <p>{{#trans}}you will get a new password by email{{/trans}}</p>
+                    <p>{{t "amnesia.notice" }}</p>
                 </div>
             </form>
         </script>
 
         <script id="user_register" type="text/html">
-            <form class="head-form register" data-title="{{#trans}}Sign up{{/trans}}">
+            <form class="head-form register" data-title="{{t "register.title" }}">
                 <div class="form-input">
-                    <input type="text" tabindex="20" class="input" name="email" placeholder="{{#trans}}Email{{/trans}}" />
+                    <input type="text" tabindex="20" class="input" name="email" placeholder="{{t "register.placeholder.email" }}" />
                 </div>
                 <div class="form-input">
-                    <input type="password" tabindex="21" class="input" name="password" placeholder="{{#trans}}Desired password{{/trans}}" />
+                    <input type="password" tabindex="21" class="input" name="password" placeholder="{{t "register.placeholder.password" }}" />
                 </div>
-                <input type="submit" tabindex="22" value="{{#trans}}Start{{/trans}}" />
+                <input type="submit" tabindex="22" value="{{t "register.button" }}" />
                 <div class="notice">
-                    <p>{{#trans}}no spam, you do not need to confirm{{/trans}}</p>
+                    <p>{{t "register.notice" }}</p>
                 </div>
             </form>
         </script>
@@ -208,7 +193,7 @@
         </script>
 
         <script id="tos" type="text/html">
-            <div class="tos" data-title="{{#trans}}Terms of Service{{/trans}}">
+            <div class="tos" data-title="{{t "tos.title"}}">
                 <div class="text">
                 <p>Just vinyl, just hardcore :)</p>
                 </div>
@@ -234,26 +219,21 @@
         </script>
 
         <script id="user_favorites" type="text/html">
-            <div class="user-favorites" data-title="{{#trans}}Favorites{{/trans}}">
+            <div class="user-favorites" data-title="{{t "favorites.title" }}">
                 {{#if showHelp}}
                     <div class="help">
-                        <p>
-                            {{#trans}}You can store favorite songs here<br /> and find them quickly in Last.FM or Google.{{/trans}}
-                        </p>
+                        <p>{{t "favorites.helptext1" }}</p>
                         <img src="{{static_url "i/radionow.png"}}" width="386" height="100" alt=": )" />
-                        <p>
-                            {{#trans}}Click on a star to add a song to favorite.<br /> It is no longer your trouble. The player remember your favorite songs{{/trans}}
-                            :)
-                        </p>
+                        <p>{{t "favorites.helptext2" }}</p>
                     </div>
                 {{/if}}
             </div>
         </script>
 
         <script id="user_settings" type="text/html">
-            <div class="user-settings" data-title="{{#trans}}Settings{{/trans}}">
+            <div class="user-settings" data-title="{{t "settings.title" }}">
                 <fieldset>
-                    <legend>{{#trans}}Playback{{/trans}}</legend>
+                    <legend>{{t "settings.playback" }}</legend>
                 </fieldset>
                 <ul class="checkbox-shift">
                     <li>
@@ -337,7 +317,36 @@
 
         <script>
             $(function(){
-                App.config = {{ app_config|tojson|safe }};
+                $.i18n.init({
+                    lng: "{{ sitelang }}",
+                    fallbackLng: false,
+                    resGetPath: '/static/js/i18n/__lng__/__ns__.json'
+                });
+
+                $('.search-input').autocomplete({
+                    source: function(request, response) {
+                        $.getJSON('/api/search', {term: request.term}, function(resp){
+                            response(resp.results || []);
+                        });
+                    },
+                    select: function() {
+                        console.log(arguments);
+                        return false;
+                    },
+                    focus: function() {
+                        return false;
+                    },
+                    appendTo: '.search',
+                    position: {at: "left center"}
+                }).data( "autocomplete" )._renderItem = function( ul, item ) {
+                    return $( "<li></li>" )
+                            .data( "item.autocomplete", item )
+                            .append( "<a><strong>" + item.label + "</strong><br>" + item.tag + '</a>')
+                            .appendTo( ul );
+                };
+                //$('.search-input').autocomplete('search', 'ho');
+
+                App.config = {{ app_config|tojson|safe }};6
                 App.setup({{ app_bootstrap|tojson|safe }});
 
                 {% if station %}
@@ -350,6 +359,8 @@
                 _.each(['small-logo.png', 'radionow.png', 'favicon_play.ico'], function(img){
                     preloadImage(App.config.static_url + 'i/' + img);
                 });
+
+                $.watermark.showAll();
             });
         </script>
     </body>

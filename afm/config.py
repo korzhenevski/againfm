@@ -39,3 +39,4 @@ EMAIL_PROVIDERS = {
 }
 
 COMET_SERVER = 'http://comet.againfm.local/'
+SEARCH_BACKEND_URL = 'http://127.0.0.1:9200/againfm_stations/_search'

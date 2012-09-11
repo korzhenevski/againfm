@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 from flask.ext.login import LoginManager
 from flask.ext.mongokit import MongoKit
@@ -6,12 +7,15 @@ from celery import Celery
 from flask.ext.assets import Environment, Bundle
 from flask_debugtoolbar import DebugToolbarExtension
 from redis import Redis
+from .i18n import I18n
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
 db = MongoKit(app)
-babel = Babel(app)
+i18n = I18n(app)
+
+#babel = Babel(app)
 redis = Redis(**app.config['REDIS'])
 
 login_manager = LoginManager()
@@ -28,13 +32,14 @@ js = Bundle(
     'js/jquery.validate.js',
     'js/jquery.cookie.js',
     'js/jquery.tinyscrollbar.js',
-    'js/bootstrap-button.js',
+    'js/i18next-1.5.5.js',
+    'js/bootstrap-button.js', # lazy
     'js/underscore.js',
     'js/backbone.js',
     'js/handlebars.js',
-    'js/render.js',
-    'js/utils.js',
-    'js/comet.js',
+    'js/template.js',
+    'js/common.js',
+    'js/comet.js', # lazy
     'js/swfobject.js',
     'js/app/base.js',
     'js/app/radio.js',

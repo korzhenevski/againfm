@@ -16,16 +16,6 @@ function gettext(text) {
     }
 })();
 
-// Django AJAX
-$.ajaxSetup({
-    beforeSend: function (xhr, settings) {
-        xhr.setRequestHeader('X-Timezone-Offset', (new Date()).getTimezoneOffset());
-        if (!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) && !(/^https?:.*/.test(settings.url))) {
-            xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-        }
-    }
-});
-
 $.getCachedScript = function(url, options) {
 
   // allow user to set any option except for dataType, cache, and url
