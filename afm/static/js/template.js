@@ -67,10 +67,6 @@ Handlebars.registerHelper("key_value", function(obj, fn) {
     return buffer;
 });
 
-Handlebars.registerHelper('trans', function(fn) {
-    return gettext(fn(this));
-});
-
 Handlebars.registerHelper('checkbox', function(option) {
     if (! (option && option.name) ) return;
     var html = '<div class="checkbox" id="'+option.name+'" data-name="'+option.name+'"';

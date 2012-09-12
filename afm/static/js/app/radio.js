@@ -226,7 +226,6 @@ App.RadioDisplayView = App.View.extend({
         this.playlist.on('reset', this.render, this);
         this.playlist.on('change_station', this.select, this);
         this.setupScroll();
-        this.$slider = $(options.slider);
     },
 
     setupScroll: function() {
@@ -286,6 +285,8 @@ App.RadioDisplayView = App.View.extend({
             }
         } while (spots.length);
 
+        this.$el.append('<div class="scale-slider"></div>');
+
         $lines.each(function() {
             var $line = $(this);
             if (!$line.find('li').size()) {
@@ -317,16 +318,15 @@ App.RadioDisplayView = App.View.extend({
         var stationId = station.id ? station.id : station;
         var $station = $('#station-'+stationId);
         if ($station) {
-            this.$slider.show().animate({
-                'left': $station.scrollLeft() + $station.position().left + 13
-            }, duration);
+            var left = $station.scrollLeft() + $station.position().left + 13;
+            this.$el.find('.scale-slider').show().animate({left: left}, duration, 'linear');
             this.$el.find('.active-station').removeClass('active-station');
             $station.addClass('active-station');
         }
     },
 
     hideSlider: function() {
-        this.$slider.hide();
+        this.$el.find('.scale-slider').hide();
     },
 
     //  playlist context
@@ -787,10 +787,10 @@ _.extend(App.Spectrum.prototype, {
 App.RadioControlsView = App.View.extend({
     el: '.radio-controls',
     events: {
-        'click .radio-control-play': 'controlPlay',
-        'click .radio-control-prev': 'controlPrevious',
-        'click .radio-control-next': 'controlNext',
-        'click .radio-control-sound': 'controlSound'
+        'click .play': 'controlPlay',
+        'click .prev': 'controlPrevious',
+        'click .next': 'controlNext',
+        'click .sound': 'controlSound'
     },
 
     initialize: function() {
@@ -802,13 +802,13 @@ App.RadioControlsView = App.View.extend({
         } else {
             this.volume = App.config.default_volume;
         }
-        this.$el.find('.radio-control-sound').toggleClass('radio-control-sound-off', this.volume === 0).show();
+        this.$el.find('.sound').toggleClass('sound-off', this.volume === 0).show();
         this.isMuted = false;
         this.render();
     },
 
     toggleBitrateIndicator: function(mediator) {
-        var $indicator = this.$el.find('.radio-control-hd');
+        var $indicator = this.$el.find('.hd');
         if (mediator.stream['is_hd']) {
             $indicator.show();
         } else {
@@ -817,22 +817,21 @@ App.RadioControlsView = App.View.extend({
     },
 
     render: function() {
-        this.$el.find('.radio-control-slider').slider({
+        this.$el.find('.slider').slider({
             range: 'min',
             value: this.volume,
             slide: _.throttle(_.bind(this.changeVolume, this), 100)
         });
-        this.$el.find('.radio-control-sound');
     },
 
     changeVolume: function(e, ui) {
         var volume = ui.value;
-        var $sound = this.$el.find('.radio-control-sound');
+        var $sound = this.$el.find('.sound');
         if (volume) {
-            $sound.removeClass('radio-control-sound-off');
+            $sound.removeClass('sound-off');
             this.isMuted = false;
         } else {
-            $sound.addClass('radio-control-sound-off');
+            $sound.addClass('sound-off');
         }
         this.setVolume(volume);
     },
@@ -866,11 +865,11 @@ App.RadioControlsView = App.View.extend({
     },
 
     controlSound: function() {
-        var $control = this.$el.find('.radio-control-sound');
-        var $slider = this.$el.find('.radio-control-slider');
-        if ($control.is('.radio-control-sound-off')) {
+        var $control = this.$el.find('.sound');
+        var $slider = this.$el.find('.slider');
+        if ($control.is('.sound-off')) {
             if (this.isMuted) {
-                $control.removeClass('radio-control-sound-off');
+                $control.removeClass('sound-off');
                 App.player.unmute();
                 $slider.slider('value', App.player.getVolume());
                 $.cookie('volume', App.player.getVolume());
@@ -880,7 +879,7 @@ App.RadioControlsView = App.View.extend({
             App.player.mute();
             $slider.slider('value', 0);
             $.cookie('volume', 0);
-            $control.addClass('radio-control-sound-off');
+            $control.addClass('sound-off');
             this.isMuted = true;
         }
     }

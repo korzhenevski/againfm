@@ -58,6 +58,11 @@
                 "required": "enter email",
                 "email": "enter a valid email, please"
             }
+        },
+        "result": {
+            "title": "A new password has been sent.",
+            "check_email": "Check email",
+            "link_hint": "opens in new window"
         }
     },
 
@@ -82,6 +87,24 @@
     "settings": {
         "title": "Settings",
         "playback": "Playback",
+        "throttle_traffic": {
+            "label": "Disable covers and lowering the sound quality to save bandwidth",
+            "notice": "turn it on in case slow or expensive internet"
+        },
+        "limit_night_volume": {
+            "label": "Limit the startup sound at night",
+            "notice": "to protect the ears volume will be set at 30%"
+        },
+        "fading_sound": {
+            "label": "Fading the sound when the player is turned off"
+        },
+        "personal_info": {
+            "title": "Personal info",
+            "email": "Email",
+            "display_name": "Display name",
+            "password": "Password",
+            "desired_password": "Desired password"
+        }
     },
 
     "radio": {

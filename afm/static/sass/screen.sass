@@ -233,12 +233,27 @@ input[type=submit]
 .radio-controls
   margin-left: 55px
   margin-top: 40px
+  .valign
+    padding-top: 15px
 
 .radio-control
   float: left
   padding: 0 5px
   span
     display: inline-block
+  .play
+    width: 96px
+    height: 96px
+    +border-radius(46px)
+    @include controls-sprite(play)
+  .prev, .next
+    width: 71px
+    height: 71px
+    +border-radius(30px)
+  .prev
+    @include controls-sprite(pre)
+  .next
+    @include controls-sprite(next)
 
 .radio-controls-status
   clear: both
@@ -246,85 +261,66 @@ input[type=submit]
   margin-left: 50px
   .inner
     margin-top: 4px
-
-.radio-control-play
-  width: 96px
-  height: 96px
-  +border-radius(46px)
-  @include controls-sprite(play)
-
-.radio-control-prev, .radio-control-next
-  width: 71px
-  height: 71px
-  +border-radius(30px)
-
-.radio-control-prev
-  @include controls-sprite(pre)
-
-.radio-control-next
-  @include controls-sprite(next)
-
-.radio-control-valign
-  padding-top: 15px
-
-.radio-control-slider
-  float: left
-  width: 100px
-  height: 9px
-  background-color: #030404
-  +background(linear-gradient(#030404, #1f2224))
-  /* FF3.6+
-    border: none */
-  position: relative
-  text-align: left
-  border-radius: 4px
-  margin: 3px 5px
-  margin-top: 4px
-  margin-right: 7px
-  .ui-slider-range
-    left: 0
-    height: 100%
-    top: 0
-    background-position: 0 0
-    display: block
-    font-size: 0.7em
-    position: absolute
+  .slider
+    float: left
+    width: 100px
+    height: 9px
+    background-color: #030404
+    +background(linear-gradient(#030404, #1f2224))
+    /* FF3.6+
+      border: none */
+    position: relative
+    text-align: left
     border-radius: 4px
-    padding-left: 4px
-    +background(linear-gradient(#4d4e50, #828486))
-    /* FF3.6+ */
-  .ui-slider-handle
-    margin-left: -10px
-    margin-top: -4px
-    cursor: default
-    position: absolute
-    outline: none
-    width: 19px
-    height: 19px
-    @include controls-sprite(slider)
+    margin: 3px 5px
+    margin-top: 4px
+    margin-right: 7px
+    .ui-slider-range
+      left: 0
+      height: 100%
+      top: 0
+      background-position: 0 0
+      display: block
+      font-size: 0.7em
+      position: absolute
+      border-radius: 4px
+      padding-left: 4px
+      +background(linear-gradient(#4d4e50, #828486))
+      /* FF3.6+ */
+    .ui-slider-handle
+      margin-left: -10px
+      margin-top: -4px
+      cursor: default
+      position: absolute
+      outline: none
+      width: 19px
+      height: 19px
+      @include controls-sprite(slider)
 
-.radio-control-sound, .radio-control-slider
-  margin-right: 9px
+  .sound, .slider
+    margin-right: 9px
 
-.radio-control-sound
-  float: left
-  width: 24px
-  height: 16px
-  @include controls-sprite(sound)
-  display: none
+  .sound
+    float: left
+    width: 24px
+    height: 16px
+    @include controls-sprite(sound)
+    display: none
 
-.radio-control-sound-off
-  @include controls-sprite(sound_off)
+  .sound-off
+    @include controls-sprite(sound_off)
 
-.radio-control-hd
-  padding-left: 5px
-  margin-top: -1px
-  float: left
-  font-size: 1em
-  font-weight: bold
-  color: #666
-  color: #71cd15
-  text-shadow: 0px 0px 2px #71cd15
+  .hd
+    padding-left: 5px
+    margin-top: -1px
+    float: left
+    font-size: 1em
+    font-weight: bold
+    color: #666
+    color: #71cd15
+    text-shadow: 0px 0px 2px #71cd15
+
+
 
 .radio-now
   margin: 70px auto 0 auto
@@ -525,7 +521,7 @@ input[type=submit]
     position: absolute
     top: 0
     width: 25px
-    height: 100%
+    height: 110%
     left: -25px
     display: none
   .empty-line
@@ -781,12 +777,10 @@ input[type=submit]
   label
     display: inline-block
     margin-left: 9px
-    cursor: pointer
   small
     font-size: 0.9em
     color: #666
     display: block
-    cursor: default
   li
     font-size: 0.9em
     padding-left: 60px

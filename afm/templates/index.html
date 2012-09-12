@@ -19,20 +19,20 @@
                 <div class="wrapper-left-content">
                     <img src="{{ static_url }}i/logo_rus.png" width="308" height="135" class="logo" alt="logo" />
                     <div class="radio-controls">
-                        <div class="radio-control radio-control-valign">
-                            <span class="radio-control-prev"></span>
+                        <div class="radio-control valign">
+                            <span class="prev"></span>
                         </div>
                         <div class="radio-control">
-                            <span class="radio-control-play"></span>
+                            <span class="play"></span>
                         </div>
-                        <div class="radio-control radio-control-valign">
-                            <span class="radio-control-next"></span>
+                        <div class="radio-control valign">
+                            <span class="next"></span>
                         </div>
                         <div class="radio-controls-status">
                             <div class="inner">
-                                <div class="radio-control-sound"></div>
-                                <div class="radio-control-slider"></div>
-                                <div class="radio-control-hd hidden">HD</div>
+                                <div class="sound"></div>
+                                <div class="slider"></div>
+                                <div class="hd hidden">HD</div>
                             </div>
                         </div>
                     </div>
@@ -75,7 +75,6 @@
                 <div class="radio-scroll">
                     <div class="radio-scale viewport">
                         <div class="scale-inner overview"></div>
-                        <div class="scale-slider"></div>
                     </div>
                     <div class="scrollbar">
                         <div class="track">
@@ -238,60 +237,52 @@
                 <ul class="checkbox-shift">
                     <li>
                         {{checkbox settings.throttle_traffic}}
-                        <label for="throttle_traffic">
-                            {{#trans}}Disable covers and lowering the sound quality to save bandwidth{{/trans}}
-                            <small>{{#trans}}turn it on in case slow or expensive internet{{/trans}}</small>
+                        <label>
+                            {{t "settings.throttle_traffic.label"}}
+                            <small>{{t "settings.throttle_traffic.notice"}}</small>
                         </label>
                     </li>
                     <li>
                         {{checkbox settings.limit_night_volume}}
-                        <label for="limit_night_volume">
-                            {{#trans}}Limit the startup sound at night{{/trans}}
-                            <small>{{#trans}}to protect the ears volume will be set at 30%{{/trans}}</small>
+                        <label>
+                            {{t "settings.limit_night_volume.label"}}
+                            <small>{{t "settings.limit_night_volume.notice"}}</small>
                         </label>
                     </li>
                     <li>
                         {{checkbox settings.fading_sound}}
-                        <label for="fading_sound">
-                            {{#trans}}Fading the sound when the player is turned off{{/trans}}
+                        <label>
+                            {{t "settings.fading_sound.label"}}
                         </label>
                     </li>
                 </ul>
-                <!--fieldset>
-                    <legend>{{#trans}}Social networks{{/trans}}</legend>
-                </fieldset>
-                <ul>
-                    
-                </ul-->
+
                 <fieldset>
-                    <legend>{{#trans}}Personal info{{/trans}}</legend>
+                    <legend>{{t "settings.personal_info.title"}}</legend>
                 </fieldset>
                 <ul>
                     <li>
-                        {{#trans}}Email{{/trans}}: <strong>{{email}}</strong> <!--span class="pseudo-link change-email">{{#trans}}change{{/trans}}</span-->
+                        {{t "settings.personal_info.email"}}: <strong>{{email}}</strong>
                     </li>
  
                     <li>
-                        {{#trans}}Display name{{/trans}}:
+                        {{t "settings.personal_info.display_name"}}:
                         <input type="text" class="name" value="{{name}}" maxlength="30" autocomplete="off" />
-                        <button class="btn change-name" data-changing-text="{{#trans}}changing...{{/trans}}">{{#trans}}change{{/trans}}</button>
+                        <button class="btn change-name" data-changing-text="changing...">change</button>
                     </li>
-                   <li>
-                        {{#trans}}Password{{/trans}}: 
+
+                    <li>
+                        {{t "settings.personal_info.password"}}:
                         <span class="password-holder">
                             ************
-                            <span class="pseudo-link show-password-change">{{#trans}}change{{/trans}}</span>
+                            <span class="pseudo-link show-password-change">change</span>
                         </span>
                         <span class="password-block hidden">
-                            <input type="password"  class="password" value="" maxlength="128" placeholder="{{#trans}}Desired password{{/trans}}" autocomplete="off" />
-                            <button class="btn change-password" data-changing-text="{{#trans}}changing...{{/trans}}">{{#trans}}change{{/trans}}</button>
+                            <input type="password" class="password" value="" maxlength="128" placeholder="{{t "settings.personal_info.desired_password"}}" autocomplete="off" />
+                            <button class="btn change-password" data-changing-text="changing...">change</button>
                         </span>
-                        <span class="pseudo-link password-reset" class="btn" data-sending-text="{{#trans}}sending...{{/trans}}" data-sent-text="{{#trans}}A new password has been sent.{{/trans}}">{{#trans}}send new password to email{{/trans}}</span>
+                        <span class="pseudo-link password-reset btn" data-sending-text="sending..." data-sent-text="A new password has been sent.">send new password to email</span>
                     </li>
-                    <!--li>
-                        <span class="pseudo-link delete-account">{{#trans}}Delete account{{/trans}}</span>
-                        <small>before removal will be asked to export the data available</small>
-                    </li-->
                 </ul>
             </div>
         </script>
@@ -299,11 +290,12 @@
         <script id="password_reset" type="text/html">
             <div class="notice">
                 <p>
-                    <strong>{{#trans}}A new password has been sent.{{/trans}}</strong>
+                    <strong>{{t "amnesia.result.title"}}</strong>
                     {{#if email_provider}}
-                    <a href="http://{{email_provider}}/" target="_blank">{{#trans}}Check email{{/trans}}</a> ({{#trans}}opens in new window{{/trans}})
+                        <a href="http://{{email_provider}}/" target="_blank">{{t "amnesia.result.check_email"}}</a>
+                        ({{t "amnesia.result.link_hint"}})
                     {{else}}
-                    {{#trans}}Check email{{/trans}}.
+                        {{t "amnesia.result.check_email"}}.
                     {{/if}}
                 </p>
             </div>

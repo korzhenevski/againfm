@@ -429,7 +429,7 @@ App.UserSettingsView = App.UserPanelView.extend({
     },
 
     checkboxLabel: function(e) {
-        $(e.target).siblings('.checkbox').click();
+        $(e.target).parents('li').find('.checkbox').click();
     },
 
     toggleCheckbox: function(e) {

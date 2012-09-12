@@ -17,8 +17,7 @@ App.setup = function(bootstrap) {
     });
 
     App.display = new App.RadioDisplayView({
-        playlist: App.playlist,
-        slider: $('.scale-slider')
+        playlist: App.playlist
     });
 
     App.radio = new App.Radio();
@@ -66,5 +65,5 @@ App.setup = function(bootstrap) {
 };
 
 App.start = function() {
-    //App.player.embedTo('player-container', {volume: App.controls.volume});
+    App.player.embedTo('player-container', {volume: App.controls.volume});
 };
