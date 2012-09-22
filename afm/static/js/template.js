@@ -76,6 +76,6 @@ Handlebars.registerHelper('checkbox', function(option) {
 });
 
 Handlebars.registerHelper('t', function(i18n_key) {
-    var res = $.t(i18n_key);
+    var res = $.i18n.t(i18n_key);
     return new Handlebars.SafeString(res);
 });

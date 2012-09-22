@@ -172,6 +172,7 @@ def app_bootstrap():
     if current_user.is_authenticated():
         bootstrap['user'] = current_user.get_public_data()
         bootstrap['settings'] = current_user.settings
+
     bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
     return dict(app_bootstrap=bootstrap)
 
@@ -193,7 +194,7 @@ def app_config():
     return context
 
 @app.route('/station/<int:station_id>')
-def play_station(station_id):
+def station_details(station_id):
     station = db.Station.find_one({'id': station_id})
     if not station:
         redirect('/')
@@ -236,3 +237,7 @@ def i18n_context():
         '_': i18n_template_filter,
         'sitelang': 'en',
     }
+
+@app.route('/test')
+def player_test():
+    return render_template('player.html')

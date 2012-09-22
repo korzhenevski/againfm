@@ -5,20 +5,14 @@ App.User = App.Model.extend({
 
     initialize: function() {
         this.settings = new App.UserSettings();
+        this.on('logged', this.settings.fetch, this);
+        this.on('logout', this.settings.clear, this);
+
         this.favorites = new App.UserFavorites();
-
-        this.on('logged', function() {
-            this.settings.fetch();
-        }, this);
-
         this.on('change:id', function() {
             if (this.isLogged()) {
                 this.trigger('logged', this);
             }
-        }, this);
-
-        this.on('logout', function() {
-            this.settings.clear();
         }, this);
     },
 
@@ -26,6 +20,7 @@ App.User = App.Model.extend({
         if (this.isLogged()) {
             return;
         }
+
         // TODO: упростить эту херню
         // гланды удаляются через жопу
         return this.callAction('login', {

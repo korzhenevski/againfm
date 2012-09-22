@@ -300,6 +300,10 @@
                 </p>
             </div>
         </script>
+
+        <script id="autocomplete_item" type="text/html">
+            <li><a><strong>{{label}}</strong><br />{{tag}}</a></li>
+        </script>
         {% endraw %}
 
         <script src="http://yandex.st/jquery/1.8.0/jquery.min.js"></script>
@@ -308,37 +312,12 @@
         {% endassets %}
 
         <script>
-            $(function(){
-                $.i18n.init({
-                    lng: "{{ sitelang }}",
-                    fallbackLng: false,
-                    resGetPath: '/static/js/i18n/__lng__/__ns__.json'
-                });
-
-                $('.search-input').autocomplete({
-                    source: function(request, response) {
-                        $.getJSON('/api/search', {term: request.term}, function(resp){
-                            response(resp.results || []);
-                        });
-                    },
-                    select: function() {
-                        console.log(arguments);
-                        return false;
-                    },
-                    focus: function() {
-                        return false;
-                    },
-                    appendTo: '.search',
-                    position: {at: "left center"}
-                }).data( "autocomplete" )._renderItem = function( ul, item ) {
-                    return $( "<li></li>" )
-                            .data( "item.autocomplete", item )
-                            .append( "<a><strong>" + item.label + "</strong><br>" + item.tag + '</a>')
-                            .appendTo( ul );
-                };
-                //$('.search-input').autocomplete('search', 'ho');
-
-                App.config = {{ app_config|tojson|safe }};6
+            App.config = {{ app_config|tojson|safe }};
+            $.i18n.init({
+                lng: "{{ sitelang }}",
+                resGetPath: '/static/js/i18n/__lng__/__ns__.json',
+                fallbackLng: false
+            }).done(function(){
                 App.setup({{ app_bootstrap|tojson|safe }});
 
                 {% if station %}
@@ -346,13 +325,8 @@
                     App.radio.setStation(new App.Station({{ station|tojson|safe }}));
                 });
                 {% endif %}
+
                 App.start();
-
-                _.each(['small-logo.png', 'radionow.png', 'favicon_play.ico'], function(img){
-                    preloadImage(App.config.static_url + 'i/' + img);
-                });
-
-                $.watermark.showAll();
             });
         </script>
     </body>

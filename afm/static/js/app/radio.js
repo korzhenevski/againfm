@@ -1,4 +1,5 @@
 var App = App || {};
+var render = render || {};
 
 App.Radio = App.Model.extend({
     history: {},
@@ -214,6 +215,39 @@ App.FiltersView = App.View.extend({
     }
 });
 
+App.RadioSearchView = App.View.extend({
+    el: '.search-input',
+    initialize: function() {
+        this.render();
+    },
+
+    render: function() {
+        this.$el.autocomplete({
+            source: function(request, response) {
+                $.getJSON('/api/search', {
+                    term: request.term
+                }, function (resp) {
+                    response(resp.results || []);
+                });
+            },
+            select: function () {
+                console.log(arguments);
+                return false;
+            },
+            focus: function () {
+                return false;
+            },
+            appendTo: '.search',
+            position: {
+                at: "left center"
+            }
+        }).data('autocomplete')._renderItem = function (ul, item) {
+            var $item = $(render.autocomplete_item(item).outerHtml());
+            return $item.data('item.autocomplete', item).appendTo(ul);
+        };
+    }
+});
+
 App.RadioDisplayView = App.View.extend({
     el: '.radio-scale .scale-inner',
     events: {
@@ -225,6 +259,7 @@ App.RadioDisplayView = App.View.extend({
         this.playlist.on('reset', this.toggleSliderVisibility, this);
         this.playlist.on('reset', this.render, this);
         this.playlist.on('change_station', this.select, this);
+        this.search = new App.RadioSearchView();
         this.setupScroll();
     },
 
@@ -844,13 +879,11 @@ App.RadioControlsView = App.View.extend({
 
     controlPlay: function() {
         var player = App.player;
-        _.defer(function(){
-            if (player.isPaused()) {
-                player.playStream();
-            } else {
-                player.stopStream();
-            }
-        });
+        if (player.isPaused()) {
+            player.playStream();
+        } else {
+            player.stopStream();
+        }
         return false;
     },
 

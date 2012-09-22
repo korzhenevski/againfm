@@ -5,8 +5,9 @@ App.setup = function(bootstrap) {
 
     App.filters = new App.Filters();
     App.playlist = new App.Playlist();
+
     App.user = new App.User(bootstrap.user);
-    App.user.settings = new App.UserSettings(bootstrap.settings || {});
+    App.user.settings.set(bootstrap.settings || {});
 
     App.userArea = new App.UserAreaView();
 
@@ -65,5 +66,9 @@ App.setup = function(bootstrap) {
 };
 
 App.start = function() {
+    _.each(['small-logo.png', 'radionow.png', 'favicon_play.ico'], function(img){
+        preloadImage(App.config.static_url + 'i/' + img);
+    });
+    $.watermark.showAll();
     App.player.embedTo('player-container', {volume: App.controls.volume});
 };
