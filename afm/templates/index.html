@@ -105,213 +105,26 @@
         <div id="player-container"></div>
         <canvas id="spectrum"></canvas>
 
-        {% raw %}
-        <script id="about" type="text/html">
-        </script>
-
-        <script id="filter_item" type="text/html">
-            <li>
-                <span class="nav-link {{role}}-link{{#if is_active}} active {{role}}-active{{/if}}">{{title}}</span>
-            </li>
-        </script>
-
-        <script id="radio_now" type="text/html">
-            <img src="{{image_url}}" width="78" height="78" />
-            <div class="radio-now-glare"></div>
-            <div class="radio-now-content">
-                <h1 title="{{title}}">
-                    <span class="title-inner">{{title}}</span>
-                </h2>
-                <h2 title="{{caption}}">{{caption}}</h2>
-                <p class="station">{{station_title}}</p>
-            </div>
-            <div class="{{star_class}}" data-id="{{id}}"></div>
-        </script>
-
-        <script id="user_profile" type="text/html">
-            <img src="{{user_gravatar_url user}}" width="50" height="50" alt="" class="avatar" />
-            <div class="content">
-                <p>{{#if user.name}}{{user.name}}{{else}}{{user.email}}{{/if}}</p>
-                <ul>
-                    <li class="favorites"><a href="#" class="link">{{t "user.favorites" }}</a></li>
-                    <li class="settings"><a href="#" class="link">{{t "user.settings" }}</a></li>
-                </ul>
-            </div>
-            <div class="logout"></div>
-        </script>
-
-        <script id="top_holder" type="text/html">
-            <div class="form-holder {{class}}">
-                <div class="wrapper-left">
-                    <div class="wrapper-left-content">
-                        <h1>{{title}}</h1>
-                    </div>
-                </div>
-                <div class="wrapper-right">
-                    <div class="wrapper-right-content">
-                        {{&content}}
-                        <div class="close-box hidden">
-                            <div class="close"><span class="pseudo-link">{{t "topholder.cancel" }}</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </script>
-
-        <script id="user_amnesia" type="text/html">
-            <form class="head-form amnesia" data-title="{{t "amnesia.title" }}">
-                <div class="form-input">
-                    <input type="text" tabindex="30" class="input" name="email" placeholder="{{t "amnesia.placeholder" }}" />
-                </div>
-                <input type="submit" tabindex="31" value="{{t "amnesia.button" }}" />
-                <div class="notice">
-                    <p>{{t "amnesia.notice" }}</p>
-                </div>
-            </form>
-        </script>
-
-        <script id="user_register" type="text/html">
-            <form class="head-form register" data-title="{{t "register.title" }}">
-                <div class="form-input">
-                    <input type="text" tabindex="20" class="input" name="email" placeholder="{{t "register.placeholder.email" }}" />
-                </div>
-                <div class="form-input">
-                    <input type="password" tabindex="21" class="input" name="password" placeholder="{{t "register.placeholder.password" }}" />
-                </div>
-                <input type="submit" tabindex="22" value="{{t "register.button" }}" />
-                <div class="notice">
-                    <p>{{t "register.notice" }}</p>
-                </div>
-            </form>
-        </script>
-
-        <script id="user_panel" type="text/html">
-            <h1>{{title}}</h1>
-            {{&content}}
-            <div class="close"></div>
-        </script>
-
-        <script id="tos" type="text/html">
-            <div class="tos" data-title="{{t "tos.title"}}">
-                <div class="text">
-                <p>Just vinyl, just hardcore :)</p>
-                </div>
-            </div>
-        </script>
-
-        <script id="user_favorites_group" type="text/html">
-            <fieldset><legend>{{day}}</legend></fieldset>
-            <table class="favorites">
-                {{#each value}}
-                <tr class="{{#if this.is_deleted}}deleted{{/if}}" data-id="{{this.id}}">
-                    <td class="state">{{this.time}}</td>
-                    <td class="content">
-                        <h2>{{this.title}}</h2>
-                        <h3>@ {{this.station_title}}</h3>
-                    </td>
-                    <td>
-                        <!-- buttons -->
-                    </td>
-                </tr>
-                {{/each}}
-            </table>
-        </script>
-
-        <script id="user_favorites" type="text/html">
-            <div class="user-favorites" data-title="{{t "favorites.title" }}">
-                {{#if showHelp}}
-                    <div class="help">
-                        <p>{{t "favorites.helptext1" }}</p>
-                        <img src="{{static_url "i/radionow.png"}}" width="386" height="100" alt=": )" />
-                        <p>{{t "favorites.helptext2" }}</p>
-                    </div>
-                {{/if}}
-            </div>
-        </script>
-
-        <script id="user_settings" type="text/html">
-            <div class="user-settings" data-title="{{t "settings.title" }}">
-                <fieldset>
-                    <legend>{{t "settings.playback" }}</legend>
-                </fieldset>
-                <ul class="checkbox-shift">
-                    <li>
-                        {{checkbox settings.throttle_traffic}}
-                        <label>
-                            {{t "settings.throttle_traffic.label"}}
-                            <small>{{t "settings.throttle_traffic.notice"}}</small>
-                        </label>
-                    </li>
-                    <li>
-                        {{checkbox settings.limit_night_volume}}
-                        <label>
-                            {{t "settings.limit_night_volume.label"}}
-                            <small>{{t "settings.limit_night_volume.notice"}}</small>
-                        </label>
-                    </li>
-                    <li>
-                        {{checkbox settings.fading_sound}}
-                        <label>
-                            {{t "settings.fading_sound.label"}}
-                        </label>
-                    </li>
-                </ul>
-
-                <fieldset>
-                    <legend>{{t "settings.personal_info.title"}}</legend>
-                </fieldset>
-                <ul>
-                    <li>
-                        {{t "settings.personal_info.email"}}: <strong>{{email}}</strong>
-                    </li>
- 
-                    <li>
-                        {{t "settings.personal_info.display_name"}}:
-                        <input type="text" class="name" value="{{name}}" maxlength="30" autocomplete="off" />
-                        <button class="btn change-name" data-changing-text="changing...">change</button>
-                    </li>
-
-                    <li>
-                        {{t "settings.personal_info.password"}}:
-                        <span class="password-holder">
-                            ************
-                            <span class="pseudo-link show-password-change">change</span>
-                        </span>
-                        <span class="password-block hidden">
-                            <input type="password" class="password" value="" maxlength="128" placeholder="{{t "settings.personal_info.desired_password"}}" autocomplete="off" />
-                            <button class="btn change-password" data-changing-text="changing...">change</button>
-                        </span>
-                        <span class="pseudo-link password-reset btn" data-sending-text="sending..." data-sent-text="A new password has been sent.">send new password to email</span>
-                    </li>
-                </ul>
-            </div>
-        </script>
-
-        <script id="password_reset" type="text/html">
-            <div class="notice">
-                <p>
-                    <strong>{{t "amnesia.result.title"}}</strong>
-                    {{#if email_provider}}
-                        <a href="http://{{email_provider}}/" target="_blank">{{t "amnesia.result.check_email"}}</a>
-                        ({{t "amnesia.result.link_hint"}})
-                    {{else}}
-                        {{t "amnesia.result.check_email"}}.
-                    {{/if}}
-                </p>
-            </div>
-        </script>
-
-        <script id="autocomplete_item" type="text/html">
-            <li><a><strong>{{label}}</strong><br />{{tag}}</a></li>
-        </script>
-        {% endraw %}
-
-        <script src="http://yandex.st/jquery/1.8.0/jquery.min.js"></script>
-        {% assets "js_all" %}
+        {% assets "core_scripts" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
+        {% assets "scripts" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+
+
         <script>
+            function getTiming() {
+                var now = +new Date();
+                var perf = window.performance.timing;
+                return {
+                    domContentLoaded: perf.domContentLoadedEventEnd - perf.domContentLoadedEventStart
+                };
+            }
+        </script>
+
+        <!--script>
             App.config = {{ app_config|tojson|safe }};
             $.i18n.init({
                 lng: "{{ sitelang }}",
@@ -328,7 +141,7 @@
 
                 App.start();
             });
-        </script>
+        </script-->
     </body>
 </html>
 

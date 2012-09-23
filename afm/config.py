@@ -1,4 +1,5 @@
 DEBUG = True
+TESTING = True
 
 ASSETS_DEBUG = DEBUG
 SECRET_KEY = 'secret_key'

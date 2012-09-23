@@ -425,7 +425,7 @@ _.extend(App.Player.prototype, Backbone.Events, {
     },
 
     throttleTraffic: function(throttle) {
-        throttle = !!throttle;
+        var throttle = !!throttle;
         this._player.throttleTraffic(throttle);
     },
 

@@ -15,7 +15,6 @@ app.config.from_pyfile('config.py')
 db = MongoKit(app)
 i18n = I18n(app)
 
-#babel = Babel(app)
 redis = Redis(**app.config['REDIS'])
 
 login_manager = LoginManager()
@@ -47,7 +46,26 @@ js = Bundle(
     'js/app/site.js',
     'js/app/setup.js',
 filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
-assets.register('js_all', js)
+
+assets.register('core_scripts', Bundle(
+    'js/jquery.min.js',
+    'js/i18next-1.5.5.js',
+    'js/underscore.js',
+    'js/backbone.js',
+))
+
+assets.register('scripts', Bundle(
+    'js/app/app.js',
+    'js/app/radio-grid.js',
+))
+
+if app.config['TESTING']:
+    from flask.ext.jasmine import Jasmine, Asset
+    jasmine = Jasmine(app)
+    jasmine.specs(
+        'js/specs/radio-grid.js',
+    )
+    jasmine.sources('js/sinon-1.4.2.js', Asset('core_scripts'), Asset('scripts'))
 
 #toolbar = DebugToolbarExtension(app)
 

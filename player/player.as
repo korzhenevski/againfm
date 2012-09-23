@@ -57,7 +57,7 @@ package {
          debug('volume: '+_volume);
 
          _soundTransform = new SoundTransform(_volume);
-         ExternalInterface.call('onPlayerReady');
+         //ExternalInterface.call('onPlayerReady');
       }
 
       public function debug(vars:Object): void {
@@ -99,14 +99,13 @@ package {
             }
          } catch(e:Error) {
             debug(e.message);
-            //ExternalInterface.call('App.player.trigger', 'error', e.message);
+            ExternalInterface.call('App.player.trigger', 'error', e.message);
          }
       }
 
       public function playStream() {
          if (_sound != null) {
              _soundChannel = _sound.play();
-             //ExternalInterface.call('App.player.trigger', 'play');
              _soundChannel.soundTransform = _soundTransform;
              setPaused(false);
          } else {

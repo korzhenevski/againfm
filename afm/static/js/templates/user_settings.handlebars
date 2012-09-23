@@ -1,0 +1,53 @@
+<div class="user-settings" data-title="{{t "settings.title" }}">
+<fieldset>
+    <legend>{{t "settings.playback" }}</legend>
+</fieldset>
+<ul class="checkbox-shift">
+    <li>
+        {{checkbox settings.throttle_traffic}}
+        <label>
+            {{t "settings.throttle_traffic.label"}}
+            <small>{{t "settings.throttle_traffic.notice"}}</small>
+        </label>
+    </li>
+    <li>
+        {{checkbox settings.limit_night_volume}}
+        <label>
+            {{t "settings.limit_night_volume.label"}}
+            <small>{{t "settings.limit_night_volume.notice"}}</small>
+        </label>
+    </li>
+    <li>
+        {{checkbox settings.fading_sound}}
+        <label>
+            {{t "settings.fading_sound.label"}}
+        </label>
+    </li>
+</ul>
+
+<fieldset>
+    <legend>{{t "settings.personal_info.title"}}</legend>
+</fieldset>
+<ul>
+    <li>
+        {{t "settings.personal_info.email"}}: <strong>{{email}}</strong>
+    </li>
+    <li>
+        {{t "settings.personal_info.display_name"}}:
+        <input type="text" class="name" value="{{name}}" maxlength="30" autocomplete="off" />
+        <button class="btn change-name" data-changing-text="changing...">change</button>
+    </li>
+    <li>
+        {{t "settings.personal_info.password"}}:
+        <span class="password-holder">
+            ************
+            <span class="pseudo-link show-password-change">change</span>
+        </span>
+        <span class="password-block hidden">
+            <input type="password" class="password" value="" maxlength="128" placeholder="{{t "settings.personal_info.desired_password"}}" autocomplete="off" />
+            <button class="btn change-password" data-changing-text="changing...">change</button>
+        </span>
+        <span class="pseudo-link password-reset btn" data-sending-text="sending..." data-sent-text="A new password has been sent.">send new password to email</span>
+    </li>
+</ul>
+</div>
