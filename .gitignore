@@ -6,6 +6,8 @@
 afm/static/js/deploy
 *.zip
 *.txt
+venv
+.vagrant
 
 jasmine
 script.js/

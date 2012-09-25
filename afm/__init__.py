@@ -1,9 +1,8 @@
 import json
 from flask import Flask
+from celery import Celery
 from flask.ext.login import LoginManager
 from flask.ext.mongokit import MongoKit
-from flask.ext.babel import Babel
-from celery import Celery
 from flask.ext.assets import Environment, Bundle
 from flask_debugtoolbar import DebugToolbarExtension
 from redis import Redis

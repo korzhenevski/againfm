@@ -1,14 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from flask.ext.script import Manager
-from flask.ext.assets import ManageAssets
+#from flask.ext.assets import ManageAssets
 from afm import app, db, assets
 from random import choice
 from pprint import pprint
 from collections import namedtuple
+
 manager = Manager(app)
-manager.add_command('assets', ManageAssets(assets))
+#manager.add_command('assets', ManageAssets(assets))
 from datetime import datetime
 
 @manager.command
