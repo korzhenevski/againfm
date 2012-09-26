@@ -1,4 +1,19 @@
-from fabric.api import local, lcd
+from fabric.api import lcd, env, local, run, prefix, sudo
+
+env.project = '/var/www/againfm'
+
+def vagrant():
+    # change from the default user to 'vagrant'
+    env.user = 'vagrant'
+    # connect to the port-forwarded ssh
+    env.hosts = ['10.0.0.2']
+ 
+    # use vagrant ssh key
+    result = local('vagrant ssh-config | grep IdentityFile', capture=True)
+    env.key_filename = result.split()[1]
+ 
+def init():
+    sudo('pip install -r {}/requirements.txt'.format(env.project))
 
 def compass():
     local('compass watch afm/static')

@@ -191,8 +191,10 @@ App.FilterItem = App.View.extend({
     },
 
     select: function() {
-        this.model.collection.unselect();
-        this.model.select();
+        if (!this.model.get('is_active')) {
+            this.model.collection.unselect();
+            this.model.select();
+        }
     }
 });
 
@@ -215,6 +217,13 @@ App.FiltersView = App.View.extend({
     }
 });
 
+/**
+ * 3 chars - realtime fetch stations
+ * empty input - restore previous scale view
+ * not found - dropdown box - "hui vam a ne radio"
+ *
+ * @type {*}
+ */
 App.RadioSearchView = App.View.extend({
     el: '.search-input',
     initialize: function() {
@@ -595,12 +604,15 @@ App.RadioNowView = App.View.extend({
         var $title = this.$el.find('.title-inner');
         var delta = $title.width() - $title.parent().width();
         if (delta > 5) {
+            /**
+             * load - wait 5 sec - marquee - wait 3 - marquee
+             */
             $title.stop();
             $title.parent().addClass('shadow');
             var marquee = function(delta) {
                 var data = {};
                 data['margin-left'] = delta < 0 ? 0 : -1 * delta;
-                $title.delay(1000).animate(data, Math.abs(delta) * 35, 'linear', function() {
+                $title.delay(5000).animate(data, Math.abs(delta) * 35, 'linear', function() {
                     marquee(-delta);
                 });
             }
@@ -917,3 +929,7 @@ App.RadioControlsView = App.View.extend({
         }
     }
 });
+
+/**
+ * play station on window focus
+ */

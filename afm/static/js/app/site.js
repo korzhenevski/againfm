@@ -13,6 +13,10 @@ App.AboutView = App.View.extend({
 });
 
 App.TosView = App.UserPanelView.extend({
+    showRender: function() {
+        this.render();
+        this.$el.fadeIn();
+    },
     getRender: function() {
         return this.serialize('tos');
     }

@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+# for python gevent
+package "libevent-dev"
+
 template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
   source "againfm.conf.erb"
   owner "root"

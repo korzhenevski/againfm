@@ -25,9 +25,9 @@ App.setup = function(bootstrap) {
     App.controls = new App.RadioControlsView();
 
     App.player = new App.Player();
-    if (App.config.spectrum) {
-        App.spectrum = new App.Spectrum();
-    }
+    //if (App.config.spectrum) {
+    App.spectrum = new App.Spectrum();
+    //}
 
     App.now = new App.RadioNowView({player: App.player});
 
