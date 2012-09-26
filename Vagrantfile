@@ -27,7 +27,7 @@ Vagrant::Config.run do |config|
 		chef.add_recipe "python"
 		chef.add_recipe "nginx"
 		#chef.add_recipe "java"
-		#chef.add_recipe "redis::server"
+		chef.add_recipe "redis::server"
     		#chef.add_recipe "mongodb::10gen_repo"
   		#chef.add_recipe "mongodb::default"
 		#chef.add_recipe "mongodb::replicaset"
@@ -36,6 +36,9 @@ Vagrant::Config.run do |config|
 		#chef.add_recipe "elasticsearch::proxy_nginx"
     
     chef.json = {
+	:redis => { :config => {
+		listen_addr: "10.0.0.2"
+	}},
 	:java => { install_flavor: "oracle" },
 	:vim => { extra_packages: ["vim-nox"] },
 	:timezone => { value: "Europe/Moscow" },

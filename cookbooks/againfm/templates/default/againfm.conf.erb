@@ -1,0 +1,12 @@
+server {
+	server_name again.fm againfm.local;
+
+	location / {
+		proxy_pass http://127.0.0.1:5000;
+		proxy_set_header Host $host;
+	}
+
+	location /static {
+		alias /var/www/againfm/afm/static;
+	}
+}
