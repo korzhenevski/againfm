@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+package "ruby-compass"
+package "libfssm-ruby"
+
 template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
   source "againfm.conf.erb"
   owner "root"

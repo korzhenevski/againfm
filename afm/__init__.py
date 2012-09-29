@@ -29,7 +29,6 @@ js = Bundle(
     'js/jquery.watermark.js',
     'js/jquery.validate.js',
     'js/jquery.cookie.js',
-    'js/jquery.tinyscrollbar.js',
     'js/i18next-1.5.5.js',
     'js/bootstrap-button.js', # lazy
     'js/underscore.js',
@@ -51,18 +50,21 @@ assets.register('core_scripts', Bundle(
     'js/i18next-1.5.5.js',
     'js/underscore.js',
     'js/backbone.js',
+    'js/jquery.tinyscrollbar.js',
+    # for production with precompiled templates only include tiny handlerbars.runtime.js
+    'js/handlebars.js',
 ))
 
 assets.register('scripts', Bundle(
     'js/app/app.js',
-    'js/app/radio-grid.js',
+    'js/app/radio-display.js',
 ))
 
 if app.config['TESTING']:
     from flask.ext.jasmine import Jasmine, Asset
     jasmine = Jasmine(app)
     jasmine.specs(
-        'js/specs/radio-grid.js',
+        'js/specs/radio-display.js',
     )
     jasmine.sources('js/sinon-1.4.2.js', Asset('core_scripts'), Asset('scripts'))
 

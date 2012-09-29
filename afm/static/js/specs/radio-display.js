@@ -35,49 +35,56 @@ xdescribe('radio playlist', function(){
         var callback = jasmine.createSpy();
         playlist.on('station_changed', callback);
         playlist.next();
-        expect(callback).wasCalledWith(playlist.getStation());
+        expect(callback).toHaveBeenCalledWith(playlist.getStation());
     });
 
-    it('fetch by query and save selected station', function(){
+    it('fetch by query and restore selected station', function(){
         this.server.respondWith('GET', '/api/playlist/tag/test',
-            [200, {"Content-Type": "application/json"}, '[{"id":1,"title":"t1"},{"id":2,"title":"t2"}]']);
+            [200, {"Content-Type": "application/json"}, '{"objects":[{"id":1,"title":"t1"},{"id":2,"title":"t2"}]}']);
         this.server.respondWith('GET', '/api/playlist/tag/other-test',
-            [200, {"Content-Type": "application/json"}, '[{"id":3,"title":"t3"},{"id":4,"title":"t4"}]']);
+            [200, {"Content-Type": "application/json"}, '{"objects":[{"id":3,"title":"t3"},{"id":4,"title":"t4"}]}']);
 
-        playlist.fetchByQuery('tag/test');
+        playlist.fetchBySelector('tag/test');
         this.server.respond();
         expect(playlist.first().id).toEqual(1);
         playlist.setStation(playlist.last());
 
-        playlist.fetchByQuery('tag/other-test');
+        playlist.fetchBySelector('tag/other-test');
         this.server.respond();
         expect(playlist.first().id).toEqual(3);
 
-        playlist.fetchByQuery('tag/test');
+        playlist.fetchBySelector('tag/test');
         this.server.respond();
         expect(playlist.getStation().id).toEqual(playlist.last().id);
     });
 });
 
-describe('playlist filters', function(){
-    var filters;
+describe('playlist selectors', function(){
+    var selectors;
     beforeEach(function(){
-        filters = new App.Filters([
-            new App.Filter({id: 1, order: -1}),
-            new App.Filter({id: 3, order: 1}),
-            new App.Filter({id: 2, order: 0})
+        selectors = new App.Selectors([
+            new App.Selector({selector: 'test'}),
+            new App.Selector({selector: 'fest'}),
+            new App.Selector({selector: 'breast'})
         ]);
     })
 
-    it('order by value', function(){
-        expect(filters.first().id).toEqual(1);
-        expect(filters.last().id).toEqual(3);
+    it('select', function(){
+        expect(selectors.first().get('active')).toEqual(false);
+        selectors.first().select();
+        expect(selectors.first().get('active')).toEqual(true);
+        selectors.first().select();
     });
 
-    it('selecting', function(){
-        expect(filters.first().get('active')).toEqual(false);
-        filters.first().select();
-        expect(filters.first().get('active')).toEqual(true);
-        filters.first().select();
+    it('selection event', function(){
+        var callback = jasmine.createSpy();
+        selectors.on('select', callback);
+
+        // event fires once
+        selectors.first().select();
+        selectors.first().select();
+
+        expect(callback.callCount).toEqual(1);
+        expect(callback).toHaveBeenCalledWith(selectors.first().id);
     });
 });

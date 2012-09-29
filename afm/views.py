@@ -113,12 +113,13 @@ def login():
     else:
         return jsonify({'error': 'No such account'}), 401
 
-@app.route('/api/playlist/<int:category_id>')
-def playlist(category_id):
-    tag = db.StationTag.find_one({'id': category_id})
+@app.route('/api/playlist/tag/<tagname>')
+def playlist(tagname):
+    tag = db.StationTag.find_one({'tag': tagname})
     if not tag:
         abort(404)
     stations = [station.get_public_data() for station in db.Station.find({'tag': tag['tag']})]
+    #stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
 
 @app.route('/')

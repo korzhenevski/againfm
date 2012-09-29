@@ -115,7 +115,11 @@
             var sCssSize = sSize.toLowerCase();
 
             oThumb.obj.css( sDirection, iScroll / oScrollbar.ratio );
-            oContent.obj.css( sDirection, -iScroll );
+            // smooth scroll, yammy :)
+            var props = {}
+            props[sDirection] = -iScroll;
+            oContent.obj.animate(props);
+
             iMouse.start = oThumb.obj.offset()[ sDirection ];
 
             oScrollbar.obj.css( sCssSize, oTrack[ options.axis ] );

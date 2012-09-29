@@ -113,5 +113,11 @@
             "info_unavailable": "Info unavailable",
             "radio_unavailable": "Radio unavailable"
         }
+    },
+
+    "display": {
+        "filters": {
+            "featured": "Featured"
+        }
     }
 }

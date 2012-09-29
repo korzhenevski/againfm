@@ -1,7 +1,6 @@
 from fabric.api import env, local, run, prefix
 
 env.project = '/var/www/againfm'
-env.virtualenv = env.project + '/venv'
 
 def vagrant():
     # change from the default user to 'vagrant'
@@ -14,8 +13,7 @@ def vagrant():
     env.key_filename = result.split()[1]
  
 def init():
-	run('virtualenv {}'.format(env.virtualenv))
-	with prefix('source {}/bin/activate'.format(env.virtualenv)):
-		run('pip install -r {}/requirements.txt'.format(env.project))
-		
-		
+	run('pip install -r {}/requirements.txt'.format(env.project))
+
+def compass():
+    local('compass watch afm/static')
