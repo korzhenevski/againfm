@@ -50,7 +50,7 @@ App.Playlist = App.Collection.extend({
     },
 
     fetchBySelector: function(selector) {
-        // skip double fetch
+        // NB: пропускаем повторные выборки
         if (selector == this._selector) {
             return;
         }
@@ -118,8 +118,11 @@ App.SelectorView = App.View.extend({
     },
 
     select: function() {
-        this.model.collection.unselectAll();
-        this.model.select();
+        // выбирается только один раз
+        if (!this.model.get('active')) {
+            this.model.collection.unselectAll();
+            this.model.select();
+        }
     }
 });
 
@@ -201,10 +204,7 @@ App.DisplayView = App.View.extend({
      * @param station Station
      */
     stationChanged: function(station) {
-        this.$('.active-station').removeClass('active-station');
-
         var $link = this.links[station.id];
-        $link.addClass('active-station');
 
         // прокрутка до видимой зоны если ссылка за пределами шкалы
         // правый край
@@ -228,7 +228,12 @@ App.DisplayView = App.View.extend({
         var $cursor = this.$('.scale-slider'),
             halfWidth = Math.round(($link.width() + 13) / 2),
             cursorLeft = $link.scrollLeft() + $link.position().left + halfWidth;
-        $cursor.show().animate({left: cursorLeft});
+
+        // выделяем ссылку по финишу анимации бегунка
+        this.$('.active-station').removeClass('active-station');
+        $cursor.show().animate({left: cursorLeft}, function(){
+            $link.addClass('active-station');
+        });
     },
 
     /**
@@ -308,13 +313,13 @@ App.DisplayView = App.View.extend({
     },
 
     setupScrollbar: function() {
-        this.$('.radio-scroll').tinyscrollbar({axis: 'x'});
+        $('.radio-scroll').tinyscrollbar({axis: 'x'});
         // обновляем позицию прокрутки при ресайзе окна
         $(window).resize(_.throttle(_.bind(this.updateScrollbar, this), 200))
     },
 
     updateScrollbar: function(position) {
-        this.$('.radio-scroll').tinyscrollbar_update(position);
+        $('.radio-scroll').tinyscrollbar_update(position);
     }
 });
 
@@ -371,6 +376,33 @@ App.SearchView = App.View.extend({
 });
 
 /**
+ * Представление кнопок навигации по шкале.
+ *
+ * @type {function}
+ */
+App.DisplayControlsView = App.View.extend({
+    el: '.radio-controls',
+    events: {
+        'click .prev': 'selectPrevious',
+        'click .next': 'selectNext'
+    },
+
+    initialize: function(options) {
+        this.playlist = options.playlist;
+    },
+
+    selectPrevious: function() {
+        this.playlist.previous();
+        return false;
+    },
+
+    selectNext: function() {
+        this.playlist.next();
+        return false;
+    }
+});
+
+/**
  * Контролер шкалы, селекторов и поиска.
  *
  * Селектор плейлиста это строка запроса к серверу,
@@ -397,12 +429,14 @@ _.extend(App.RadioDisplay.prototype, {
         this.selectorsView = new App.SelectorsView({selectors: this.selectors});
         this.displayView = new App.DisplayView({playlist: this.playlist});
         this.searchView = new App.SearchView({playlist: this.playlist, selectors: this.selectors});
+        this.controlsView = new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
             new App.FavoriteSelector({title: 'Favorites'}),
             new App.Selector({selector: 'featured'})
         ]);
 
+        // теги
         for (var i = options.tags.length; i > 0; i--) {
             var tag = options.tags[i - 1];
             this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
@@ -413,7 +447,6 @@ _.extend(App.RadioDisplay.prototype, {
         this.playlist.fetchBySelector(selector);
     }
 });
-
 
 $(function(){
     App.radioDisplay = new App.RadioDisplay({tags: [
