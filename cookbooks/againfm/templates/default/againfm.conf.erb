@@ -6,6 +6,12 @@ server {
 		proxy_set_header Host $host;
 	}
 
+	# поисковые запросы идут на отдельного демона
+	location /api/playlist/search {
+		rewrite /api/playlist/search/([^/]+) /search/$1 break;
+		proxy_pass http://10.0.0.3:6100;
+	}
+
 	location /static {
 		alias /var/www/againfm/afm/static;
 	}

@@ -75,16 +75,4 @@ describe('playlist selectors', function(){
         expect(selectors.first().get('active')).toEqual(true);
         selectors.first().select();
     });
-
-    it('selection event', function(){
-        var callback = jasmine.createSpy();
-        selectors.on('select', callback);
-
-        // event fires once
-        selectors.first().select();
-        selectors.first().select();
-
-        expect(callback.callCount).toEqual(1);
-        expect(callback).toHaveBeenCalledWith(selectors.first().id);
-    });
 });

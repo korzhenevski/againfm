@@ -1,11 +1,12 @@
-/*display view
-search view
-playlist
-filters*/
+var App = App || {};
 
-
-// TODO: rename grid to display
-
+/**
+ * Плейлист (список радио).
+ *
+ * Выборка по селектору и управление курсором текущего радио.
+ *
+ * @type {function}
+ */
 App.Playlist = App.Collection.extend({
     model: App.Station,
     _state: {},
@@ -49,9 +50,14 @@ App.Playlist = App.Collection.extend({
     },
 
     fetchBySelector: function(selector) {
+        // skip double fetch
+        if (selector == this._selector) {
+            return;
+        }
         this._selector = selector;
-        var xhr = this.fetch();
-        xhr.always(_.bind(this.restoreSelectedStation, this));
+        var deferred = this.fetch();
+        deferred.always(_.bind(this.restoreSelectedStation, this));
+        return deferred;
     },
 
     restoreSelectedStation: function() {
@@ -62,6 +68,11 @@ App.Playlist = App.Collection.extend({
     }
 });
 
+/**
+ * Селектор
+ *
+ * @type {function}
+ */
 App.Selector = App.Model.extend({
     idAttribute: 'selector',
 
@@ -88,18 +99,6 @@ App.Selector = App.Model.extend({
 
     unselect: function() {
         this.set('active', false);
-    },
-
-    getTitle: function() {
-        return this.get('title');
-        /*if (!title) {
-            var key = 'display.filters.' + this.get('selector');
-            title = App.i18n(key);
-            if (title == key) {
-                title = '';
-            }
-        }
-        return title;*/
     }
 });
 
@@ -126,17 +125,13 @@ App.SelectorView = App.View.extend({
 
 App.Selectors = App.Collection.extend({
     model: App.Selector,
-    selectedId: null,
 
     unselectAll: function() {
         return _.invoke(this.where({'active': true}), 'unselect');
     },
 
     select: function(model) {
-        if (this.selectedId != model.id) {
-            this.selectedId = model.id;
-            this.trigger('select', model.id);
-        }
+        this.trigger('select', model.id);
     }
 });
 
@@ -151,6 +146,14 @@ App.FavoriteSelector = App.Selector.extend({
     }
 });
 
+/**
+ * Панель селекторов.
+ *
+ * рендеринг делегирован в
+ * @see SelectorView
+ *
+ * @type {function}
+ */
 App.SelectorsView = App.View.extend({
     el: '.radio-display .filters',
 
@@ -170,10 +173,17 @@ App.SelectorsView = App.View.extend({
     }
 });
 
+/**
+ * Представление шкалы.
+ *
+ * отрисовка по обновлению плейлиста.
+ * @see Playlist
+ *
+ * @type {function}
+ */
 App.DisplayView = App.View.extend({
     el: '.radio-scale .scale-inner',
-    scrollEl: '.radio-scroll',
-    cursorEl: '.scale-slider',
+    template: App.getTemplate('scale'),
     events: {
         'click .station': 'selectStation'
     },
@@ -191,7 +201,7 @@ App.DisplayView = App.View.extend({
      * @param station Station
      */
     stationChanged: function(station) {
-        this.$el.find('.active-station').removeClass('active-station');
+        this.$('.active-station').removeClass('active-station');
 
         var $link = this.links[station.id];
         $link.addClass('active-station');
@@ -202,7 +212,6 @@ App.DisplayView = App.View.extend({
             scrollShift = $link.position().left + $link.width() * 2;
         scrollShift -= scrollLeft + this.$el.parent().width();
         if (scrollShift > 0) {
-            console.log('overflow right');
             var scrollPos = scrollLeft + scrollShift;
             var maxScrollPos = this.$el.width() - this.$el.parent().width();
             if (scrollPos > maxScrollPos) {
@@ -212,12 +221,11 @@ App.DisplayView = App.View.extend({
         }
         // левый край
         if ($link.position().left < scrollLeft) {
-            console.log('overflow left');
             this.updateScrollbar($link.position().left);
         }
 
         // меняем позицию бегунка, позиционирование на середину ширины ссылки
-        var $cursor = this.$el.find(this.cursorEl),
+        var $cursor = this.$('.scale-slider'),
             halfWidth = Math.round(($link.width() + 13) / 2),
             cursorLeft = $link.scrollLeft() + $link.position().left + halfWidth;
         $cursor.show().animate({left: cursorLeft});
@@ -239,21 +247,17 @@ App.DisplayView = App.View.extend({
      */
     render: function() {
         var SLIDER_SIZE = 13,
-            MAX_LINES = 4,
             space = 150 - Math.round(Math.log(this.playlist.length) * 20),
             maxLimit = Math.round(this.playlist.length * SLIDER_SIZE),
-            $lines = [],
             lineLimits = [];
 
-        this.$el.html('');
         // station_id => $element
         this.links = {};
 
-        // создаем линии
-        for (var i = 0; i < MAX_LINES; i++) {
+        this.$el.html(this.template());
+        var $lines = this.$('ul');
+        for (var i = 0; i < $lines.size(); i++) {
             lineLimits.push(0);
-            var $line = $(this.make('ul', {'class': 'line'+(i+1)}));
-            $lines.push($line.appendTo(this.$el));
         }
 
         for (var spots = [], i = maxLimit; 0 <= i; i--) {
@@ -301,27 +305,88 @@ App.DisplayView = App.View.extend({
 
         // обновляем полосу прокрутки
         this.updateScrollbar();
-
-        // слайдер обязательно внутри прокручиваемого контента
-        this.$el.append('<div class="scale-slider"></div>');
     },
 
     setupScrollbar: function() {
-        $(this.scrollEl).tinyscrollbar({axis: 'x'});
+        this.$('.radio-scroll').tinyscrollbar({axis: 'x'});
         // обновляем позицию прокрутки при ресайзе окна
         $(window).resize(_.throttle(_.bind(this.updateScrollbar, this), 200))
     },
 
     updateScrollbar: function(position) {
-        $(this.scrollEl).tinyscrollbar_update(position);
+        this.$('.radio-scroll').tinyscrollbar_update(position);
     }
 });
+
+/**
+ * Представление поиска
+ *
+ * @type {function}
+ */
+App.SearchView = App.View.extend({
+    el: '.search-input',
+    popupEl: '.search-popup',
+    recentSelector: null,
+
+    events: {
+        'keyup': 'changeText'
+    },
+
+    initialize: function(options) {
+        this.playlist = options.playlist;
+        this.selectors = options.selectors;
+        this.selectors.on('select', function(selector) {
+            this.recentSelector = selector;
+        }, this);
+        this.dockPopup();
+    },
+
+    dockPopup: function() {
+        this.$popupEl = $(this.popupEl);
+        var offset = this.$el.offset();
+        offset.top += Math.ceil(this.$el.height() / 2)
+        this.$popupEl.offset(offset);
+    },
+
+    changeText: _.debounce(function() {
+        this.$popupEl.hide();
+        var query = $.trim(this.$el.val());
+        if (query) {
+            this.selectors.unselectAll();
+            this.search(query);
+        } else if (this.recentSelector) {
+            var selector = this.selectors.get(this.recentSelector);
+            selector.select();
+        }
+    }, 200),
+
+    search: function(query) {
+        this.playlist.fetchBySelector('search/' + query).always(_.bind(function(){
+            if (!this.playlist.length) {
+                this.$popupEl.html('not found').show();
+                this.dockPopup();
+            }
+        }, this));
+    }
+});
+
+/**
+ * Контролер шкалы, селекторов и поиска.
+ *
+ * Селектор плейлиста это строка запроса к серверу,
+ * типа /api/playlist/<selector>
+ *
+ * Переключение с селектора на поиск и обратно в
+ * @see SearchView
+ *
+ * @type {function}
+ */
 
 App.RadioDisplay = function() {
     this.initialize.apply(this, arguments);
 }
 
-App.RadioDisplay.prototype = {
+_.extend(App.RadioDisplay.prototype, {
     initialize: function(options) {
         var options = _.defaults(options || {}, {tags: []});
 
@@ -331,11 +396,13 @@ App.RadioDisplay.prototype = {
 
         this.selectorsView = new App.SelectorsView({selectors: this.selectors});
         this.displayView = new App.DisplayView({playlist: this.playlist});
+        this.searchView = new App.SearchView({playlist: this.playlist, selectors: this.selectors});
 
         this.selectors.add([
             new App.FavoriteSelector({title: 'Favorites'}),
             new App.Selector({selector: 'featured'})
         ]);
+
         for (var i = options.tags.length; i > 0; i--) {
             var tag = options.tags[i - 1];
             this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
@@ -345,7 +412,7 @@ App.RadioDisplay.prototype = {
     select: function(selector) {
         this.playlist.fetchBySelector(selector);
     }
-}
+});
 
 
 $(function(){
