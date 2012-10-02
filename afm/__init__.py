@@ -37,7 +37,6 @@ js = Bundle(
     'js/template.js',
     'js/common.js',
     'js/comet.js', # lazy
-    'js/swfobject.js',
     'js/app/base.js',
     'js/app/radio.js',
     'js/app/user.js',
@@ -50,7 +49,10 @@ assets.register('core_scripts', Bundle(
     'js/i18next-1.5.5.js',
     'js/underscore.js',
     'js/backbone.js',
+    # radio-display
     'js/jquery.tinyscrollbar.js',
+    # radio-player
+    'js/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js
     'js/handlebars.js',
 ))
@@ -58,6 +60,7 @@ assets.register('core_scripts', Bundle(
 assets.register('scripts', Bundle(
     'js/app/app.js',
     'js/app/radio-display.js',
+    'js/app/radio-player.js',
 ))
 
 if app.config['TESTING']:

@@ -31,20 +31,17 @@ package {
       private var _fadingTime:Number = 1; //secs
       private var _volume:Number = 0.6;
       private var _preMuteVolume:Number = 0;
-      private var _isMuted:Boolean = false;
-      private var _startVolume:Number;
-      private var _isPaused:Boolean = true;
+      private var _muted:Boolean = false;
+      private var _stopped:Boolean = true;
+      private var _url:String;
 
       public function Player() {
          Security.allowDomain("*");
-         var params:Object = LoaderInfo(this.root.loaderInfo).parameters;
 
-         ExternalInterface.addCallback("loadStreamByUrl", loadStreamByUrl);
+         ExternalInterface.addCallback("loadStream", loadStream);
          ExternalInterface.addCallback("playStream", playStream);
-         ExternalInterface.addCallback("pauseStream", pauseStream);
          ExternalInterface.addCallback("stopStream", stopStream);
          ExternalInterface.addCallback("stopStreamWithFade", stopStreamWithFade);
-         ExternalInterface.addCallback("pauseStreamWithFade", pauseStreamWithFade);
          ExternalInterface.addCallback("setVolume", setVolume);
          ExternalInterface.addCallback("getVolume", getVolume);
          ExternalInterface.addCallback("mute", mute);
@@ -53,11 +50,8 @@ package {
          ExternalInterface.addCallback("getSpectrum", getSpectrum);
          ExternalInterface.addCallback("getVersion", getVersion);
 
-         _volume = (params['volume'] != undefined) ? (parseFloat(params['volume']) / 100) : _volume;
-         debug('volume: '+_volume);
-
          _soundTransform = new SoundTransform(_volume);
-         //ExternalInterface.call('onPlayerReady');
+         this.callback('ready');
       }
 
       public function debug(vars:Object): void {
@@ -84,52 +78,38 @@ package {
          return spectrum;
       }
 
-      public function loadStreamByUrl(url:String, startPlay:Boolean) {
-         try {
-            stopStream()
-            debug('stream url: '+url)
-            
-            // TODO: make additional request and receive stream URL as plain text
-            _sound = new Sound();
-            _sound.load(new URLRequest(url));
-            _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError, false, 0, true);
+       public function setStream(url:String):void {
+           _url = url;
+       }
 
-            if (startPlay == true) {
-                playStream()
-            }
-         } catch(e:Error) {
-            debug(e.message);
-            ExternalInterface.call('App.player.trigger', 'error', e.message);
-         }
-      }
+       public function loadStream(url:String):void {
+           this.callback('loading');
+           try {
+               stopStream();
+               debug('stream url: '+url);
+
+               _sound = new Sound();
+               _sound.load(new URLRequest(url));
+               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+
+           } catch(e:Error) {
+               debug('load stream: ' + e.message);
+               this.callback('exception', e.message);
+           }
+       }
 
       public function playStream() {
          if (_sound != null) {
              _soundChannel = _sound.play();
              _soundChannel.soundTransform = _soundTransform;
-             setPaused(false);
+             stopped(false);
          } else {
-             setPaused(true);
+             stopped(true);
          }
-      }
-
-      // TODO: refactor tweener copypast
-      public function pauseStreamWithFade() {
-         setPaused(true);
-         if (_soundChannel) {
-             new EazeTween(_soundChannel).onComplete(pauseStream).to(_fadingTime, {volume: 0});
-         }
-      }
-
-      public function pauseStream() {
-         if (_soundChannel != null) {
-             _soundChannel.stop();
-         }
-         setPaused(true);
       }
 
       public function stopStreamWithFade() {
-         setPaused(true);
+         stopped(true);
          if (_soundChannel) {
              new EazeTween(_soundChannel).onComplete(stopStream).to(_fadingTime, {volume: 0});
          }
@@ -137,81 +117,90 @@ package {
 
       public function stopStream() {
          if (_soundChannel != null) {
-             _soundChannel.stop();
-             _sound.close();
+             try {
+                _soundChannel.stop();
+                //_sound.close();
+             } catch(e:Error) {
+                 debug('error while stopping: '+e.message);
+             }
+             _soundChannel = null;
          }
-         setPaused(true);
+         stopped(true);
       }
 
-      public function setPaused(paused:Boolean): void {
-         // if state changed
-         if (paused != _isPaused) {
-            //ExternalInterface.call('App.player.trigger', paused ? 'paused' : 'play');
-            _isPaused = paused;
-         }
-      }
+       public function stopped(stopped:Boolean) {
+           // if state changed
+           if (stopped != _stopped) {
+               this.callback(stopped ? 'stopped' : 'playing');
+               _stopped = stopped;
+           }
+       }
 
-      public function sendEvent() {
-         // send via setTimeout(zero) 
-         // performance reasons
-      }
+       public function setVolume(volume:Number) {
+           _soundTransform.volume = volume;
+           _volume = volume;
 
-      public function setVolume(volume:Number):void {
-         volume = volume / 100
-         _volume = volume;
-         _soundTransform.volume = volume;
+           if (_soundChannel != null) {
+               _soundChannel.soundTransform = _soundTransform;
+           }
+       }
 
-         if (_soundChannel != null) {
-             _soundChannel.soundTransform = _soundTransform;
-         }
-      }
+       public function getVolume(): Number {
+           if (_muted) {
+               return 0;
+           } else {
+               return _volume;
+           }
+       }
 
-      public function getVolume():Number {
-         if (_isMuted) {
-             return 0;
-         } else {
-             return _volume * 100;
-         }
-      }
+       public function unmute() {
+           setMuted(false);
+       }
 
-      public function unmute():void {
-         setMuted(false);
-      }
+       public function mute() {
+           setMuted(true);
+       }
 
-      public function mute():void {
-         setMuted(true);
-      }
+       public function setMuted(muted:Boolean) {
+           // ignore if already set
+           if (muted == _muted) {
+               return;
+           }
+           _muted = muted;
 
-      public function setMuted(muted:Boolean):void {
-         // ignore if already set
-         if ( (muted && _isMuted) || (!muted && !_isMuted))
-             return;
+           if (muted) {
+               _preMuteVolume = _soundTransform.volume;
+               setVolume(0);
+           } else {
+               setVolume(_preMuteVolume);
+           }
 
-         if (muted) {
-             _preMuteVolume = _soundTransform.volume;
-             setVolume(0);
-         } else {
-             setVolume(_preMuteVolume * 100);
-         }
+       }
 
-         _isMuted = muted;
-      }
+       public function callback(eventName:String) {
+           ExternalInterface.call('flashPlayerCallback', eventName);
+       }
+
+
+       public function callbackWithData(eventName:String, data:Object) {
+           ExternalInterface.call('flashPlayerCallback', eventName, data);
+       }
 
       public function isPaused():Boolean {
-         return _isPaused;
+         return _stopped;
       }
 
       public function getVersion():String {
-         return 'player v1.0.9';
+         return 'player v1.0.12';
       }
 
-      private function onIOError(event:Event): void {
-         setPaused(true);
-         _soundChannel = null;
-         _sound = null;
+       private function onIOError(event:Event) {
+           stopped(true);
+           _soundChannel = null;
+           _sound = null;
 
-         debug('io-error: '+event.text);
-         ExternalInterface.call('App.player.trigger', 'error', event.text);
-      }
+           debug('io-error: '+event.text);
+           this.callbackWithData('exception', event.text);
+       }
    }
 }
