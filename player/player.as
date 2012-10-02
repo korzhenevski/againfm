@@ -33,12 +33,10 @@ package {
       private var _preMuteVolume:Number = 0;
       private var _muted:Boolean = false;
       private var _stopped:Boolean = true;
-      private var _url:String;
 
       public function Player() {
          Security.allowDomain("*");
 
-         ExternalInterface.addCallback("loadStream", loadStream);
          ExternalInterface.addCallback("playStream", playStream);
          ExternalInterface.addCallback("stopStream", stopStream);
          ExternalInterface.addCallback("stopStreamWithFade", stopStreamWithFade);
@@ -78,34 +76,23 @@ package {
          return spectrum;
       }
 
-       public function setStream(url:String):void {
-           _url = url;
-       }
+      public function playStream(url:String) {
+          try {
+              stopStream();
+              debug('stream url: '+url);
 
-       public function loadStream(url:String):void {
-           this.callback('loading');
-           try {
-               stopStream();
-               debug('stream url: '+url);
+              this.callback('loading');
+              _sound = new Sound();
+              _sound.load(new URLRequest(url));
+              _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 
-               _sound = new Sound();
-               _sound.load(new URLRequest(url));
-               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-
-           } catch(e:Error) {
-               debug('load stream: ' + e.message);
-               this.callback('exception', e.message);
-           }
-       }
-
-      public function playStream() {
-         if (_sound != null) {
-             _soundChannel = _sound.play();
-             _soundChannel.soundTransform = _soundTransform;
-             stopped(false);
-         } else {
-             stopped(true);
-         }
+              _soundChannel = _sound.play();
+              _soundChannel.soundTransform = _soundTransform;
+              stopped(false);
+          } catch(e:Error) {
+              debug('load stream: ' + e.message);
+              this.callback('exception', e.message);
+          }
       }
 
       public function stopStreamWithFade() {
@@ -119,7 +106,7 @@ package {
          if (_soundChannel != null) {
              try {
                 _soundChannel.stop();
-                //_sound.close();
+                _sound.close();
              } catch(e:Error) {
                  debug('error while stopping: '+e.message);
              }

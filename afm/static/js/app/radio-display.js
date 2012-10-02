@@ -411,6 +411,8 @@ App.DisplayControlsView = App.View.extend({
  * Переключение с селектора на поиск и обратно в
  * @see SearchView
  *
+ * Глобальное событие playlist:station_changed(Station).
+ *
  * @type {function}
  */
 
@@ -419,6 +421,8 @@ App.RadioDisplay = function() {
 }
 
 _.extend(App.RadioDisplay.prototype, {
+    mediator: App.mediator,
+
     initialize: function(options) {
         var options = _.defaults(options || {}, {tags: []});
 
@@ -441,6 +445,10 @@ _.extend(App.RadioDisplay.prototype, {
             var tag = options.tags[i - 1];
             this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
         }
+
+        this.playlist.on('station_changed', function(station) {
+            this.mediator.trigger('playlist:station_changed', station);
+        }, this);
     },
 
     select: function(selector) {
