@@ -30,8 +30,6 @@ package {
 
       private var _fadingTime:Number = 1; //secs
       private var _volume:Number = 0.6;
-      private var _preMuteVolume:Number = 0;
-      private var _muted:Boolean = false;
       private var _stopped:Boolean = true;
 
       public function Player() {
@@ -42,9 +40,7 @@ package {
          ExternalInterface.addCallback("stopStreamWithFade", stopStreamWithFade);
          ExternalInterface.addCallback("setVolume", setVolume);
          ExternalInterface.addCallback("getVolume", getVolume);
-         ExternalInterface.addCallback("mute", mute);
-         ExternalInterface.addCallback("unmute", unmute);
-         ExternalInterface.addCallback("isPaused", isPaused);
+         ExternalInterface.addCallback("isPlaying", isPlaying);
          ExternalInterface.addCallback("getSpectrum", getSpectrum);
          ExternalInterface.addCallback("getVersion", getVersion);
 
@@ -52,13 +48,9 @@ package {
          this.callback('ready');
       }
 
-      public function debug(vars:Object): void {
-         ExternalInterface.call('console.log', 'Player: ' + vars);
-      }
-
       public function getSpectrum(points:Number) {
          var spectrum:Array = [];
-         if (isPaused() || _sound == null) {
+         if (!isPlaying() || _sound == null) {
              return spectrum;
          }
 
@@ -90,7 +82,7 @@ package {
               stopped(false);
           } catch(e:Error) {
               debug('load stream: ' + e.message);
-              this.callback('exception', e.message);
+              this.callback('error', e.message);
           }
       }
 
@@ -132,35 +124,11 @@ package {
        }
 
        public function getVolume(): Number {
-           if (_muted) {
-               return 0;
-           } else {
-               return _volume;
-           }
+           return _volume;
        }
 
-       public function unmute() {
-           setMuted(false);
-       }
-
-       public function mute() {
-           setMuted(true);
-       }
-
-       public function setMuted(muted:Boolean) {
-           // ignore if already set
-           if (muted == _muted) {
-               return;
-           }
-           _muted = muted;
-
-           if (muted) {
-               _preMuteVolume = _soundTransform.volume;
-               setVolume(0);
-           } else {
-               setVolume(_preMuteVolume);
-           }
-
+       public function debug(vars:Object): void {
+           //ExternalInterface.call('console.log', 'Player: ' + vars);
        }
 
        // вызов колбеков без отдельного потока (setTimeout(..., 0)) блокирует HTML UI
@@ -172,13 +140,15 @@ package {
            ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'", "'+data+'")', 0);
        }
 
-      public function isPaused():Boolean {
-         return _stopped;
+      public function isPlaying():Boolean {
+         return !_stopped;
       }
 
       public function getVersion():String {
          return 'player v1.0.12';
       }
+
+
 
        private function onIOError(event:Event) {
            stopped(true);
@@ -186,7 +156,7 @@ package {
            _sound = null;
 
            debug('io-error: '+event.text);
-           this.callbackWithData('exception', event.text);
+           this.callbackWithData('error', event.text);
        }
    }
 }

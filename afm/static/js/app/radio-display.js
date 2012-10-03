@@ -233,7 +233,7 @@ App.DisplayView = App.View.extend({
 
         // выделяем ссылку по финишу анимации бегунка
         this.$('.active-station').removeClass('active-station');
-        $cursor.show().animate({left: cursorLeft}, 'fast', function(){
+        $cursor.show().animate({left: cursorLeft}, function(){
             $link.addClass('active-station');
         });
     },
@@ -443,6 +443,14 @@ _.extend(App.RadioDisplay.prototype, {
             var tag = options.tags[i - 1];
             this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
         }
+
+        // когда пользователь жмет на большую кнопку, проигрывается первая станция
+        this.mediator.on('player:power', function(){
+            var firstStation = this.playlist.first();
+            if (this.playlist.getStation() != firstStation) {
+                this.playlist.setStation(firstStation);
+            }
+        }, this);
 
         this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
     },
