@@ -61,7 +61,38 @@ App.Station = App.Model.extend({});
  */
 App.i18n = function(key) {
     return $.i18n.t(key);
-}
+};
+
+
+// как-то громоздко, потенциально надо упростить
+(function(){
+    /**
+     * Проксирует эвенты из одного объекта в другой.
+     *
+     * Полезно использовать для передачи событий в глобальный медиатор.
+     *
+     * @param events string - имена событий (разделенные пробелом)
+     * @param destObj object - получатель эвентов
+     * @param prefix string - (необязательно) префикс новых событий
+     */
+    function publishEvents(events, destObj, prefix) {
+        var events = events.split(' ');
+        var self = this;
+        var prefix = prefix ? (prefix + ':') : '';
+        _.each(events, function(event){
+            self.on(event, function(){
+                var args = _.toArray(arguments);
+                args.unshift(prefix + event);
+                destObj.trigger.apply(destObj, args);
+            });
+        })
+    }
+
+    App.Model.prototype.publishEvents = publishEvents;
+    App.View.prototype.publishEvents = publishEvents;
+    App.Collection.prototype.publishEvents = publishEvents;
+    Backbone.Events.publishEvents = publishEvents;
+})();
 
 /**
  * Global events mediator
@@ -98,3 +129,7 @@ Handlebars.templates = Handlebars.templates || {};
 Handlebars.registerHelper('t', function(key) {
     return new Handlebars.SafeString(App.i18n(key));
 });
+
+App.mediator.on('all', function(){
+    console.log('[mediator]', arguments);
+})

@@ -12,6 +12,7 @@ from hashlib import md5
 from bson.objectid import ObjectId
 from random import choice
 from datetime import datetime
+import time
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -199,6 +200,28 @@ class Stream(BaseDocument):
             'url': self.get_web_url(),
             'is_hd': self.is_hd(),
         }
+
+
+class UserFavorites(object):
+    def __init__(self, user_id, redis):
+        self.redis = redis
+        self.user_id = user_id
+
+    def add(self, object_type, object_id):
+        self.redis.zadd(self.object_key(object_type), self.get_ts(), object_id)
+
+    def exists(self, object_type, object_id):
+        score = self.redis.zscore(self.object_key(object_type), object_id)
+        return bool(score)
+
+    def remove(self, object_type, object_id):
+        self.redis.zrem(self.object_key(object_type), object_id)
+
+    def object_key(self, object_type):
+        return 'favorite_user_{}:{}'.format(object_type, self.user_id)
+
+    def get_ts(self):
+        return int(time.time())
 
 @db.register
 class Track(BaseDocument):

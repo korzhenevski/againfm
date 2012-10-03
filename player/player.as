@@ -81,7 +81,6 @@ package {
               stopStream();
               debug('stream url: '+url);
 
-              this.callback('loading');
               _sound = new Sound();
               _sound.load(new URLRequest(url));
               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
@@ -164,13 +163,13 @@ package {
 
        }
 
+       // вызов колбеков без отдельного потока (setTimeout(..., 0)) блокирует HTML UI
        public function callback(eventName:String) {
-           ExternalInterface.call('flashPlayerCallback', eventName);
+           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'")', 0);
        }
 
-
        public function callbackWithData(eventName:String, data:Object) {
-           ExternalInterface.call('flashPlayerCallback', eventName, data);
+           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'", "'+data+'")', 0);
        }
 
       public function isPaused():Boolean {

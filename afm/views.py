@@ -3,10 +3,11 @@
 import pymongo
 import requests
 import json
-from . import app, db, login_manager, tasks, i18n
+from . import app, db, login_manager, tasks, i18n, redis
 from .forms import RegisterForm
 from flask import jsonify, request, render_template, redirect, abort, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
+from .models import UserFavorites
 
 def send_mail(**kwargs):
     if app.debug:
@@ -63,7 +64,7 @@ def register():
     send_mail(subject='Welcome to Again.FM', email=user.email, body=body)
     return jsonify(user.get_public_data())
 
-@app.route('/api/user/logout', methods=['DELETE'])
+@app.route('/api/user/logout', methods=['DELETE','POST'])
 @login_required
 def logout():
     logout_user()
@@ -144,6 +145,28 @@ def stream_for_station(station_id):
         abort(404)
     data = stream.get_public_data()
     return jsonify(data)
+
+@app.route('/api/station/<int:station_id>/getplayinfo')
+def getplayinfo(station_id):
+    """
+    Возвращает поток для плеера.
+    с параметром low_bitrate выбирается самый меньший битрейт
+
+    @param station_id:
+    @return: json
+    """
+    sort_direction = pymongo.ASCENDING if request.args.get('low_bitrate') else pymongo.DESCENDING
+    stream = db.Stream.find_one({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
+    if not stream:
+        abort(404)
+    resp = {'stream': stream.get_public_data()}
+
+    # возвращаем наличие станции в закладках, если пользователь авторизован
+    if current_user.is_authenticated():
+        favs = UserFavorites(user_id=current_user.id, redis=redis)
+        resp['user'] = {'favorite_station': favs.exists('station', station_id)}
+
+    return jsonify(resp)
 
 @app.route('/api/user/favorites')
 @login_required

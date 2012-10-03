@@ -49,7 +49,7 @@ App.Playlist = App.Collection.extend({
         this.setStation(this.at(index));
     },
 
-    fetchBySelector: function(selector) {
+    fetchBySelector: function(selector, callback) {
         // NB: пропускаем повторные выборки
         if (selector == this._selector) {
             return;
@@ -57,7 +57,9 @@ App.Playlist = App.Collection.extend({
         this._selector = selector;
         var deferred = this.fetch();
         deferred.always(_.bind(this.restoreSelectedStation, this));
-        return deferred;
+        if (callback) {
+            deferred.always(callback);
+        }
     },
 
     restoreSelectedStation: function() {
@@ -112,7 +114,7 @@ App.SelectorView = App.View.extend({
         var context = this.model.toJSON();
         // первая часть пути селектора это класс запроса
         // tag/trance => tag
-        context['class'] = context['selector'].split('/')[0]
+        context['class'] = context['selector'].split('/')[0];
         this.setElement(this.template(context));
         return this.el;
     },
@@ -231,7 +233,7 @@ App.DisplayView = App.View.extend({
 
         // выделяем ссылку по финишу анимации бегунка
         this.$('.active-station').removeClass('active-station');
-        $cursor.show().animate({left: cursorLeft}, function(){
+        $cursor.show().animate({left: cursorLeft}, 'fast', function(){
             $link.addClass('active-station');
         });
     },
@@ -254,18 +256,18 @@ App.DisplayView = App.View.extend({
         var SLIDER_SIZE = 13,
             space = 150 - Math.round(Math.log(this.playlist.length) * 20),
             maxLimit = Math.round(this.playlist.length * SLIDER_SIZE),
-            lineLimits = [];
+            lineLimits = [], spots = [];
 
         // station_id => $element
         this.links = {};
-
         this.$el.html(this.template());
-        var $lines = this.$('ul');
-        for (var i = 0; i < $lines.size(); i++) {
-            lineLimits.push(0);
-        }
 
-        for (var spots = [], i = maxLimit; 0 <= i; i--) {
+        var $lines = this.$('ul');
+
+        _.times($lines.size(), function(){
+            lineLimits.push(0);
+        });
+        for (var i = maxLimit; 0 <= i; i--) {
             spots.push(i * SLIDER_SIZE);
         }
 
@@ -302,11 +304,7 @@ App.DisplayView = App.View.extend({
          */
         var viewOverflow = _.max(lineLimits) > $(window).width();
         this.$el.parent().toggleClass('movable', viewOverflow);
-        if (viewOverflow) {
-            this.$el.css('width', _.max(lineLimits));
-        } else {
-            this.$el.css('width', '100%');
-        }
+        this.$el.css('width', viewOverflow ? _.max(lineLimits) : '100%');
 
         // обновляем полосу прокрутки
         this.updateScrollbar();
@@ -349,7 +347,7 @@ App.SearchView = App.View.extend({
     dockPopup: function() {
         this.$popupEl = $(this.popupEl);
         var offset = this.$el.offset();
-        offset.top += Math.ceil(this.$el.height() / 2)
+        offset.top += Math.ceil(this.$el.height() / 2);
         this.$popupEl.offset(offset);
     },
 
@@ -366,7 +364,7 @@ App.SearchView = App.View.extend({
     }, 200),
 
     search: function(query) {
-        this.playlist.fetchBySelector('search/' + query).always(_.bind(function(){
+        this.playlist.fetchBySelector('search/' + query, _.bind(function(){
             if (!this.playlist.length) {
                 this.$popupEl.html('not found').show();
                 this.dockPopup();
@@ -413,18 +411,18 @@ App.DisplayControlsView = App.View.extend({
  *
  * Глобальное событие playlist:station_changed(Station).
  *
- * @type {function}
+ * @type {Function}
  */
 
 App.RadioDisplay = function() {
     this.initialize.apply(this, arguments);
-}
+};
 
 _.extend(App.RadioDisplay.prototype, {
     mediator: App.mediator,
 
     initialize: function(options) {
-        var options = _.defaults(options || {}, {tags: []});
+        options = _.defaults(options || {}, {tags: []});
 
         this.playlist = new App.Playlist();
         this.selectors = new App.Selectors();
@@ -446,9 +444,7 @@ _.extend(App.RadioDisplay.prototype, {
             this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
         }
 
-        this.playlist.on('station_changed', function(station) {
-            this.mediator.trigger('playlist:station_changed', station);
-        }, this);
+        this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
     },
 
     select: function(selector) {
@@ -462,7 +458,7 @@ $(function(){
         {title: "Trance", tag: "trance"}
     ]});
     App.radioDisplay.selectors.get('tag/trance').select();
-})
+});
 
 /*
 App

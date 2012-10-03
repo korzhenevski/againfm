@@ -37,7 +37,7 @@ Vagrant::Config.run do |config|
     
     chef.json = {
 	:redis => { :config => {
-		listen_addr: "10.0.0.2"
+		listen_addr: "0.0.0.0"
 	}},
 	:java => { install_flavor: "oracle" },
 	:vim => { extra_packages: ["vim-nox"] },
