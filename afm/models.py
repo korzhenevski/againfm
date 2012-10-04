@@ -191,14 +191,11 @@ class Stream(BaseDocument):
             return self.url + u';'
         return self.url
 
-    def is_hd(self):
-        return self.bitrate >= 192
-
     def get_public_data(self):
         return {
             'id': self['id'],
             'url': self.get_web_url(),
-            'is_hd': self.is_hd(),
+            'bitrate': self['bitrate'],
         }
 
 

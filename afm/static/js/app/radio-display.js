@@ -49,7 +49,13 @@ App.Playlist = App.Collection.extend({
         this.setStation(this.at(index));
     },
 
-    fetchBySelector: function(selector, callback) {
+    /**
+     * Загрузка по селектору.
+     * @param selector string
+     * @param callback function - выполняется по завершению запроса
+     * @param errback function - выполняется если произошла ошибка
+     */
+    fetchBySelector: function(selector, callback, errback) {
         // NB: пропускаем повторные выборки
         if (selector == this._selector) {
             return;
@@ -59,6 +65,9 @@ App.Playlist = App.Collection.extend({
         deferred.always(_.bind(this.restoreSelectedStation, this));
         if (callback) {
             deferred.always(callback);
+        }
+        if (errback) {
+            deferred.error(errback);
         }
     },
 
@@ -341,14 +350,19 @@ App.SearchView = App.View.extend({
         this.selectors.on('select', function(selector) {
             this.recentSelector = selector;
         }, this);
-        this.dockPopup();
+        this.$popupEl = $(this.popupEl);
     },
 
+    // состыковка с полем ввода
     dockPopup: function() {
-        this.$popupEl = $(this.popupEl);
         var offset = this.$el.offset();
         offset.top += Math.ceil(this.$el.height() / 2);
         this.$popupEl.offset(offset);
+    },
+
+    showPopup: function(type) {
+        this.$popupEl.html(App.i18n('display.search.' + type)).show();
+        this.dockPopup();
     },
 
     changeText: _.debounce(function() {
@@ -364,12 +378,14 @@ App.SearchView = App.View.extend({
     }, 200),
 
     search: function(query) {
-        this.playlist.fetchBySelector('search/' + query, _.bind(function(){
-            if (!this.playlist.length) {
-                this.$popupEl.html('not found').show();
-                this.dockPopup();
+        var self = this;
+        this.playlist.fetchBySelector('search/' + query, function(){
+            if (!self.playlist.length) {
+                self.showPopup('404');
             }
-        }, this));
+        }, function() {
+            self.showPopup('500');
+        });
     }
 });
 

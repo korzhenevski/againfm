@@ -118,6 +118,10 @@
     "display": {
         "filters": {
             "featured": "Featured"
+        },
+        "search": {
+            "404": "Nothing found",
+            "500": "Search not available"
         }
     }
 }

@@ -83,15 +83,21 @@ App.Player = App.Model.extend({
 
     initialize: function() {
         this.engine = new App.FlashPlayerEngine({url: '/static/swf/player.swf'});
-
         // подписываемся на смену станции
         this.mediator.on('playlist:station_changed', this.setStation, this);
         // публикуем в медиатор локальные события
         this.engine.publishEvents('playing stopped error', this.mediator, 'player');
         this.publishEvents('loading error', this.mediator, 'player');
         // устанавливаем громкость
-        this.engine.on('ready', this.syncEngineVolume, this);
-        this.on('change:volume', this.syncEngineVolume, this);
+        if ($.cookie('volume')) {
+            this.set('volume', parseInt($.cookie('volume')));
+        }
+        this.engine.on('ready', this.syncVolume, this);
+        this.on('change:volume', this.syncVolume, this);
+        // смена громкости по глобальному событию
+        this.mediator.on('player:set_volume', function(volume){
+            this.set('volume', parseInt(volume));
+        }, this);
     },
 
     setStation: function(station) {
@@ -109,7 +115,7 @@ App.Player = App.Model.extend({
     },
 
     setPlayInfo: function(playinfo) {
-        this.playinfo = playinfo;
+        this.set('playinfo', playinfo);
         this.play();
     },
 
@@ -117,7 +123,7 @@ App.Player = App.Model.extend({
         // если стация не выбрана, хорошо играть самую первую
         // кидаем событие - дислей поймает
         // TODO: возможно это хуйня и надо перепроектировать
-        if (!this.playinfo) {
+        if (!this.get('playinfo')) {
             this.mediator.trigger('player:power');
             return;
         }
@@ -130,10 +136,11 @@ App.Player = App.Model.extend({
     },
 
     play: function() {
-        this.engine.play(this.playinfo.stream.url);
+        this.engine.play(this.get('playinfo').url);
     },
 
-    syncEngineVolume: function() {
+    syncVolume: function() {
+        $.cookie('volume', this.get('volume'));
         this.engine.setVolume(this.get('volume') / 100);
     }
 });
@@ -141,57 +148,52 @@ App.Player = App.Model.extend({
 /**
  * Представление громкости.
  *
- * Создает событие volume_changed.
- *
  * @type {function}
  */
 App.PlayerVolumeView = App.View.extend({
     el: '.radio-controls-status',
+    muted: false,
+    mutedVolume: 0,
     events: {
         'click .sound': 'controlSound'
     },
 
     initialize: function(options) {
-        this.volume = options.volume;
-        this.muted = false;
-        this.mutedVolume = 0;
-        this.render();
-    },
-
-    render: function() {
+        this.player = options.player;
+        this.player.on('change:volume', this.render, this);
         // бегунок
         var self = this;
         this.$sound = this.$('.sound');
         this.$slider = this.$('.slider').slider({
             range: 'min',
-            value: this.volume,
-            slide: function(evnt, ui) {
-                self.setVolume(ui.value);
-            }
+            value: this.player.get('volume'),
+            slide:_.bind(this.changeSlider, this)
         });
-        // начальное состояние индикатора звука
-        this.$sound.toggleClass('sound-off', this.volume === 0).show();
     },
 
-    setVolume: function(volume) {
-        this.volume = volume;
-        this.$slider.slider('value', this.volume);
-        this.$sound.toggleClass('sound-off', this.volume === 0).show();
-        this.trigger('volume_changed', this.volume);
+    changeSlider: function(evnt, ui) {
+        this.player.set('volume', ui.value);
+    },
+
+    render: function() {
+        var volume = this.player.get('volume');
+        this.$slider.slider('value', volume);
+        this.$sound.toggleClass('sound-off', volume === 0).show();
     },
 
     controlSound: function() {
         // если громкость уже нулевая, отключение пропускаем
-        if (!this.muted && !this.volume) {
+        if (!this.muted && !this.player.get('volume')) {
             return;
         }
 
         if (this.muted) {
-            this.setVolume(this.mutedVolume);
+            this.player.set('volume', this.mutedVolume);
         } else {
-            this.mutedVolume = this.volume;
-            this.setVolume(0);
+            this.mutedVolume = this.player.get('volume');
+            this.player.set('volume', 0);
         }
+
         this.muted = !this.muted;
     }
 });
@@ -209,16 +211,16 @@ App.PlayerView = App.View.extend({
 
     initialize: function(options) {
         this.player = options.player;
+        this.player.on('change:playinfo', this.render, this);
         // add global volume tracking
-        this.volume = new App.PlayerVolumeView({volume: this.player.get('volume')});
-        this.volume.on('volume_changed', function(volume){
-            this.player.set('volume', volume);
-        }, this);
-        this.render();
+        this.volume = new App.PlayerVolumeView({player: this.player});
+        this.volume.render();
     },
 
     render: function() {
-        this.volume.render();
+        // индикатор высокого битрейта
+        var playinfo = this.player.get('playinfo');
+        this.$('.hd').toggle(playinfo && playinfo['bitrate'] >= 192);
     },
 
     toggle: function() {
@@ -235,7 +237,7 @@ App.PlayerView = App.View.extend({
  *
  */
 $(function() {
-    var player = new App.Player({volume: 30});
+    var player = new App.Player();
     App.playerView = new App.PlayerView({player: player});
 });
 

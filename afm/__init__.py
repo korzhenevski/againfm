@@ -47,6 +47,7 @@ filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
 assets.register('core_scripts', Bundle(
     'js/jquery.min.js',
     'js/jquery-ui-1.8.23.custom.min.js',
+    # jquery-ui touch events support
     'js/jquery.ui.touch-punch.js',
     'js/i18next-1.5.5.js',
     'js/underscore.js',
@@ -57,6 +58,7 @@ assets.register('core_scripts', Bundle(
     'js/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js
     'js/handlebars.js',
+    'js/jquery.cookie.js',
 ))
 
 assets.register('scripts', Bundle(
