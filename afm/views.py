@@ -161,14 +161,19 @@ def getplayinfo(station_id):
         abort(404)
 
     resp = {
-        'url': stream.get_web_url(),
-        'bitrate': stream['bitrate'],
+        'stream': {
+            'url': stream.get_web_url(),
+            'bitrate': stream['bitrate'],
+            'type': 'audio/mpeg'
+        }
     }
 
     # возвращаем наличие станции в закладках, если пользователь авторизован
     if current_user.is_authenticated():
         favs = UserFavorites(user_id=current_user.id, redis=redis)
-        resp['favorite_station'] = favs.exists('station', station_id)
+        resp['station'] = {
+            'user_favorite': favs.exists('station', station_id)
+        }
 
     return jsonify(resp)
 

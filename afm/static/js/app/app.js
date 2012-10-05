@@ -95,6 +95,22 @@ App.i18n = function(key) {
 })();
 
 /**
+ * Фабрика классов.
+ *
+ * @param proto - прототип
+ * @return {Function}
+ */
+App.klass = function(proto) {
+    var klass = function() {
+        if (this.initialize) {
+            this.initialize.apply(this, arguments);
+        }
+    }
+    _.extend(klass.prototype, Backbone.Events);
+    return klass;
+};
+
+/**
  * Global events mediator
  *
  * @type {object}

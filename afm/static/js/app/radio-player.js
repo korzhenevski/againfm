@@ -73,57 +73,67 @@ App.FlashPlayerEngine = App.View.extend({
 });
 
 /**
+ */
+
+/**
  * Контролер плеера
+ *
+ * @type {function}
  */
 App.Player = App.Model.extend({
     mediator: App.mediator,
-    defaults: {
-        volume: 40
-    },
+    volume: 40,
+    station: {},
 
     initialize: function() {
         this.engine = new App.FlashPlayerEngine({url: '/static/swf/player.swf'});
         // подписываемся на смену станции
-        this.mediator.on('playlist:station_changed', this.setStation, this);
-        // публикуем в медиатор локальные события
-        this.engine.publishEvents('playing stopped error', this.mediator, 'player');
-        this.publishEvents('loading error', this.mediator, 'player');
-        // устанавливаем громкость
-        if ($.cookie('volume')) {
-            this.set('volume', parseInt($.cookie('volume')));
-        }
-        this.engine.on('ready', this.syncVolume, this);
-        this.on('change:volume', this.syncVolume, this);
+        this.mediator.on('radio:station_changed', this.stationChanged, this);
+        this.mediator.on('radio:stream_changed', this.playStream, this);
         // смена громкости по глобальному событию
         this.mediator.on('player:set_volume', function(volume){
-            this.set('volume', parseInt(volume));
+            this.setVolume(parseInt(volume));
         }, this);
+        // публикуем в медиатор локальные события
+        this.engine.publishEvents('playing stopped error', this.mediator, 'player');
+        this.publishEvents('error', this.mediator, 'player');
+        // устанавливаем громкость
+        if ($.cookie('volume')) {
+            this.setVolume(parseInt($.cookie('volume')));
+        }
+        this.on('volume_changed', this.syncVolume, this);
+        this.engine.on('ready', this.syncVolume, this);
     },
 
-    setStation: function(station) {
+    stationChanged: function(station) {
+        // игнорируем апдейты станции
+        if (this.station['id'] == station['id']) {
+            return;
+        }
         this.station = station;
         // останавливаем плеер до загрузки адреса потока
         this.engine.stop();
-        this.trigger('loading');
-        // запрос адреса потока
-        var url = '/api/station/' + station.id + '/getplayinfo';
-        var cb = _.bind(this.setPlayInfo, this);
-        $.getJSON(url, cb).error(_.bind(function(state, err){
-            // если ajax-ошибка, кидаем событие error
-            this.trigger('error', 'getplayinfo error: '+err);
-        }, this));
     },
 
-    setPlayInfo: function(playinfo) {
-        this.set('playinfo', playinfo);
+    play: function() {
+        this.engine.play(this.stream.url);
+    },
+
+    playStream: function(stream) {
+        this.stream = stream;
         this.play();
+    },
+
+    setVolume: function(volume) {
+        this.volume = volume;
+        this.trigger('volume_changed');
     },
 
     toggle: function() {
         // если стация не выбрана, хорошо играть самую первую
         // кидаем событие - дислей поймает
         // TODO: возможно это хуйня и надо перепроектировать
-        if (!this.get('playinfo')) {
+        if (!this.stream) {
             this.mediator.trigger('player:power');
             return;
         }
@@ -135,18 +145,14 @@ App.Player = App.Model.extend({
         }
     },
 
-    play: function() {
-        this.engine.play(this.get('playinfo').url);
-    },
-
     syncVolume: function() {
-        $.cookie('volume', this.get('volume'));
-        this.engine.setVolume(this.get('volume') / 100);
+        $.cookie('volume', this.volume);
+        this.engine.setVolume(this.volume / 100);
     }
 });
 
 /**
- * Представление громкости.
+ * Представление регулятора громкости.
  *
  * @type {function}
  */
@@ -160,38 +166,38 @@ App.PlayerVolumeView = App.View.extend({
 
     initialize: function(options) {
         this.player = options.player;
-        this.player.on('change:volume', this.render, this);
+        this.player.on('volume_changed', this.render, this);
         // бегунок
         var self = this;
         this.$sound = this.$('.sound');
         this.$slider = this.$('.slider').slider({
             range: 'min',
-            value: this.player.get('volume'),
+            value: this.player.volume,
             slide:_.bind(this.changeSlider, this)
         });
     },
 
     changeSlider: function(evnt, ui) {
-        this.player.set('volume', ui.value);
+        this.player.setVolume(ui.value);
     },
 
     render: function() {
-        var volume = this.player.get('volume');
+        var volume = this.player.volume;
         this.$slider.slider('value', volume);
         this.$sound.toggleClass('sound-off', volume === 0).show();
     },
 
     controlSound: function() {
         // если громкость уже нулевая, отключение пропускаем
-        if (!this.muted && !this.player.get('volume')) {
+        if (!this.muted && !this.player.volume) {
             return;
         }
 
         if (this.muted) {
-            this.player.set('volume', this.mutedVolume);
+            this.player.setVolume(this.mutedVolume);
         } else {
-            this.mutedVolume = this.player.get('volume');
-            this.player.set('volume', 0);
+            this.mutedVolume = this.player.volume;
+            this.player.setVolume(0);
         }
 
         this.muted = !this.muted;
@@ -208,23 +214,66 @@ App.PlayerView = App.View.extend({
     events: {
         'click .power': 'toggle'
     },
+    mediator: App.mediator,
 
     initialize: function(options) {
         this.player = options.player;
-        this.player.on('change:playinfo', this.render, this);
+        this.mediator.on('radio:stream_changed', this.streamChanged, this);
         // add global volume tracking
         this.volume = new App.PlayerVolumeView({player: this.player});
         this.volume.render();
     },
 
-    render: function() {
+    streamChanged: function(stream) {
         // индикатор высокого битрейта
-        var playinfo = this.player.get('playinfo');
-        this.$('.hd').toggle(playinfo && playinfo['bitrate'] >= 192);
+        this.$('.hd').toggle(stream['bitrate'] >= 192);
     },
 
     toggle: function() {
         this.player.toggle();
+    }
+});
+
+/**
+ * Менеджер загрузки радио.
+ *
+ * @type {function}
+ */
+App.Radio = App.Model.extend({
+    mediator: App.mediator,
+    defaults: {
+        station: {},
+        stream: {}
+    },
+
+    initialize: function() {
+        this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
+        this.mediator.on('playlist:station_changed', this.playlistStationChanged, this);
+    },
+
+    playlistStationChanged: function(station) {
+        // модель приводим к плоскому виду
+        this.setStation(station.toJSON());
+        // запрос адреса потока
+        var url = '/api/station/' + station.id + '/getplayinfo';
+        var cb = _.bind(function(playinfo){
+            this.setStation(_.extend(this.station, playinfo['station']));
+            this.setStream(playinfo['stream'])
+        }, this);
+        $.getJSON(url, cb).error(_.bind(function(state, err){
+            // если ajax-ошибка, кидаем событие error
+            this.trigger('error', 'getplayinfo error: '+err);
+        }, this));
+    },
+
+    setStation: function(station) {
+        this.station = station;
+        this.trigger('station_changed', station);
+    },
+
+    setStream: function(stream) {
+        this.stream = stream;
+        this.trigger('stream_changed', stream);
     }
 });
 
@@ -238,13 +287,6 @@ App.PlayerView = App.View.extend({
  */
 $(function() {
     var player = new App.Player();
+    App.radio = new App.Radio();
     App.playerView = new App.PlayerView({player: player});
 });
-
-/**
- * статус имеет 4 состояния
- *  загрузка
- *  трек-инфо
- *  инфа недоступна
- *  радио недоступно
- */
