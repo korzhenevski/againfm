@@ -10,6 +10,7 @@
 @import compass/css3/border-radius
 @import compass/css3/opacity
 @import compass/css3/user-interface
+@import compass/css3/inline-block
 
 @import "display/home*.png"
 @import "controls/*.png"
@@ -320,9 +321,7 @@ input[type=submit]
     color: #71cd15
     text-shadow: 0px 0px 10px #71cd15
 
-
-
-.radio-now
+.radio-sticker
   margin: 70px auto 0 auto
   clear: both
   overflow: hidden
@@ -357,26 +356,17 @@ input[type=submit]
     &:hover
       @include bbstar-sprite(star-selected)
 
-.radio-now-glare
-  border-top-left-radius: 4px
-  display: block
-  height: 79px
-  width: 78px
-  left: 2px
-  top: 2px
-  position: absolute
-  background-image: url('../i/blackberry/nowplaying/glare.png')
-  display: none
-
-.radio-now-content
+$station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
+.radio-sticker-content
   position: absolute
   top: 0
-  left: 80px
-  padding-left: 20px
+  padding-left: 12px
   padding-top: 0.4em
+  margin-left: 80px
   height: 80px
+  width: 270px
   h1
-    font-size: 1.1em
+    font-size: 18px
     font-weight: bold
     line-height: 1.4em
     color: #fff
@@ -385,18 +375,40 @@ input[type=submit]
     font-size: 0.9em
     color: #999
     text-shadow: 1px 1px 0px #000
-  h1, h2, p
+  h1, h2
     overflow: hidden
     max-width: 225px
     white-space: nowrap
     margin: 0
   h2
-    margin-top: -0.2em
-    font-size: 0.8em
+    font-size: 14px
     text-overflow: ellipsis
-  p.station
+    color: #999
+    line-height: 1.4em
+
+  .station
+    background: sprite($station-icon, off, 0, 5) no-repeat
     position: absolute
     bottom: 0.9em
+    max-width: 225px
+    overflow: hidden
+    white-space: nowrap
+    width: 100%
+    color: #999
+    text-decoration: none
+    text-overflow: ellipsis
+    padding-left: 16px
+    max-width: 210px
+    cursor: pointer
+    &:hover
+      color: #f9f9f9
+      background: sprite($station-icon, off-hover, 0, 5) no-repeat
+
+  .favorite-station
+    background: sprite($station-icon, on, 0, 5) no-repeat
+    &:hover
+      background: sprite($station-icon, on-hover, 0, 5) no-repeat
+
 
 /* content limiter */
 
@@ -902,6 +914,7 @@ input[type=submit]
 
 .radio-control
   position: relative
+
 #flash-player
   position: absolute
   height: 100px

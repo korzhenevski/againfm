@@ -9,7 +9,6 @@ try:
 except ImportError:
     from mongokit import Document
 from hashlib import md5
-from bson.objectid import ObjectId
 from random import choice
 from datetime import datetime
 import time
@@ -205,7 +204,7 @@ class UserFavorites(object):
         self.user_id = user_id
 
     def add(self, object_type, object_id):
-        self.redis.zadd(self.object_key(object_type), self.get_ts(), object_id)
+        self.redis.zadd(self.object_key(object_type), object_id, self.get_ts())
 
     def exists(self, object_type, object_id):
         score = self.redis.zscore(self.object_key(object_type), object_id)
@@ -213,6 +212,14 @@ class UserFavorites(object):
 
     def remove(self, object_type, object_id):
         self.redis.zrem(self.object_key(object_type), object_id)
+
+    def toggle(self, object_type, object_id):
+        exists = self.exists(object_type, object_id)
+        if exists:
+            self.remove(object_type, object_id)
+        else:
+            self.add(object_type, object_id)
+        return not exists
 
     def object_key(self, object_type):
         return 'favorite_user_{}:{}'.format(object_type, self.user_id)

@@ -65,6 +65,7 @@ assets.register('scripts', Bundle(
     'js/app/app.js',
     'js/app/radio-display.js',
     'js/app/radio-player.js',
+    'js/app/radio-sticker.js',
 ))
 
 if app.config['TESTING']:

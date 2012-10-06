@@ -462,10 +462,7 @@ _.extend(App.RadioDisplay.prototype, {
 
         // когда пользователь жмет на большую кнопку, проигрывается первая станция
         this.mediator.on('player:power', function(){
-            var firstStation = this.playlist.first();
-            if (this.playlist.getStation() != firstStation) {
-                this.playlist.setStation(firstStation);
-            }
+            this.playlist.next();
         }, this);
 
         this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
@@ -481,7 +478,10 @@ $(function(){
         {title: "House", tag: "house"},
         {title: "Trance", tag: "trance"}
     ]});
-    App.radioDisplay.selectors.get('tag/trance').select();
+    //App.radioDisplay.selectors.get('tag/house').select();
+    App.mediator.on('player:ready', function(){
+        App.radioDisplay.playlist.next();
+    })
 });
 
 /*

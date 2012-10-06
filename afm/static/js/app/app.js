@@ -106,7 +106,7 @@ App.klass = function(proto) {
             this.initialize.apply(this, arguments);
         }
     }
-    _.extend(klass.prototype, Backbone.Events);
+    _.extend(klass.prototype, Backbone.Events, proto);
     return klass;
 };
 
@@ -146,6 +146,32 @@ Handlebars.registerHelper('t', function(key) {
     return new Handlebars.SafeString(App.i18n(key));
 });
 
-App.mediator.on('all', function(){
-    console.log('[mediator]', arguments);
-})
+Handlebars.registerHelper('station_link', function(station) {
+    var $wrap = $('<div><div class="station"></div></div>'),
+        $el = $wrap.find('div');
+    $el.text(station.title);
+    if (station.favorite !== undefined) {
+        $el.toggleClass('favorite-station', station.favorite);
+    }
+    var html = $wrap.html();
+    return new Handlebars.SafeString(html);
+});
+
+
+/**
+ * Отладочный кейс, доступный по http://again.fm/?debug
+ */
+//if (window.location.search.indexOf('debug') !== -1) {
+    App.mediator.on('all', function(){
+        console.log('[mediator]', arguments);
+    });
+    App.login = function() {
+        $.post('/api/user/login', {login: 'test@testing.com', password: 'password'});
+    }
+    App.logout = function() {
+        $.post('/api/user/logout');
+    }
+    /*App.mediator.on('radio:station_changed', function(station){
+        alert('favorite: '+station.favorite);
+    });*/
+//}

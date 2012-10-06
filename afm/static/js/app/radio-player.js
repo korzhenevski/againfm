@@ -80,7 +80,7 @@ App.FlashPlayerEngine = App.View.extend({
  *
  * @type {function}
  */
-App.Player = App.Model.extend({
+App.Player = App.klass({
     mediator: App.mediator,
     volume: 40,
     station: {},
@@ -95,7 +95,7 @@ App.Player = App.Model.extend({
             this.setVolume(parseInt(volume));
         }, this);
         // публикуем в медиатор локальные события
-        this.engine.publishEvents('playing stopped error', this.mediator, 'player');
+        this.engine.publishEvents('ready playing stopped error', this.mediator, 'player');
         this.publishEvents('error', this.mediator, 'player');
         // устанавливаем громкость
         if ($.cookie('volume')) {
@@ -103,6 +103,12 @@ App.Player = App.Model.extend({
         }
         this.on('volume_changed', this.syncVolume, this);
         this.engine.on('ready', this.syncVolume, this);
+        // если радио играет, при выгрузке страницы флеш кидает ошибку
+        // поэтому останавливаем поток до выгрузки
+        // TODO: важно понять, кто за это отвечает :)
+        $(window).bind('beforeunload', _.bind(function(){
+            this.engine.stop();
+        }, this));
     },
 
     stationChanged: function(station) {
@@ -111,6 +117,7 @@ App.Player = App.Model.extend({
             return;
         }
         this.station = station;
+        this.stream = null;
         // останавливаем плеер до загрузки адреса потока
         this.engine.stop();
     },
@@ -241,26 +248,27 @@ App.PlayerView = App.View.extend({
  */
 App.Radio = App.Model.extend({
     mediator: App.mediator,
-    defaults: {
-        station: {},
-        stream: {}
-    },
 
     initialize: function() {
         this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
-        this.mediator.on('playlist:station_changed', this.playlistStationChanged, this);
+        this.mediator.on('playlist:station_changed', this.changeStation, this);
     },
 
-    playlistStationChanged: function(station) {
+    changeStation: function(station) {
         // модель приводим к плоскому виду
-        this.setStation(station.toJSON());
+        station = station.toJSON();
+        // пропускаем повторные вызовы
+        if (this.station && station.id == this.station.id) {
+            return;
+        }
+        this.setStation(station);
         // запрос адреса потока
         var url = '/api/station/' + station.id + '/getplayinfo';
-        var cb = _.bind(function(playinfo){
-            this.setStation(_.extend(this.station, playinfo['station']));
+        var callback = _.bind(function(playinfo){
+            this.setStation($.extend(this.station, playinfo['station']));
             this.setStream(playinfo['stream'])
         }, this);
-        $.getJSON(url, cb).error(_.bind(function(state, err){
+        $.getJSON(url, callback).error(_.bind(function(state, err){
             // если ajax-ошибка, кидаем событие error
             this.trigger('error', 'getplayinfo error: '+err);
         }, this));

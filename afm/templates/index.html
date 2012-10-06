@@ -60,7 +60,7 @@
                         </form>
                         <div class="user-profile hidden"></div>
                     </div>
-                    <div class="radio-now"></div>
+                    <div class="radio-sticker"></div>
                     <div class="user-panel"></div>
                 </div>
             </div>
@@ -115,36 +115,6 @@
         {% assets "scripts" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
-
-
-        <script>
-            function getTiming() {
-                var now = +new Date();
-                var perf = window.performance.timing;
-                return {
-                    domContentLoaded: perf.domContentLoadedEventEnd - perf.domContentLoadedEventStart
-                };
-            }
-        </script>
-
-        <!--script>
-            App.config = {{ app_config|tojson|safe }};
-            $.i18n.init({
-                lng: "{{ sitelang }}",
-                resGetPath: '/static/js/i18n/__lng__/__ns__.json',
-                fallbackLng: false
-            }).done(function(){
-                App.setup({{ app_bootstrap|tojson|safe }});
-
-                {% if station %}
-                App.player.on('ready', function(){
-                    App.radio.setStation(new App.Station({{ station|tojson|safe }}));
-                });
-                {% endif %}
-
-                App.start();
-            });
-        </script-->
     </body>
 </html>
 

@@ -15,6 +15,10 @@ def send_mail(**kwargs):
         return
     return tasks.send_mail.delay(**kwargs)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return jsonify({'error': 'Auth required'}), 401
@@ -123,28 +127,11 @@ def tag_playlist(tagname):
     #stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/api/station/<int:station_id>')
 def station_detail(station_id):
     station = db.Station.get_or_404(station_id)
     station = station.get_public_data()
     return jsonify(station.get_public_data())
-
-# http://againfm.local/api/listen/5013ea731d41c80efe0cc300
-@app.route('/api/stream_for_station/<int:station_id>')
-def stream_for_station(station_id):
-    if request.args.get('low_bitrate'):
-        sort_direction = pymongo.ASCENDING
-    else:
-        sort_direction = pymongo.DESCENDING
-    stream = db.Stream.find_one({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
-    if not stream:
-        abort(404)
-    data = stream.get_public_data()
-    return jsonify(data)
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
 def getplayinfo(station_id):
@@ -164,7 +151,6 @@ def getplayinfo(station_id):
         'stream': {
             'url': stream.get_web_url(),
             'bitrate': stream['bitrate'],
-            'type': 'audio/mpeg'
         }
     }
 
@@ -172,10 +158,25 @@ def getplayinfo(station_id):
     if current_user.is_authenticated():
         favs = UserFavorites(user_id=current_user.id, redis=redis)
         resp['station'] = {
-            'user_favorite': favs.exists('station', station_id)
+            'favorite': favs.exists('station', station_id)
         }
 
     return jsonify(resp)
+
+@app.route('/api/user/favorite/station/<int:station_id>', methods=['POST'])
+@login_required
+def favorite_station(station_id):
+    favs = UserFavorites(user_id=current_user.id, redis=redis)
+    favorite = favs.toggle('station', station_id)
+    return jsonify({'favorite': favorite})
+
+# копипаста пока допустима
+@app.route('/api/user/favorite/track/<int:track_id>', methods=['POST'])
+@login_required
+def favorite_track(track_id):
+    favs = UserFavorites(user_id=current_user.id, redis=redis)
+    favorite = favs.toggle('track', track_id)
+    return jsonify({'favorite': favorite})
 
 @app.route('/api/user/favorites')
 @login_required
@@ -189,10 +190,7 @@ def favorites_list():
         return jsonify({})
     return jsonify(favorite.get_public_data())
 
-@app.route('/api/user/favorites/<int:track_id>/toggle', methods=['POST'])
-def add_favorite(track_id):
-    pass
-
+"""
 @app.context_processor
 def app_bootstrap():
     categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
@@ -208,20 +206,13 @@ def app_bootstrap():
 
     bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
     return dict(app_bootstrap=bootstrap)
+"""
 
 @app.context_processor
 def app_config():
     static_url = url_for('.static', filename='')
     context = {
         'sitename': 'Again.FM',
-        'app_config': {
-            'spectrum': False,
-            'default_volume': 80,
-            'night_volume': 30,
-            'comet_server': app.config['COMET_SERVER'],
-            'static_url': static_url,
-            'full_static_url': url_for('.static', filename='', _external=True),
-        },
         'static_url': static_url,
     }
     return context
@@ -234,32 +225,6 @@ def station_details(station_id):
 
     return render_template('index.html', station=station.get_public_data())
 
-@app.route('/api/search')
-def search():
-    term = request.args.get('term', '')
-    if not term:
-        abort(400)
-    term = term.strip().strip('*:')[0:64]
-
-    resp = requests.get(app.config['SEARCH_BACKEND_URL'], params={'q': '%s*' % term}, )
-    if not (resp.ok and resp.json):
-        abort(503)
-
-    hits = resp.json.get('hits', {}).get('hits', [])
-
-    results = []
-    for res in hits:
-        station = res['_source']
-        results.append({
-            'id': station['id'],
-            'label': station['title'],
-            'tag': station.get('tag', ''),
-        })
-
-    results = results[0:3]
-
-    return jsonify({'results': results})
-
 @app.template_filter('i18n')
 def i18n_template_filter(key):
     return i18n.translate(key)
@@ -270,7 +235,3 @@ def i18n_context():
         '_': i18n_template_filter,
         'sitelang': 'en',
     }
-
-@app.route('/test')
-def player_test():
-    return render_template('player.html')
