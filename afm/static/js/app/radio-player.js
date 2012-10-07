@@ -276,12 +276,12 @@ App.Radio = App.Model.extend({
 
     setStation: function(station) {
         this.station = station;
-        this.trigger('station_changed', station);
+        this.trigger('station_changed', _.clone(station));
     },
 
     setStream: function(stream) {
         this.stream = stream;
-        this.trigger('stream_changed', stream);
+        this.trigger('stream_changed', _.clone(stream));
     }
 });
 

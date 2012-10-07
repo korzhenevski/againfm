@@ -59,6 +59,7 @@ App.Feed = App.klass({
  */
 App.Sticker = App.Model.extend({
     mediator: App.mediator,
+    stationBookmarkUrl: '/api/user/favorite/station/',
 
     initialize: function() {
         this.mediator.on('radio:station_changed', this.setStation, this);
@@ -71,25 +72,55 @@ App.Sticker = App.Model.extend({
             this.set({trackUnavailable: false});
         });
 
+        // добавление станции в закладки
+        // при выходе юзера отключаем
         this.mediator.on('user:logout', function(){
             var station = this.get('station');
             if (station) {
                 delete station.favorite;
-                this.set('station', station, {silent: true});
-                this.trigger('user_update');
+                this.update('station', station);
             }
         }, this);
-
+        // при входе включаем
         this.mediator.on('user:logged', function(){
             var station = this.get('station');
-            if (station && !_.has(station, 'favorite')) {
-                $.getJSON('/api/user/favorite/station/' + station.id, _.bind(function(response){
-                    station = $.extend(station, response);
-                    this.set('station', station, {silent: true});
-                    this.trigger('user_update');
-                }, this));
+            if (!station || _.has(station, 'favorite')) {
+                return;
             }
+            // получаем статус
+            $.getJSON(this.stationBookmarkUrl + station.id, _.bind(function(response){
+                this.update('station', $.extend(station, response));
+            }, this));
         }, this);
+    },
+
+    bookmarkStation: function() {
+        var station = this.get('station');
+        if (!station) {
+            return;
+        }
+        $.post(this.stationBookmarkUrl + station.id, _.bind(function(response){
+            station.favorite = response.favorite;
+            this.update('station', station);
+        }, this));
+    },
+
+    bookmarkTrack: function() {
+        var track = this.get('track');
+        if (!track) {
+            return;
+        }
+        $.post('/api/user/favorite/track/' + track.id, _.bind(function(response){
+            track.favorite = response.favorite;
+            this.update('track', track);
+        }, this));
+    },
+
+    // метод для изменения части данных,
+    // вне модели, другое событие
+    update: function(field, value) {
+        this.set(field, value, {silent: true});
+        this.trigger('update');
     },
 
     setStation: function(station) {
@@ -109,7 +140,8 @@ App.Sticker = App.Model.extend({
     },
 
     trackUnavailable: function() {
-        if (!this.get('track')) {
+        var track = this.get('track');
+        if (!track || _.isEmpty(track)) {
             this.set('trackUnavailable', true);
         }
     }
@@ -124,7 +156,8 @@ App.StickerView = App.View.extend({
     el: '.radio-sticker',
     template: App.getTemplate('sticker'),
     events: {
-        'click .bookmark-station': 'bookmarkStation'
+        'click .bookmark-station': 'bookmarkStation',
+        'click .bookmark-track': 'bookmarkTrack'
     },
     icon: {
         notfound: '/static/i/display/notfound.png',
@@ -133,7 +166,7 @@ App.StickerView = App.View.extend({
 
     initialize: function() {
         this.model = new App.Sticker();
-        this.model.on('change user_update', this.render, this);
+        this.model.on('change update', this.render, this);
 
         // если в течение 20-ти секунд нет трек-инфы, меняем статус на "информация недоступна"
         this.model.on('change:station', function(){
@@ -179,7 +212,7 @@ App.StickerView = App.View.extend({
             // звездочка - добавление трека в избранное
             context.has_track_favorite = _.has(track, 'favorite');
             if (context.has_track_favorite) {
-                context.track_favorite = track.favorite;
+                context.favorite_track = track.favorite;
             }
             // обложка
             if (track.image_url) {
@@ -190,6 +223,14 @@ App.StickerView = App.View.extend({
             context.image_url = this.icon.loading;
         }
 
+        /*var html = this.template(context);
+        var self = this;
+        this.$el.fadeOut(300, 'linear', function(){
+            self.$el.html(html).fadeIn(500, 'linear', function(){
+                self.marqueeTitle();
+            });
+        });*/
+        // TODO: добавить анимацию для смены состояний закладок
         this.$el.show().html(this.template(context));
         this.marqueeTitle();
     },
@@ -199,6 +240,10 @@ App.StickerView = App.View.extend({
      */
     bookmarkStation: function() {
         this.model.bookmarkStation();
+    },
+
+    bookmarkTrack: function() {
+        this.model.bookmarkTrack();
     },
 
     /**

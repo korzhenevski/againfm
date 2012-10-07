@@ -322,7 +322,7 @@ input[type=submit]
     text-shadow: 0px 0px 10px #71cd15
 
 .radio-sticker
-  margin: 70px auto 0 auto
+  margin: 65px auto 0 auto
   clear: both
   overflow: hidden
   border: none
@@ -342,7 +342,7 @@ input[type=submit]
       background-image: url('../i/display/loading.png')
       background-repeat: no-repeat
       display: block
-  .star
+  .bookmark-track
     position: absolute
     top: 7px
     right: 75px
@@ -352,7 +352,7 @@ input[type=submit]
     @include bbstar-sprite(star-add)
     &:hover
       @include bbstar-sprite(star-hover)
-  .star-selected
+  .favorite-track
     @include bbstar-sprite(star-selected)
     &:hover
       @include bbstar-sprite(star-selected)
@@ -378,7 +378,7 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     text-shadow: 1px 1px 0px #000
   h1, h2
     overflow: hidden
-    max-width: 225px
+    max-width: 230px
     white-space: nowrap
     margin: 0
   h2
@@ -389,8 +389,8 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
 
   .station
     position: absolute
-    bottom: 0.9em
-    max-width: 225px
+    bottom: 0.8em
+    max-width: 230px
     overflow: hidden
     white-space: nowrap
     width: 100%
@@ -593,7 +593,7 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     margin-right: 15px
     height: 45px
   .left-shift
-    margin-left: -1.2em
+    margin-left: -1em
   p
     line-height: 1.5em
     color: #666
