@@ -1,5 +1,3 @@
-"use strict";
-
 var App = App || {};
 
 App.Model = Backbone.Model.extend({
@@ -49,7 +47,7 @@ App.Collection = Backbone.Collection.extend({
         /**
          * flask jsonify возвращает только объекты
          */
-        return response['objects'];
+        return response.objects;
     }
 });
 
@@ -78,16 +76,16 @@ App.i18n = function(key) {
      * @param prefix string - (необязательно) префикс новых событий
      */
     function publishEvents(events, destObj, prefix) {
-        var events = events.split(' ');
+        events = events.split(' ');
         var self = this;
-        var prefix = prefix ? (prefix + ':') : '';
+        prefix = prefix ? (prefix + ':') : '';
         _.each(events, function(event){
             self.on(event, function(){
                 var args = _.toArray(arguments);
                 args.unshift(prefix + event);
                 destObj.trigger.apply(destObj, args);
             });
-        })
+        });
     }
 
     App.Model.prototype.publishEvents = publishEvents;
@@ -107,7 +105,7 @@ App.klass = function(proto) {
         if (this.initialize) {
             this.initialize.apply(this, arguments);
         }
-    }
+    };
     _.extend(klass.prototype, Backbone.Events, proto);
     return klass;
 };
@@ -160,20 +158,12 @@ Handlebars.registerHelper('station_link', function(station) {
 });
 
 
-/**
- * Отладочный кейс, доступный по http://again.fm/?debug
- */
-//if (window.location.search.indexOf('debug') !== -1) {
-    App.mediator.on('all', function(){
-        console.log('[mediator]', arguments);
-    });
-    App.login = function() {
-        $.post('/api/user/login', {login: 'test@testing.com', password: 'password'});
-    }
-    App.logout = function() {
-        $.post('/api/user/logout');
-    }
-    /*App.mediator.on('radio:station_changed', function(station){
-        alert('favorite: '+station.favorite);
-    });*/
-//}
+App.mediator.on('all', function(){
+    console.log('[mediator]', arguments);
+});
+App.login = function() {
+    $.post('/api/user/login', {login: 'test@testing.com', password: 'password'});
+};
+App.logout = function() {
+    $.post('/api/user/logout');
+};

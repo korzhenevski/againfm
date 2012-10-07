@@ -123,7 +123,7 @@ App.SelectorView = App.View.extend({
         var context = this.model.toJSON();
         // первая часть пути селектора это класс запроса
         // tag/trance => tag
-        context['class'] = context['selector'].split('/')[0];
+        context['class'] = context.selector.split('/')[0];
         this.setElement(this.template(context));
         return this.el;
     },
@@ -322,7 +322,7 @@ App.DisplayView = App.View.extend({
     setupScrollbar: function() {
         $('.radio-scroll').tinyscrollbar({axis: 'x'});
         // обновляем позицию прокрутки при ресайзе окна
-        $(window).resize(_.throttle(_.bind(this.updateScrollbar, this), 200))
+        $(window).resize(_.throttle(_.bind(this.updateScrollbar, this), 200));
     },
 
     updateScrollbar: function(position) {
@@ -483,21 +483,3 @@ $(function(){
         App.radioDisplay.playlist.next();
     });
 });
-
-/*
-App
-    Radio
-        Player
-        Teaser
-        TeaserView
-        SpectrumView
-
-
-
-    RadioDisplay
-        Filters
-        FiltersView
-        SearchView
-        DisplayView
-    User
-*/

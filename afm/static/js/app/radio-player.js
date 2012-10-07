@@ -16,7 +16,7 @@ App.FlashPlayerEngine = App.View.extend({
 
     initialize: function(options) {
         // метод вызываемый из флеша, обертка для trigger
-        window['flashPlayerCallback'] = _.bind(this.trigger, this);
+        window.flashPlayerCallback = _.bind(this.trigger, this);
 
         // грузим плеер в контейнер, размеры берем из css, минимальная версия - 10
         // контейнер нужен, для разлокировки от всяких ClickToFlash
@@ -44,7 +44,7 @@ App.FlashPlayerEngine = App.View.extend({
                     this.trigger('error', 'player not ready');
                 }
             }, self);
-        })
+        });
     },
 
     _swfobjectCallback: function(res) {
@@ -92,7 +92,7 @@ App.Player = App.klass({
         this.mediator.on('radio:stream_changed', this.playStream, this);
         // смена громкости по глобальному событию
         this.mediator.on('player:set_volume', function(volume){
-            this.setVolume(parseInt(volume));
+            this.setVolume(parseInt(volume, 10));
         }, this);
         // публикуем в медиатор локальные события
         this.engine.publishEvents('ready playing stopped error', this.mediator, 'player');
@@ -113,7 +113,7 @@ App.Player = App.klass({
 
     stationChanged: function(station) {
         // игнорируем апдейты станции
-        if (this.station['id'] == station['id']) {
+        if (this.station.id == station.id) {
             return;
         }
         this.station = station;
@@ -233,7 +233,7 @@ App.PlayerView = App.View.extend({
 
     streamChanged: function(stream) {
         // индикатор высокого битрейта
-        this.$('.hd').toggle(stream['bitrate'] >= 192);
+        this.$('.hd').toggle(stream.bitrate >= 192);
     },
 
     toggle: function() {
@@ -265,8 +265,8 @@ App.Radio = App.Model.extend({
         // запрос адреса потока
         var url = '/api/station/' + station.id + '/getplayinfo';
         var callback = _.bind(function(playinfo){
-            this.setStation($.extend(this.station, playinfo['station']));
-            this.setStream(playinfo['stream'])
+            this.setStation($.extend(this.station, playinfo.station));
+            this.setStream(playinfo.stream);
         }, this);
         $.getJSON(url, callback).error(_.bind(function(state, err){
             // если ajax-ошибка, кидаем событие error
