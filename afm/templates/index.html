@@ -1,121 +1,135 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        {% if station %}
-            <title>{{ station.title }} - {{ sitename }}</title>
-            <meta name="description" content="Listen {{ station.title }} on {{ sitename }}" />
-        {% else %}
-            <title>{{ sitename }}</title>
-            <meta name="description" content="{{ _('site.description') }}" />
-        {% endif %}
-        <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet" />
-        <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico" />
-    </head>
-    <body>
-        <div class="wrapper">
-            <div class="main">
-            <div class="wrapper-left">
-                <div class="wrapper-left-content">
-                    <img src="{{ static_url }}i/logo_rus.png" width="308" height="135" class="logo" alt="logo" />
-                    <div class="radio-controls">
-                        <div class="radio-control valign">
-                            <span class="prev"></span>
-                        </div>
-                        <div class="radio-control">
-                            <span class="power"></span>
-                            <!-- плеер поверх кнопки, удобно включать заблокированный контент -->
-                            <div class="flash-player" id="flash-player"></div>
-                        </div>
-                        <div class="radio-control valign">
-                            <span class="next"></span>
-                        </div>
-                        <div class="radio-controls-status">
-                            <div class="inner">
-                                <div class="sound"></div>
-                                <div class="slider"></div>
-                                <div class="hd hidden">HD</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<head>
+    <meta charset="utf-8"/>
+    {% if station %}
+        <title>{{ station.title }} - {{ sitename }}</title>
+        <meta name="description" content="Listen {{ station.title }} on {{ sitename }}"/>
+    {% else %}
+        <title>{{ sitename }}</title>
+        <meta name="description" content="{{ _('site.description') }}"/>
+    {% endif %}
+    <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet"/>
+    <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico"/>
+</head>
+<body>
+<div class="wrapper">
+    <div class="main">
+        <div class="wrapper-left">
+            <div class="wrapper-left-content">
+                <img src="{{ static_url }}i/logo_rus.png" width="308" height="135" class="logo" alt="logo"/>
 
-            <div class="wrapper-right">
-                <div class="wrapper-right-content">
-                    <div class="box-holder">
-                        <form class="head-form login hidden">
-                            <div class="form-input">
-                                <input type="text" tabindex="10" class="input" name="login" placeholder="{{ _('login.placeholder.login') }}" />
-                                <span class="pseudo-link register">{{ _('login.register') }}</span>
-                            </div>
-                            <div class="form-input">
-                                <input type="password" tabindex="11" class="input" name="password" placeholder="{{ _('login.placeholder.password') }}" />
-                                <span class="pseudo-link amnesia">{{ _('login.amnesia') }}</span>
-                            </div>
-                            <input type="submit" tabindex="12" value="{{ _('login.button') }}" />
-                            <div class="notice hidden">
-                                <p><!-- --></p>
-                            </div>
-                        </form>
-                        <div class="user-profile hidden"></div>
+                <div class="radio-controls">
+                    <div class="radio-control valign">
+                        <span class="prev"></span>
                     </div>
-                    <div class="radio-sticker"></div>
-                    <div class="user-panel"></div>
-                </div>
-            </div>
-            <div class="wrapper-wide">
-                <div class="radio-display">
-                    <div class="radio-display-head">
-                        <ul class="filters"></ul>
-                        <div class="search">
-                            <div class="search-icon"></div>
-                            <input type="text" placeholder="{{ _('search.placeholder') }}" autocomplete="off" class="search-input" name="q" />
-                            <div class="search-popup"></div>
-                        </div>
+                    <div class="radio-control">
+                        <span class="power"></span>
+                        <!-- плеер поверх кнопки для активации при заблокированном флеше -->
+                        <div class="flash-player" id="flash-player"></div>
                     </div>
-                </div>
-                <div class="radio-scroll">
-                    <div class="radio-scale viewport">
-                        <div class="scale-inner overview"></div>
+                    <div class="radio-control valign">
+                        <span class="next"></span>
                     </div>
-                    <div class="scrollbar">
-                        <div class="track">
-                            <div class="thumb"></div>
+                    <div class="radio-controls-status">
+                        <div class="inner">
+                            <div class="sound"></div>
+                            <div class="slider"></div>
+                            <div class="hd hidden">HD</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-            <div style="width: 100%; clear: both; height: 3em;"></div>
-        </div>
+        <div class="wrapper-right">
+            <div class="wrapper-right-content">
+                <div class="box-holder">
+                    <form class="head-form login hidden">
+                        <div class="form-input">
+                            <input type="text" tabindex="10" class="input" name="login"
+                                   placeholder="{{ _('login.placeholder.login') }}"/>
+                            <span class="pseudo-link register">{{ _('login.register') }}</span>
+                        </div>
+                        <div class="form-input">
+                            <input type="password" tabindex="11" class="input" name="password"
+                                   placeholder="{{ _('login.placeholder.password') }}"/>
+                            <span class="pseudo-link amnesia">{{ _('login.amnesia') }}</span>
+                        </div>
+                        <input type="submit" tabindex="12" value="{{ _('login.button') }}"/>
 
-        <div class="footer">
-            <div class="left">
-            <p>{{ sitename}} {{ _('site.footer.disclaimer') }}</p>
-            <p class="left-shift">
-                &copy; 2012, {{ sitename }} &middot; {{ _('site.footer.made_in') }}
-                &middot; <span class="pseudo-link about">{{ _('site.footer.about') }}</span> &middot; <span class="pseudo-link tos">{{ _('site.footer.tos') }}</span>
-            </p>
+                        <div class="notice hidden">
+                            <p><!-- --></p>
+                        </div>
+                    </form>
+                    <div class="user-profile hidden"></div>
+                </div>
+                <div class="radio-sticker"></div>
+                <div class="user-panel"></div>
             </div>
-            <div class="right">
-                <p>{{ _('site.footer.designer.label') }} <a href="http://www.zolotorevich.com/">Rei Z</a></p>
-                <p><a href="">{{ _('site.footer.designer.info_label') }}</a></p>
+        </div>
+        <div class="wrapper-wide">
+            <div class="radio-display">
+                <div class="radio-display-head">
+                    <ul class="filters"></ul>
+                    <div class="search">
+                        <div class="search-icon"></div>
+                        <input type="text" placeholder="{{ _('search.placeholder') }}" autocomplete="off"
+                               class="search-input" name="q"/>
+
+                        <div class="search-popup"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="radio-scroll">
+                <div class="radio-scale viewport">
+                    <div class="scale-inner overview"></div>
+                </div>
+                <div class="scrollbar">
+                    <div class="track">
+                        <div class="thumb"></div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="footer-guard"></div>
+</div>
+<div class="footer">
+    <div class="left">
+        <p>{{ sitename }} {{ _('site.footer.disclaimer') }}</p>
 
-        <div id="player-container"></div>
-        <canvas id="spectrum"></canvas>
+        <p class="left-shift">
+            &copy; 2012, {{ sitename }} &middot; {{ _('site.footer.made_in') }}
+            &middot; <span class="pseudo-link about">{{ _('site.footer.about') }}</span> &middot; <span
+                class="pseudo-link tos">{{ _('site.footer.tos') }}</span>
+        </p>
+    </div>
+    <div class="right">
+        <p>{{ _('site.footer.designer.label') }} <a href="http://www.zolotorevich.com/">Rei Z</a></p>
 
-        {% assets "core_scripts" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-        {% endassets %}
+        <p><a href="">{{ _('site.footer.designer.info_label') }}</a></p>
+    </div>
+</div>
 
-        {% assets "scripts" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-        {% endassets %}
-    </body>
+<div id="player-container"></div>
+<canvas id="spectrum"></canvas>
+
+{% assets "core_scripts" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+{% assets "scripts" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+<script>
+    $(function(){
+        App.user.set();
+    });
+</script>
+
+</body>
 </html>
 
 

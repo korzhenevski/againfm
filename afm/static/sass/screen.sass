@@ -387,7 +387,6 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     line-height: 1.4em
 
   .station
-    background: sprite($station-icon, off, 0, 5) no-repeat
     position: absolute
     bottom: 0.9em
     max-width: 225px
@@ -395,8 +394,10 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     white-space: nowrap
     width: 100%
     color: #999
-    text-decoration: none
     text-overflow: ellipsis
+
+  .bookmark-station
+    background: sprite($station-icon, off, 0, 5) no-repeat
     padding-left: 16px
     max-width: 210px
     cursor: pointer
@@ -597,6 +598,11 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     color: #666
   .pseudo-link
     font-size: 1em
+
+.footer-guard
+  width: 100%
+  clear: both
+  height: 3em
 
 #player-container
   position: absolute

@@ -594,9 +594,9 @@ App.RadioNowView = App.View.extend({
     marqueeTitle: function() {
         var $title = this.$el.find('.title-inner');
         var delta = $title.width() - $title.parent().width();
-        if (delta > 5) {
+        if (delta >= 5) {
             $title.stop();
-            $title.parent().addClass('shadow');
+            //$title.parent().addClass('shadow');
             var marquee = function(delta) {
                 var data = {};
                 data['margin-left'] = delta < 0 ? 0 : -1 * delta;
@@ -606,7 +606,7 @@ App.RadioNowView = App.View.extend({
             }
             marquee(delta);
         } else {
-            $title.parent().removeClass('shadow');
+            //$title.parent().removeClass('shadow');
         }
     },
 

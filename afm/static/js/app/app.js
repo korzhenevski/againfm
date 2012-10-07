@@ -1,3 +1,5 @@
+"use strict";
+
 var App = App || {};
 
 App.Model = Backbone.Model.extend({
@@ -151,7 +153,7 @@ Handlebars.registerHelper('station_link', function(station) {
         $el = $wrap.find('div');
     $el.text(station.title);
     if (station.favorite !== undefined) {
-        $el.toggleClass('favorite-station', station.favorite);
+        $el.addClass('bookmark-station').toggleClass('favorite-station', station.favorite);
     }
     var html = $wrap.html();
     return new Handlebars.SafeString(html);

@@ -1,6 +1,7 @@
 // Constructor.
 // Based on Dklab_Realplexor
 // Create new Comet object.
+
 function Comet(fullUrl)
 {
 	// Current JS library version.

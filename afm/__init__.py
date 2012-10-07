@@ -39,7 +39,7 @@ js = Bundle(
     'js/comet.js', # lazy
     'js/app/base.js',
     'js/app/radio.js',
-    'js/app/user.js',
+    'js/app/user-old.js',
     'js/app/site.js',
     'js/app/setup.js',
 filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
@@ -59,6 +59,7 @@ assets.register('core_scripts', Bundle(
     # for production with precompiled templates only include tiny handlerbars.runtime.js
     'js/handlebars.js',
     'js/jquery.cookie.js',
+    'js/comet.js',
 ))
 
 assets.register('scripts', Bundle(
@@ -66,6 +67,7 @@ assets.register('scripts', Bundle(
     'js/app/radio-display.js',
     'js/app/radio-player.js',
     'js/app/radio-sticker.js',
+    'js/app/user.js',
 ))
 
 if app.config['TESTING']:

@@ -149,6 +149,7 @@ def getplayinfo(station_id):
 
     resp = {
         'stream': {
+            'id': stream['id'],
             'url': stream.get_web_url(),
             'bitrate': stream['bitrate'],
         }

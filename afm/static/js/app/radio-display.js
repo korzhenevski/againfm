@@ -478,10 +478,10 @@ $(function(){
         {title: "House", tag: "house"},
         {title: "Trance", tag: "trance"}
     ]});
-    //App.radioDisplay.selectors.get('tag/house').select();
+    App.radioDisplay.selectors.get('tag/house').select();
     App.mediator.on('player:ready', function(){
         App.radioDisplay.playlist.next();
-    })
+    });
 });
 
 /*
