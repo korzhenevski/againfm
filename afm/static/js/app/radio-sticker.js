@@ -99,10 +99,9 @@ App.Sticker = App.Model.extend({
         if (!station) {
             return;
         }
-        $.post(this.stationBookmarkUrl + station.id, _.bind(function(response){
-            station.favorite = response.favorite;
-            this.update('station', station);
-        }, this));
+        station.favorite = !station.favorite;
+        this.update('station', station);
+        $.post(this.stationBookmarkUrl + station.id);
     },
 
     bookmarkTrack: function() {
@@ -110,10 +109,9 @@ App.Sticker = App.Model.extend({
         if (!track) {
             return;
         }
-        $.post('/api/user/favorite/track/' + track.id, _.bind(function(response){
-            track.favorite = response.favorite;
-            this.update('track', track);
-        }, this));
+        track.favorite = !track.favorite;
+        this.update('track', track);
+        $.post('/api/user/favorite/track/' + track.id);
     },
 
     // метод для изменения части данных,
