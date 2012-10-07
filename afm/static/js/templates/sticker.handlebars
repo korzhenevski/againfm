@@ -4,6 +4,13 @@
         <span class="title-inner">{{title}}</span>
     </h1>
     <h2 title="{{subtitle}}">{{subtitle}}</h2>
-    {{station_link station}}
+    {{#if has_station_favorite}}
+        <div class="station bookmark-station{{#if station.favorite}} favorite-station{{/if}}">{{station.title}}</div>
+    {{else}}
+        <div class="station">{{station.title}}</div>
+    {{/if}}
 </div>
-<div class="{{star_class}}"></div>
+
+{{#if has_track_favorite}}
+    <div class="star{{#if track_favorite}} star-selected{{/if}}"></div>
+{{/if}}

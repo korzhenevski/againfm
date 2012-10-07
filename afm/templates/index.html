@@ -125,7 +125,7 @@
 
 <script>
     $(function(){
-        App.user.set();
+        App.user.set({{ bootstrap.user|tojson|safe }});
     });
 </script>
 

@@ -8,7 +8,7 @@ App.User = App.Model.extend({
         this.publishEvents('logged logout', this.mediator, 'user');
         this.on('change:id', function() {
             if (this.isLogged()) {
-                this.trigger('logged');
+                this.trigger('logged', this);
             } else {
                 this.trigger('logout');
             }
@@ -21,8 +21,12 @@ App.User = App.Model.extend({
         }
 
         var self = this;
-        $.post(this.url + 'login', {login: login, password: password}, function(){
-            self.trigger('login');
+        $.post(this.url + 'login', {login: login, password: password}, function(user){
+            if (user.error) {
+                self.trigger('login.error', user.error);
+            } else {
+                self.set(user);
+            }
         });
     },
 

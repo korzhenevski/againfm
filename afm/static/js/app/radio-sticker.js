@@ -1,22 +1,21 @@
-/**
- * статус имеет 4 состояния
- *  загрузка
- *  трек-инфо
- *  инфа недоступна
- *  радио недоступно
- */
-
-
 var App = App || {};
 
+/**
+ * Comet-посредник,
+ * обновляет текущий трек радиостанции.
+ *
+ * @type {function}
+ */
 App.Feed = App.klass({
     params: {},
     mediator: App.mediator,
 
     initialize: function(options) {
         this.engine = new Comet(options.url);
+
         this.mediator.on('player:stopped player:error radio:error', this.stop, this);
         this.mediator.on('player:playing', this.start, this);
+
         this.mediator.on('radio:station_changed', function(station){
             this.params.station_id = station.id;
         }, this);
@@ -25,6 +24,7 @@ App.Feed = App.klass({
             this.params.stream_id = stream.id;
         }, this);
 
+        // рестартуем клиента при смене пользовательского состояния
         this.mediator.on('user:logged user:logout', function(user){
             this.params.user_id = user ? user.id : null;
             this.stop();
@@ -36,16 +36,28 @@ App.Feed = App.klass({
         this.mediator.trigger('feed:track_changed', track);
     },
 
+    // обязательные параметры для comet запроса
+    _checkParams: function() {
+        return _.has(this.params, 'station_id') && _.has(this.params, 'stream_id');
+    },
+
     start: function() {
+        if (!this._checkParams()) return;
         this.engine.subscribe(this.params, _.bind(this.changeTrack, this));
     },
 
     stop: function() {
+        if (!this._checkParams()) return;
         this.engine.unsubscribe();
     }
 });
 
-App.StickerManager = App.Model.extend({
+/**
+ * Посредник мини-дисплея.
+ *
+ * @type {function}
+ */
+App.Sticker = App.Model.extend({
     mediator: App.mediator,
 
     initialize: function() {
@@ -58,6 +70,26 @@ App.StickerManager = App.Model.extend({
         this.on('change:station change:track', function(){
             this.set({trackUnavailable: false});
         });
+
+        this.mediator.on('user:logout', function(){
+            var station = this.get('station');
+            if (station) {
+                delete station.favorite;
+                this.set('station', station, {silent: true});
+                this.trigger('user_update');
+            }
+        }, this);
+
+        this.mediator.on('user:logged', function(){
+            var station = this.get('station');
+            if (station && !_.has(station, 'favorite')) {
+                $.getJSON('/api/user/favorite/station/' + station.id, _.bind(function(response){
+                    station = $.extend(station, response);
+                    this.set('station', station, {silent: true});
+                    this.trigger('user_update');
+                }, this));
+            }
+        }, this);
     },
 
     setStation: function(station) {
@@ -83,6 +115,11 @@ App.StickerManager = App.Model.extend({
     }
 });
 
+/**
+ * Представление мини-дисплея.
+ *
+ * @type {function}
+ */
 App.StickerView = App.View.extend({
     el: '.radio-sticker',
     template: App.getTemplate('sticker'),
@@ -95,8 +132,8 @@ App.StickerView = App.View.extend({
     },
 
     initialize: function() {
-        this.model = new App.StickerManager();
-        this.model.on('change', this.render, this);
+        this.model = new App.Sticker();
+        this.model.on('change user_update', this.render, this);
 
         // если в течение 20-ти секунд нет трек-инфы, меняем статус на "информация недоступна"
         this.model.on('change:station', function(){
@@ -122,6 +159,7 @@ App.StickerView = App.View.extend({
             return;
         }
         context.station = attrs.station;
+        context.has_station_favorite = _.has(attrs.station, 'favorite');
         context.image_url = this.icon.notfound;
         if (attrs.error) {
             context.title = App.i18n('radio.errors.radio_unavailable');
@@ -138,6 +176,12 @@ App.StickerView = App.View.extend({
                 context.title = App.i18n('radio.loading');
                 context.image_url = this.icon.loading;
             }
+            // звездочка - добавление трека в избранное
+            context.has_track_favorite = _.has(track, 'favorite');
+            if (context.has_track_favorite) {
+                context.track_favorite = track.favorite;
+            }
+            // обложка
             if (track.image_url) {
                 context.image_url = track.image_url;
             }

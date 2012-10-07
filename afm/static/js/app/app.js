@@ -146,18 +146,6 @@ Handlebars.registerHelper('t', function(key) {
     return new Handlebars.SafeString(App.i18n(key));
 });
 
-Handlebars.registerHelper('station_link', function(station) {
-    var $wrap = $('<div><div class="station"></div></div>'),
-        $el = $wrap.find('div');
-    $el.text(station.title);
-    if (station.favorite !== undefined) {
-        $el.addClass('bookmark-station').toggleClass('favorite-station', station.favorite);
-    }
-    var html = $wrap.html();
-    return new Handlebars.SafeString(html);
-});
-
-
 App.mediator.on('all', function(){
     console.log('[mediator]', arguments);
 });

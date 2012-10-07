@@ -114,9 +114,9 @@ def login():
             login_user(user)
             return jsonify(user.get_public_data())
         else:
-            return jsonify({'error': 'Please check that you have entered your login and password correctly'}), 401
+            return jsonify({'error': 'Please check that you have entered your login and password correctly'})
     else:
-        return jsonify({'error': 'No such account'}), 401
+        return jsonify({'error': 'No such account'})
 
 @app.route('/api/playlist/tag/<tagname>')
 def tag_playlist(tagname):
@@ -164,11 +164,14 @@ def getplayinfo(station_id):
 
     return jsonify(resp)
 
-@app.route('/api/user/favorite/station/<int:station_id>', methods=['POST'])
+@app.route('/api/user/favorite/station/<int:station_id>', methods=['GET', 'POST'])
 @login_required
 def favorite_station(station_id):
     favs = UserFavorites(user_id=current_user.id, redis=redis)
-    favorite = favs.toggle('station', station_id)
+    if request.method == 'POST':
+        favorite = favs.toggle('station', station_id)
+    else:
+        favorite = favs.exists('station', station_id)
     return jsonify({'favorite': favorite})
 
 # копипаста пока допустима
@@ -191,23 +194,21 @@ def favorites_list():
         return jsonify({})
     return jsonify(favorite.get_public_data())
 
-"""
 @app.context_processor
 def app_bootstrap():
-    categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
+    #categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
     bootstrap = {
         'user': {},
-        'settings': {},
-        'categories': categories,
-        'playlist': {}
+        #'settings': {},
+        #'categories': categories,
+        #'playlist': {}
     }
     if current_user.is_authenticated():
         bootstrap['user'] = current_user.get_public_data()
-        bootstrap['settings'] = current_user.settings
+        #bootstrap['settings'] = current_user.settings
 
-    bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
-    return dict(app_bootstrap=bootstrap)
-"""
+    #bootstrap['playlist'] = [station.get_public_data() for station in db.Station.find()]
+    return dict(bootstrap=bootstrap)
 
 @app.context_processor
 def app_config():
