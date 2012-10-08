@@ -119,7 +119,7 @@ def login():
         return jsonify({'error': 'No such account'})
 
 @app.route('/api/playlist/tag/<tagname>')
-def tag_playlist(tagname):
+def api_tag_playlist(tagname):
     tag = db.StationTag.find_one({'tag': tagname})
     if not tag:
         abort(404)
@@ -128,13 +128,14 @@ def tag_playlist(tagname):
     return jsonify({'objects': stations})
 
 @app.route('/api/station/<int:station_id>')
-def station_detail(station_id):
-    station = db.Station.get_or_404(station_id)
-    station = station.get_public_data()
+def api_station_detail(station_id):
+    station = db.Station.find_one({'id': station_id})
+    if not station:
+        abort(404)
     return jsonify(station.get_public_data())
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
-def getplayinfo(station_id):
+def api_station_getplayinfo(station_id):
     """
     Возвращает поток для плеера.
     с параметром low_bitrate выбирается самый меньший битрейт

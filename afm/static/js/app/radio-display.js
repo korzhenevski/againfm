@@ -479,8 +479,8 @@ $(function(){
         {title: "Trance", tag: "trance"}
     ]});
     App.radioDisplay.selectors.get('tag/trance').select();
-    App.mediator.on('player:ready', function(){
-        var playlist = App.radioDisplay.playlist;
-        playlist.setStation(playlist.last());
-    });
+    //App.mediator.on('player:ready', function(){
+    //    var playlist = App.radioDisplay.playlist;
+    //    playlist.setStation(playlist.last());
+    //});
 });

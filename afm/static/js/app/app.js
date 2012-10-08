@@ -1,24 +1,6 @@
 var App = App || {};
 
-App.Model = Backbone.Model.extend({
-    // TODO: migrate from options callbacks to deferred promise
-    callAction: function(action, data, options) {
-        return this.save({}, _.extend(options || {}, {
-            action: action,
-            data: $.param(data)
-        }));
-    },
-
-    parseActionError: function(resp, acceptedCodes) {
-        if (resp.responseText && _.include(acceptedCodes, resp.status)) {
-            return $.parseJSON(resp.responseText).error;
-        } else {
-            console.log(arguments);
-            console.error(resp);
-        }
-        return false;
-    }
-});
+App.Model = Backbone.Model.extend({});
 
 App.View = Backbone.View.extend({
     show: function() {
@@ -149,9 +131,3 @@ Handlebars.registerHelper('t', function(key) {
 App.mediator.on('all', function(){
     console.log('[mediator]', arguments);
 });
-App.login = function() {
-    $.post('/api/user/login', {login: 'test@testing.com', password: 'password'});
-};
-App.logout = function() {
-    $.post('/api/user/logout');
-};

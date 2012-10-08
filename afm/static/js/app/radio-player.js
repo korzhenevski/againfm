@@ -101,14 +101,26 @@ App.Player = App.klass({
         if ($.cookie('volume')) {
             this.setVolume(parseInt($.cookie('volume')));
         }
-        this.on('volume_changed', this.syncVolume, this);
-        this.engine.on('ready', this.syncVolume, this);
+        this.engine.on('ready', this.engineReady, this);
         // если радио играет, при выгрузке страницы флеш кидает ошибку
         // поэтому останавливаем поток до выгрузки
         // TODO: важно понять, кто за это отвечает :)
         $(window).bind('beforeunload', _.bind(function(){
-            this.engine.stop();
+            if (this.engine.ready) {
+                this.engine.stop();
+            }
         }, this));
+    },
+
+    engineReady: function() {
+        this.on('volume_changed', function(){
+            this.engine.setVolume(this.volume / 100);
+        }, this);
+        // если к моменту загрузки плеера есть станция и поток,
+        // включаем плеер
+        if (this.station && this.stream) {
+            this.play();
+        }
     },
 
     stationChanged: function(station) {
@@ -119,11 +131,15 @@ App.Player = App.klass({
         this.station = station;
         this.stream = null;
         // останавливаем плеер до загрузки адреса потока
-        this.engine.stop();
+        if (this.engine.ready) {
+            this.engine.stop();
+        }
     },
 
     play: function() {
-        this.engine.play(this.stream.url);
+        if (this.engine.ready) {
+            this.engine.play(this.stream.url);
+        }
     },
 
     playStream: function(stream) {
@@ -134,6 +150,7 @@ App.Player = App.klass({
     setVolume: function(volume) {
         this.volume = volume;
         this.trigger('volume_changed');
+        $.cookie('volume', volume);
     },
 
     toggle: function() {
@@ -150,11 +167,6 @@ App.Player = App.klass({
         } else {
             this.play();
         }
-    },
-
-    syncVolume: function() {
-        $.cookie('volume', this.volume);
-        this.engine.setVolume(this.volume / 100);
     }
 });
 
@@ -251,12 +263,14 @@ App.Radio = App.Model.extend({
 
     initialize: function() {
         this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
-        this.mediator.on('playlist:station_changed', this.changeStation, this);
+        this.mediator.on('playlist:station_changed app:set_station', this.changeStation, this);
     },
 
     changeStation: function(station) {
         // модель приводим к плоскому виду
-        station = station.toJSON();
+        if (station instanceof App.Station) {
+            station = station.toJSON();
+        }
         // пропускаем повторные вызовы
         if (this.station && station.id == this.station.id) {
             return;

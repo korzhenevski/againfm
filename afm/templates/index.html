@@ -2,13 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8"/>
-    {% if station %}
-        <title>{{ station.title }} - {{ sitename }}</title>
-        <meta name="description" content="Listen {{ station.title }} on {{ sitename }}"/>
-    {% else %}
-        <title>{{ sitename }}</title>
-        <meta name="description" content="{{ _('site.description') }}"/>
-    {% endif %}
+    <title>{{ sitename }}</title>
+    <meta name="description" content="{{ _('site.description') }}"/>
     <link href="{{ static_url }}css/screen.css" media="screen, projection" rel="stylesheet"/>
     <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico"/>
 </head>
@@ -126,6 +121,11 @@
 <script>
     $(function(){
         App.user.set({{ bootstrap.user|tojson|safe }});
+        App.router = new App.Router();
+        {% if station %}
+            App.router.station = {{ station|tojson|safe }};
+        {% endif %}
+        Backbone.history.start({pushState: true});
     });
 </script>
 
