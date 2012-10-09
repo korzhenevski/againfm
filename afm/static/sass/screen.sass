@@ -12,7 +12,7 @@
 @import compass/css3/user-interface
 @import compass/css3/inline-block
 
-@import "display/home*.png"
+@import "filter-icon/*.png"
 @import "controls/*.png"
 @import "profile/*.png"
 @import "bbstar/*.png"
@@ -467,14 +467,17 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
   .active
     color: #f8d222
     text-shadow: 0px 0px 3px #f8d222
-  .home-link
+  .icon-selector
     text-indent: -9999px
     width: 19px
     height: 19px
     display: inline-block
     top: 5px
     position: relative
-    @include display-sprite(home)
+  .favorite-selector
+    @include filter-icon-sprite(favorite)
+  .history-selector
+    @include filter-icon-sprite(history)
 
 .search
   float: right
@@ -684,7 +687,7 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     float: right
     p
       font-size: 1em
-      line-height: 1.1em
+      line-height: 1.2em
       text-shadow: 0px 1px 1px #111
     .favorites
       @include profile-sprite(favorites)
@@ -698,7 +701,7 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
         float: left
         margin-right: 10px
         height: 13px
-        line-height: 8px
+        line-height: 9px
         background-repeat: no-repeat
         padding-left: 16px
     a

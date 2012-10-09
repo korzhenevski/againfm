@@ -22,7 +22,7 @@ celery = Celery(__name__)
 celery.conf.add_defaults(app.config)
 
 assets = Environment(app)
-
+"""
 js = Bundle(
     'js/jquery-ui-1.8.23.custom.min.js',
     'js/jquery.watermark.js',
@@ -42,6 +42,7 @@ js = Bundle(
     'js/app/site.js',
     'js/app/setup.js',
 filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
+"""
 
 assets.register('core_scripts', Bundle(
     'js/jquery.min.js',
@@ -57,10 +58,12 @@ assets.register('core_scripts', Bundle(
     # radio-player
     'js/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js
+    #'js/handlebars.runtime.js',
+    #'js/render.js',
     'js/handlebars.js',
     'js/jquery.cookie.js',
     'js/comet.js',
-))
+    filters='uglifyjs', output='js/deploy/core.%(version)s.js'))
 
 assets.register('scripts', Bundle(
     'js/app/app.js',
@@ -69,7 +72,7 @@ assets.register('scripts', Bundle(
     'js/app/radio-sticker.js',
     'js/app/user.js',
     'js/app/router.js',
-))
+    filters='uglifyjs', output='js/deploy/app.%(version)s.js'))
 
 if app.config['TESTING']:
     from flask.ext.jasmine import Jasmine, Asset

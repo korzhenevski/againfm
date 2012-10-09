@@ -1,6 +1,6 @@
-<img src="{{user_gravatar_url user}}" width="50" height="50" alt="" class="avatar" />
+<img src="{{user_gravatar_url this "50"}}" width="50" height="50" alt="" class="avatar" />
 <div class="content">
-    <p>{{#if user.name}}{{user.name}}{{else}}{{user.email}}{{/if}}</p>
+    <p>{{#if name}}{{name}}{{else}}{{email}}{{/if}}</p>
     <ul>
         <li class="favorites"><a href="#" class="link">{{t "user.favorites" }}</a></li>
         <li class="settings"><a href="#" class="link">{{t "user.settings" }}</a></li>

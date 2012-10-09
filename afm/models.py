@@ -197,7 +197,16 @@ class Stream(BaseDocument):
             'bitrate': self['bitrate'],
         }
 
+@db.register
+class UserFavorite(BaseDocument):
+    __collection__ = 'user_favorites'
 
+    structure = {
+        'user_id': int,
+
+    }
+
+# TODO: это слой кеширования, переписать на хранение в монге
 class UserFavorites(object):
     def __init__(self, user_id, redis):
         self.redis = redis

@@ -160,6 +160,13 @@ App.FavoriteSelector = App.Selector.extend({
     }
 });
 
+App.HistorySelector = App.Selector.extend({
+    initialize: function() {
+        this.set('selector', 'history');
+    }
+});
+
+
 /**
  * Панель селекторов.
  *
@@ -450,8 +457,9 @@ _.extend(App.RadioDisplay.prototype, {
         new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
-            new App.FavoriteSelector({title: 'Favorites'}),
-            new App.Selector({selector: 'featured'})
+            new App.FavoriteSelector(),
+            new App.HistorySelector(),
+            new App.Selector({selector: 'featured', title: 'Featured'})
         ]);
 
         // теги

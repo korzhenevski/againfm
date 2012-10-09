@@ -136,6 +136,10 @@ App.Player = App.klass({
         }
     },
 
+    isPlaying: function() {
+        return this.engine.isPlaying();
+    },
+
     play: function() {
         if (this.engine.ready) {
             this.engine.play(this.stream.url);
@@ -300,6 +304,29 @@ App.Radio = App.Model.extend({
 });
 
 /**
+ * Меняем фавиконку если радио играет.
+ *
+ * @type {function}
+ */
+App.PlayerFaviconView = App.View.extend({
+    el: '#favicon',
+    mediator: App.mediator,
+
+    initialize: function() {
+        this.mediator.on('player:playing', this.playIcon, this);
+        this.mediator.on('player:stopped', this.defaultIcon, this);
+    },
+
+    playIcon: function() {
+        this.$el.attr('href', '/static/i/favicon_play.ico');
+    },
+
+    defaultIcon: function() {
+        this.$el.attr('href', '/static/i/favicon.ico');
+    }
+});
+
+/**
  * Player (model)
  *  - PlayerEngine
  *
@@ -309,6 +336,7 @@ App.Radio = App.Model.extend({
  */
 $(function() {
     var player = new App.Player();
+    new App.PlayerFaviconView();
     App.radio = new App.Radio();
     App.playerView = new App.PlayerView({player: player});
 });

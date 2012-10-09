@@ -126,6 +126,12 @@ def api_tag_playlist(tagname):
     #stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
 
+@app.route('/api/playlist/favorite')
+def api_favorite_playlist():
+    stations = [station.get_public_data() for station in db.Station.find()]
+    return jsonify({'objects': stations})
+
+
 @app.route('/api/station/<int:station_id>')
 def api_station_detail(station_id):
     station = db.Station.find_one({'id': station_id})

@@ -133,6 +133,11 @@ App.klass = function(proto) {
  */
 App.mediator = _.clone(Backbone.Events);
 
+App.getUrl = function(path) {
+    var loc = document.location;
+    return loc.protocol + '//' + loc.hostname + '/' + (path ? path : '');
+}
+
 /**
  * i18n template helper
  */

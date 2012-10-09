@@ -29,3 +29,7 @@ validictory==0.8.3
 webassets==0.7
 wsgiref==0.1.2
 ujson==1.22
+# ебанутые изменения по зависимости от фласка,
+# ставим фиксенные версии
+-r git+https://github.com/miracle2k/webassets.git
+-r git+https://github.com/svetlyak40wt/flask-assets.git

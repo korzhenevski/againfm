@@ -24,3 +24,7 @@ def celery():
 def player():
     with lcd('player'):
         local('as3compile --flashversion 10 --output ../afm/static/swf/player.swf player.as')
+
+def handlebars():
+    with lcd('afm/static/js'):
+        local('handlebars templates/*.handlebars --min --output render.js')

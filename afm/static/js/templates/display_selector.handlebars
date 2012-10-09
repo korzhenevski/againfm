@@ -1,5 +1,9 @@
 <li>
-    <span class="nav-link {{ class }}-link{{#if active}} active {{ class }}-active{{/if}}">
-        {{ title }}
-    </span>
+    {{#if title}}
+        {{! текст }}
+        <span{{#if active}} class="active"{{/if}}>{{ title }}</span>
+    {{else}}
+        {{! иконка }}
+        <span class="icon-selector {{ class }}-selector{{#if active}} {{ class }}-active{{/if}}"></span>
+    {{/if}}
 </li>
