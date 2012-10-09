@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pymongo
-import requests
-import json
+import ujson as json
 from . import app, db, login_manager, tasks, i18n, redis
 from .forms import RegisterForm
 from flask import jsonify, request, render_template, redirect, abort, url_for
@@ -195,11 +194,19 @@ def favorites_list():
         return jsonify({})
     return jsonify(favorite.get_public_data())
 
+"""
+быстрый фильтр-сериализатор json
+"""
+@app.template_filter('json')
+def template_filter_json(data):
+    return json.dumps(data)
+
 @app.context_processor
 def app_bootstrap():
     #categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
     bootstrap = {
         'user': {},
+        'i18n': i18n.get_json_dict(),
         #'settings': {},
         #'categories': categories,
         #'playlist': {}

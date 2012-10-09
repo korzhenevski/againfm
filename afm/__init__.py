@@ -1,4 +1,3 @@
-import json
 from flask import Flask
 from celery import Celery
 from flask.ext.login import LoginManager
@@ -17,7 +16,7 @@ i18n = I18n(app)
 redis = Redis(**app.config['REDIS'])
 
 login_manager = LoginManager()
-login_manager.setup_app(app)
+login_manager.init_app(app)
 
 celery = Celery(__name__)
 celery.conf.add_defaults(app.config)
@@ -54,6 +53,7 @@ assets.register('core_scripts', Bundle(
     'js/backbone.js',
     # radio-display
     'js/jquery.tinyscrollbar.js',
+    'js/jquery.validate.js',
     # radio-player
     'js/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js

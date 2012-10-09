@@ -263,7 +263,7 @@ App.Radio = App.Model.extend({
 
     initialize: function() {
         this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
-        this.mediator.on('playlist:station_changed app:set_station', this.changeStation, this);
+        this.mediator.on('playlist:station_changed route:station', this.changeStation, this);
     },
 
     changeStation: function(station) {

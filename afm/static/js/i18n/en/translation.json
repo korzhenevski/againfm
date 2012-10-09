@@ -109,7 +109,7 @@
 
     "radio": {
         "loading": "Loading...",
-        "error": {
+        "errors": {
             "info_unavailable": "Info unavailable",
             "radio_unavailable": "Radio unavailable"
         }

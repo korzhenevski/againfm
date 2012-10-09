@@ -40,7 +40,7 @@
         <div class="wrapper-right">
             <div class="wrapper-right-content">
                 <div class="box-holder">
-                    <form class="head-form login hidden">
+                    <form class="head-form login">
                         <div class="form-input">
                             <input type="text" tabindex="10" class="input" name="login"
                                    placeholder="{{ _('login.placeholder.login') }}"/>
@@ -51,11 +51,8 @@
                                    placeholder="{{ _('login.placeholder.password') }}"/>
                             <span class="pseudo-link amnesia">{{ _('login.amnesia') }}</span>
                         </div>
-                        <input type="submit" tabindex="12" value="{{ _('login.button') }}"/>
-
-                        <div class="notice hidden">
-                            <p><!-- --></p>
-                        </div>
+                        <input type="submit" class="button" disabled="" tabindex="12" value="{{ _('login.button') }}"/>
+                        <p class="notice"></p>
                     </form>
                     <div class="user-profile hidden"></div>
                 </div>
@@ -100,11 +97,6 @@
                 class="pseudo-link tos">{{ _('site.footer.tos') }}</span>
         </p>
     </div>
-    <div class="right">
-        <p>{{ _('site.footer.designer.label') }} <a href="http://www.zolotorevich.com/">Rei Z</a></p>
-
-        <p><a href="">{{ _('site.footer.designer.info_label') }}</a></p>
-    </div>
 </div>
 
 <div id="player-container"></div>
@@ -119,11 +111,19 @@
 {% endassets %}
 
 <script>
+    {# словарь мультиязычности #}
+    App.i18n_dict = {{ bootstrap.i18n|safe }};
+</script>
+
+<script>
     $(function(){
-        App.user.set({{ bootstrap.user|tojson|safe }});
+        App.user.set({{ bootstrap.user|json|safe }});
         App.router = new App.Router();
+        {#  страница станции - /station/N
+            предзагрузка данных в роутер
+        #}
         {% if station %}
-            App.router.station = {{ station|tojson|safe }};
+            App.router.station = {{ station|json|safe }};
         {% endif %}
         Backbone.history.start({pushState: true});
     });

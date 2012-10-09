@@ -201,6 +201,7 @@ App.DisplayView = App.View.extend({
     events: {
         'click .station': 'selectStation'
     },
+    mediator: App.mediator,
 
     initialize: function(options) {
         this.playlist = options.playlist;
@@ -216,7 +217,6 @@ App.DisplayView = App.View.extend({
      */
     stationChanged: function(station) {
         var $link = this.links[station.id];
-
         // прокрутка до видимой зоны если ссылка за пределами шкалы
         // правый край
         var scrollLeft = Math.round(this.$el.position().left * -1),
@@ -444,10 +444,10 @@ _.extend(App.RadioDisplay.prototype, {
         this.selectors = new App.Selectors();
         this.selectors.on('select', this.select, this);
 
-        this.selectorsView = new App.SelectorsView({selectors: this.selectors});
-        this.displayView = new App.DisplayView({playlist: this.playlist});
-        this.searchView = new App.SearchView({playlist: this.playlist, selectors: this.selectors});
-        this.controlsView = new App.DisplayControlsView({playlist: this.playlist});
+        new App.SelectorsView({selectors: this.selectors});
+        new App.DisplayView({playlist: this.playlist});
+        new App.SearchView({playlist: this.playlist, selectors: this.selectors});
+        new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
             new App.FavoriteSelector({title: 'Favorites'}),

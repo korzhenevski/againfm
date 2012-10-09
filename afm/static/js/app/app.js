@@ -2,6 +2,28 @@ var App = App || {};
 
 App.Model = Backbone.Model.extend({});
 
+/**
+ * Template helper that
+ * load and runtime compile on development env
+ * or simple return precompiled template on production
+ *
+ * @param name string - Template name
+ * @return {object}
+ */
+App.getTemplate = function(name) {
+    if (!Handlebars.templates[name]) {
+        $.ajax({
+            url: '/static/js/templates/' + name + '.handlebars',
+            async: false,
+            success: function(data) {
+                Handlebars.templates[name] = Handlebars.compile(data);
+            }
+        });
+    }
+    return Handlebars.templates[name];
+};
+Handlebars.templates = Handlebars.templates || {};
+
 App.View = Backbone.View.extend({
     show: function() {
         this.$el.show();
@@ -21,6 +43,17 @@ App.View = Backbone.View.extend({
     showRender: function() {
         this.render();
         this.show();
+    },
+
+    serializeForm: function() {
+        var $el = this.$el.is('form') ? this.$el : this.$('form');
+        var serialized = {};
+        if ($el && $el.size()) {
+            _.each($el.serializeArray(), function(field){
+                serialized[field.name] = field.value;
+            })
+        }
+        return serialized;
     }
 });
 
@@ -42,7 +75,8 @@ App.Station = App.Model.extend({});
  * @return {string}
  */
 App.i18n = function(key) {
-    return $.i18n.t(key);
+    return App.i18n_dict[key] || key;
+    //return $.i18n.t(key);
 };
 
 
@@ -98,28 +132,6 @@ App.klass = function(proto) {
  * @type {object}
  */
 App.mediator = _.clone(Backbone.Events);
-
-/**
- * Template helper that
- * load and runtime compile on development env
- * or simple return precompiled template on production
- *
- * @param name string - Template name
- * @return {object}
- */
-App.getTemplate = function(name) {
-    if (!Handlebars.templates[name]) {
-        $.ajax({
-            url: '/static/js/templates/' + name + '.handlebars',
-            async: false,
-            success: function(data) {
-                Handlebars.templates[name] = Handlebars.compile(data);
-            }
-        });
-    }
-    return Handlebars.templates[name];
-};
-Handlebars.templates = Handlebars.templates || {};
 
 /**
  * i18n template helper

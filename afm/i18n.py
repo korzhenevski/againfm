@@ -1,4 +1,4 @@
-import json
+import ujson as json
 
 class I18n(object):
     def __init__(self, app):
@@ -13,6 +13,9 @@ class I18n(object):
 
     def translate(self, key):
         return self._dict.get(key, key)
+
+    def get_json_dict(self):
+        return json.dumps(self._dict)
 
 class DotCollapsedDict(dict):
     """

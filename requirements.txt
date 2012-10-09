@@ -28,3 +28,4 @@ supervisor==3.0b1
 validictory==0.8.3
 webassets==0.7
 wsgiref==0.1.2
+ujson==1.22

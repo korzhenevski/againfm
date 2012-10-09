@@ -36,7 +36,7 @@ button, input, select, textarea, p
   color: #fff
 
 input[disabled], button[disabled]
-  +opacity(0.65)
+  +opacity(0.7)
 
 .hidden
   display: none
@@ -119,11 +119,11 @@ a
   a, label, p
     font-size: 0.8em
     line-height: 1.6em
-  .notice p
+  .notice
     margin-left: 13px
     clear: both
     color: #666
-  .notice-error p
+  .notice-error
     color: #cb0101
   .notice-ok p
     color: #7ad81c
@@ -180,7 +180,7 @@ a
   padding-left: 12px
   outline: none
 
-input[type=submit]
+input[type=submit2]
   height: 32px
   margin: 0px
   padding: 0px
@@ -193,6 +193,31 @@ input[type=submit]
   font-weight: bold
   text-align: center
   float: left
+
+.button
+  display: inline-block
+  border: 1px solid #2c1200
+  color: #000
+  background-color: #666
+  text-shadow: 0px 1px 0px #cfcfcf
+  margin: 0px
+  line-height: 20px
+  padding: 5px 0
+  cursor: pointer
+  outline: none
+  +border-radius(5px)
+  +background(linear-gradient(#cacaca, #9d9d9d))
+  &:focus
+    +box-shadow(#fc6622 0 0px 6px 1px)
+  &:hover
+    +background(linear-gradient(#ebebeb, #959595))
+  &:active
+    +background(linear-gradient(#5d5d5d, #b1b1b1))
+
+.button[disabled],
+.button.disabled
+  +background(linear-gradient(#7d7f80, #616364))
+  text-shadow: 0px 1px 0px #999
 
 .loading
   margin-left: 10px
@@ -438,8 +463,7 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
     color: #999
     cursor: pointer
     &:hover
-      color: #f8d222
-      text-shadow: 0px 0px 3px #f8d222
+      color: #f9f9f9
   .active
     color: #f8d222
     text-shadow: 0px 0px 3px #f8d222
@@ -483,6 +507,8 @@ $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
   font-size: 0.8em
   display: none
   padding: 25px 9px 10px 24px
+  color: #666
+  font-weight: bold
 
 .ui-menu-item
   border-bottom: 1px solid #363636
