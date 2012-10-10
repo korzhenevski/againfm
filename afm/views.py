@@ -6,7 +6,7 @@ from . import app, db, login_manager, tasks, i18n, redis
 from .forms import RegisterForm
 from flask import jsonify, request, render_template, redirect, abort, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from .models import UserFavorites
+from .models import UserFavoritesCache
 
 def send_mail(**kwargs):
     if app.debug:
@@ -119,14 +119,13 @@ def login():
 
 @app.route('/api/playlist/tag/<tagname>')
 def api_tag_playlist(tagname):
-    tag = db.StationTag.find_one({'tag': tagname})
-    if not tag:
-        abort(404)
+    tag = db.StationTag.find_one_or_404({'tag': tagname})
     stations = [station.get_public_data() for station in db.Station.find({'tag': tag['tag']})]
     #stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')
+@login_required
 def api_favorite_playlist():
     stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
@@ -134,9 +133,7 @@ def api_favorite_playlist():
 
 @app.route('/api/station/<int:station_id>')
 def api_station_detail(station_id):
-    station = db.Station.find_one({'id': station_id})
-    if not station:
-        abort(404)
+    station = db.Station.find_one_or_404({'id': station_id})
     return jsonify(station.get_public_data())
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
@@ -149,10 +146,7 @@ def api_station_getplayinfo(station_id):
     @return: json
     """
     sort_direction = pymongo.ASCENDING if request.args.get('low_bitrate') else pymongo.DESCENDING
-    stream = db.Stream.find_one({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
-    if not stream:
-        abort(404)
-
+    stream = db.Stream.find_one_or_404({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
     resp = {
         'stream': {
             'id': stream['id'],
@@ -163,9 +157,9 @@ def api_station_getplayinfo(station_id):
 
     # возвращаем наличие станции в закладках, если пользователь авторизован
     if current_user.is_authenticated():
-        favs = UserFavorites(user_id=current_user.id, redis=redis)
+        favorite_cache = UserFavoritesCache(user_id=current_user.id)
         resp['station'] = {
-            'favorite': favs.exists('station', station_id)
+            'favorite': favorite_cache.exists('station', station_id)
         }
 
     return jsonify(resp)
@@ -173,20 +167,32 @@ def api_station_getplayinfo(station_id):
 @app.route('/api/user/favorite/station/<int:station_id>', methods=['GET', 'POST'])
 @login_required
 def favorite_station(station_id):
-    favs = UserFavorites(user_id=current_user.id, redis=redis)
+    # проверка на существование станции
+    # можно конечно и без нее, но тогда реально засрать
+    # избранное несуществующими станциями
+    db.Station.find_one_or_404({'id': station_id})
+    favorite_cache = UserFavoritesCache(user_id=current_user.id)
     if request.method == 'POST':
-        favorite = favs.toggle('station', station_id)
+        info = db.FavoriteStation.toggle(station_id, user_id=current_user.id)
+        state = favorite_cache.toggle('station', station_id, state=info['favorite'])
     else:
-        favorite = favs.exists('station', station_id)
-    return jsonify({'favorite': favorite})
+        state = favorite_cache.exists('station', station_id)
+    return jsonify({'favorite': state})
 
-# копипаста пока допустима
-@app.route('/api/user/favorite/track/<int:track_id>', methods=['POST'])
+@app.route('/api/user/favorite/track/<int:track_id>', methods=['GET', 'POST'])
 @login_required
 def favorite_track(track_id):
-    favs = UserFavorites(user_id=current_user.id, redis=redis)
-    favorite = favs.toggle('track', track_id)
-    return jsonify({'favorite': favorite})
+    onair_info = db.OnairHistory.find_one_or_404({'track_id': track_id})
+    station = db.Station.find_one_or_404({'id': onair_info['station_id']})
+    track = db.Track.find_one_or_404({'id': track_id})
+
+    favorite_cache = UserFavoritesCache(user_id=current_user.id)
+    if request.method == 'POST':
+        info = db.FavoriteTrack.toggle(track, station, current_user.id)
+        state = favorite_cache.toggle('track', track_id, state=info['favorite'])
+    else:
+        state = favorite_cache.exists('track', track_id)
+    return jsonify({'favorite': state})
 
 @app.route('/api/user/favorites')
 @login_required

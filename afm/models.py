@@ -22,6 +22,9 @@ def md5hash(data):
     hashed.update(data)
     return hashed.hexdigest()
 
+def get_ts():
+    return int(time.time())
+
 class BaseDocument(Document):
     use_dot_notation = True
 
@@ -33,6 +36,115 @@ class BaseDocument(Document):
                 update={'$inc': {'next': 1}},
                 new=True, upsert=True)['next']
         return super(BaseDocument, self).save(*args, **kwargs)
+
+class UserFavoritesCache(object):
+    def __init__(self, user_id, redis=None):
+        if redis is None:
+            from . import redis as global_redis
+            self.redis = global_redis
+        else:
+            self.redis = redis
+        self.user_id = user_id
+
+    def add(self, object_type, object_id):
+        self.redis.zadd(self.object_key(object_type), object_id, get_ts())
+
+    def exists(self, object_type, object_id):
+        score = self.redis.zscore(self.object_key(object_type), object_id)
+        return bool(score)
+
+    def remove(self, object_type, object_id):
+        self.redis.zrem(self.object_key(object_type), object_id)
+
+    def toggle(self, object_type, object_id, state=None):
+        if state is None:
+            state = not self.exists(object_type, object_id)
+
+        if state:
+            self.add(object_type, object_id)
+        else:
+            self.remove(object_type, object_id)
+        return state
+
+    def object_key(self, object_type):
+        return 'favorite_user_{}:{}'.format(object_type, self.user_id)
+
+class AbstractFavorite(BaseDocument):
+    @staticmethod
+    def decorate(obj):
+        obj['favorite'] = bool(obj['favorite'] % 2)
+        return obj
+
+    @classmethod
+    def toggle_favorite(cls, query, update=None):
+        collection = db[cls.__collection__]
+        if update is None:
+            update = {}
+        update.update({'$inc': {'favorite': 1}})
+        row = collection.find_and_modify(query, update, new=True, upsert=True)
+        # добавляем время создания
+        # в upsert нельзя, иначе ломается его логика
+        if 'created_at' not in row:
+            row = collection.find_and_modify(query, {'$set': {'created_at': get_ts()}}, new=True)
+        # изменяем инкрементом, значение получаем остатком от деления
+        return cls.decorate(row)
+
+@db.register
+class FavoriteTrack(AbstractFavorite):
+    __collection__ = 'favorite_tracks'
+
+    structure = {
+        'user_id': int,
+        'track': {
+            'id': int,
+            'title': unicode,
+            'artist': unicode,
+            'name': unicode
+        },
+        'station': {
+            'id': int,
+            'title': unicode,
+        },
+        'favorite': bool,
+        'created_at': int
+    }
+    indexes = [{'fields': ['track.id', 'user_id'], 'unique': True}]
+
+    @classmethod
+    def toggle(cls, track, station, user_id):
+        # копируем только нужные ключи
+        filter_keys = lambda source, keys: dict((k, v) for k, v in source.iteritems() if k in keys)
+        return cls.toggle_favorite({
+            'track': filter_keys(track, cls.structure['track']),
+            'station': filter_keys(station, cls.structure['station']),
+            'user_id': user_id,
+        })
+
+    @classmethod
+    def remove(cls, track_id, station_id, user_id):
+        cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
+
+@db.register
+class FavoriteStation(AbstractFavorite):
+    __collection__ = 'favorite_stations'
+    structure = {
+        'user_id': int,
+        'station_id': int,
+        'favorite': int,
+        'created_at': int,
+    }
+    indexes = [{'fields': ['user_id', 'station_id'], 'unique': True}]
+
+    @classmethod
+    def toggle(cls, station_id, user_id):
+        return cls.toggle_favorite({
+            'user_id': user_id,
+            'station_id': station_id
+        })
+
+    @classmethod
+    def remove(cls, station_id, user_id):
+        cls.remove({'user_id': user_id, 'station_id': station_id})
 
 @db.register
 class User(BaseDocument):
@@ -64,6 +176,11 @@ class User(BaseDocument):
         'settings.fading_sound': True,
         'settings.limit_night_volume': True
     }
+
+    def favorites_cache(self):
+        if not self._favorites_cache:
+            self._favorites_cache = FavoritesCache(user_id=self['id'], redis=global_redis)
+        return self._favorites_cache
 
     def check_password(self, raw_password):
         if not self['password']:
@@ -198,45 +315,6 @@ class Stream(BaseDocument):
         }
 
 @db.register
-class UserFavorite(BaseDocument):
-    __collection__ = 'user_favorites'
-
-    structure = {
-        'user_id': int,
-
-    }
-
-# TODO: это слой кеширования, переписать на хранение в монге
-class UserFavorites(object):
-    def __init__(self, user_id, redis):
-        self.redis = redis
-        self.user_id = user_id
-
-    def add(self, object_type, object_id):
-        self.redis.zadd(self.object_key(object_type), object_id, self.get_ts())
-
-    def exists(self, object_type, object_id):
-        score = self.redis.zscore(self.object_key(object_type), object_id)
-        return bool(score)
-
-    def remove(self, object_type, object_id):
-        self.redis.zrem(self.object_key(object_type), object_id)
-
-    def toggle(self, object_type, object_id):
-        exists = self.exists(object_type, object_id)
-        if exists:
-            self.remove(object_type, object_id)
-        else:
-            self.add(object_type, object_id)
-        return not exists
-
-    def object_key(self, object_type):
-        return 'favorite_user_{}:{}'.format(object_type, self.user_id)
-
-    def get_ts(self):
-        return int(time.time())
-
-@db.register
 class Track(BaseDocument):
     __collection__ = 'tracks'
 
@@ -260,49 +338,6 @@ class Track(BaseDocument):
     default_values = {
         'created_at': datetime.now,
     }
-
-@db.register
-class Favorite(BaseDocument):
-    __collection__ = 'favorites'
-
-    structure = {
-        'id': int,
-        'ts': datetime,
-        'track_ids': [int],
-        'tracks': [
-            {
-                'id': int,
-                'title': unicode,
-                'station_id': int,
-                'station_title': unicode,
-                'ts': datetime,
-                'deleted': int,
-            }
-        ]
-    }
-
-    default_values = {
-        'ts': datetime.now
-    }
-
-    def get_public_data(self):
-        data = {
-            'id': self['id'],
-            'date': naturalday(self['ts'], '%Y %m %d'),
-            'tracks': []
-        }
-
-        for track in self['tracks']:
-            data['tracks'].append({
-                'id': track['id'],
-                'title': track['title'],
-                'station_title': track['station_title'],
-                'station_id': track['station_id'],
-                'time': track['ts'].strftime('%H:%M'),
-                'is_deleted': bool(track['deleted'] % 2)
-            })
-
-        return data
 
 @db.register
 class StationTag(BaseDocument):
@@ -332,3 +367,7 @@ class StationTag(BaseDocument):
             'id': self['id'],
             'title': self['tag'],
         }
+
+@db.register
+class OnairHistory(BaseDocument):
+    __collection__ = 'onair_history'
