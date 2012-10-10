@@ -127,7 +127,13 @@ def api_tag_playlist(tagname):
 @app.route('/api/playlist/favorite')
 @login_required
 def api_favorite_playlist():
-    stations = [station.get_public_data() for station in db.Station.find()]
+    favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
+    favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
+    # выборка по списку айдишников
+    query = {'id': {'$in': favorite_stations.keys()}}
+    stations = [station.get_public_data() for station in db.Station.find(query)]
+    # сортируем по времени добавления
+    stations.sort(reverse=True, key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
 
 

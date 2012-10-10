@@ -124,6 +124,7 @@ class FavoriteTrack(AbstractFavorite):
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
 
+# TODO: сюда хорошо добавить dbref на station
 @db.register
 class FavoriteStation(AbstractFavorite):
     __collection__ = 'favorite_stations'
