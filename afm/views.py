@@ -4,7 +4,7 @@
 import pymongo
 import ujson as json
 from . import app, db, login_manager, tasks, i18n
-from .forms import RegisterForm
+from .forms import SignupForm
 from flask import jsonify, request, render_template, redirect, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from .models import UserFavoritesCache
@@ -30,6 +30,7 @@ def token_auth(user_id, token):
         login_user(user)
     return redirect('/')
 
+# HTTP-адрес инбокса по почтовому ящику
 def get_email_provider(email):
     domain = email.split('@')[1].lower()
     for link, domains in app.config['EMAIL_PROVIDERS'].items():
@@ -37,8 +38,8 @@ def get_email_provider(email):
             return link
     return None
 
-@app.route('/api/user/password_reset', methods=['POST'])
-def password_reset():
+@app.route('/api/user/amnesia', methods=['POST'])
+def api_user_amnesia():
     email = request.form['email']
     user = db.User.find_one({'email': email})
     if user:
@@ -46,16 +47,16 @@ def password_reset():
         body = render_template('mail/password_reset.html', user=user, password=password, token=token)
         send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
         email_provider = get_email_provider(user.email)
-        return jsonify({'email_provider': email_provider, 'status': True})
-    return jsonify({'error': {'email': 'No such user'}})
+        return jsonify({'email_provider': email_provider})
+    return jsonify({'error': 'No such user'})
 
-@app.route('/api/user/register', methods=['POST'])
-def register():
-    form = RegisterForm(request.form)
+@app.route('/api/user/signup', methods=['POST'])
+def signup():
+    form = SignupForm(request.form)
     if not form.validate():
-        return jsonify({'error': form.errors}), 400
+        return jsonify({'error': 'bad request'})
     if db.User.find_one({'email': form.email.data}):
-        return jsonify({'error': {'email': ['email is already in use']}}), 400
+        return jsonify({'error': 'email_exists'})
     # create
     user = db.User()
     user.email = form.email.data

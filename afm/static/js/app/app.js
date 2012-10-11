@@ -52,6 +52,11 @@ App.View = Backbone.View.extend({
         this.show();
     },
 
+    /**
+     * Сериализует данные формы в объект.
+     *
+     * @return {Object}
+     */
     serializeForm: function() {
         var $el = this.$el.is('form') ? this.$el : this.$('form');
         var serialized = {};

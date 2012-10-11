@@ -94,6 +94,7 @@
     {# словарь мультиязычности #}
     var App = App || {};
     App.i18n_dict = {{ bootstrap.i18n|safe }};
+    App.debug = {{ config.DEBUG|tojson }};
 </script>
 
 {% assets "core_scripts" %}

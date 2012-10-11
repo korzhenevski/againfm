@@ -19,6 +19,7 @@
     },
 
     "signup": {
+        "link": "sign-up",
         "title": "Sign up",
         "button": "Start",
         "notice": "no spam, you do not need to confirm",
@@ -26,6 +27,7 @@
             "email": "Email",
             "password": "Desired password"
         },
+        "exists_email": "Email already in use.",
         "validation": {
             "email": {
                 "required": "enter email",
@@ -43,12 +45,11 @@
             "login": "Email",
             "password": "Password"
         },
-        "button": "Login",
-        "signup": "sign-up",
-        "amnesia": "forgot password?"
+        "button": "Login"
     },
 
     "amnesia": {
+        "link": "forgot password?",
         "title": "Reset password",
         "placeholder": "Your email",
         "button": "Send",
