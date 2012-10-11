@@ -1,21 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import ujson as json
 
 class I18n(object):
     def __init__(self, app):
         self._app = app
-        self._dict = {}
+        self.dict = {}
+        # плоский словарь
+        self.flat_dict = {}
         self.load_dict(app.config.get('LOCALE', 'en'))
 
     def load_dict(self, locale):
         name = 'static/js/i18n/{}/translation.json'.format(locale)
         with self._app.open_resource(name) as f:
-            self._dict = DotCollapsedDict(json.loads(f.read()))
+            self.dict = json.loads(f.read())
+            self.flat_dict = DotCollapsedDict(self.dict)
 
     def translate(self, key):
-        return self._dict.get(key, key)
+        return self.flat_dict.get(key, key)
 
     def get_json_dict(self):
-        return json.dumps(self._dict)
+        return json.dumps(self.dict)
 
 class DotCollapsedDict(dict):
     """

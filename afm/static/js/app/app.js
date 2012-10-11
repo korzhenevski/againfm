@@ -24,6 +24,13 @@ App.getTemplate = function(name) {
 };
 Handlebars.templates = Handlebars.templates || {};
 
+/**
+ * Декоратор ссылок. Предваряет путь решеткой если нет HTML5 pushState.
+ */
+Handlebars.registerHelper('link', function(uri) {
+    return '#' + uri;
+});
+
 App.View = Backbone.View.extend({
     show: function() {
         this.$el.show();
@@ -74,11 +81,14 @@ App.Station = App.Model.extend({});
  * @param key string
  * @return {string}
  */
-App.i18n = function(key) {
-    return App.i18n_dict[key] || key;
-    //return $.i18n.t(key);
+App.i18n = function(key, options) {
+    var chunks = key.split('.'),
+        val = App.i18n_dict[chunks[0]];
+    for (var i = 1, len = chunks.length; i < len; i++) {
+        val = val[chunks[i]];
+    }
+    return val || key;
 };
-
 
 // как-то громоздко, потенциально надо упростить
 (function(){
@@ -127,16 +137,30 @@ App.klass = function(proto) {
 };
 
 /**
- * Global events mediator
+ * Глобальный посредник событий.
  *
  * @type {object}
  */
 App.mediator = _.clone(Backbone.Events);
 
+/**
+ * Возвращает абсолютный путь с доменом и протоколом.
+ *
+ * @param path - относительный путь
+ * @return {String} - абсолютный путь
+ */
 App.getUrl = function(path) {
     var loc = document.location;
     return loc.protocol + '//' + loc.hostname + '/' + (path ? path : '');
-}
+};
+
+/**
+ * Уведомляем компоненты о выгрузке окна.
+ */
+$(window).bind('beforeunload', function(){
+    App.mediator.trigger('app:unload');
+});
+
 
 /**
  * i18n template helper

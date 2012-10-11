@@ -18,7 +18,7 @@
         "settings": "settings"
     },
 
-    "register": {
+    "signup": {
         "title": "Sign up",
         "button": "Start",
         "notice": "no spam, you do not need to confirm",
@@ -44,7 +44,7 @@
             "password": "Password"
         },
         "button": "Login",
-        "register": "sign-up",
+        "signup": "sign-up",
         "amnesia": "forgot password?"
     },
 

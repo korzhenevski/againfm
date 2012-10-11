@@ -471,7 +471,7 @@ App.TopHolderView = App.View.extend({
     },
 
     setupValidator: function(rules, messages) {
-        this.validator = this.getForm().validate({
+        this.validator = this.getForm()._validate({
             focusInvalid: false,
             onfocusout: false,
             ignoreTitle: true,

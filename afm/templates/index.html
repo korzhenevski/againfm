@@ -9,6 +9,7 @@
 </head>
 <body>
 <div class="wrapper">
+    <div class="top-holder"></div>
     <div class="main">
         <div class="wrapper-left">
             <div class="wrapper-left-content">
@@ -40,20 +41,7 @@
         <div class="wrapper-right">
             <div class="wrapper-right-content">
                 <div class="box-holder">
-                    <form class="head-form login hidden">
-                        <div class="form-input">
-                            <input type="text" tabindex="10" class="input" name="login"
-                                   placeholder="{{ _('login.placeholder.login') }}"/>
-                            <span class="pseudo-link register">{{ _('login.register') }}</span>
-                        </div>
-                        <div class="form-input">
-                            <input type="password" tabindex="11" class="input" name="password"
-                                   placeholder="{{ _('login.placeholder.password') }}"/>
-                            <span class="pseudo-link amnesia">{{ _('login.amnesia') }}</span>
-                        </div>
-                        <input type="submit" class="button" disabled="" tabindex="12" value="{{ _('login.button') }}"/>
-                        <p class="notice"></p>
-                    </form>
+                    <form class="head-form login"></form>
                     <div class="user-profile hidden"></div>
                 </div>
                 <div class="radio-sticker"></div>
@@ -102,6 +90,12 @@
 <div id="player-container"></div>
 <canvas id="spectrum"></canvas>
 
+<script>
+    {# словарь мультиязычности #}
+    var App = App || {};
+    App.i18n_dict = {{ bootstrap.i18n|safe }};
+</script>
+
 {% assets "core_scripts" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
@@ -111,21 +105,16 @@
 {% endassets %}
 
 <script>
-    {# словарь мультиязычности #}
-    App.i18n_dict = {{ bootstrap.i18n|safe }};
-</script>
-
-<script>
     $(function(){
+        /*$(document).bind('keyup.ctrl_l', function(){
+            var $form = $('form.login');
+            $form.find(':text').val('test@testing.com');
+            $form.find(':password').val('password');
+            $form.submit();
+        });*/
+
         App.user.set({{ bootstrap.user|json|safe }});
-        App.router = new App.Router();
-        {#  страница станции - /station/N
-            предзагрузка данных в роутер
-        #}
-        {% if station %}
-            App.router.station = {{ station|json|safe }};
-        {% endif %}
-        Backbone.history.start({pushState: true});
+        Backbone.history.start(/*{pushState: true}*/);
     });
 </script>
 

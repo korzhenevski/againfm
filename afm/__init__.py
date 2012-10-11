@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from flask import Flask
 from celery import Celery
 from flask.ext.login import LoginManager
@@ -22,47 +25,25 @@ celery = Celery(__name__)
 celery.conf.add_defaults(app.config)
 
 assets = Environment(app)
-"""
-js = Bundle(
-    'js/jquery-ui-1.8.23.custom.min.js',
-    'js/jquery.watermark.js',
-    'js/jquery.validate.js',
-    'js/jquery.cookie.js',
-    'js/i18next-1.5.5.js',
-    'js/bootstrap-button.js', # lazy
-    'js/underscore.js',
-    'js/backbone.js',
-    'js/handlebars.js',
-    'js/template.js',
-    'js/common.js',
-    'js/comet.js', # lazy
-    'js/app/base.js',
-    'js/app/radio.js',
-    'js/app/user-old.js',
-    'js/app/site.js',
-    'js/app/setup.js',
-filters='uglifyjs', output='js/deploy/afm-packed.%(version)s.js')
-"""
 
 assets.register('core_scripts', Bundle(
-    'js/jquery.min.js',
-    'js/jquery-ui-1.8.23.custom.min.js',
+    'js/libs/jquery.min.js',
+    'js/libs/jquery-ui-1.8.23.custom.min.js',
     # jquery-ui touch events support
-    'js/jquery.ui.touch-punch.js',
-    'js/i18next-1.5.5.js',
-    'js/underscore.js',
-    'js/backbone.js',
+    'js/libs/jquery.ui.touch-punch.js',
+    'js/libs/i18next-1.5.5.js',
+    'js/libs/underscore.js',
+    'js/libs/backbone.js',
     # radio-display
-    'js/jquery.tinyscrollbar.js',
-    'js/jquery.validate.js',
+    'js/libs/jquery.tinyscrollbar.js',
     # radio-player
-    'js/swfobject.js',
+    'js/libs/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js
     #'js/handlebars.runtime.js',
     #'js/render.js',
-    'js/handlebars.js',
-    'js/jquery.cookie.js',
-    'js/comet.js',
+    'js/libs/handlebars.js',
+    'js/libs/jquery.cookie.js',
+    'js/libs/comet.js',
     filters='uglifyjs', output='js/deploy/core.%(version)s.js'))
 
 assets.register('scripts', Bundle(

@@ -114,11 +114,9 @@ a
   input
     &[type=text], &[type=password]
       width: 185px
-    &[type=submit]
-      width: 70px
   a, label, p
-    font-size: 0.8em
-    line-height: 1.6em
+    font-size: 12px
+    line-height: 2em
   .notice
     margin-left: 13px
     clear: both
@@ -158,12 +156,14 @@ a
     height: 200px
   .wrapper-left h1
     font-size: 3.5em
-    line-height: 2em
+    line-height: 2.2em
+  .head-form
+    height: 56px
   .close-box
     width: 500px
     margin: 0 auto
     position: relative
-    top: 58px
+    bottom: -52px
     .close
       display: inline
       height: 20px
@@ -202,7 +202,7 @@ input[type=submit2]
   text-shadow: 0px 1px 0px #cfcfcf
   margin: 0px
   line-height: 20px
-  padding: 5px 0
+  padding: 5px 15px
   cursor: pointer
   outline: none
   +border-radius(5px)
@@ -223,13 +223,13 @@ input[type=submit2]
   margin-left: 10px
 
 .form-input
+  margin-top: 1px
   width: 200px
   float: left
   margin-right: 10px
-  .pseudo-link, label
+  .pseudo-link, label, a
     display: inline-block
     margin-left: 13px
-    margin-top: 3px
   label.error, input.error
     color: #ab0101
   label.valid, input.valid
@@ -239,8 +239,6 @@ input[type=submit2]
   input
     &[type=text]
       width: 280px
-    &[type=submit]
-      width: 100px
   .form-input
     width: 290px
   .notice
@@ -250,11 +248,9 @@ input[type=submit2]
     strong
       color: #fff
 
-
 .amnesia-holder h1
   font-size: 3.2em !important
   line-height: 2.2em !important
-
 
 .radio-controls
   margin-left: 55px

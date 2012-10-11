@@ -1,10 +1,11 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import pymongo
 import ujson as json
-from . import app, db, login_manager, tasks, i18n, redis
+from . import app, db, login_manager, tasks, i18n
 from .forms import RegisterForm
-from flask import jsonify, request, render_template, redirect, abort, url_for
+from flask import jsonify, request, render_template, redirect, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from .models import UserFavoritesCache
 

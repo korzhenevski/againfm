@@ -6,7 +6,7 @@
 
 $.extend($.fn, {
 	// http://docs.jquery.com/Plugins/Validation/validate
-	validate: function( options ) {
+	_validate: function( options ) {
 
 		// if nothing is selected, return nothing; can't chain anyway
 		if (!this.length) {
@@ -86,10 +86,10 @@ $.extend($.fn, {
 	// http://docs.jquery.com/Plugins/Validation/valid
 	valid: function() {
 		if ( $(this[0]).is('form')) {
-			return this.validate().form();
+			return this._validate().form();
 		} else {
 			var valid = true;
-			var validator = $(this[0].form).validate();
+			var validator = $(this[0].form)._validate();
 			this.each(function() {
 				valid &= validator.element(this);
 			});
@@ -324,7 +324,7 @@ $.extend($.validator, {
 				.validateDelegate("[type='radio'], [type='checkbox'], select, option", "click", delegate);
 
 			if (this.settings.invalidHandler) {
-				$(this.currentForm).bind("invalid-form.validate", this.settings.invalidHandler);
+				$(this.currentForm).bind("invalid-form._validate", this.settings.invalidHandler);
 			}
 		},
 
@@ -1023,7 +1023,7 @@ $.extend($.validator, {
 			$.ajax($.extend(true, {
 				url: param,
 				mode: "abort",
-				port: "validate" + element.name,
+				port: "_validate" + element.name,
 				dataType: "json",
 				data: data,
 				success: function(response) {

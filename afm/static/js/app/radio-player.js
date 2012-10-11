@@ -94,28 +94,27 @@ App.Player = App.klass({
         this.mediator.on('player:set_volume', function(volume){
             this.setVolume(parseInt(volume, 10));
         }, this);
+        this.engine.on('ready', this.engineReady, this);
         // публикуем в медиатор локальные события
         this.engine.publishEvents('ready playing stopped error', this.mediator, 'player');
         this.publishEvents('error', this.mediator, 'player');
-        // устанавливаем громкость
-        if ($.cookie('volume')) {
-            this.setVolume(parseInt($.cookie('volume')));
-        }
-        this.engine.on('ready', this.engineReady, this);
         // если радио играет, при выгрузке страницы флеш кидает ошибку
         // поэтому останавливаем поток до выгрузки
         // TODO: важно понять, кто за это отвечает :)
-        $(window).bind('beforeunload', _.bind(function(){
+        this.mediator.on('app:unload', function(){
             if (this.engine.ready) {
                 this.engine.stop();
             }
-        }, this));
+        }, this);
+        // громкость из cookie
+        this.volume = $.cookie('volume') ? parseInt($.cookie('volume')) : this.volume;
     },
 
     engineReady: function() {
         this.on('volume_changed', function(){
             this.engine.setVolume(this.volume / 100);
         }, this);
+        this.engine.setVolume(this.volume / 100);
         // если к моменту загрузки плеера есть станция и поток,
         // включаем плеер
         if (this.station && this.stream) {
@@ -308,21 +307,28 @@ App.Radio = App.Model.extend({
  *
  * @type {function}
  */
-App.PlayerFaviconView = App.View.extend({
-    el: '#favicon',
+App.PlayerFaviconView = App.klass({
+    id: 'favicon',
     mediator: App.mediator,
 
     initialize: function() {
-        this.mediator.on('player:playing', this.playIcon, this);
-        this.mediator.on('player:stopped', this.defaultIcon, this);
+        this.mediator.on('player:playing', function() {
+            this.setIcon('favicon_play');
+        }, this);
+
+        this.mediator.on('player:stopped', function() {
+            this.setIcon('favicon');
+        }, this);
     },
 
-    playIcon: function() {
-        this.$el.attr('href', '/static/i/favicon_play.ico');
-    },
-
-    defaultIcon: function() {
-        this.$el.attr('href', '/static/i/favicon.ico');
+    setIcon: function(name) {
+        var icon = $('<link>').attr({
+            id: this.id,
+            rel: 'shortcut icon',
+            type: 'image/ico',
+            href: '/static/i/' + name + '.ico'
+        });
+        $('#' + this.id).replaceWith($(icon));
     }
 });
 

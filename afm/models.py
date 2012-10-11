@@ -1,8 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import string
 from . import app, login_manager, db
-from afm.helpers import naturalday
 
 try:
     from flask.ext.mongokit import Document
