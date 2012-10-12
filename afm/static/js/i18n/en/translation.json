@@ -37,6 +37,10 @@
                 "required": "choose a password",
                 "minlength": "at least six characters, please"
             }
+        },
+        "error": {
+            "email_exists": "email is already in use",
+            "bad_request": "invalid form data"
         }
     },
 
@@ -45,7 +49,11 @@
             "login": "Email",
             "password": "Password"
         },
-        "button": "Login"
+        "button": "Login",
+        "error": {
+            "auth": "Please check that you have entered your login and password correctly",
+            "no_user": "No such account"
+        }
     },
 
     "amnesia": {
@@ -64,6 +72,9 @@
             "title": "A new password has been sent.",
             "check_email": "Check email",
             "link_hint": "opens in new window"
+        },
+        "error": {
+            "no_user": "No such account"
         }
     },
 
@@ -71,7 +82,7 @@
         "placeholder": "radio search"
     },
 
-    "topholder": {
+    "topbox": {
         "cancel": "cancel"
     },
 
@@ -124,5 +135,9 @@
             "404": "Nothing found",
             "500": "Search not available"
         }
+    },
+
+    "button": {
+        "loadingText": "Loading..."
     }
 }

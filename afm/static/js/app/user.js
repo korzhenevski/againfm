@@ -15,18 +15,18 @@ App.User = App.Model.extend({
         }, this);
     },
 
-    login: function(params, options) {
+    login: function(params) {
         if (this.isLogged()) {
             return;
         }
-        $.post(this.url + 'login', params, this._callback('login_error'));
+        return $.post(this.url + 'login', params, this._callback('login_error'));
     },
 
     signup: function(params) {
         if (this.isLogged()) {
             return;
         }
-        $.post(this.url + 'signup', params, this._callback('signup_error'));
+        return $.post(this.url + 'signup', params, this._callback('signup_error'));
     },
 
     logout: function() {
@@ -35,13 +35,13 @@ App.User = App.Model.extend({
         }
 
         var self = this;
-        $.post(this.url + 'logout').always(function(){
+        return $.post(this.url + 'logout').always(function(){
             self.clear();
         });
     },
 
-    amnesia: function(params, callback) {
-        $.post(this.url + 'amnesia', params, _.bind(function(result){
+    amnesia: function(params) {
+        return $.post(this.url + 'amnesia', params, _.bind(function(result){
             if (result.error) {
                 this.trigger('amnesia_error', result.error);
             } else {
@@ -86,7 +86,8 @@ App.LoginFormView = App.View.extend({
         this.user.on('logged logout', this.render, this);
         // вывод ошибки логина
         this.user.on('login.error', function(error){
-            this.$('.notice').addClass('notice-error').show().text(error);
+            var text = App.i18n('login.error.' + error);
+            this.$('.notice').addClass('notice-error').show().text(text);
         }, this);
         this.render();
     },
@@ -113,7 +114,9 @@ App.LoginFormView = App.View.extend({
         if (!this.valid) {
             return false;
         }
-        this.user.login(this.serializeForm());
+        this.loadingButton(function(){
+            return this.user.login(this.serializeForm());
+        });
         return false;
     }
 });
@@ -162,114 +165,83 @@ App.UserBarView = App.View.extend({
 });
 
 /**
- * Представление для выпадающих сверху плашек.
- * Обеспечивает анимацию и валидацию формы.
+ * Представление-лейаут выезжающей сверху панели.
  *
  * @type {function}
  */
-App.TopHolderView = App.View.extend({
-    el: '.top-holder',
-    // базовый шаблон
-    layout: App.getTemplate('top_holder'),
+App.TopBox = App.View.extend({
+    el: '.top-box',
     events: {
-        'click .close': 'slideUp'
-    },
-    // дочерняя модель перечисляет какие эвенты от юзера ей интересны
-    user_events: {},
-    // заголовок плашки, может быть i18n-ключем
-    title: '',
-    // классы для обертки,
-    // нужны для кастомизации заголовков лейаута
-    layout_class: '',
-    mediator: App.mediator,
-
-    initialize: function(options) {
-        this.user = options.user;
-        _.bindAll(this, 'submit');
-        _.each(this.user_events, function(callback, event){
-            this.user.on(event, this[callback], this);
-        }, this);
-        // показываем только одну плашку, остальные скрываются
-        // следим по событию
-        this.mediator.on('top_holder:show', function(view){
-            if (view != this) {
-                this.$holder.hide();
-            }
-        }, this);
+        'click .close': 'hide'
     },
 
-    slideDown: function() {
-        this.mediator.trigger('top_holder:show', this);
-        this.render_layout(this.render());
-        var $el = this.$holder;
-        $el.show().animate({marginTop: 0}, 'linear', function() {
-            // ставим фокус на первое текстовое поле
-            var $text = $el.find(':text:first');
-            if ($text.val()) {
-                // если поле уже содержит текст,
-                // эмулируем нажатие для срабатывания валидатора и разблокировки формы
-                // (формы с одним полем будут рады)
-                $text.keyup();
-            } else {
-                $text.focus();
-            }
-        });
-        return this;
-    },
-
-    slideUp: function() {
-        var $el = this.$holder;
-        $el.animate({marginTop: $el.height() * -1}, 'linear', _.bind(function() {
-            $el.hide();
-            this.trigger('hide');
-        }, this));
-        return this;
-    },
-
-    render_layout: function(content) {
-        this.$el.html(this.layout({
-            title: App.i18n(this.title),
-            layout_class: this.layout_class,
-            content: content
-        }));
-        this.$holder = this.$('.form-holder');
-        var $form = this.$('form');
-        if ($form) {
-            this.setupValidator($form);
-            $form.submit(this.submit);
+    show: function(view) {
+        if (this.view) {
+            this.view.remove();
         }
+        view.on('hide', this.hide, this);
+        view.on('refresh', function(render){
+            this.$el.html(render);
+        }, this);
+        this.$el.html(view.render());
+        this.$el.show().animate({marginTop: 0}, 'linear', _.bind(function(){
+            this.$('form :text:first').focus();
+            this.$('.close').show();
+        }, this));
+        this.view = view;
     },
 
-    render: function() {
-        return this.template();
+    hide: function() {
+        if (this.view) {
+            this.view.remove();
+            this.view = null;
+        }
+        var $el = this.$el;
+        $el.animate({marginTop: $el.height() * -1}, 'linear', function(){
+            $el.hide();
+        });
+        this.$('.close').hide();
+        this.trigger('hide');
+    }
+});
+
+/**
+ * Абстрактное представление формы для TopBox.
+ *
+ * @type {function}
+ */
+App.TopBoxForm = App.View.extend({
+    hide: function() {
+        this.trigger('hide');
     },
 
-    setupValidator: function($form) {
-        this.validator = new FormValidator($form, this.validation);
-        this.validator.on('field', function($el, error) {
+    setupValidator: function() {
+        this.validator = new FormValidator(this.$el, this.validation);
+        this.validator.on('field', function(node, error) {
             this.$('label.error').remove();
             if (error) {
-                $el.removeClass('valid');
-                $el.after($('<label class="error">').text(error));
+                node.removeClass('valid');
+                node.after($('<label class="error">').text(error));
             } else {
-                $el.addClass('valid');
+                node.addClass('valid');
             }
         }, this);
-
-        this.$('form').on('keyup', 'input', _.bind(function(){
-            // при обновлении статуса формы
-            // восстанавливаем первоначальный хинт
-            if (this.errorNotice) {
-                this.errorNotice.remove();
-                this.errorNotice = false;
-                this.$('.notice').show();
-            }
-            console.log('restore');
-        }, this));
 
         this.validator.on('valid', function(valid) {
-           this.$('form :submit').prop('disabled', !valid);
+            this.$(':submit').prop('disabled', !valid);
         }, this);
+
+        this.validator.validateForm();
+        this.$('input').bind('textchange', _.bind(this._removeErrorNotice, this));
+    },
+
+    _removeErrorNotice: function() {
+        if (!this.errorNotice) {
+            return;
+        }
+        this.errorNotice.remove();
+        this.errorNotice = false;
+        this.$('.notice').show();
     },
 
     /**
@@ -289,10 +261,8 @@ App.TopHolderView = App.View.extend({
  *
  * @type {function}
  */
-App.UserSignupView = App.TopHolderView.extend({
+App.UserSignup = App.TopBoxForm.extend({
     template: App.getTemplate('user_signup'),
-    email_exists: App.getTemplate('user_email_exists'),
-    title: 'signup.title',
     validation: {
         rules: {
             email: {required: true, email: true},
@@ -300,26 +270,31 @@ App.UserSignupView = App.TopHolderView.extend({
         },
         messages: App.i18n('signup.validation')
     },
-    user_events: {
-        'signup_error': 'signupError',
-        'logged': 'slideUp'
+    events: {
+        'submit': 'submit'
+    },
+
+    initialize: function() {
+        this.model.on('signup_error', this.error, this);
+        this.model.on('logged', this.hide, this);
+    },
+
+    render: function() {
+        var $content = $(this.template());
+        this.setElement($content.find('form'));
+        this.setupValidator();
+        return $content;
     },
 
     submit: function() {
-        this.user.signup(this.serializeForm());
+        this.loadingButton(function(){
+            return this.model.signup(this.serializeForm());
+        });
         return false;
     },
 
-    signupError: function(error) {
-        if (error == 'email_exists') {
-            // если адрес уже существует, показываем ссылку на форму
-            // где куда прокидываем адрес почты
-            this.showError(this.email_exists({
-                email: this.$('input[name=email]').val()
-            }));
-        } else {
-            this.showError(error);
-        }
+    error: function(code) {
+        this.showError(App.i18n('signup.error.' + code));
     }
 });
 
@@ -328,10 +303,8 @@ App.UserSignupView = App.TopHolderView.extend({
  *
  * @type {function}
  */
-App.UserAmnesiaView = App.TopHolderView.extend({
+App.UserAmnesia = App.TopBoxForm.extend({
     template: App.getTemplate('user_amnesia'),
-    layout_class: 'amnesia-holder',
-    title: 'amnesia.title',
     result: App.getTemplate('password_reset'),
     validation: {
         rules: {
@@ -339,25 +312,36 @@ App.UserAmnesiaView = App.TopHolderView.extend({
         },
         messages: App.i18n('amnesia.validation')
     },
-    user_events: {
-        'amnesia_error': 'passwordReset',
-        'password_reset': 'passwordReset',
-        'logged': 'slideUp'
+    events: {
+        'submit': 'submit'
     },
-    // подставляется в форму
-    email: '',
+
+    initialize: function() {
+        this.model.on('amnesia_error', this.error, this);
+        this.model.on('password_reset', this.passwordReset, this);
+    },
 
     render: function() {
-        return this.template({email: this.email});
+        var $content = $(this.template({email: this.email}));
+        this.setElement($content.find('form'));
+        this.setupValidator();
+        return $content;
     },
 
     submit: function() {
-        this.user.amnesia(this.serializeForm());
+        this.loadingButton(function(){
+            return this.model.amnesia(this.serializeForm());
+        });
         return false;
     },
 
     passwordReset: function(params) {
-        this.render_layout(this.result(params));
+        // эвент обновляет контент плашки
+        this.trigger('refresh', this.result(params));
+    },
+
+    error: function(code) {
+        this.showError(App.i18n('amnesia.error.' + code));
     }
 });
 
@@ -370,27 +354,20 @@ App.UserRouter = Backbone.Router.extend({
 
     initialize: function(options) {
         this.user = options.user;
+        this.topbox = new App.TopBox();
+        this.topbox.on('hide', this.navigateToPrevious, this);
     },
 
     signup: function() {
-        if (!this.signupView) {
-            this.signupView = new App.UserSignupView({user: this.user});
-            this.signupView.on('hide', this.navigateToPrevious, this);
-        }
-        this.signupView.slideDown();
+        this.topbox.show(new App.UserSignup({model: this.user}));
     },
 
-    amnesia: function(email) {
-        if (!this.amnesiaView) {
-            this.amnesiaView = new App.UserAmnesiaView({user: this.user});
-            this.amnesiaView.on('hide', this.navigateToPrevious, this);
-        }
-        this.amnesiaView.email = email || '';
-        this.amnesiaView.slideDown();
+    amnesia: function() {
+        this.topbox.show(new App.UserAmnesia({model: this.user}));
     },
 
     navigateToPrevious: function() {
-        this.navigate('/');
+        this.navigate('/', {replace: true});
     }
 });
 

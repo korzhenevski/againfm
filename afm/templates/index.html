@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="top-holder"></div>
+    <div class="top-box hidden"></div>
     <div class="main">
         <div class="wrapper-left">
             <div class="wrapper-left-content">
@@ -106,7 +106,9 @@
 {% endassets %}
 
 <script>
+
     $(function(){
+        $.fn.button.defaults = App.i18n('button');
         /*$(document).bind('keyup.ctrl_l', function(){
             var $form = $('form.login');
             $form.find(':text').val('test@testing.com');

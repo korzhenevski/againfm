@@ -13,6 +13,8 @@ server {
 	}
 
 	location /static {
+		expires 7d;
+		add_header Cache-Control public;
 		alias /var/www/againfm/afm/static;
 	}
 }

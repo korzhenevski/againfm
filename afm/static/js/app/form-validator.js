@@ -35,37 +35,40 @@ var FormValidator = App.klass({
         this.options = options;
         this.form = $(form);
         // валидаторы срабатывают по тексту и смене фокуса
-        this.form.on('keyup blur', _.bind(this._validate, this));
+        this.form.on('keyup blur', _.bind(this._event, this));
         // блокируем submit если форма невалидна
         this.form.submit(_.bind(function(){
             return this.isValid();
         }, this));
-        _.each(options.rules, function(rule, name){
-            this.valid[name] = false;
-        }, this);
     },
 
-    _validate: function(e) {
-        var $target = $(e.target),
-            name = $target.attr('name'),
-            rule = this.options.rules[name];
-        if (!rule) {
-            return;
-        }
+    validateForm: function() {
+        _.each(this.options.rules, function(rule, name){
+            this.validateField(this.form.find('[name='+name+']'), name);
+        }, this);
+        this.trigger('valid', this.isValid());
+    },
 
+    validateField: function($field, name) {
+        var rule = this.options.rules[name];
         delete this.errors[name];
         _.each(rule, function(param, validator_name){
             var validator = this.validators[validator_name];
             if (!validator || this.errors[name]) {
                 return;
             }
-            if (!validator($target, param)) {
+            if (!validator($field, param)) {
                 this.errors[name] = this.options.messages[name][validator_name] || validator_name + ' error';
             }
         }, this);
-
         this.valid[name] = !this.errors[name];
-        this.trigger('field', $target, this.errors[name]);
+    },
+
+    _event: function(e) {
+        var $field = $(e.target),
+            name = $field.attr('name');
+        this.validateField($field, name);
+        this.trigger('field', $field, this.errors[name]);
         this.trigger('valid', this.isValid());
     },
 

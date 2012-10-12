@@ -19,6 +19,8 @@
 @import "checkbox/*.png"
 @import "common/*.png"
 
+$left-width: 550px
+
 html, body
   height: 100%
 
@@ -90,7 +92,7 @@ a
 .wrapper-left
   overflow: hidden
   float: left
-  width: 500px
+  width: $left-width
   height: 340px
 
 .wrapper-left, .wrapper-right
@@ -133,7 +135,7 @@ a
 
 .wrapper-right
   .head-form, .box-holder
-    width: 500px
+    width: $left-width
     margin: 0 auto
     padding-top: 2px
 
@@ -141,7 +143,22 @@ a
   overflow: hidden
   height: 70px
 
-.form-holder
+.amnesia
+  input
+    &[type=text]
+      width: 280px
+  .form-input
+    width: 290px
+  .password-reset
+    font-size: 1em
+  .notice
+    a
+      font-size: 1em
+      color: #03cbfd
+    strong
+      color: #fff
+
+.top-box
   background-color: black
   width: 100%
   height: 200px
@@ -149,7 +166,6 @@ a
   top: 0px
   left: 0px
   margin-top: -200px
-  display: none
   z-index: 1000
   +background(linear-gradient(#2a2e31, #000000))
   .wrapper-left,  .wrapper-right
@@ -160,7 +176,7 @@ a
   .head-form
     height: 56px
   .close-box
-    width: 500px
+    width: $left-width
     margin: 0 auto
     position: relative
     bottom: -52px
@@ -236,23 +252,6 @@ form
   .pseudo-link, label, a
     display: inline-block
     margin-left: 13px
-
-.amnesia
-  input
-    &[type=text]
-      width: 280px
-  .form-input
-    width: 290px
-  .notice
-    a
-      font-size: 1em
-      color: #03cbfd
-    strong
-      color: #fff
-
-.amnesia-holder h1
-  font-size: 3.2em !important
-  line-height: 2.2em !important
 
 .radio-controls
   margin-left: 55px

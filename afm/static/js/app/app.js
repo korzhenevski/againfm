@@ -66,6 +66,19 @@ App.View = Backbone.View.extend({
             })
         }
         return serialized;
+    },
+
+    /**
+     * Хелпер для смены состояния кнопки при ajax-запросе.
+     *
+     * @param callback - колбек возвращающий Deferred
+     */
+    loadingButton: function(callback) {
+        var $submit = this.$(':submit');
+        $submit.button('loading');
+        callback.apply(this).always(function(){
+            $submit.button('reset');
+        });
     }
 });
 
@@ -89,8 +102,10 @@ App.Station = App.Model.extend({});
 App.i18n = function(key, options) {
     var chunks = key.split('.'),
         val = App.i18n_dict[chunks[0]];
-    for (var i = 1, len = chunks.length; i < len; i++) {
-        val = val[chunks[i]];
+    if (val) {
+        for (var i = 1, len = chunks.length; i < len; i++) {
+            val = val[chunks[i]];
+        }
     }
     return val || key;
 };

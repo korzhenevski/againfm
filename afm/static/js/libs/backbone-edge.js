@@ -536,16 +536,16 @@
     // Check if the model is currently in a valid state. It's only possible to
     // get into an *invalid* state if you're using silent changes.
     isValid: function(options) {
-      return !this._validate || !this._validate(this.attributes, options);
+      return !this.validate || !this.validate(this.attributes, options);
     },
 
     // Run validation against the next complete set of model attributes,
     // returning `true` if all is well. If a specific `error` callback has
     // been passed, call that instead of firing the general `"error"` event.
     _validate: function(attrs, options) {
-      if (options && options.silent || !this._validate) return true;
+      if (options && options.silent || !this.validate) return true;
       attrs = _.extend({}, this.attributes, attrs);
-      var error = this._validate(attrs, options);
+      var error = this.validate(attrs, options);
       if (!error) return true;
       if (options && options.error) options.error(this, error, options);
       this.trigger('error', this, error, options);

@@ -31,11 +31,12 @@ assets.register('core_scripts', Bundle(
     'js/libs/jquery-ui-1.8.23.custom.min.js',
     # jquery-ui touch events support
     'js/libs/jquery.ui.touch-punch.js',
-    'js/libs/i18next-1.5.5.js',
-    'js/libs/underscore.js',
-    'js/libs/backbone.js',
+    'js/libs/lodash.underscore.min.js',
+    'js/libs/backbone-edge.js',
     # radio-display
     'js/libs/jquery.tinyscrollbar.js',
+    'js/libs/jquery.textchange.js',
+    'js/libs/bootstrap-button.js',
     # radio-player
     'js/libs/swfobject.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js

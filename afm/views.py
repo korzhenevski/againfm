@@ -48,13 +48,13 @@ def api_user_amnesia():
         send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
         email_provider = get_email_provider(user.email)
         return jsonify({'email_provider': email_provider})
-    return jsonify({'error': 'No such user'})
+    return jsonify({'error': 'no_user'})
 
 @app.route('/api/user/signup', methods=['POST'])
-def signup():
+def api_user_signup():
     form = SignupForm(request.form)
     if not form.validate():
-        return jsonify({'error': 'bad request'})
+        return jsonify({'error': 'bad_request'})
     if db.User.find_one({'email': form.email.data}):
         return jsonify({'error': 'email_exists'})
     # create
@@ -115,9 +115,8 @@ def login():
             login_user(user)
             return jsonify(user.get_public_data())
         else:
-            return jsonify({'error': 'Please check that you have entered your login and password correctly'})
-    else:
-        return jsonify({'error': 'No such account'})
+            return jsonify({'error': 'auth'})
+    return jsonify({'error': 'no_user'})
 
 @app.route('/api/playlist/tag/<tagname>')
 def api_tag_playlist(tagname):
