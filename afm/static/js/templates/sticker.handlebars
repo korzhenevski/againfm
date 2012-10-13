@@ -5,7 +5,10 @@
     </h1>
     <h2 title="{{subtitle}}">{{subtitle}}</h2>
     {{#if has_station_favorite}}
-        <div class="station bookmark-station{{#if station.favorite}} favorite-station{{/if}}">{{station.title}}</div>
+        <div class="station bookmark-station{{#if station.favorite}} favorite-station{{/if}}">
+            <i class="icon"></i>
+            {{station.title}}
+        </div>
     {{else}}
         <div class="station">{{station.title}}</div>
     {{/if}}

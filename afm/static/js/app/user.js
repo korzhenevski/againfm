@@ -180,7 +180,7 @@ App.TopBox = App.View.extend({
             this.view.remove();
         }
         view.on('hide', this.hide, this);
-        view.on('refresh', function(render){
+        view.on('render', function(render){
             this.$el.html(render);
         }, this);
         this.$el.html(view.render());
@@ -337,7 +337,7 @@ App.UserAmnesia = App.TopBoxForm.extend({
 
     passwordReset: function(params) {
         // эвент обновляет контент плашки
-        this.trigger('refresh', this.result(params));
+        this.trigger('render', this.result(params));
     },
 
     error: function(code) {
@@ -349,25 +349,88 @@ App.UserRouter = Backbone.Router.extend({
     routes: {
         'signup': 'signup',
         'amnesia': 'amnesia',
-        'amnesia/:email': 'amnesia'
+        'user/favorites': 'favorites',
+        'user/settings': 'settings'
     },
 
     initialize: function(options) {
         this.user = options.user;
         this.topbox = new App.TopBox();
         this.topbox.on('hide', this.navigateToPrevious, this);
+
+        this.panelbox = new App.PanelBox();
     },
 
+    /**
+     * Регистрация
+     */
     signup: function() {
         this.topbox.show(new App.UserSignup({model: this.user}));
     },
 
+    /**
+     * Сброс пароля
+     */
     amnesia: function() {
         this.topbox.show(new App.UserAmnesia({model: this.user}));
     },
 
+    /**
+     * Избранные треки
+     */
+    favorites: function() {
+        if (!this.user.isLogged()) {
+            this.navigate('/');
+        }
+        this.panelbox.show(new App.UserFavoritesView());
+    },
+
+    /**
+     * Настройки аккаунта
+     */
+    settings: function() {
+        if (!this.user.isLogged()) {
+            this.navigate('/');
+        }
+        //this.panelbox.show(new App.UserFavoritesView());
+    },
+
     navigateToPrevious: function() {
         this.navigate('/', {replace: true});
+    }
+});
+
+App.PanelBox = App.View.extend({
+    events: {
+        'click .close': 'hide'
+    },
+
+    show: function(view) {
+        if (this.view) {
+            this.view.remove();
+        }
+        view.on('hide', this.hide, this);
+        view.on('render', function(render){
+            this.$el.html(render);
+        }, this);
+        this.$el.html(view.render());
+        this.$el.show();
+        this.view = view;
+    },
+
+    hide: function() {
+        if (this.view) {
+            this.view.remove();
+            this.view = null;
+        }
+        this.$el.hide();
+        this.trigger('hide');
+    }
+});
+
+App.UserFavoritesView = App.View.extend({
+    hide: function() {
+        this.trigger('hide');
     }
 });
 

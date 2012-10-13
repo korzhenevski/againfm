@@ -48,6 +48,7 @@
                 <div class="user-panel"></div>
             </div>
         </div>
+
         <div class="wrapper-wide">
             <div class="radio-display">
                 <div class="radio-display-head">
@@ -106,17 +107,10 @@
 {% endassets %}
 
 <script>
-
-    $(function(){
+    $(function () {
         $.fn.button.defaults = App.i18n('button');
-        /*$(document).bind('keyup.ctrl_l', function(){
-            var $form = $('form.login');
-            $form.find(':text').val('test@testing.com');
-            $form.find(':password').val('password');
-            $form.submit();
-        });*/
-
         App.user.set({{ bootstrap.user|json|safe }});
+        new App.Router();
         Backbone.history.start(/*{pushState: true}*/);
     });
 </script>
