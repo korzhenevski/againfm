@@ -203,15 +203,10 @@ def favorite_track(track_id):
 
 @app.route('/api/user/favorites')
 @login_required
-def favorites_list():
-    query = {'user_id': current_user._id}
-    last_id = request.args.get('last_id', 0, type=int)
-    if last_id:
-        query['id'] = {'$lt': last_id}
-    favorite = db.Favorite.find(query).sort('id', pymongo.DESCENDING).limit(1)
-    if not favorite:
-        return jsonify({})
-    return jsonify(favorite.get_public_data())
+def api_user_favorites():
+    favorites = db.FavoriteTrack.find({'user_id': current_user.id})
+    favorites = [favorite.get_public_data() for favorite in favorites]
+    return jsonify({'objects': favorites})
 
 """
 быстрый фильтр-сериализатор json
@@ -253,6 +248,13 @@ def station_details(station_id):
         redirect('/')
 
     return render_template('index.html', station=station.get_public_data())
+
+@app.route('/user/favorites')
+@app.route('/user/settings')
+def user_routes():
+    if not current_user.is_authenticated():
+        redirect('/')
+    return render_template('index.html')
 
 @app.template_filter('i18n')
 def i18n_template_filter(key):

@@ -85,6 +85,7 @@ a
   background-image: url('../i/background_pattern.png')
   position: relative
   min-height: 100%
+  width: 100%
 
 .main
   height: 630px
@@ -658,7 +659,7 @@ $station-icon-shift: 5px
   z-index: -10
 
 .user-profile
-  margin-left: 40px
+  margin-left: 65px
   width: 350px
   height: 50px
   background-color: #414141
@@ -716,9 +717,10 @@ $station-icon-shift: 5px
       text-decoration: none
       border-bottom: 1px solid #fff
 
-.user-panel
-  width: 50%
+.panel-box
+  width: 45%
   max-width: 700px
+  margin-top: -1000px
   background-color: #fff
   background-image: url('../i/favorites/back.jpg')
   color: #000
@@ -729,6 +731,7 @@ $station-icon-shift: 5px
   border: 1px solid #aaa
   padding-bottom: 1em
   right: 100px
+  +box-shadow(#111 5px 5px 20px 5px)
   p
     color: #000
   .text
@@ -754,7 +757,6 @@ $station-icon-shift: 5px
     padding-left: 60px
     color: #000
   fieldset
-    padding-top: 5px
     padding-left: 60px
     border-top: 1px solid #c1c1c1
   legend
@@ -764,12 +766,11 @@ $station-icon-shift: 5px
  
 .user-favorites
   overflow: auto
-  max-height: 480px
+  max-height: 400px
   .help
     text-align: center
     margin: 1em 0 2em 0
     img
-      margin-top: 2em
       margin-bottom: 0.5em
       margin-left: 1em
     p
@@ -779,34 +780,24 @@ $station-icon-shift: 5px
     width: 100%
     background-image: url('../i/favorites/back.jpg')
     margin-bottom: 1em
-  tr
+  .favorite
     border: 1px solid transparent
     &:hover
-      .state
-        text-indent: -2000px
-        background-image: url('../i/bbstar/star-selected.png')
-        background-position: center center
-        background-repeat: no-repeat
-        background-color: #fff
-      td
-        background-color: #fff
+      background-color: #fff
+    td
+      padding: 0.5em 0
+      cursor: pointer
   .deleted
-    &:hover
-      .state
-        background-image: url('../i/bbstar/star-deleted.png')
     h2
       text-decoration: line-through
-        
-  td
-    padding: 0.5em 0
-    cursor: pointer
+      color: #999
   .state
     width: 60px
     text-align: center
     color: #999
     font-size: 0.9em
   h2, h3
-    line-height: 1.2em
+    line-height: 1.3em
   h2
     font-weight: bold
   h3

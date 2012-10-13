@@ -32,10 +32,11 @@ assets.register('core_scripts', Bundle(
     # jquery-ui touch events support
     'js/libs/jquery.ui.touch-punch.js',
     'js/libs/lodash.underscore.min.js',
-    'js/libs/backbone-edge.js',
+    'js/libs/backbone.js',
     # radio-display
     'js/libs/jquery.tinyscrollbar.js',
     'js/libs/jquery.textchange.js',
+    #'js/libs/jquery.transition.js',
     'js/libs/bootstrap-button.js',
     # radio-player
     'js/libs/swfobject.js',

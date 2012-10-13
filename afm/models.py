@@ -12,6 +12,7 @@ from hashlib import md5
 from random import choice
 from datetime import datetime
 import time
+from .helpers import naturalday
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -123,6 +124,14 @@ class FavoriteTrack(AbstractFavorite):
     @classmethod
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
+
+    def get_public_data(self):
+        fields = self.structure.keys()
+        data = dict([(k, v) for k, v in self.iteritems() if k in fields])
+        ts = datetime.utcfromtimestamp(data['created_at'])
+        data['time'] = ts.strftime("%H:%M")
+        data['favorite'] = bool(data['favorite'] % 2)
+        return data
 
 # TODO: сюда хорошо добавить dbref на station
 @db.register

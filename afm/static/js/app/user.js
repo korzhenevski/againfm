@@ -130,9 +130,7 @@ App.UserBarView = App.View.extend({
     el: '.user-profile',
     template: App.getTemplate('userbar'),
     events: {
-        'click .logout': 'logout',
-        'click .favorites': 'favorites',
-        'click .settings': 'settings'
+        'click .logout': 'logout'
     },
 
     initialize: function(options) {
@@ -150,16 +148,6 @@ App.UserBarView = App.View.extend({
 
     logout: function() {
         this.user.logout();
-        return false;
-    },
-
-    favorites: function() {
-        this.trigger('favorites');
-        return false;
-    },
-
-    settings: function() {
-        this.trigger('settings');
         return false;
     }
 });
@@ -180,15 +168,17 @@ App.TopBox = App.View.extend({
             this.view.remove();
         }
         view.on('hide', this.hide, this);
-        view.on('render', function(render){
-            this.$el.html(render);
-        }, this);
-        this.$el.html(view.render());
+        view.setHtml = _.bind(this.setHtml, this);
+        view.render();
         this.$el.show().animate({marginTop: 0}, 'linear', _.bind(function(){
             this.$('form :text:first').focus();
             this.$('.close').show();
         }, this));
         this.view = view;
+    },
+
+    setHtml: function(html) {
+        this.$el.html(html);
     },
 
     hide: function() {
@@ -253,7 +243,10 @@ App.TopBoxForm = App.View.extend({
         // обычный хинт скрываем и добавляем новый хинт с ошибкой
         this.errorNotice = $('<p class="notice error">').html(error);
         this.$('.notice').hide().before(this.errorNotice);
-    }
+    },
+
+    // заменяется лейаут менеджером
+    setHtml: function(html) {}
 });
 
 /**
@@ -283,7 +276,7 @@ App.UserSignup = App.TopBoxForm.extend({
         var $content = $(this.template());
         this.setElement($content.find('form'));
         this.setupValidator();
-        return $content;
+        this.setHtml($content);
     },
 
     submit: function() {
@@ -325,7 +318,7 @@ App.UserAmnesia = App.TopBoxForm.extend({
         var $content = $(this.template({email: this.email}));
         this.setElement($content.find('form'));
         this.setupValidator();
-        return $content;
+        this.setHtml($content);
     },
 
     submit: function() {
@@ -337,7 +330,7 @@ App.UserAmnesia = App.TopBoxForm.extend({
 
     passwordReset: function(params) {
         // эвент обновляет контент плашки
-        this.trigger('render', this.result(params));
+        this.setHtml(this.result(params))
     },
 
     error: function(code) {
@@ -355,10 +348,12 @@ App.UserRouter = Backbone.Router.extend({
 
     initialize: function(options) {
         this.user = options.user;
+        this.favorites = options.favorites;
         this.topbox = new App.TopBox();
         this.topbox.on('hide', this.navigateToPrevious, this);
 
         this.panelbox = new App.PanelBox();
+        this.panelbox.on('hide', this.navigateToPrevious, this);
     },
 
     /**
@@ -382,7 +377,7 @@ App.UserRouter = Backbone.Router.extend({
         if (!this.user.isLogged()) {
             this.navigate('/');
         }
-        this.panelbox.show(new App.UserFavoritesView());
+        this.panelbox.show(new App.UserFavoritesView({collection: this.favorites}));
     },
 
     /**
@@ -400,7 +395,13 @@ App.UserRouter = Backbone.Router.extend({
     }
 });
 
+/**
+ * Представление панели с контентом.
+ *
+ * @type {function}
+ */
 App.PanelBox = App.View.extend({
+    el: '.panel-box',
     events: {
         'click .close': 'hide'
     },
@@ -409,28 +410,118 @@ App.PanelBox = App.View.extend({
         if (this.view) {
             this.view.remove();
         }
-        view.on('hide', this.hide, this);
-        view.on('render', function(render){
-            this.$el.html(render);
-        }, this);
-        this.$el.html(view.render());
-        this.$el.show();
+        // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
+        view.parent = this;
+        view.render();
+        this.$el.css('marginTop', this.panelMarginTop()).show().animate({marginTop: 0}, 450, 'linear');
         this.view = view;
     },
 
+    // значение верхнего отступа, что-бы контейнер ушел за пределы экрана
+    panelMarginTop: function() {
+        return -1 * (this.$el.outerHeight() + this.$el.position().top);
+    },
+
     hide: function() {
-        if (this.view) {
-            this.view.remove();
-            this.view = null;
-        }
-        this.$el.hide();
+        this.$el.animate({marginTop: this.panelMarginTop()}, 'linear', _.bind(function(){
+            this.$el.hide();
+            // убиваем после анимации, иначе при скрытии виден только пустой контейнер
+            if (this.view) {
+                this.view.remove();
+                this.view = null;
+            }
+        }, this));
         this.trigger('hide');
     }
 });
 
+App.UserFavorite = App.Model.extend({
+    mediator: App.mediator,
+    // этот извращенский подход вызван нежеланием создавать кучу item-view для большого избранного
+    toggleBookmark: function() {
+        var self = this,
+            track_id = this.get('track').id;
+        return $.post('/api/user/favorite/track/' + track_id, function(track){
+            self.set('favorite', track.favorite);
+            self.mediator.trigger('user_favorites:change', track_id, track.favorite);
+        });
+    },
+
+    toJSON: function() {
+        var json = _.clone(this.attributes);
+        json['cid'] = this.cid;
+        return json;
+    }
+});
+
+App.UserFavorites = App.Collection.extend({
+    url: '/api/user/favorites',
+    model: App.UserFavorite,
+    mediator: App.mediator,
+
+    initialize: function() {
+        // обновляем список при
+        // - входе юзера
+        // - добавлении/удалении трека с мини-дисплея
+        this.mediator.on('user:logged sticker:bookmark_track', function(){
+            this.fetch();
+        }, this);
+        this.mediator.on('user:logout', function(){
+            this.reset();
+        }, this);
+    },
+
+    comparator: function(model) {
+        return model.get('created_at');
+    }
+});
+
 App.UserFavoritesView = App.View.extend({
+    template: App.getTemplate('user_favorites'),
+    item_template: App.getTemplate('user_favorite'),
+    label_template: App.getTemplate('favorites_label'),
+    events: {
+        'click .favorite': 'toggleFavorite'
+    },
+
+    initialize: function() {
+        this.collection.on('reset', this.render, this);
+    },
+
+    toggleFavorite: function(e) {
+        var $el = $(e.currentTarget),
+            template = this.item_template,
+            model = this.collection.getByCid($el.data('cid'));
+        model.toggleBookmark().always(function(){
+            $el.replaceWith(template(model.toJSON()));
+        });
+    },
+
+    render: function() {
+        var content = [];
+        this.collection.each(function(model){
+            content.unshift(this.item_template(model.toJSON()));
+        }, this);
+        this.setElement(this.template({content: content.join('')}));
+        this.parent.$el.html(this.$el);
+        this.placeGroupLabels();
+    },
+
+    placeGroupLabels: function() {
+        var group = {};
+        this.parent.$('.favorite').each(function(){
+            var groupKey = App.datediff(this.getAttribute('data-ts'));
+            if (!_.has(group, groupKey)) {
+                group[groupKey] = $(this);
+            }
+        });
+        _.each(group, function($node, label){
+            $node.before(this.label_template(label));
+        }, this)
+    },
+
     hide: function() {
-        this.trigger('hide');
+        this.parent.hide();
     }
 });
 
@@ -449,7 +540,8 @@ Handlebars.registerHelper('user_gravatar_url', function(user, size) {
 
 $(function(){
     App.user = new App.User();
+    App.userFavorites = new App.UserFavorites();
     App.userBar = new App.UserBarView({user: App.user});
     App.loginForm = new App.LoginFormView({user: App.user});
-    App.userRouter = new App.UserRouter({user: App.user});
+    App.userRouter = new App.UserRouter({user: App.user, favorites: App.userFavorites});
 })

@@ -24,13 +24,67 @@ App.getTemplate = function(name) {
 };
 Handlebars.templates = Handlebars.templates || {};
 
+function padzero(val) {
+    val = '' + val;
+    if (val) {
+        if (val.length == 1) {
+            return '0' + val;
+        } else {
+            return val;
+        }
+    }
+    return '00';
+}
+
 /**
- * Декоратор ссылок. Предваряет путь решеткой если нет HTML5 pushState.
+ * Человекочитаемое значение прошедшей даты от таймстемпа.
+ * Возвращает локализованное значение: сегодня, вчера, YYYY.MM.DD
+ *
+ * @param ts int - unix timestrap
+ * @return {string}
+ */
+App.datediff = function(ts) {
+    var res;
+    var date = new Date(ts * 1000),
+        diff = Math.round(((new Date().getTime()) - date.getTime()) / 1000);
+
+    if (diff <= 86400) {
+        res = 'today';
+    } else if (diff <= 86400 * 2) {
+        res = 'yesterday'
+    }
+
+    if (res) {
+        return App.i18n('timediff.' + res);
+    }
+
+    return date.getFullYear() + '.' + padzero(date.getMonth()) + '.' + padzero(date.getDate());
+};
+
+/**
+ * Возвращает время по таймстемпу.
+ *
+ * @param ts int - unix timestrap
+ * @return {string}
+ */
+Handlebars.registerHelper('time', function(ts){
+    var date = new Date(ts * 1000);
+    return padzero(date.getHours()) + ':' + padzero(date.getMinutes());
+});
+
+
+/**
+ * Декоратор ссылок. Предваряет путь решеткой, если нет HTML5 pushState.
  */
 Handlebars.registerHelper('link', function(uri) {
     return '#' + uri;
 });
 
+/**
+ * Абстрактное представление c хелперами.
+ *
+ * @type {function}
+ */
 App.View = Backbone.View.extend({
     show: function() {
         this.$el.show();

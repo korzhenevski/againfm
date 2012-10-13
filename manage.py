@@ -81,5 +81,25 @@ def clear():
         print 'clear %s' % col
         db[col].remove()
 
+@manager.command
+def gen():
+    from time import time
+    from random import randint, choice
+    import string
+    ts = int(time())
+    db.favorite_tracks.remove({'user_id': 65})
+    randstr = lambda: unicode(string.join([choice(string.ascii_lowercase) for i in xrange(randint(4, 20))], ''))
+    for i in xrange(1000):
+        fav = db.FavoriteTrack()
+        fav['user_id'] = 65
+        fav['station'] = {'id': 10, 'title': randstr()}
+        track = u'{} - {}'.format(randstr(), randstr())
+        fav['track'] = {'id': 1000, 'title': track}
+        fav['track']['artist'], fav['track']['name'] = track.split(u' - ')
+        fav['favorite'] = bool(i % 3)
+        fav['created_at'] = ts + randint(-10, 10) * 86400 + randint(0, 86400)
+        fav.save()
+        print fav._id
+
 if __name__ == "__main__":
     manager.run()

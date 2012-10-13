@@ -8,8 +8,10 @@
     <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url }}i/favicon.ico"/>
 </head>
 <body>
+
 <div class="wrapper">
     <div class="top-box hidden"></div>
+    <div class="panel-box"></div>
     <div class="main">
         <div class="wrapper-left">
             <div class="wrapper-left-content">
@@ -45,7 +47,6 @@
                     <div class="user-profile hidden"></div>
                 </div>
                 <div class="radio-sticker"></div>
-                <div class="user-panel"></div>
             </div>
         </div>
 
@@ -96,6 +97,7 @@
     var App = App || {};
     App.i18n_dict = {{ bootstrap.i18n|safe }};
     App.debug = {{ config.DEBUG|tojson }};
+    App.pushState = false;
 </script>
 
 {% assets "core_scripts" %}
@@ -111,7 +113,7 @@
         $.fn.button.defaults = App.i18n('button');
         App.user.set({{ bootstrap.user|json|safe }});
         new App.Router();
-        Backbone.history.start(/*{pushState: true}*/);
+        Backbone.history.start({pushState: App.pushState});
     });
 </script>
 

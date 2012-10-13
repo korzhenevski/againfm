@@ -71,7 +71,14 @@ App.Sticker = App.Model.extend({
         this.on('change:station change:track', function(){
             this.set({trackUnavailable: false});
         });
-
+        // следим за обновлением
+        this.mediator.on('user_favorites:change', function(track_id, favorite){
+            var track = this.get('track');
+            if (track && track.id == track_id) {
+                track.favorite = favorite;
+                this.update('track', track);
+            }
+        }, this);
         // добавление станции в закладки
         // при выходе юзера отключаем
         this.mediator.on('user:logout', function(){
@@ -92,6 +99,7 @@ App.Sticker = App.Model.extend({
                 this.update('station', $.extend(station, response));
             }, this));
         }, this);
+        this.publishEvents('bookmark_station bookmark_track', this.mediator, 'sticker');
     },
 
     bookmarkStation: function() {
@@ -102,6 +110,7 @@ App.Sticker = App.Model.extend({
         station.favorite = !station.favorite;
         this.update('station', station);
         $.post(this.stationBookmarkUrl + station.id);
+        this.trigger('bookmark_station', station.id, station.favorite);
     },
 
     bookmarkTrack: function() {
@@ -112,6 +121,7 @@ App.Sticker = App.Model.extend({
         track.favorite = !track.favorite;
         this.update('track', track);
         $.post('/api/user/favorite/track/' + track.id);
+        this.trigger('bookmark_track', track.id, track.favorite);
     },
 
     // метод для изменения части данных,
