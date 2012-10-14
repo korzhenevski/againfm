@@ -85,11 +85,16 @@ App.LoginFormView = App.View.extend({
         this.user = options.user;
         this.user.on('logged logout', this.render, this);
         // вывод ошибки логина
-        this.user.on('login.error', function(error){
-            var text = App.i18n('login.error.' + error);
-            this.$('.notice').addClass('notice-error').show().text(text);
+        this.user.on('login_error', function(error){
+            var error = App.i18n('login.error.' + error);
+            this.$('.notice').addClass('notice-error').text(error);
         }, this);
+        this.$('input').bind('textchange', _.bind(this._clearError, this));
         this.render();
+    },
+
+    _clearError: function() {
+        this.$('.notice').removeClass('notice-error').text('');
     },
 
     render: function() {
@@ -110,6 +115,7 @@ App.LoginFormView = App.View.extend({
     },
 
     submit: function() {
+        this._clearError();
         this._validate();
         if (!this.valid) {
             return false;
