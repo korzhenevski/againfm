@@ -94,10 +94,12 @@ def change_name():
 
 @app.route('/api/user/settings', methods=['GET','POST'])
 @login_required
-def settings():
+def api_user_settings():
     if request.method == 'POST':
-        current_user.settings = request.json
-        current_user.save()
+        settings = json.loads(request.form['settings'])
+        current_user.update_settings(settings)
+        # reload user via relogin
+        login_user(current_user)
     return jsonify(current_user.settings)
 
 @app.route('/api/user/login', methods=['POST'])

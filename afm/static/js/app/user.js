@@ -16,24 +16,14 @@ App.User = App.Model.extend({
     },
 
     login: function(params) {
-        if (this.isLogged()) {
-            return;
-        }
         return $.post(this.url + 'login', params, this._callback('login_error'));
     },
 
     signup: function(params) {
-        if (this.isLogged()) {
-            return;
-        }
         return $.post(this.url + 'signup', params, this._callback('signup_error'));
     },
 
     logout: function() {
-        if (!this.isLogged()) {
-            return;
-        }
-
         var self = this;
         return $.post(this.url + 'logout').always(function(){
             self.clear();
@@ -48,6 +38,10 @@ App.User = App.Model.extend({
                 this.trigger('password_reset', result);
             }
         }, this));
+    },
+
+    saveSettings: function() {
+        return $.post(this.url + 'settings', {settings: JSON.stringify(this.get('settings'))});
     },
 
     // фабрика возвращает колбек который при ошибке с сервера
@@ -355,6 +349,8 @@ App.UserRouter = Backbone.Router.extend({
     initialize: function(options) {
         this.user = options.user;
         this.favorites = options.favorites;
+        this.settings = options.settings;
+
         this.topbox = new App.TopBox();
         this.topbox.on('hide', this.navigateToPrevious, this);
 
@@ -393,7 +389,7 @@ App.UserRouter = Backbone.Router.extend({
         if (!this.user.isLogged()) {
             this.navigate('/');
         }
-        //this.panelbox.show(new App.UserFavoritesView());
+        this.panelbox.show(new App.UserSettingsView({model: this.user}));
     },
 
     navigateToPrevious: function() {
@@ -531,6 +527,47 @@ App.UserFavoritesView = App.View.extend({
     }
 });
 
+
+App.UserSettingsView = App.View.extend({
+    template: App.getTemplate('user_settings'),
+
+    events: {
+        'click .setting': 'toggleSetting'
+    },
+
+    toggleSetting: function(e) {
+        var $button = $(e.currentTarget);
+        var settings = this.model.get('settings');
+        $button.button('toggle');
+        settings[$button.data('name')] = $button.hasClass('active');
+        this.model.set('settings', settings);
+        this.model.saveSettings();
+    },
+
+    initialize: function() {
+        this.model.on('logout', this.hide, this);
+    },
+
+    render: function() {
+        this.setElement(this.template(this.model.toJSON()));
+        this.parent.$el.html(this.$el);
+    },
+
+    hide: function() {
+        this.parent.hide();
+    }
+});
+
+Handlebars.registerHelper('setting', function(name) {
+    var html = App.getTemplate('user_settings_checkbox')({
+        name: name,
+        value: this.settings[name],
+        label: App.i18n('settings.' + name + '.label'),
+        notice: App.i18n('settings.' + name + '.notice', {default: ''})
+    });
+    return new Handlebars.SafeString(html);
+});
+
 /**
  * Хелпер для юзерской граватарки.
  */
@@ -549,5 +586,8 @@ $(function(){
     App.userFavorites = new App.UserFavorites();
     App.userBar = new App.UserBarView({user: App.user});
     App.loginForm = new App.LoginFormView({user: App.user});
-    App.userRouter = new App.UserRouter({user: App.user, favorites: App.userFavorites});
+    App.userRouter = new App.UserRouter({
+        user: App.user,
+        favorites: App.userFavorites
+    });
 })

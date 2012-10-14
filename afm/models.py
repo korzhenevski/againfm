@@ -228,6 +228,7 @@ class User(BaseDocument):
             'name': self['name'],
             'sex': self['sex'],
             'gravatar_hash': self.gravatar_hash,
+            'settings': self['settings']
         }
 
     def generate_new_password(self, length=8):
@@ -255,6 +256,10 @@ class User(BaseDocument):
             self.save()
             return True
         return False
+
+    def update_settings(self, settings):
+        self['settings'] = dict([(k, bool(v)) for k, v in settings.iteritems() if k in self.structure['settings']])
+        self.save()
 
 @db.register
 class Station(BaseDocument):

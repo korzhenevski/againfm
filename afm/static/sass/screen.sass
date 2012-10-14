@@ -732,6 +732,13 @@ $station-icon-shift: 5px
   padding-bottom: 1em
   right: 100px
   +box-shadow(#111 5px 5px 20px 5px)
+  h1
+    font-weight: bold
+    margin-top: 0.5em
+    font-size: 1.6em
+    line-height: 2em
+    padding-left: 60px
+    color: #000
   p
     color: #000
   .text
@@ -749,13 +756,6 @@ $station-icon-shift: 5px
     background-repeat: no-repeat
     cursor: pointer
     +border-radius(15px)
-  h1
-    font-weight: bold
-    margin-top: 0.5em
-    font-size: 1.6em
-    line-height: 2.5em
-    padding-left: 60px
-    color: #000
   fieldset
     padding-left: 60px
     border-top: 1px solid #c1c1c1
@@ -816,7 +816,7 @@ $station-icon-shift: 5px
     border: 1px solid #ccc
     padding: 2px 4px
     +border-radius(3px)
-  button
+  .btn
     color: #fff
     border: 1px solid #ccc
     font-size: 1em
@@ -833,9 +833,11 @@ $station-icon-shift: 5px
     font-size: 0.9em
     padding-left: 60px
     margin-bottom: 1em
+  fieldset
+    margin-bottom: 0.5em
   .checkbox-shift li
     padding-left: 35px
-  .checkbox
+  .setting
     height: 16px
     width: 16px
     display: block
@@ -843,12 +845,13 @@ $station-icon-shift: 5px
     clear: left
     margin-top: 0.14em
     cursor: pointer
+    border: 0
     @include checkbox-sprite(default)
-    &[data-checked]
-      @include checkbox-sprite(checked) 
-    &[data-disabled]
-      cursor: default
-      @include checkbox-sprite(disabled)
+  .setting.active
+    @include checkbox-sprite(checked)
+  .setting.disabled
+    cursor: default
+    @include checkbox-sprite(disabled)
   .pseudo-link
     font-size: 1em
     color: #3366cc

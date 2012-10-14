@@ -161,7 +161,8 @@ App.i18n = function(key, options) {
             val = val[chunks[i]];
         }
     }
-    return val || key;
+    var def = options && !_.isUndefined(options.default) ? options.default : key;
+    return val || def;
 };
 
 // как-то громоздко, потенциально надо упростить
