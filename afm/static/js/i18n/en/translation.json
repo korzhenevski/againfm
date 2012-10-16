@@ -9,7 +9,8 @@
             "designer": {
                 "label": "designed by",
                 "info_label":  "site information"
-            }
+            },
+            "feedback": "feedback"
         }
     },
 
@@ -78,6 +79,32 @@
         }
     },
 
+    "settings": {
+        "title": "Settings",
+        "playback": "Playback",
+        "throttle_traffic": {
+            "label": "Disable covers and lowering the sound quality to save bandwidth",
+            "notice": "turn it on in case slow or expensive internet"
+        },
+        "limit_night_volume": {
+            "label": "Limit the startup sound at night",
+            "notice": "from midnight to six a.m., for protect the ears volume will be set at 30%"
+        },
+        "fading_sound": {
+            "label": "Fading the sound when the player is turned off"
+        },
+        "personal_info": {
+            "title": "Personal info",
+            "email": "Email",
+            "name": "Display name",
+            "password": "Password",
+            "new_password": "New password",
+            "current_password": "Current password",
+            "new_email": "New Email",
+            "desired_password": "Desired password"
+        }
+    },
+
     "search": {
         "placeholder": "radio search"
     },
@@ -90,33 +117,14 @@
         "title": "Terms of Service"
     },
 
+    "about": {
+        "title": "About"
+    },
+
     "favorites": {
         "title": "Favorites",
         "helptext1": "You can store favorite songs here<br /> and find them quickly in Last.FM or Google.",
         "helptext2": "Click on a star to add a song to favorite.<br /> It is no longer your trouble. The player remember your favorite songs."
-    },
-
-    "settings": {
-        "title": "Settings",
-        "playback": "Playback",
-        "throttle_traffic": {
-            "label": "Disable covers and lowering the sound quality to save bandwidth",
-            "notice": "turn it on in case slow or expensive internet"
-        },
-        "limit_night_volume": {
-            "label": "Limit the startup sound at night",
-            "notice": "to protect the ears volume will be set at 30%"
-        },
-        "fading_sound": {
-            "label": "Fading the sound when the player is turned off"
-        },
-        "personal_info": {
-            "title": "Personal info",
-            "email": "Email",
-            "display_name": "Display name",
-            "password": "Password",
-            "desired_password": "Desired password"
-        }
     },
 
     "radio": {
@@ -138,11 +146,20 @@
     },
 
     "button": {
-        "loadingText": "Loading..."
+        "change": "change",
+        "loadingText": "Loading...",
+        "changingText": "Changing...",
+        "sendingText": "Sending..."
     },
 
     "timediff": {
         "today": "Today",
         "yesterday": "Yesterday"
+    },
+
+    "feedback": {
+        "title": "listen carefully",
+        "email": "Contact Email",
+        "send": "Send"
     }
 }

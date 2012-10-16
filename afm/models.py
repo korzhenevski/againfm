@@ -386,3 +386,19 @@ class StationTag(BaseDocument):
 @db.register
 class OnairHistory(BaseDocument):
     __collection__ = 'onair_history'
+
+@db.register
+class FeedbackMessage(BaseDocument):
+    __collection__ = 'feedback_messages'
+
+    structure = {
+        'id': int,
+        'text': unicode,
+        'email': unicode,
+        'remote_addr': unicode,
+        'created_at': datetime
+    }
+
+    default_values = {
+        'created_at': datetime.now
+    }

@@ -77,14 +77,28 @@
     </div>
     <div class="footer-guard"></div>
 </div>
+
 <div class="footer">
+    <div class="feedback-box hidden">
+        <div class="answer">Слушаем внимательно :)</div>
+        <div class="answer answer-complete hidden">Спасибо</div>
+        <div class="question">
+            <form>
+                <textarea name="text"></textarea>
+                <input type="text" name="email" placeholder="{{ _('feedback.email') }}" />
+                <input type="submit" value="{{ _('feedback.send') }}" />
+            </form>
+            <div class="close"></div>
+        </div>
+    </div>
     <div class="left">
         <p>{{ sitename }} {{ _('site.footer.disclaimer') }}</p>
 
         <p class="left-shift">
             &copy; 2012, {{ sitename }} &middot; {{ _('site.footer.made_in') }}
-            &middot; <span class="pseudo-link about">{{ _('site.footer.about') }}</span> &middot; <span
-                class="pseudo-link tos">{{ _('site.footer.tos') }}</span>
+            &middot; <a class="about" href="#about">{{ _('site.footer.about') }}</a>
+            &middot; <a class="tos" href="#tos">{{ _('site.footer.tos') }}</a>
+            &middot; <a class="feedback" href="#feedback">{{ _('site.footer.feedback') }}</a>
         </p>
     </div>
 </div>

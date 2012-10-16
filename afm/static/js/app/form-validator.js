@@ -5,8 +5,6 @@
  * @type {function}
  */
 var FormValidator = App.klass({
-    errors: {},
-    valid: {},
     validators: {
         required: function($el) {
             return $.trim($el.val()).length > 0;
@@ -32,9 +30,11 @@ var FormValidator = App.klass({
      * @param options - настройки валидации
      */
     initialize: function(form, options) {
+        this.errors = {};
+        this.valid = {};
         this.options = options;
         this.form = $(form);
-        // валидаторы срабатывают по тексту и смене фокуса
+        // валидаторы срабатывают по изменению текста и смене фокуса
         this.form.on('keyup blur', _.bind(this._event, this));
         // блокируем submit если форма невалидна
         this.form.submit(_.bind(function(){
@@ -46,11 +46,12 @@ var FormValidator = App.klass({
         _.each(this.options.rules, function(rule, name){
             this.validateField(this.form.find('[name='+name+']'), name);
         }, this);
-        this.trigger('valid', this.isValid());
+        this.trigger('validate', this.isValid());
     },
 
     validateField: function($field, name) {
         var rule = this.options.rules[name];
+        var messages = this.options.messages || {};
         delete this.errors[name];
         _.each(rule, function(param, validator_name){
             var validator = this.validators[validator_name];
@@ -58,7 +59,11 @@ var FormValidator = App.klass({
                 return;
             }
             if (!validator($field, param)) {
-                this.errors[name] = this.options.messages[name][validator_name] || validator_name + ' error';
+                if (messages[name] && messages[name][validator_name]) {
+                    this.errors[name] = messages[name][validator_name];
+                } else {
+                    this.errors[name] = validator_name + ' error';
+                }
             }
         }, this);
         this.valid[name] = !this.errors[name];
@@ -68,8 +73,8 @@ var FormValidator = App.klass({
         var $field = $(e.target),
             name = $field.attr('name');
         this.validateField($field, name);
-        this.trigger('field', $field, this.errors[name]);
-        this.trigger('valid', this.isValid());
+        this.trigger('validate_field', $field, this.errors[name]);
+        this.trigger('validate', this.isValid());
     },
 
     isValid: function() {

@@ -1,5 +1,7 @@
 var App = App || {};
 
+App.UserSettings = App.Model.extend();
+
 App.User = App.Model.extend({
     url: '/api/user/',
     mediator: App.mediator,
@@ -13,6 +15,15 @@ App.User = App.Model.extend({
                 this.trigger('logout');
             }
         }, this);
+        // кидаем событие при изменении настроек
+        this.on('change:settings', function(model, settings){
+            var previousSettings = this.previous('settings') || {};
+            _.each(settings, function(val, key){
+                if (val !== previousSettings[key]) {
+                    this.mediator.trigger('playback:' + key, val);
+                }
+            }, this)
+        })
     },
 
     login: function(params) {
@@ -40,8 +51,17 @@ App.User = App.Model.extend({
         }, this));
     },
 
+    changeName: function(params) {
+        return $.post(this.url + 'change_name', params, this._callback('change_name_error'));
+    },
+
     saveSettings: function() {
-        return $.post(this.url + 'settings', {settings: JSON.stringify(this.get('settings'))});
+        return $.ajax({
+            url: this.url + 'settings',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(this.get('settings'))
+        })
     },
 
     // фабрика возвращает колбек который при ошибке с сервера
@@ -114,7 +134,7 @@ App.LoginFormView = App.View.extend({
         if (!this.valid) {
             return false;
         }
-        this.loadingButton(function(){
+        this.ajaxButton(function(){
             return this.user.login(this.serializeForm());
         });
         return false;
@@ -152,198 +172,15 @@ App.UserBarView = App.View.extend({
     }
 });
 
-/**
- * Представление-лейаут выезжающей сверху панели.
- *
- * @type {function}
- */
-App.TopBox = App.View.extend({
-    el: '.top-box',
-    events: {
-        'click .close': 'hide'
-    },
-
-    show: function(view) {
-        if (this.view) {
-            this.view.remove();
-        }
-        view.on('hide', this.hide, this);
-        view.setHtml = _.bind(this.setHtml, this);
-        view.render();
-        this.$el.show().animate({marginTop: 0}, 'linear', _.bind(function(){
-            this.$('form :text:first').focus();
-            this.$('.close').show();
-        }, this));
-        this.view = view;
-    },
-
-    setHtml: function(html) {
-        this.$el.html(html);
-    },
-
-    hide: function() {
-        if (this.view) {
-            this.view.remove();
-            this.view = null;
-        }
-        var $el = this.$el;
-        $el.animate({marginTop: $el.height() * -1}, 'linear', function(){
-            $el.hide();
-        });
-        this.$('.close').hide();
-        this.trigger('hide');
-    }
-});
-
-/**
- * Абстрактное представление формы для TopBox.
- *
- * @type {function}
- */
-App.TopBoxForm = App.View.extend({
-    hide: function() {
-        this.trigger('hide');
-    },
-
-    setupValidator: function() {
-        this.validator = new FormValidator(this.$el, this.validation);
-        this.validator.on('field', function(node, error) {
-            this.$('label.error').remove();
-            if (error) {
-                node.removeClass('valid');
-                node.after($('<label class="error">').text(error));
-            } else {
-                node.addClass('valid');
-            }
-        }, this);
-
-        this.validator.on('valid', function(valid) {
-            this.$(':submit').prop('disabled', !valid);
-        }, this);
-
-        this.validator.validateForm();
-        this.$('input').bind('textchange', _.bind(this._removeErrorNotice, this));
-    },
-
-    _removeErrorNotice: function() {
-        if (!this.errorNotice) {
-            return;
-        }
-        this.errorNotice.remove();
-        this.errorNotice = false;
-        this.$('.notice').show();
-    },
-
-    /**
-     * Вывод сообщения об ошибке под формой.
-     *
-     * @param error string - html или текст
-     */
-    showError: function(error) {
-        // обычный хинт скрываем и добавляем новый хинт с ошибкой
-        this.errorNotice = $('<p class="notice error">').html(error);
-        this.$('.notice').hide().before(this.errorNotice);
-    },
-
-    // заменяется лейаут менеджером
-    setHtml: function(html) {}
-});
-
-/**
- * Форма регистрации.
- *
- * @type {function}
- */
-App.UserSignup = App.TopBoxForm.extend({
-    template: App.getTemplate('user_signup'),
-    validation: {
-        rules: {
-            email: {required: true, email: true},
-            password: {required: true, minlength: 6}
-        },
-        messages: App.i18n('signup.validation')
-    },
-    events: {
-        'submit': 'submit'
-    },
-
-    initialize: function() {
-        this.model.on('signup_error', this.error, this);
-        this.model.on('logged', this.hide, this);
-    },
-
-    render: function() {
-        var $content = $(this.template());
-        this.setElement($content.find('form'));
-        this.setupValidator();
-        this.setHtml($content);
-    },
-
-    submit: function() {
-        this.loadingButton(function(){
-            return this.model.signup(this.serializeForm());
-        });
-        return false;
-    },
-
-    error: function(code) {
-        this.showError(App.i18n('signup.error.' + code));
-    }
-});
-
-/**
- * Форма восстановления пароля.
- *
- * @type {function}
- */
-App.UserAmnesia = App.TopBoxForm.extend({
-    template: App.getTemplate('user_amnesia'),
-    result: App.getTemplate('password_reset'),
-    validation: {
-        rules: {
-            email: {required: true, email: true}
-        },
-        messages: App.i18n('amnesia.validation')
-    },
-    events: {
-        'submit': 'submit'
-    },
-
-    initialize: function() {
-        this.model.on('amnesia_error', this.error, this);
-        this.model.on('password_reset', this.passwordReset, this);
-    },
-
-    render: function() {
-        var $content = $(this.template({email: this.email}));
-        this.setElement($content.find('form'));
-        this.setupValidator();
-        this.setHtml($content);
-    },
-
-    submit: function() {
-        this.loadingButton(function(){
-            return this.model.amnesia(this.serializeForm());
-        });
-        return false;
-    },
-
-    passwordReset: function(params) {
-        // эвент обновляет контент плашки
-        this.setHtml(this.result(params))
-    },
-
-    error: function(code) {
-        this.showError(App.i18n('amnesia.error.' + code));
-    }
-});
-
 App.UserRouter = Backbone.Router.extend({
     routes: {
         'signup': 'signup',
         'amnesia': 'amnesia',
         'user/favorites': 'favorites',
-        'user/settings': 'settings'
+        'user/settings': 'settings',
+        'about': 'about',
+        'tos': 'tos',
+        'feedback': 'feedback'
     },
 
     initialize: function(options) {
@@ -392,48 +229,24 @@ App.UserRouter = Backbone.Router.extend({
         this.panelbox.show(new App.UserSettingsView({model: this.user}));
     },
 
+    about: function() {
+        this.panelbox.show(new App.AboutView())
+    },
+
+    tos: function() {
+        this.panelbox.show(new App.TosView())
+    },
+
+    feedback: function() {
+        if (!this.feedbackView) {
+            this.feedbackView = new App.FeedbackView();
+            this.feedbackView.on('hide', this.navigateToPrevious, this);
+        };
+        this.feedbackView.show();
+    },
+
     navigateToPrevious: function() {
         this.navigate('/', {replace: true});
-    }
-});
-
-/**
- * Представление панели с контентом.
- *
- * @type {function}
- */
-App.PanelBox = App.View.extend({
-    el: '.panel-box',
-    events: {
-        'click .close': 'hide'
-    },
-
-    show: function(view) {
-        if (this.view) {
-            this.view.remove();
-        }
-        // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
-        view.parent = this;
-        view.render();
-        this.$el.css('marginTop', this.panelMarginTop()).show().animate({marginTop: 0}, 450, 'linear');
-        this.view = view;
-    },
-
-    // значение верхнего отступа, что-бы контейнер ушел за пределы экрана
-    panelMarginTop: function() {
-        return -1 * (this.$el.outerHeight() + this.$el.position().top);
-    },
-
-    hide: function() {
-        this.$el.animate({marginTop: this.panelMarginTop()}, 'linear', _.bind(function(){
-            this.$el.hide();
-            // убиваем после анимации, иначе при скрытии виден только пустой контейнер
-            if (this.view) {
-                this.view.remove();
-                this.view = null;
-            }
-        }, this));
-        this.trigger('hide');
     }
 });
 
@@ -476,96 +289,6 @@ App.UserFavorites = App.Collection.extend({
     comparator: function(model) {
         return model.get('created_at');
     }
-});
-
-App.UserFavoritesView = App.View.extend({
-    template: App.getTemplate('user_favorites'),
-    item_template: App.getTemplate('user_favorite'),
-    label_template: App.getTemplate('favorites_label'),
-    events: {
-        'click .favorite': 'toggleFavorite'
-    },
-
-    initialize: function() {
-        this.collection.on('reset', this.render, this);
-    },
-
-    toggleFavorite: function(e) {
-        var $el = $(e.currentTarget),
-            template = this.item_template,
-            model = this.collection.getByCid($el.data('cid'));
-        model.toggleBookmark().always(function(){
-            $el.replaceWith(template(model.toJSON()));
-        });
-    },
-
-    render: function() {
-        var content = [];
-        this.collection.each(function(model){
-            content.unshift(this.item_template(model.toJSON()));
-        }, this);
-        this.setElement(this.template({content: content.join('')}));
-        this.parent.$el.html(this.$el);
-        this.placeGroupLabels();
-    },
-
-    placeGroupLabels: function() {
-        var group = {};
-        this.parent.$('.favorite').each(function(){
-            var groupKey = App.datediff(this.getAttribute('data-ts'));
-            if (!_.has(group, groupKey)) {
-                group[groupKey] = $(this);
-            }
-        });
-        _.each(group, function($node, label){
-            $node.before(this.label_template(label));
-        }, this)
-    },
-
-    hide: function() {
-        this.parent.hide();
-    }
-});
-
-
-App.UserSettingsView = App.View.extend({
-    template: App.getTemplate('user_settings'),
-
-    events: {
-        'click .setting': 'toggleSetting'
-    },
-
-    toggleSetting: function(e) {
-        var $button = $(e.currentTarget);
-        var settings = this.model.get('settings');
-        $button.button('toggle');
-        settings[$button.data('name')] = $button.hasClass('active');
-        this.model.set('settings', settings);
-        this.model.saveSettings();
-    },
-
-    initialize: function() {
-        this.model.on('logout', this.hide, this);
-    },
-
-    render: function() {
-        this.setElement(this.template(this.model.toJSON()));
-        this.parent.$el.html(this.$el);
-    },
-
-    hide: function() {
-        this.parent.hide();
-    }
-});
-
-Handlebars.registerHelper('setting', function(name) {
-    var html = App.getTemplate('user_settings_checkbox')({
-        name: name,
-        value: this.settings[name],
-        label: App.i18n('settings.' + name + '.label'),
-        notice: App.i18n('settings.' + name + '.notice', {default: ''})
-    });
-    return new Handlebars.SafeString(html);
 });
 
 /**

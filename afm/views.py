@@ -4,16 +4,45 @@
 import pymongo
 import ujson as json
 from . import app, db, login_manager, tasks, i18n
-from .forms import SignupForm
-from flask import jsonify, request, render_template, redirect, url_for
+from flask import jsonify, request, render_template, redirect, url_for, abort
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from .models import UserFavoritesCache
+import validictory
+import logging
 
 def send_mail(**kwargs):
     if app.debug:
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)
+
+def safe_input_field(field, schema):
+    object_schema = {}
+    object_schema[field] = schema
+    data = safe_input_object(object_schema)
+    return data[field]
+
+def safe_input_object(schema, **kwargs):
+    properties = {}
+    for k, v in schema.iteritems():
+        if isinstance(v, str):
+            properties[k] = {'type': v}
+        else:
+            properties[k] = v
+    object = safe_input({'type': 'object', 'properties': properties}, **kwargs)
+    # фильтруем все поля не описанные в схеме
+    return dict([(k, v) for k, v in object.iteritems() if k in properties])
+
+def safe_input(schema, data=None, **kwargs):
+    data = data or request.json or request.form.to_dict()
+    try:
+        validictory.validate(data, schema=schema, **kwargs)
+        return data
+    except ValueError, error:
+        logging.exception(error)
+        print data
+        abort(400)
+    return None
 
 @app.route('/')
 def index():
@@ -38,74 +67,11 @@ def get_email_provider(email):
             return link
     return None
 
-@app.route('/api/user/amnesia', methods=['POST'])
-def api_user_amnesia():
-    email = request.form['email']
-    user = db.User.find_one({'email': email})
-    if user:
-        password, token = user.generate_new_password()
-        body = render_template('mail/password_reset.html', user=user, password=password, token=token)
-        send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
-        email_provider = get_email_provider(user.email)
-        return jsonify({'email_provider': email_provider})
-    return jsonify({'error': 'no_user'})
-
-@app.route('/api/user/signup', methods=['POST'])
-def api_user_signup():
-    form = SignupForm(request.form)
-    if not form.validate():
-        return jsonify({'error': 'bad_request'})
-    if db.User.find_one({'email': form.email.data}):
-        return jsonify({'error': 'email_exists'})
-    # create
-    user = db.User()
-    user.email = form.email.data
-    user.set_password(form.password.data)
-    user.save()
-    # login
-    login_user(user)
-    # send welcome email
-    body = render_template('mail/welcome.html', user=user)
-    send_mail(subject='Welcome to Again.FM', email=user.email, body=body)
-    return jsonify(user.get_public_data())
-
-@app.route('/api/user/logout', methods=['DELETE','POST'])
-@login_required
-def logout():
-    logout_user()
-    return jsonify({'logout': True})
-
-@app.route('/api/user/change_password', methods=['PUT'])
-@login_required
-def change_password():
-    password = request.form['password'].strip()
-    if password:
-        current_user.set_password(password)
-        current_user.save()
-    return jsonify(current_user.get_public_data())
-
-@app.route('/api/user/change_name', methods=['PUT'])
-@login_required
-def change_name():
-    name = request.form['name'].strip()
-    current_user.name = name
-    current_user.save()
-    return jsonify(current_user.get_public_data())
-
-@app.route('/api/user/settings', methods=['GET','POST'])
-@login_required
-def api_user_settings():
-    if request.method == 'POST':
-        settings = json.loads(request.form['settings'])
-        current_user.update_settings(settings)
-        # reload user via relogin
-        login_user(current_user)
-    return jsonify(current_user.settings)
-
 @app.route('/api/user/login', methods=['POST'])
 def login():
-    data = request.form
+    data = safe_input_object({'login': 'string', 'password': 'string'})
     if '@' in data['login']:
+        # логин по почте
         where = {'email': data['login']}
     else:
         where = {'login': data['login']}
@@ -119,6 +85,83 @@ def login():
         else:
             return jsonify({'error': 'auth'})
     return jsonify({'error': 'no_user'})
+
+@app.route('/api/user/amnesia', methods=['POST'])
+def api_user_amnesia():
+    email = safe_input_field('email', 'string')
+    user = db.User.find_one({'email': email})
+    if user:
+        password, token = user.generate_new_password()
+        body = render_template('mail/password_reset.html', user=user, password=password, token=token)
+        send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
+        email_provider = get_email_provider(user.email)
+        return jsonify({'email_provider': email_provider})
+    return jsonify({'error': 'no_user'})
+
+@app.route('/api/user/signup', methods=['POST'])
+def api_user_signup():
+    data = safe_input_object({'email': 'string', 'password': 'string'})
+    if db.User.find_one({'email': data['email']}):
+        return jsonify({'error': 'email_exists'})
+    # create
+    user = db.User()
+    user.email = data['email']
+    user.set_password(data['password'])
+    user.save()
+    # login
+    login_user(user)
+    # send welcome email
+    body = render_template('mail/welcome.html', user=user)
+    send_mail(subject='Welcome to Again.FM', email=user.email, body=body)
+    return jsonify(user.get_public_data())
+
+@app.route('/api/user/logout', methods=['DELETE','POST'])
+@login_required
+def logout():
+    logout_user()
+    return jsonify({'success': True})
+
+@app.route('/api/user/password', methods=['POST'])
+@login_required
+def change_password():
+    data = safe_input_object({
+        'current_password': {'type': 'string'},
+        'password': {'type': 'string', 'minLength': 6}
+    })
+    if not current_user.check_password(data['current_password']):
+        return jsonify({'error': 'incorrect_password'}), 401
+    current_user.set_password(data['password'])
+    current_user.save()
+    login_user(current_user)
+    return jsonify({'success': True})
+
+"""
+@app.route('/api/user/email', methods=['POST'])
+@login_required
+def api_user_change_email():
+    return jsonify({'status': True})
+"""
+
+@app.route('/api/user/name', methods=['POST'])
+@login_required
+def api_user_name():
+    name = safe_input_field('name', {'type': 'string', 'maxLength': 64})
+    current_user.name = name
+    current_user.save()
+    login_user(current_user)
+    return jsonify({'name': current_user.name})
+
+@app.route('/api/user/settings', methods=['GET','POST'])
+@login_required
+def api_user_settings():
+    # схема валидации на основе структуры модели
+    schema = dict([(k, 'boolean') for k in db.User.structure['settings'].keys()])
+    settings = safe_input_object(schema)
+    if request.method == 'POST':
+        current_user.update_settings(settings)
+        # reload user via relogin
+        login_user(current_user)
+    return jsonify(current_user.settings)
 
 @app.route('/api/playlist/tag/<tagname>')
 def api_tag_playlist(tagname):
@@ -209,6 +252,18 @@ def api_user_favorites():
     favorites = db.FavoriteTrack.find({'user_id': current_user.id})
     favorites = [favorite.get_public_data() for favorite in favorites]
     return jsonify({'objects': favorites})
+
+@app.route('/api/feedback', methods=['POST'])
+def api_feedback():
+    form = safe_input_object({
+        'text': {'type': 'string', 'maxLength': 2048},
+        'email': {'type': 'string', 'maxLength': 255}
+    })
+    message = db.FeedbackMessage()
+    message.update(form)
+    message.remote_addr = unicode(request.remote_addr)
+    message.save()
+    return jsonify({'success': True})
 
 """
 быстрый фильтр-сериализатор json

@@ -7,10 +7,10 @@ var App = App || {};
  * @type {function}
  */
 App.Feed = App.klass({
-    params: {},
     mediator: App.mediator,
 
     initialize: function(options) {
+        this.params = {};
         this.engine = new Comet(options.url);
 
         this.mediator.on('player:stopped player:error radio:error', this.stop, this);

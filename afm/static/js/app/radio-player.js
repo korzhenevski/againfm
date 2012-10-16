@@ -59,8 +59,8 @@ App.FlashPlayerEngine = App.View.extend({
         this.el.playStream(url);
     },
 
-    stop: function() {
-        this.el.stopStream();
+    stop: function(fading) {
+        fading ? this.el.stopStreamWithFade() : this.el.stopStream();
     },
 
     setVolume: function(volume) {
@@ -82,17 +82,26 @@ App.FlashPlayerEngine = App.View.extend({
  */
 App.Player = App.klass({
     mediator: App.mediator,
-    volume: 40,
-    station: {},
+    volume: 50,
+    night_volume: 30,
+    fading_sound: false,
 
     initialize: function() {
+        this.station = {};
         this.engine = new App.FlashPlayerEngine({url: '/static/swf/player.swf'});
         // подписываемся на смену станции
         this.mediator.on('radio:station_changed', this.stationChanged, this);
         this.mediator.on('radio:stream_changed', this.playStream, this);
-        // смена громкости по глобальному событию
-        this.mediator.on('player:set_volume', function(volume){
-            this.setVolume(parseInt(volume, 10));
+        // ночью делаем громкость принудительно ниже
+        this.mediator.on('playback:limit_night_volume', function(limit){
+            var hours = (new Date()).getHours();
+            if (limit && (hours >= 0 || hours <= 6)) {
+                this.setVolume(this.night_volume);
+            }
+        }, this);
+        // плавное затухание звука
+        this.mediator.on('playback:fading_sound', function(fading_sound){
+            this.fading_sound = fading_sound;
         }, this);
         this.engine.on('ready', this.engineReady, this);
         // публикуем в медиатор локальные события
@@ -166,7 +175,7 @@ App.Player = App.klass({
         }
 
         if (this.engine.isPlaying()) {
-            this.engine.stop();
+            this.engine.stop(this.fading_sound);
         } else {
             this.play();
         }
@@ -265,8 +274,13 @@ App.Radio = App.Model.extend({
     mediator: App.mediator,
 
     initialize: function() {
+        this.params = {};
         this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
         this.mediator.on('playlist:station_changed route:station', this.changeStation, this);
+        // если есть ограничение по трафику, дергаем поток с наименьшим битрейтом
+        this.mediator.on('playback:throttle_traffic', function(throttle_traffic){
+            this.params = throttle_traffic ? {low_bitrate: true} : {};
+        }, this);
     },
 
     changeStation: function(station) {
@@ -285,7 +299,7 @@ App.Radio = App.Model.extend({
             this.setStation($.extend(this.station, playinfo.station));
             this.setStream(playinfo.stream);
         }, this);
-        $.getJSON(url, callback).error(_.bind(function(state, err){
+        $.getJSON(url, this.params, callback).error(_.bind(function(state, err){
             // если ajax-ошибка, кидаем событие error
             this.trigger('error', 'getplayinfo error: '+err);
         }, this));

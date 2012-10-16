@@ -111,8 +111,10 @@ App.View = Backbone.View.extend({
      *
      * @return {Object}
      */
-    serializeForm: function() {
-        var $el = this.$el.is('form') ? this.$el : this.$('form');
+    serializeForm: function($el) {
+        if (!$el) {
+            $el = this.$el.is('form') ? this.$el : this.$('form');
+        }
         var serialized = {};
         if ($el && $el.size()) {
             _.each($el.serializeArray(), function(field){
@@ -126,12 +128,13 @@ App.View = Backbone.View.extend({
      * Хелпер для смены состояния кнопки при ajax-запросе.
      *
      * @param callback - колбек возвращающий Deferred
+     * @param state string - состояние отправки
      */
-    loadingButton: function(callback) {
-        var $submit = this.$(':submit');
-        $submit.button('loading');
+    ajaxButton: function(callback, state) {
+        var $button = this.$(':submit');
+        $button.button(state || 'loading');
         callback.apply(this).always(function(){
-            $submit.button('reset');
+            $button.button('reset');
         });
     }
 });
@@ -247,3 +250,7 @@ Handlebars.registerHelper('t', function(key) {
 App.mediator.on('all', function(){
     console.log('[mediator]', arguments);
 });
+
+window._log = function() {
+    console.log(arguments);
+}

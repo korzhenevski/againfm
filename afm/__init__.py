@@ -54,7 +54,10 @@ assets.register('scripts', Bundle(
     'js/app/radio-player.js',
     'js/app/radio-sticker.js',
     'js/app/form-validator.js',
+    'js/app/user-pages.js',
+    'js/app/user-topbox.js',
     'js/app/user.js',
+    'js/app/site-common.js',
     'js/app/router.js',
     filters='uglifyjs', output='js/deploy/app.%(version)s.js'))
 

@@ -731,7 +731,7 @@ $station-icon-shift: 5px
   border: 1px solid #aaa
   padding-bottom: 1em
   right: 100px
-  +box-shadow(#111 5px 5px 20px 5px)
+  +box-shadow(#111 4px 4px 20px 4px)
   h1
     font-weight: bold
     margin-top: 0.5em
@@ -810,16 +810,17 @@ $station-icon-shift: 5px
   p
     color: #000
     font-size: 1em
+  input, .btn
+    font-size: 13px
+    padding: 2px 7px
+    line-height: 20px
+    border: 1px solid #ccc
   input
     color: #000
-    font-size: 1em
-    border: 1px solid #ccc
-    padding: 2px 4px
     +border-radius(3px)
   .btn
+    margin-top: -1px
     color: #fff
-    border: 1px solid #ccc
-    font-size: 1em
     +border-radius(5px)
     +background(linear-gradient(#eb5504, #c14d03))
   label
@@ -835,6 +836,15 @@ $station-icon-shift: 5px
     margin-bottom: 1em
   fieldset
     margin-bottom: 0.5em
+  form
+    display: inline
+  form.change
+    display: none
+  li.change
+    .info
+      display: none
+    form
+      display: inline
   .checkbox-shift li
     padding-left: 35px
   .setting
@@ -925,28 +935,78 @@ $station-icon-shift: 5px
   .disable
     display: none
 
-.feedback
+.feedback-box
   position: absolute
-  top: 0
-  left: 0
-  height: 100px
-  width: 300px
-.feedback-inner
-  position: relative
-  padding: 10px
-  color: #fff
-  background-color: #f3f3f3
-  +border-radius(3px)
-  &:after
-    content: ""
-    position: absolute
-    bottom: -20px
-    left: 20px
-    border-width: 20px 10px 0 0
-    border-style: solid
-    border-color: #f3f3f3 transparent
+  bottom: 25px
+  left: 325px
+  .answer
+    background-image: url('../i/feedback/answer.png')
+    background-repeat: no-repeat
+    height: 55px
+    width: 405px
+    margin-left: -40px
+    margin-bottom: -25px
+    padding: 45px 33px
+    padding-bottom: 0
+  .question
+    background-image: url('../i/feedback/question.png')
+    background-repeat: no-repeat
+    width: 400px
+    height: 233px
+  form
+    padding: 35px
+    color: #fff
+    textarea, input[type=text]
+      color: #111
+      font-size: 13px
+      padding: 2px 7px
+      line-height: 20px
+      border: 1px solid #ccc
+      +border-radius(3px)
+      resize: none
+    textarea
+      width: 96%
+      height: 125px
+    input[type=text]
+      width: 210px
+      float: left
+    input[type=submit]
+      float: right
+      border: 1px solid #ccc
+      display: inline-block
+      color: black
+      margin: 0px
+      margin-top: 2px
+      line-height: 14px
+      padding: 5px 15px
+      cursor: pointer
+      +border-radius(5px)
+      +background(linear-gradient(#f8f8f8, #eeeeee))
+    input[disabled]
+      color: #999
+    .close
+      width: 24px
+      height: 24px
+      display: block
+      position: absolute
+      right: -15px
+      bottom: 180px
+      background-image: url('../i/favorites/close.png')
+      background-repeat: no-repeat
+      cursor: pointer
+      +border-radius(15px)
+
+.feedback-box.complete
+  .question
+    visibility: hidden
+  .answer
+    display: none
+  .answer-complete
     display: block
-    width: 0
+    background-image: url('../i/feedback/complete.png')
+    background-position: 0 15px
+    background-repeat: no-repeat
+
 
 .radio-control
   position: relative
