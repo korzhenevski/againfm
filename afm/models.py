@@ -154,7 +154,7 @@ class FavoriteStation(AbstractFavorite):
 
     @classmethod
     def remove(cls, station_id, user_id):
-        cls.remove({'user_id': user_id, 'station_id': station_id})
+        db[cls.__collection__].remove({'user_id': user_id, 'station_id': station_id})
 
 @db.register
 class User(BaseDocument):

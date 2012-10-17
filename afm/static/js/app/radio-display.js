@@ -71,6 +71,14 @@ App.Playlist = App.Collection.extend({
         }
     },
 
+    refresh: function() {
+        console.log('refresh');
+        var self = this;
+        this.fetch().always(function(){
+            self.restoreSelectedStation();
+        });
+    },
+
     restoreSelectedStation: function() {
         var snapshot = this._state[this._selector];
         if (snapshot) {
@@ -102,9 +110,7 @@ App.Selector = App.Model.extend({
     },
 
     select: function() {
-        if (this.collection) {
-            this.collection.select(this);
-        }
+        this.collection.select(this);
         this.set('active', true);
     },
 
@@ -145,7 +151,7 @@ App.Selectors = App.Collection.extend({
     },
 
     select: function(model) {
-        this.trigger('select', model.id);
+        this.trigger('select', model.id, model);
     }
 });
 
@@ -157,6 +163,13 @@ App.FavoriteSelector = App.Selector.extend({
         this.set('selector', 'favorite');
         this.mediator.on('user:logged', this.show, this);
         this.mediator.on('user:logout', this.hide, this);
+        this.mediator.on('sticker:bookmark_station', this.refreshPlaylist, this);
+    },
+
+    refreshPlaylist: function() {
+        if (this.get('active')) {
+            this.collection.playlist.refresh();
+        }
     }
 });
 
@@ -449,7 +462,8 @@ _.extend(App.RadioDisplay.prototype, {
 
         this.playlist = new App.Playlist();
         this.selectors = new App.Selectors();
-        this.selectors.on('select', this.select, this);
+        this.selectors.on('select', this.playlistSelect, this);
+        this.selectors.playlist = this.playlist;
 
         new App.SelectorsView({selectors: this.selectors});
         new App.DisplayView({playlist: this.playlist});
@@ -476,10 +490,11 @@ _.extend(App.RadioDisplay.prototype, {
         this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
     },
 
-    select: function(selector) {
+    playlistSelect: function(selector) {
         this.playlist.fetchBySelector(selector);
     }
 });
+
 
 $(function(){
     App.radioDisplay = new App.RadioDisplay({tags: [

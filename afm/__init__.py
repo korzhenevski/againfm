@@ -72,5 +72,5 @@ if app.config['TESTING']:
 
 #toolbar = DebugToolbarExtension(app)
 
-from . import models
-from . import views
+from . import models, views, api
+

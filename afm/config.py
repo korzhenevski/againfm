@@ -41,3 +41,10 @@ EMAIL_PROVIDERS = {
 
 COMET_SERVER = 'http://comet.againfm.local/'
 SEARCH_BACKEND_URL = 'http://127.0.0.1:9200/againfm_stations/_search'
+
+VK = {
+    'app_id': '3183069',
+    'secret': 'YYhwf0e5rqyNli117cL2',
+    'authorize_url': 'https://oauth.vk.com/authorize',
+    'access_token_url': 'https://oauth.vk.com/access_token',
+}

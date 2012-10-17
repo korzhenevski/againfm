@@ -235,10 +235,14 @@ App.getUrl = function(path) {
 /**
  * Уведомляем компоненты о выгрузке окна.
  */
-$(window).bind('beforeunload', function(){
-    App.mediator.trigger('app:unload');
-});
-
+(function(mediator){
+    var playing = false;
+    $(window).bind('beforeunload', function(){
+        mediator.trigger('app:unload');
+    });
+    mediator.on('player:playing', function() { playing = true; });
+    mediator.on('player:stopped', function() { playing = false; });
+})(App.mediator);
 
 /**
  * i18n template helper

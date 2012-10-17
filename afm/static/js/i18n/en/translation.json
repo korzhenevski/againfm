@@ -160,6 +160,8 @@
     "feedback": {
         "title": "listen carefully",
         "email": "Contact Email",
-        "send": "Send"
+        "send": "Send",
+        "title": "We a all ears :)",
+        "tnx": "Thank you!"
     }
 }
