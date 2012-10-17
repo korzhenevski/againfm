@@ -261,7 +261,7 @@ App.StickerView = App.View.extend({
         var $title = this.$('.title-inner'),
             overhead = $title.width() - $title.parent().width();
         // если заголовок перекрывает контейнер, включаем анимацию
-        if (overhead < 10) {
+        if (overhead < 2) {
             return;
         }
         $title.stop();

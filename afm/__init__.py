@@ -53,6 +53,7 @@ assets.register('scripts', Bundle(
     'js/app/radio-display.js',
     'js/app/radio-player.js',
     'js/app/radio-sticker.js',
+    #'js/app/radio-spectrum.js',
     'js/app/form-validator.js',
     'js/app/user-pages.js',
     'js/app/user-topbox.js',

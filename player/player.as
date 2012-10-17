@@ -48,21 +48,20 @@ package {
          this.callback('ready');
       }
 
-      public function getSpectrum(points:Number) {
+      public function getSpectrum(length:Number) {
          var spectrum:Array = [];
          if (!isPlaying() || _sound == null) {
              return spectrum;
          }
 
          var bytes:ByteArray = new ByteArray();
-         var i:int = 0;
          var val:Number = 0;
 
-         _sound.extract(bytes, points);
+         _sound.extract(bytes, length);
          bytes.position = 0;
-         while(bytes.bytesAvailable > 0) {
-            spectrum.push((176 + bytes.readFloat() * 176) / 2);
-            bytes.readFloat();
+         while (bytes.bytesAvailable > 0) {
+            val = bytes.readFloat() + bytes.readFloat();
+            spectrum.push((val + 1) / 2 * 100);
          }
 
          return spectrum;

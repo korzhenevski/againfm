@@ -35,7 +35,7 @@ App.FlashPlayerEngine = App.View.extend({
         // к функциям флеша нельзя применять apply, поэтому проксируем обертки
         // с проверкой готовности флеша
         var self = this;
-        _.each(['play', 'stop', 'setVolume', 'isPlaying'], function(name){
+        _.each(['play', 'stop', 'setVolume', 'isPlaying', 'getSpectrum'], function(name){
             var fn = self[name];
             self[name] = _.bind(function() {
                 if (this.ready) {
@@ -69,6 +69,10 @@ App.FlashPlayerEngine = App.View.extend({
 
     isPlaying: function() {
         return this.el.isPlaying();
+    },
+
+    getSpectrum: function(length) {
+        return this.el.getSpectrum(length);
     }
 });
 
@@ -92,21 +96,21 @@ App.Player = App.klass({
         // подписываемся на смену станции
         this.mediator.on('radio:station_changed', this.stationChanged, this);
         this.mediator.on('radio:stream_changed', this.playStream, this);
-        // ночью делаем громкость принудительно ниже
+        // опция: убавляем громкость во время с полуночи до шести, если текущее значение больше ночного.
         this.mediator.on('playback:limit_night_volume', function(limit){
             var hours = (new Date()).getHours();
-            if (limit && (hours >= 0 || hours <= 6)) {
+            if (limit && this.volume > this.night_volume && (hours >= 0 || hours <= 6)) {
                 this.setVolume(this.night_volume);
             }
         }, this);
-        // плавное затухание звука
+        // опция: плавное затухание звука
         this.mediator.on('playback:fading_sound', function(fading_sound){
             this.fading_sound = fading_sound;
         }, this);
         this.engine.on('ready', this.engineReady, this);
         // публикуем в медиатор локальные события
-        this.engine.publishEvents('ready playing stopped error', this.mediator, 'player');
-        this.publishEvents('error', this.mediator, 'player');
+        this.engine.publishEvents('ready playing stopped error', this);
+        this.publishEvents('ready playing stopped error', this.mediator, 'player');
         // если радио играет, при выгрузке страницы флеш кидает ошибку
         // поэтому останавливаем поток до выгрузки
         // TODO: важно понять, кто за это отвечает :)
@@ -356,7 +360,8 @@ App.PlayerFaviconView = App.klass({
  */
 $(function() {
     var player = new App.Player();
-    new App.PlayerFaviconView();
+    App.faviconView = new App.PlayerFaviconView();
     App.radio = new App.Radio();
     App.playerView = new App.PlayerView({player: player});
+    //App.spectrum = new App.RadioSpectrum({player: player});
 });

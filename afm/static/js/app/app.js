@@ -251,6 +251,13 @@ App.mediator.on('all', function(){
     console.log('[mediator]', arguments);
 });
 
+window.requestAnimFrame = (function() {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(/* function */ callback, /* DOMElement */ element) {
+        window.setTimeout(callback, 100); // floor 1000 / 20 fps
+    };
+})();
+
+
 window._log = function() {
     console.log(arguments);
 }
