@@ -171,6 +171,8 @@ App.StickerView = App.View.extend({
         notfound: '/static/i/display/notfound.png',
         loading: '/static/i/display/loading.png'
     },
+    mediator: App.mediator,
+    showCovers: true,
 
     initialize: function() {
         this.model = new App.Sticker();
@@ -184,6 +186,11 @@ App.StickerView = App.View.extend({
             }
             this.infoTimer = setTimeout(_.bind(this.model.trackUnavailable, this.model), 10000);
         }, this);
+
+        // если ограничен трафик, не загружаем обложки
+        this.mediator.on('playback:throttle_traffic', function(throttleTraffic){
+            this.showCovers = !throttleTraffic;
+        }, this)
 
         // останавливаем таймер при ошибке
         this.model.on('change:error', function(model, value){
@@ -223,7 +230,7 @@ App.StickerView = App.View.extend({
                 context.favorite_track = track.favorite;
             }
             // обложка
-            if (track.image_url) {
+            if (track.image_url && this.showCovers) {
                 context.image_url = track.image_url;
             }
         } else {

@@ -472,7 +472,7 @@ _.extend(App.RadioDisplay.prototype, {
 
         this.selectors.add([
             new App.FavoriteSelector({hint: App.i18n('display.filters.favorite')}),
-            new App.HistorySelector({hint: App.i18n('display.filters.history')}),
+            //new App.HistorySelector({hint: App.i18n('display.filters.history')}),
             new App.Selector({selector: 'featured', title: App.i18n('display.filters.featured')})
         ]);
 

@@ -133,7 +133,7 @@
     "display": {
         "filters": {
             "featured": "Подборка",
-            "favorite": "Избранное радио",
+            "favorite": "Избранные станции",
             "history": "История проигрывания"
         },
         "search": {
