@@ -473,7 +473,7 @@ _.extend(App.RadioDisplay.prototype, {
         this.selectors.add([
             new App.FavoriteSelector(),
             new App.HistorySelector(),
-            new App.Selector({selector: 'featured', title: 'Featured'})
+            new App.Selector({selector: 'featured', title: App.i18n('display.filters.featured')})
         ]);
 
         // теги
