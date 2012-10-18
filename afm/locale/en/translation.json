@@ -6,10 +6,6 @@
             "about": "about",
             "tos": "terms of service",
             "disclaimer": "is irrelevant and is not responsible for any radio ads.",
-            "designer": {
-                "label": "designed by",
-                "info_label":  "site information"
-            },
             "feedback": "feedback"
         }
     },

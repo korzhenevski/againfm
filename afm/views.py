@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import requests
+import logging
 import ujson as json
 from . import app, db, login_manager, i18n
+from .connect.vkontakte import VKApi
 from flask import jsonify, render_template, redirect, url_for, request
 from flask.ext.login import login_user, current_user
+from urllib import urlencode
 
 @app.route('/')
 def index():
@@ -21,27 +25,77 @@ def token_auth(user_id, token):
         login_user(user)
     return redirect('/')
 
-@app.route('/auth/vk')
-def vk_auth():
-    from urllib import urlencode
-    import requests
+def vk_connect(user, code):
+    config = app.config['VK']
+    response = requests.get(config['access_token_url'], params={
+        'client_id': config['app_id'],
+        'client_secret': config['secret'],
+        'code': code,
+        'redirect_uri': url_for('vk_connect_request', _external=True)})
+
+    if not response.ok:
+        raise Exception('VKontakte access token {}'.format(response.status_code))
+    result = response.json
+    if not result:
+        raise Exception('VKontakte empty JSON response')
+
+    api = VKApi(access_token=result['access_token'])
+    profile = api.request('getProfiles', params={
+        'uid': result['user_id'],
+        'fields': 'uid,first_name,last_name,nickname,sex,birthdate,city,country,timezone,photo_50'
+    })[0]
+
+    if not user:
+        user = db.User.find_one({'connect.vk.uid': result['user_id']})
+
+    if not user:
+        user = db.User()
+
+    user.connect['vk'] = profile
+    user.connect['vk']['access_token'] = result['access_token']
+
+    if not user.name:
+        user.name = ' '.join([profile.get('first_name'), profile.get('last_name')])
+
+    # копируем логин, если он не занят
+    nickname = profile.get('nickname')
+    if nickname and not user.login and not db.User.find_one({'login': nickname}):
+        user.login = nickname
+    # пол
+    sex = profile['sex']
+    if not user.sex:
+        if sex == 1:
+            user.sex = u'female'
+        elif sex == 2:
+            user.sex = u'male'
+    # аватарка
+    photo = profile.get('photo_50')
+    if photo and not user.avatar_url and not photo.endswith('camera_c.gif'):
+        user.avatar_url = photo
+
+    user.save()
+    return user
+
+@app.route('/connect/vk')
+def vk_connect_request():
     vk = app.config['VK']
     code = request.args.get('code')
     if code:
-        resp = requests.get(vk['access_token_url'], params={
-            'client_id': vk['app_id'],
-            'client_secret': vk['secret'],
-            'code': code,
-            'redirect_uri': url_for('vk_auth', _external=True),
-        })
-        access_token = resp.json
-        return jsonify(access_token)
+        user = current_user if current_user.is_authenticated() else None
+        try:
+            user = vk_connect(user, code)
+            login_user(user)
+            return redirect('/')
+        except Exception as exc:
+            logging.exception(exc)
+            return render_template('connect.html')
     else:
+        scope = 'friends,audio,offline'
         authorize_url = vk['authorize_url'] + '?'
         authorize_url += urlencode({
+            'scope': scope,
             'client_id': vk['app_id'],
-            'scope': 'settings,offline',
-            'redirect_uri': url_for('vk_auth', _external=True),
+            'redirect_uri': url_for('vk_connect_request', _external=True),
             'response_type': 'code'
         })
         return redirect(authorize_url)

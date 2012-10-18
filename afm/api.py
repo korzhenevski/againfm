@@ -73,7 +73,6 @@ def change_password():
         return jsonify({'error': 'incorrect_password'}), 401
     current_user.set_password(data['password'])
     current_user.save()
-    login_user(current_user)
     return jsonify({'success': True})
 
 @app.route('/api/user/name', methods=['POST'])
@@ -82,7 +81,6 @@ def api_user_name():
     name = safe_input_field('name', {'type': 'string', 'maxLength': 64})
     current_user.name = name
     current_user.save()
-    login_user(current_user)
     return jsonify({'name': current_user.name})
 
 @app.route('/api/user/settings', methods=['GET','POST'])
@@ -92,9 +90,8 @@ def api_user_settings():
     schema = dict([(k, 'boolean') for k in db.User.structure['settings'].keys()])
     settings = safe_input_object(schema)
     if request.method == 'POST':
-        current_user.update_settings(settings)
-        # reload user via relogin
-        login_user(current_user)
+        current_user.settings = settings
+        current_user.save()
     return jsonify(current_user.settings)
 
 @app.route('/api/playlist/tag/<tagname>')

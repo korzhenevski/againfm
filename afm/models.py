@@ -31,7 +31,7 @@ class BaseDocument(Document):
 
     def save(self, *args, **kwargs):
         # additional monotonic integer object_id
-        if 'id' in self.structure:
+        if 'id' in self.structure and not self['id']:
             self['id'] = self.db.object_ids.find_and_modify(
                 query={'_id': self.collection.name},
                 update={'$inc': {'next': 1}},
@@ -168,7 +168,9 @@ class User(BaseDocument):
         'email': unicode,
         'password': unicode,
         'new_password': unicode,
+        'avatar_url': unicode,
         'is_active': bool,
+        'connect': dict,
         'settings': {
             'throttle_traffic': bool,
             'limit_night_volume': bool,
@@ -181,16 +183,14 @@ class User(BaseDocument):
     default_values = {
         'login': u'',
         'sex': u'',
+        'avatar_url': u'',
+        'email': u'',
         'is_active': True,
+        'connect': {},
         'settings.throttle_traffic': False,
         'settings.fading_sound': True,
         'settings.limit_night_volume': True
     }
-
-    def favorites_cache(self):
-        if not self._favorites_cache:
-            self._favorites_cache = FavoritesCache(user_id=self['id'], redis=global_redis)
-        return self._favorites_cache
 
     def check_password(self, raw_password):
         if not self['password']:
@@ -205,28 +205,13 @@ class User(BaseDocument):
     def _password_hash(self, raw_password):
         return md5hash(app.secret_key + raw_password)
 
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return self['is_active']
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return self['id']
-
-    @property
-    def gravatar_hash(self):
-        return md5hash(self['email'].lower())
-
     def get_public_data(self):
         return {
             'id': self['id'],
             'email': self['email'],
             'name': self['name'],
             'sex': self['sex'],
+            'avatar_url': self['avatar_url'],
             'gravatar_hash': self.gravatar_hash,
             'settings': self['settings']
         }
@@ -257,9 +242,21 @@ class User(BaseDocument):
             return True
         return False
 
-    def update_settings(self, settings):
-        self['settings'] = dict([(k, bool(v)) for k, v in settings.iteritems() if k in self.structure['settings']])
-        self.save()
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return self['is_active']
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self['id']
+
+    @property
+    def gravatar_hash(self):
+        return md5hash(self['email'].lower())
 
 @db.register
 class Station(BaseDocument):

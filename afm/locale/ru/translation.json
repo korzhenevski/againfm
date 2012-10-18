@@ -5,11 +5,7 @@
             "made_in": "сделано в России",
             "about": "о проекте",
             "tos": "условия использования",
-            "disclaimer": "is irrelevant and is not responsible for any radio ads.",
-            "designer": {
-                "label": "designed by",
-                "info_label":  "site information"
-            },
+            "disclaimer": "не имеет отношения и не несет ответственность за рекламу размещенную на радио.",
             "feedback": "обратная связь"
         }
     },
