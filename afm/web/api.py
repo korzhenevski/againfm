@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import pymongo
-from . import app, db
+from afm import app, db
 from flask import jsonify, request, render_template
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from .afm.web.models import UserFavoritesCache
+from afm.models import UserFavoritesCache
 from .helpers import *
 
 @app.route('/api/user/login', methods=['POST'])

@@ -1,0 +1,55 @@
+<h1>{{t "settings.title"}}</h1>
+<div class="user-settings">
+<fieldset>
+    <legend>{{t "settings.playback" }}</legend>
+</fieldset>
+<ul class="checkbox-shift">
+    <li>
+        {{setting "throttle_traffic"}}
+    </li>
+    <li>
+        {{setting "limit_night_volume"}}
+    </li>
+    <li>
+        {{setting "fading_sound"}}
+    </li>
+</ul>
+
+<fieldset>
+    <legend>{{t "settings.personal_info.title"}}</legend>
+</fieldset>
+<ul>
+    <li>
+        {{t "settings.personal_info.name"}}:
+        <form action="change_name" autocomplete="off" class="change-name">
+            <input name="name" placeholder="{{t "settings.personal_info.name"}}" value="{{ name }}" />
+            <input type="submit" class="btn" disabled="disabled" value="{{t "button.change"}}" />
+        </form>
+    </li>
+    <!--<li>
+        {{t "settings.personal_info.email"}}:
+        <span class="info">
+            <strong>{{ email }}</strong>
+            <span class="pseudo-link open-form">{{t "button.change"}}</span>
+        </span>
+        <form class="change" action="change_email" autocomplete="off">
+            <input name="email" placeholder="{{t "settings.personal_info.new_email"}}" />
+            <input type="password" name="current_password" placeholder="{{t "settings.personal_info.current_password"}}" />
+            <input type="submit" class="btn" value="{{t "button.change"}}" />
+        </form>
+    </li> -->
+    <!--li>
+        {{t "settings.personal_info.password"}}:
+        <span class="info">
+            <strong>*******</strong>
+            <span class="pseudo-link open-form">{{t "button.change"}}</span>
+        </span>
+        <form class="change" action="change_password" autocomplete="off">
+            <input type="password" name="password" placeholder="{{t "settings.personal_info.new_password"}}" />
+            <input type="password" name="current_password" placeholder="{{t "settings.personal_info.current_password"}}" />
+            <input type="submit" class="btn" value="{{t "button.change"}}" />
+        </form>
+    </li-->
+</ul>
+</div>
+<div class="close"></div>

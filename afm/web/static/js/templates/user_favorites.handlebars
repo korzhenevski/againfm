@@ -1,0 +1,19 @@
+<h1>{{t "favorites.title"}}</h1>
+<div class="user-favorites">
+    {{#if content}}
+        <table class="favorites">
+            {{&content}}
+        </table>
+    {{else}}
+        <div class="help">
+            <p>{{t "favorites.helptext1" }}</p>
+            <img src="/static/i/radionow.png" width="386" height="100" alt="" />
+            <p>{{t "favorites.helptext2" }}</p>
+        </div>
+    {{/if}}
+</div>
+<div class="close"></div>
+
+
+
+

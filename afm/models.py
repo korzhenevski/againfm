@@ -13,10 +13,6 @@ from hashlib import md5
 from random import choice
 from datetime import datetime
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.User.find_one({'id': user_id})
-
 def md5hash(data):
     hashed = md5()
     hashed.update(data)

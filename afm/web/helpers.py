@@ -3,8 +3,7 @@
 
 import logging
 import validictory
-from . import app
-from flask import  request, abort
+from flask import request, abort, current_app
 from datetime import date
 from afm.web import tasks
 
@@ -19,7 +18,7 @@ def naturalday(ts, ts_format=None):
     return ts.strftime(ts_format)
 
 def send_mail(**kwargs):
-    if app.debug:
+    if current_app.debug:
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)
@@ -55,7 +54,7 @@ def safe_input(schema, data=None, **kwargs):
 # HTTP-адрес инбокса по почтовому ящику
 def get_email_provider(email):
     domain = email.split('@')[1].lower()
-    for link, domains in app.config['EMAIL_PROVIDERS'].items():
+    for link, domains in current_app.config['EMAIL_PROVIDERS'].items():
         if domain in domains:
             return link
     return None

@@ -1,0 +1,9 @@
+<img src="{{#if avatar_url}} {{avatar_url}} {{else}} {{user_gravatar_url this "50"}} {{/if}}" width="50" height="50" alt="" class="avatar" />
+<div class="content">
+    <p>{{#if name}}{{name}}{{else}}{{email}}{{/if}}</p>
+    <ul>
+        <li class="favorites"><a href="{{link "user/favorites"}}" class="link">{{t "user.favorites" }}</a></li>
+        <li class="settings"><a href="{{link "user/settings"}}" class="link">{{t "user.settings" }}</a></li>
+    </ul>
+</div>
+<div class="logout"></div>
