@@ -471,8 +471,8 @@ _.extend(App.RadioDisplay.prototype, {
         new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
-            new App.FavoriteSelector(),
-            new App.HistorySelector(),
+            new App.FavoriteSelector({hint: App.i18n('display.filters.favorite')}),
+            new App.HistorySelector({hint: App.i18n('display.filters.history')}),
             new App.Selector({selector: 'featured', title: App.i18n('display.filters.featured')})
         ]);
 

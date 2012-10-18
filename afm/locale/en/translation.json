@@ -137,7 +137,9 @@
 
     "display": {
         "filters": {
-            "featured": "Featured"
+            "featured": "Featured",
+            "favorite": "Favorite radio",
+            "history": "Playback history"
         },
         "search": {
             "404": "Nothing found",
