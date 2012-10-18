@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
 import string
 from . import app, login_manager, db
 
@@ -11,8 +12,6 @@ except ImportError:
 from hashlib import md5
 from random import choice
 from datetime import datetime
-import time
-from .helpers import naturalday
 
 @login_manager.user_loader
 def load_user(user_id):
