@@ -112,7 +112,12 @@ App.LoginFormView = App.View.extend({
     },
 
     render: function() {
-        this.$el.html(this.template()).toggle(!this.user.isLogged());
+        this.$el.html(this.template());
+        if (this.user.isLogged()) {
+            this.$el.hide();
+        } else {
+            this.$el.fadeIn();
+        }
     },
 
     // проверка заполненности полей
@@ -160,7 +165,7 @@ App.UserBarView = App.View.extend({
 
     render: function() {
         if (this.user.isLogged()) {
-            this.$el.show().html(this.template(this.user.toJSON()));
+            this.$el.fadeIn().html(this.template(this.user.toJSON()));
         } else {
             this.$el.hide();
         }
