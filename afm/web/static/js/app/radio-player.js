@@ -280,7 +280,7 @@ App.Radio = App.Model.extend({
     initialize: function() {
         this.params = {};
         this.publishEvents('station_changed stream_changed error', this.mediator, 'radio');
-        this.mediator.on('playlist:station_changed route:station', this.changeStation, this);
+        this.mediator.on('playlist:station_changed radio:play', this.changeStation, this);
         // если есть ограничение по трафику, дергаем поток с наименьшим битрейтом
         this.mediator.on('playback:throttle_traffic', function(throttle_traffic){
             this.params = throttle_traffic ? {low_bitrate: true} : {};

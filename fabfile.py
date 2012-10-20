@@ -16,15 +16,15 @@ def init():
 	run('pip install -r {}/requirements.txt'.format(env.project))
 
 def compass():
-    local('compass watch afm/static')
+    local('compass watch afm/web/static')
 
 def celery():
-    local('celery -A afm.celery worker -l info')
+    local('celery -A afm.web.celery worker -l info')
 
 def player():
     with lcd('player'):
-        local('as3compile --flashversion 10 --output ../afm/static/swf/player.swf player.as')
+        local('as3compile --flashversion 10 --output ../afm/web/static/swf/player.swf player.as')
 
 def handlebars():
-    with lcd('afm/static/js'):
+    with lcd('afm/web/static/js'):
         local('handlebars templates/*.handlebars --min --output render.js')

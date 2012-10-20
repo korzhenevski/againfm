@@ -3,7 +3,15 @@ App.UserFavoritesView = App.View.extend({
     item_template: App.getTemplate('user_favorite'),
     label_template: App.getTemplate('favorites_label'),
     events: {
-        'click .favorite': 'toggleFavorite'
+        'click .favorite': 'toggleFavorite',
+        'click .station': 'playRadio'
+    },
+    mediator: App.mediator,
+
+    playRadio: function(e) {
+        var station = $(e.currentTarget).data();
+        this.mediator.trigger('radio:play', station);
+        return false;
     },
 
     initialize: function() {
