@@ -38,7 +38,7 @@ App.RadioSpectrum = App.View.extend({
             this.points[i] = 50;
         }
         this.drawBlankLine();
-        //this.animate();
+        this.animate();
         this.pullSpectrum();
     },
 

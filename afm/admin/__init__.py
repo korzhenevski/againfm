@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint
-admin = Blueprint('admin', __name__)
+admin = Blueprint('admin', __name__, template_folder='templates')
 
-@admin.route('/')
-def admin_index():
-    return 'admin index'
+from . import views

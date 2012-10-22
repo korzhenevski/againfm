@@ -1,0 +1,16 @@
+{% extends "admin/layout.html" %}
+
+{% block content %}
+    <h2>Station &laquo;{{ station.title }}&raquo;</h2>
+
+    <table class="table table-bordered">
+        <tbody>
+        {% for stream in streams %}
+            <tr class="{% if stream.is_online %}success{% else %}error{% endif %}">
+                <td>{{ stream.id }}</td>
+                <td>{{ stream.url }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

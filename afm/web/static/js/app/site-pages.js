@@ -69,6 +69,9 @@ App.FeedbackView = App.View.extend({
     },
 
     show: function() {
+        var position = this.$el.position();
+        position.left = $('a.feedback').position().left;
+        this.$el.position(position);
         this.$el.fadeIn();
     },
 

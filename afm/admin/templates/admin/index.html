@@ -1,0 +1,31 @@
+{% extends "admin/layout.html" %}
+
+{% block content %}
+    <h1>Streams</h1>
+
+    <table class="table table-bordered">
+        <tbody>
+        {% for group in list %}
+            {% if group.station %}
+            <tr>
+                <th colspan="2">
+                    <a href="{{ url_for('admin.station_details', station_id=group.station.id) }}">
+                    {{ group.station.title }}
+                    </a>
+                </th>
+            </tr>
+            {% else %}
+                <tr>
+                    <th colspan="2">No station</th>
+                </tr>
+            {% endif %}
+            {% for stream in group.streams %}
+            <tr class="{% if stream.is_online %}success{% else %}error{% endif %}">
+                <td>{{ stream.id }}</td>
+                <td>{{ stream.url }}</td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

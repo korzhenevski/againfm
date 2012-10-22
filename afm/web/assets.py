@@ -33,6 +33,6 @@ assets.register('scripts', Bundle(
     'js/app/user-pages.js',
     'js/app/user-topbox.js',
     'js/app/user.js',
-    'js/app/site-common.js',
+    'js/app/site-pages.js',
     'js/app/router.js',
     filters='uglifyjs', output='js/deploy/app.%(version)s.js'))
