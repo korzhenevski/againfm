@@ -25,6 +25,7 @@ App.TopBox = App.View.extend({
 
     setHtml: function(html) {
         this.$el.html(html);
+        this.showPlaceholder();
     },
 
     hide: function() {

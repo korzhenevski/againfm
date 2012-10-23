@@ -100,7 +100,7 @@ App.LoginFormView = App.View.extend({
         this.user.on('logged logout', this.render, this);
         // вывод ошибки логина
         this.user.on('login_error', function(error){
-            var error = App.i18n('login.error.' + error);
+            error = App.i18n('login.error.' + error);
             this.$('.notice').addClass('notice-error').text(error);
         }, this);
         this.$('input').bind('textchange', _.bind(this._clearError, this));
@@ -113,6 +113,7 @@ App.LoginFormView = App.View.extend({
 
     render: function() {
         this.$el.html(this.template());
+        this.showPlaceholder();
         if (this.user.isLogged()) {
             this.$el.hide();
         } else {
@@ -141,7 +142,7 @@ App.LoginFormView = App.View.extend({
         }
         this.ajaxButton(function(){
             return this.user.login(this.serializeForm());
-        });
+        }, 'loading');
         return false;
     }
 });
@@ -246,7 +247,7 @@ App.UserRouter = Backbone.Router.extend({
         if (!this.feedbackView) {
             this.feedbackView = new App.FeedbackView();
             this.feedbackView.on('hide', this.navigateToPrevious, this);
-        };
+        }
         this.feedbackView.show();
     },
 
@@ -318,4 +319,12 @@ $(function(){
         user: App.user,
         favorites: App.userFavorites
     });
-})
+    $('a').live('click', function(e){
+        var url = $(e.currentTarget).attr('href');
+        if (!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
+            url = url.replace(/^\//, '')
+            App.userRouter.navigate(url, {trigger: true})
+            return false;
+        }
+    });
+});

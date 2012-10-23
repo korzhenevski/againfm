@@ -370,6 +370,7 @@ App.SearchView = App.View.extend({
             this.recentSelector = selector;
         }, this);
         this.$popupEl = $(this.popupEl);
+        this.showPlaceholder();
     },
 
     // состыковка с полем ввода

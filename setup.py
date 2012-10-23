@@ -40,6 +40,8 @@ setup(
         'ujson==1.22',
         'virtualenv==1.8.2',
         'validictory==0.8.3',
+        'raven==2.0.7.1',
+        'blinker==1.2',
     ],
     zip_safe=False,
 )

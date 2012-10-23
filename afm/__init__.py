@@ -33,3 +33,6 @@ app.register_blueprint(admin, url_prefix='/admin')
 from afm.web.assets import assets
 assets.init_app(app)
 
+if not app.config['DEBUG']:
+    from raven.contrib.flask import Sentry
+    sentry = Sentry(app)

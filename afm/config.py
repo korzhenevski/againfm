@@ -48,3 +48,5 @@ VK = {
     'authorize_url': 'https://oauth.vk.com/authorize',
     'access_token_url': 'https://oauth.vk.com/access_token',
 }
+
+SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'

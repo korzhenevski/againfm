@@ -4,7 +4,8 @@
     <meta charset="utf-8"/>
     <title>{{ sitename }}</title>
     <meta name="description" content="{{ _('site.description') }}"/>
-    <link href="/static/css/screen.css" media="screen, projection" rel="stylesheet"/>
+    <link href="/static/css/screen.css" rel="stylesheet"/>
+    <link href="/static/css/common.css" rel="stylesheet"/>
     <link id="favicon" rel="shortcut icon" type="image/x-icon" href="/static/i/favicon.ico"/>
 </head>
 <body>
@@ -109,7 +110,7 @@
     var App = App || {};
     App.i18n_dict = {{ bootstrap.i18n|safe }};
     App.debug = {{ config.DEBUG|tojson }};
-    App.pushState = false;
+    App.pushState = true;
 </script>
 
 {% assets "core_scripts" %}
@@ -123,6 +124,9 @@
 <script>
     $(function () {
         $.fn.button.defaults = App.i18n('button');
+        $.watermark.options.className = 'placeholder';
+        $.watermark.options.useNative = false;
+
         App.user.set({{ bootstrap.user|json|safe }});
         new App.Router();
         Backbone.history.start({pushState: App.pushState});

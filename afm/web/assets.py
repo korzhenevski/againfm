@@ -19,6 +19,7 @@ assets.register('core_scripts', Bundle(
     #'js/handlebars.runtime.js',
     #'js/render.js',
     'js/libs/handlebars.js',
+    'js/libs/jquery.watermark.js',
     'js/libs/jquery.cookie.js',
     'js/libs/comet.js',
     filters='uglifyjs', output='js/deploy/core.%(version)s.js'))

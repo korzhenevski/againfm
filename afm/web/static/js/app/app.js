@@ -106,6 +106,17 @@ App.View = Backbone.View.extend({
         this.show();
     },
 
+    showPlaceholder: function() {
+        if (this.$el.is('[placeholder]')) {
+            this.$el.watermark(this.$el.attr('placeholder'));
+        } else {
+            this.$('[placeholder]').each(function(){
+                var $el = $(this);
+                $el.watermark($el.attr('placeholder'));
+            });
+        }
+    },
+
     /**
      * Сериализует данные формы в объект.
      *
@@ -260,7 +271,6 @@ window.requestAnimFrame = (function() {
         window.setTimeout(callback, 100); // floor 1000 / 20 fps
     };
 })();
-
 
 window._log = function() {
     console.log(arguments);
