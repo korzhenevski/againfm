@@ -696,10 +696,16 @@ $footer-height: 2em
       text-shadow: 0px 1px 1px #111
     .favorites
       @include profile-sprite(favorites)
+      &:hover
+        @include profile-sprite(favorites_hover)
     .history
       @include profile-sprite(history)
+      &:hover
+        @include profile-sprite(history_hover)
     .settings
       @include profile-sprite(settings)
+      &:hover
+        @include profile-sprite(settings_hover)
     ul
       margin-top: 0.4em
       li
@@ -714,6 +720,9 @@ $footer-height: 2em
       color: #fff
       text-decoration: none
       border-bottom: 1px solid #fff
+      &:hover
+        border-bottom: 1px solid #f60
+        color: #ff6600
 
 .panel-box
   width: 45%
