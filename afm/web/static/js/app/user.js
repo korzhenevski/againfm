@@ -126,7 +126,7 @@ App.LoginFormView = App.View.extend({
         var valid = true;
         this.$(':text, :password').each(function(){
             var val = $.trim(this.value);
-            if (!val) {
+            if (!val || val == $(this).attr('placeholder')) {
                 valid = false;
             }
         });

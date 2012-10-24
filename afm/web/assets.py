@@ -15,6 +15,7 @@ assets.register('core_scripts', Bundle(
     'js/libs/bootstrap-button.js',
     # radio-player
     'js/libs/swfobject.js',
+    'js/libs/modernizr.js',
     # for production with precompiled templates only include tiny handlerbars.runtime.js
     #'js/handlebars.runtime.js',
     #'js/render.js',

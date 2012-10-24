@@ -7,7 +7,8 @@
 var FormValidator = App.klass({
     validators: {
         required: function($el) {
-            return $.trim($el.val()).length > 0;
+            var val = $.trim($el.val());
+            return val && val != $el.attr('placeholder');
         },
 
         email: function($el) {

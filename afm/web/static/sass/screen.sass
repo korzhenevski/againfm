@@ -25,19 +25,19 @@ html, body
   height: 100%
 
 body
+  font-family: Arial,sans-serif
   background: #111
-  +background(linear-gradient(#2a2e31, #000000))
   font-size: 15px
   line-height: 1.3em
   color: #fff
-  font-family: Arial,sans-serif
 
 button, input, select, textarea, p
   font-size: 0.8em
   line-height: 1.4em
   color: #fff
 
-input[disabled], button[disabled]
+input[disabled],
+button[disabled]
   +opacity(0.7)
 
 .hidden
@@ -53,29 +53,10 @@ input[disabled], button[disabled]
     color: #fe7b2c
 
 a
-  &:link
+  &:link, &:visited
     color: #999
-  &:visited
-    color: #666
   &:active, &:hover
     color: #fe7b2c
-  &.fm
-    text-decoration: none
-    border-bottom: 1px #999 dotted
-    text-shadow: 1px 1px 0px #000
-    &:link
-      color: #999
-    &:visited
-      color: #666
-      border-color: #666
-    &:active, &:hover
-      color: #fe7b2c
-      border-color: #fe7b2c
-  &.logo
-    line-height: 0px
-    height: 0px
-    font-size: 0px
-    border: none
 
 .wrapper
   background-image: url('../i/background_pattern.png')
@@ -110,9 +91,8 @@ a
 .head-form
   top: 86px
   overflow: hidden
-  input
-    &[type=text], &[type=password]
-      width: 185px
+  .input
+    width: 185px
   a, label, p
     font-size: 12px
     line-height: 2em
@@ -156,16 +136,15 @@ a
       color: #fff
 
 .top-box
-  background-color: black
   width: 100%
   height: 200px
   position: absolute
   top: 0px
   left: 0px
-  margin-top: -200px
   z-index: 1000
-  +background(linear-gradient(#2a2e31, #000000))
-  .wrapper-left,  .wrapper-right
+  margin-top: -200px
+  background-color: #000
+  .wrapper-left, .wrapper-right
     height: 200px
   .wrapper-left h1
     font-size: 3.5em
@@ -188,48 +167,27 @@ a
   background-color: #666
   border: none
   margin: 0
-  border-radius: 5px
+  +border-radius(5px)
   padding: 7px 0px
   padding-left: 12px
   outline: none
-
-input[type=submit2]
-  height: 32px
-  margin: 0px
-  padding: 0px
-  border: 1px solid #333
-  color: #333
-  border-radius: 5px
-  background-color: #666
-  +background(linear-gradient(#c4c4c4, #9b9b9b))
-  text-shadow: 0px 1px 0px #cfcfcf
-  font-weight: bold
-  text-align: center
-  float: left
 
 .button
   display: inline-block
   border: 1px solid #2c1200
   color: #000
-  background-color: #666
   text-shadow: 0px 1px 0px #cfcfcf
   margin: 0px
   line-height: 20px
   padding: 5px 15px
   cursor: pointer
   outline: none
+  background-color: #cacaca
   +border-radius(5px)
-  +background(linear-gradient(#cacaca, #9d9d9d))
   &:focus
     +box-shadow(#fc6622 0 0px 6px 1px)
-  &:hover
-    +background(linear-gradient(#ebebeb, #959595))
-  &:active
-    +background(linear-gradient(#5d5d5d, #b1b1b1))
 
-.button[disabled],
-.button.disabled
-  +background(linear-gradient(#7d7f80, #616364))
+.button[disabled], .button.disabled
   text-shadow: 0px 1px 0px #999
 
 .loading
@@ -286,15 +244,13 @@ form
     width: 100px
     height: 9px
     background-color: #1f2224
-    +background(linear-gradient(#030404, #1f2224))
-    /* FF3.6+
-      border: none */
     position: relative
     text-align: left
-    border-radius: 4px
+    +border-radius(4px)
     margin: 3px 5px
     margin-top: 3px
     margin-right: 7px
+    background: #303338
     .ui-slider-range
       left: 0
       height: 100%
@@ -303,10 +259,9 @@ form
       display: block
       font-size: 0.7em
       position: absolute
-      border-radius: 4px
+      +border-radius(4px)
       padding-left: 4px
-      +background(linear-gradient(#4d4e50, #828486))
-      /* FF3.6+ */
+      background: #828486
     .ui-slider-handle
       margin-left: -10px
       margin-top: -3px
@@ -489,7 +444,7 @@ $station-icon-shift: 5px
 
 .search-input
   position: relative
-  margin-top: 8px
+  top: 6px
   border: none
   outline: none
   padding: 4px 9px
@@ -501,7 +456,6 @@ $station-icon-shift: 5px
   background: #303338
   +box-shadow(#111 0 0 1px 1px inset)
   +border-radius(12px)
-  +background(linear-gradient(#1a1c20, #303338))
 
 .search-popup
   width: 78%
@@ -1019,3 +973,36 @@ $footer-height: 2em
   height: 100px
   width: 100px
   top: 0
+
+.cssgradients
+  body,
+  .top-box
+    +background(linear-gradient(#2a2e31, #000000))
+
+  .button
+    +background(linear-gradient(#cacaca, #9d9d9d))
+    &:hover
+      +background(linear-gradient(#ebebeb, #959595))
+    &:active
+      +background(linear-gradient(#5d5d5d, #b1b1b1))
+
+  .button[disabled],
+  .button.disabled
+    +background(linear-gradient(#7d7f80, #616364))
+
+  .slider
+    +background(linear-gradient(#030404, #1f2224))
+    .ui-slider-range
+      +background(linear-gradient(#4d4e50, #828486))
+
+  .search-input
+    +background(linear-gradient(#1a1c20, #303338))
+
+.ie
+  .search-input
+    top: 8px
+    padding-top: 3px
+    height: 17px
+  .input
+    padding-top: 7px
+    padding-bottom: 9px
