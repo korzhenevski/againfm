@@ -132,7 +132,7 @@
     },
 
     "display": {
-        "filters": {
+        "selectors": {
             "featured": "Featured",
             "favorite": "Favorite radio",
             "history": "Playback history"

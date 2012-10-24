@@ -136,11 +136,19 @@ def station_details(station_id):
     if not station:
         redirect('/')
 
-    return render_template('web/index.html', station=station.get_public_data())
+    return render_template('index.html', station=station.get_public_data())
 
 @web.route('/user/favorites')
 @web.route('/user/settings')
 def user_routes():
     if not current_user.is_authenticated():
         redirect('/')
-    return render_template('web/index.html')
+    return render_template('index.html')
+
+@web.route('/signup')
+@web.route('/amnesia')
+@web.route('/tos')
+@web.route('/feedback')
+@web.route('/about')
+def site_pages():
+    return render_template('index.html')

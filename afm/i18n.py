@@ -12,7 +12,7 @@ class I18n(object):
         self.load_dict(app.config.get('LOCALE', 'en'))
 
     def load_dict(self, locale):
-        name = 'locale/{}/translation.json'.format(locale)
+        name = 'locale/{}.json'.format(locale)
         with self._app.open_resource(name) as f:
             self.dict = json.loads(f.read())
             self.flat_dict = DotCollapsedDict(self.dict)

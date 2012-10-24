@@ -130,7 +130,7 @@
     },
 
     "display": {
-        "filters": {
+        "selectors": {
             "featured": "Подборка",
             "favorite": "Избранные станции",
             "history": "История проигрывания"

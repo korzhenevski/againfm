@@ -319,7 +319,8 @@ $(function(){
         user: App.user,
         favorites: App.userFavorites
     });
-    $('a').live('click', function(e){
+
+    $(document).on("click", "a[href^='/']", function(e) {
         var url = $(e.currentTarget).attr('href');
         if (!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
             url = url.replace(/^\//, '')

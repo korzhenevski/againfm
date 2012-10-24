@@ -11,6 +11,7 @@ App.Playlist = App.Collection.extend({
     model: App.Station,
     _state: {},
     _selector: 'default',
+    _shuffled: [],
 
     initialize: function() {
         // track station for restore playlist current
@@ -49,26 +50,36 @@ App.Playlist = App.Collection.extend({
         this.setStation(this.at(index));
     },
 
+    fetch: function() {
+        var self = this;
+        return $.getJSON(this.url(), function(response){
+            if (response && response.objects) {
+                //var objects = _.map(response.objects, function(title, id){
+                //   return {id: id, title: title};
+                //});
+                self.reset(response.objects);
+            }
+        });
+    },
+
     /**
      * Загрузка по селектору.
      * @param selector string
-     * @param callback function - выполняется по завершению запроса
-     * @param errback function - выполняется если произошла ошибка
      */
-    fetchBySelector: function(selector, callback, errback) {
+    fetchBySelector: function(selector, options) {
+        options = _.defaults(options || {}, {shuffle: false, cursor: true});
+        var result = $.Deferred();
         // NB: пропускаем повторные выборки
         if (selector == this._selector) {
-            return;
+            result.resolve();
+            return result.promise();
         }
         this._selector = selector;
-        var deferred = this.fetch();
-        deferred.always(_.bind(this.restoreSelectedStation, this));
-        if (callback) {
-            deferred.always(callback);
+        var result = this.fetch();
+        if (options.cursor) {
+            result.done(_.bind(this.restoreSelectedStation, this));
         }
-        if (errback) {
-            deferred.error(errback);
-        }
+        return result;
     },
 
     refresh: function() {
@@ -83,6 +94,19 @@ App.Playlist = App.Collection.extend({
         if (snapshot) {
             this.setStation(this.get(snapshot.currentStation.id));
         }
+    }
+});
+
+App.Selectors = App.Collection.extend({
+    model: App.Selector,
+
+    unselectAll: function() {
+        return _.invoke(this.where({'active': true}), 'unselect');
+    },
+
+    select: function(model) {
+        model.fetchPlaylist(this.playlist);
+        this.trigger('select', model.id);
     }
 });
 
@@ -115,6 +139,10 @@ App.Selector = App.Model.extend({
 
     unselect: function() {
         this.set('active', false);
+    },
+
+    fetchPlaylist: function(playlist) {
+        playlist.fetchBySelector(this.id, {shuffle: true});
     }
 });
 
@@ -139,18 +167,6 @@ App.SelectorView = App.View.extend({
             this.model.collection.unselectAll();
             this.model.select();
         }
-    }
-});
-
-App.Selectors = App.Collection.extend({
-    model: App.Selector,
-
-    unselectAll: function() {
-        return _.invoke(this.where({'active': true}), 'unselect');
-    },
-
-    select: function(model) {
-        this.trigger('select', model.id, model);
     }
 });
 
@@ -399,11 +415,13 @@ App.SearchView = App.View.extend({
 
     search: function(query) {
         var self = this;
-        this.playlist.fetchBySelector('search/' + query, function(){
+        var result = this.playlist.fetchBySelector('search/' + query);
+        result.done(function(){
             if (!self.playlist.length) {
                 self.showPopup('404');
             }
-        }, function() {
+        });
+        result.fail(function(){
             self.showPopup('500');
         });
     }
@@ -462,7 +480,6 @@ _.extend(App.RadioDisplay.prototype, {
 
         this.playlist = new App.Playlist();
         this.selectors = new App.Selectors();
-        this.selectors.on('select', this.playlistSelect, this);
         this.selectors.playlist = this.playlist;
 
         new App.SelectorsView({selectors: this.selectors});
@@ -471,9 +488,13 @@ _.extend(App.RadioDisplay.prototype, {
         new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
-            new App.FavoriteSelector({hint: App.i18n('display.filters.favorite')}),
-            //new App.HistorySelector({hint: App.i18n('display.filters.history')}),
-            new App.Selector({selector: 'featured', title: App.i18n('display.filters.featured')})
+            new App.FavoriteSelector({
+                hint: App.i18n('display.selectors.favorite')
+            }),
+            new App.Selector({
+                selector: 'featured',
+                title: App.i18n('display.selectors.featured')
+            })
         ]);
 
         // теги
@@ -488,10 +509,6 @@ _.extend(App.RadioDisplay.prototype, {
         }, this);
 
         this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
-    },
-
-    playlistSelect: function(selector) {
-        this.playlist.fetchBySelector(selector);
     }
 });
 
