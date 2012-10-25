@@ -59,7 +59,7 @@ App.Feed = App.klass({
  */
 App.Sticker = App.Model.extend({
     mediator: App.mediator,
-    stationBookmarkUrl: '/api/user/favorite/station/',
+    stationBookmarkUrl: '/api/user/bookmark/station/',
 
     initialize: function() {
         this.mediator.on('radio:station_changed', this.setStation, this);
@@ -120,7 +120,7 @@ App.Sticker = App.Model.extend({
         }
         track.favorite = !track.favorite;
         this.update('track', track);
-        $.post('/api/user/favorite/track/' + track.id);
+        $.post('/api/user/bookmark/track/' + track.id);
         this.trigger('bookmark_track', track.id, track.favorite);
     },
 

@@ -646,27 +646,30 @@ $footer-height: 2em
       font-size: 1em
       line-height: 1.2em
       text-shadow: 0px 1px 1px #111
+    .icon
+      position: absolute
+      height: 13px
+      width: 13px
+      margin-left: -16px
+      +inline-block
     .favorites
-      @include profile-sprite(favorites)
-      &:hover
+      .icon
+        @include profile-sprite(favorites)
+      &:hover .icon
         @include profile-sprite(favorites_hover)
-    .history
-      @include profile-sprite(history)
-      &:hover
-        @include profile-sprite(history_hover)
     .settings
-      @include profile-sprite(settings)
-      &:hover
+      .icon
+        @include profile-sprite(settings)
+      &:hover .icon
         @include profile-sprite(settings_hover)
     ul
       margin-top: 0.4em
       li
+        margin: 0 9px 0 16px
         float: left
         margin-right: 10px
         height: 13px
         line-height: 9px
-        background-repeat: no-repeat
-        padding-left: 16px
     a
       font-size: 0.8em
       color: #fff

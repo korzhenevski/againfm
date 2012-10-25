@@ -262,7 +262,7 @@ App.UserFavorite = App.Model.extend({
     toggleBookmark: function() {
         var self = this,
             track_id = this.get('track').id;
-        return $.post('/api/user/favorite/track/' + track_id, function(track){
+        return $.post('/api/user/bookmark/track/' + track_id, function(track){
             self.set('favorite', track.favorite);
             self.mediator.trigger('user_favorites:change', track_id, track.favorite);
         });

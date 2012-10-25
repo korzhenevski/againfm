@@ -116,10 +116,12 @@ def i18n_template_filter(key):
 
 @web.context_processor
 def app_context():
-    #categories = [tag.get_public_data() for tag in db.StationTag.find({'is_public': True})]
     bootstrap = {
         'user': {},
         'i18n': i18n.get_json_dict(),
+        'display': {
+            'genres': db.Genre.public_list(lang=current_app.config['LANG']),
+        }
     }
     if current_user.is_authenticated():
         bootstrap['user'] = current_user.get_public_data()

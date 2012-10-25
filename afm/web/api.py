@@ -28,7 +28,7 @@ def login():
     return jsonify({'error': 'no_user'})
 
 @app.route('/api/user/amnesia', methods=['POST'])
-def api_user_amnesia():
+def amnesia():
     email = safe_input_field('email', 'string')
     user = db.User.find_one({'email': email})
     if user:
@@ -40,7 +40,7 @@ def api_user_amnesia():
     return jsonify({'error': 'no_user'})
 
 @app.route('/api/user/signup', methods=['POST'])
-def api_user_signup():
+def signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
     if db.User.find_one({'email': data['email']}):
         return jsonify({'error': 'email_exists'})
@@ -77,7 +77,7 @@ def change_password():
 
 @app.route('/api/user/name', methods=['POST'])
 @login_required
-def api_user_name():
+def change_name():
     name = safe_input_field('name', {'type': 'string', 'maxLength': 64})
     current_user.name = name
     current_user.save()
@@ -85,7 +85,7 @@ def api_user_name():
 
 @app.route('/api/user/settings', methods=['GET','POST'])
 @login_required
-def api_user_settings():
+def change_settings():
     # схема валидации на основе структуры модели
     schema = dict([(k, 'boolean') for k in db.User.structure['settings'].keys()])
     settings = safe_input_object(schema)
@@ -94,16 +94,20 @@ def api_user_settings():
         current_user.save()
     return jsonify(current_user.settings)
 
-@app.route('/api/playlist/tag/<tagname>')
-def api_tag_playlist(tagname):
-    tag = db.StationTag.find_one_or_404({'tag': tagname})
-    stations = [station.get_public_data() for station in db.Station.find({'tag': tag['tag']})]
-    #stations = [station.get_public_data() for station in db.Station.find()]
+@app.route('/api/playlist/genre/<genre>')
+def genre_playlist(genre):
+    genre = db.Genre.find_one_or_404({'id': genre})
+    stations = [station.get_public_data() for station in db.Station.find({'tag': {'$in': genre['tags']}})]
+    return jsonify({'objects': stations})
+
+@app.route('/api/playlist/featured')
+def featured_playlist():
+    stations = [station.get_public_data() for station in db.Station.find()]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')
 @login_required
-def api_favorite_playlist():
+def favorite_playlist():
     favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
     favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
     # выборка по списку айдишников
@@ -114,12 +118,12 @@ def api_favorite_playlist():
     return jsonify({'objects': stations})
 
 @app.route('/api/station/<int:station_id>')
-def api_station_detail(station_id):
+def station_detail(station_id):
     station = db.Station.find_one_or_404({'id': station_id})
     return jsonify(station.get_public_data())
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
-def api_station_getplayinfo(station_id):
+def station_getplayinfo(station_id):
     """
     Возвращает поток для плеера.
     с параметром low_bitrate выбирается самый меньший битрейт
@@ -134,7 +138,7 @@ def api_station_getplayinfo(station_id):
             'id': stream['id'],
             'url': stream.get_web_url(),
             'bitrate': stream['bitrate'],
-            }
+        }
     }
 
     # возвращаем наличие станции в закладках, если пользователь авторизован
@@ -146,9 +150,9 @@ def api_station_getplayinfo(station_id):
 
     return jsonify(resp)
 
-@app.route('/api/user/favorite/station/<int:station_id>', methods=['GET', 'POST'])
+@app.route('/api/user/bookmark/station/<int:station_id>', methods=['GET', 'POST'])
 @login_required
-def favorite_station(station_id):
+def bookmark_station(station_id):
     # проверка на существование станции
     # можно конечно и без нее, но тогда реально засрать
     # избранное несуществующими станциями
@@ -164,9 +168,9 @@ def favorite_station(station_id):
         state = favorite_cache.exists('station', station_id)
     return jsonify({'favorite': state})
 
-@app.route('/api/user/favorite/track/<int:track_id>', methods=['GET', 'POST'])
+@app.route('/api/user/bookmark/track/<int:track_id>', methods=['GET', 'POST'])
 @login_required
-def favorite_track(track_id):
+def bookmark_track(track_id):
     onair_info = db.OnairHistory.find_one_or_404({'track_id': track_id})
     station = db.Station.find_one_or_404({'id': onair_info['station_id']})
     track = db.Track.find_one_or_404({'id': track_id})
@@ -181,13 +185,13 @@ def favorite_track(track_id):
 
 @app.route('/api/user/favorites')
 @login_required
-def api_user_favorites():
+def favorites():
     favorites = db.FavoriteTrack.find({'user_id': current_user.id})
     favorites = [favorite.get_public_data() for favorite in favorites]
     return jsonify({'objects': favorites})
 
 @app.route('/api/feedback', methods=['POST'])
-def api_feedback():
+def feedback():
     form = safe_input_object({
         'text': {'type': 'string', 'maxLength': 2048},
         'email': {'type': 'string', 'maxLength': 255}

@@ -3,7 +3,7 @@
 
 import time
 import string
-from . import app, login_manager, db
+from . import app, db
 
 try:
     from flask.ext.mongokit import Document
@@ -25,8 +25,9 @@ class BaseDocument(Document):
     use_dot_notation = True
 
     def save(self, *args, **kwargs):
-        # additional monotonic integer object_id
-        if 'id' in self.structure and not self['id']:
+        # автоинкремент числового идентификатора
+        spec = self.structure.get('id')
+        if spec is int and not self['id']:
             self['id'] = self.db.object_ids.find_and_modify(
                 query={'_id': self.collection.name},
                 update={'$inc': {'next': 1}},
@@ -356,28 +357,46 @@ class StationTag(BaseDocument):
 
     structure = {
         'id': int,
-        'tag': unicode,
-        'count': int,
-        'is_public': bool,
-        'updated_at': datetime
+        'title': unicode,
+        'tags': [unicode],
+        'is_visible': bool
     }
-
+    i18n = ['title']
     default_values = {
-        'is_public': False,
-        'updated_at': datetime.now,
+        'is_visible': True,
     }
 
-    indexes = [
-        {'fields': 'id', 'unique': True},
-        {'fields': 'tag', 'unique': True},
-        {'fields': 'is_public'},
-    ]
+    indexes = [{'fields': 'id', 'unique': True}]
 
     def get_public_data(self):
         return {
             'id': self['id'],
             'title': self['tag'],
         }
+
+@db.register
+class Genre(BaseDocument):
+    __collection__ = 'genres'
+    i18n = ['title']
+    structure = {
+        'id': unicode,
+        'title': unicode,
+        'tags': [unicode]
+    }
+
+    def get_public_data(self):
+        return {
+            'id': self.id,
+            'title': self.title
+        }
+
+    @staticmethod
+    def public_list(lang):
+        genres = []
+        for genre in db.Genre.find():
+            genre.set_lang(lang)
+            genres.append(genre.get_public_data())
+        return genres
 
 @db.register
 class OnairHistory(BaseDocument):

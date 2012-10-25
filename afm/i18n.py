@@ -9,7 +9,7 @@ class I18n(object):
         self.dict = {}
         # плоский словарь
         self.flat_dict = {}
-        self.load_dict(app.config.get('LOCALE', 'en'))
+        self.load_dict(app.config.get('LANG'))
 
     def load_dict(self, locale):
         name = 'locale/{}.json'.format(locale)

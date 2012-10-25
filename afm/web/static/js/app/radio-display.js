@@ -475,10 +475,10 @@ App.RadioDisplay = function() {
 _.extend(App.RadioDisplay.prototype, {
     mediator: App.mediator,
 
-    initialize: function(options) {
-        options = _.defaults(options || {}, {tags: []});
-
+    initialize: function() {
         this.playlist = new App.Playlist();
+        this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
+
         this.selectors = new App.Selectors();
         this.selectors.playlist = this.playlist;
 
@@ -488,27 +488,24 @@ _.extend(App.RadioDisplay.prototype, {
         new App.DisplayControlsView({playlist: this.playlist});
 
         this.selectors.add([
-            new App.FavoriteSelector({
-                hint: App.i18n('display.selectors.favorite')
-            }),
-            new App.Selector({
-                selector: 'featured',
-                title: App.i18n('display.selectors.featured')
-            })
+            new App.FavoriteSelector({hint: App.i18n('display.selectors.favorite')}),
+            new App.Selector({selector: 'featured', title: App.i18n('display.selectors.featured')})
         ]);
-
-        // теги
-        for (var i = options.tags.length; i > 0; i--) {
-            var tag = options.tags[i - 1];
-            this.selectors.add(new App.Selector({title: tag.title, selector: 'tag/' + tag.tag}));
-        }
 
         // когда пользователь жмет на большую кнопку, проигрывается первая станция
         this.mediator.on('player:power', function(){
             this.playlist.next();
         }, this);
+    },
 
-        this.playlist.publishEvents('station_changed', this.mediator, 'playlist');
+    setGenres: function(genres) {
+        // теги
+        _.each(genres, function(genre) {
+            this.selectors.add(new App.Selector({
+                title: genre.title,
+                selector: 'genre/' + genre.id
+            }));
+        }, this);
     }
 });
 
@@ -518,9 +515,5 @@ $(function(){
         {title: "House", tag: "house"},
         {title: "Trance", tag: "trance"}
     ]});
-    App.radioDisplay.selectors.get('tag/trance').select();
-    //App.mediator.on('player:ready', function(){
-    //    var playlist = App.radioDisplay.playlist;
-    //    playlist.setStation(playlist.last());
-    //});
+    App.radioDisplay.selectors.get('featured').select();
 });

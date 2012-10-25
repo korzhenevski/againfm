@@ -127,12 +127,8 @@
         $.fn.button.defaults = App.i18n('button');
         $.watermark.options.className = 'placeholder';
         $.watermark.options.useNative = false;
-        window.onerror = function() {
-            console.log(arguments);
-            return true;
-        }
-
         App.user.set({{ bootstrap.user|json|safe }});
+        App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
         new App.Router();
         Backbone.history.start({pushState: App.pushState});
     });
