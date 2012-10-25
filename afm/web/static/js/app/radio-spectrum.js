@@ -17,7 +17,7 @@ App.RadioSpectrum = App.View.extend({
         this.player.on('playing', this.start, this);
         this.player.on('stopped', this.stop, this);
         this.canvas = this.el.getContext('2d');
-        _.bindAll(this, 'pullSpectrum', '_updateDimensions', 'drawBlankLine');
+        _.bindAll(this, 'pullSpectrum', 'animate', '_updateDimensions', 'drawBlankLine');
         $(window).resize(_.throttle(this._updateDimensions, 200));
         this._updateDimensions();
     },
@@ -30,23 +30,25 @@ App.RadioSpectrum = App.View.extend({
     },
 
     start: function() {
-        console.profile('spectrum');
         this.running = true;
         this.spectrum = [];
         this.points = [];
+        this.animateTime = 0;
+        this.spectrumTime = 0;
         for (var i = 0; i < this.limit; ++i) {
-            this.points[i] = 50;
+            this.points[i] = 10;
         }
-        this.drawBlankLine();
-        this.animate();
-        this.pullSpectrum();
+        var self = this;
+        _.delay(function(){
+            //this.drawBlankLine();
+            self.animate2();
+        }, 1000);
     },
 
     stop: function() {
-        console.profileEnd('spectrum');
         this.running = false;
         this.clear();
-        requestAnimFrame(this.drawBlankLine);
+        this.drawBlankLine();
     },
 
     drawBlankLine: function() {
@@ -61,24 +63,72 @@ App.RadioSpectrum = App.View.extend({
         ctx.shadowColor = color;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 2;
 
         ctx.moveTo(0, height);
         ctx.lineTo(this.width, height);
         ctx.stroke();
     },
 
-    animate2: function(values, duration, interval) {
+    render: function() {
+        this.clear();
+        for(var lineIndex = 0; lineIndex < this.colors.length; lineIndex++) {
+            var pos = 0,
+                points = [],
+                lim = (lineIndex + 1) * this.lineSize;
+            var maxVal = this.height - 5;
+            var c = 0;
+            for (var i = lineIndex * this.lineSize; i < lim; i++) {
+                var val = (this.points[i] + 10 * lineIndex);
+                if (val > maxVal) {
+                    val = maxVal;
+                }
+                if (val < 0) {
+                    val = 5;
+                }
+                points.push([pos, val]);
+                pos += this.renderStep;
+                c++;
+            }
+
+            this.drawCurve(points, this.colors[lineIndex]);
+        }
+    },
+
+    /**
+     * 1. exists
+     *
+     * to = from
+     * from = getSpectrum
+     *
+     * 2. not exists
+     *
+     * to = getSpectrum
+     * from = zero fill
+     *
+     *
+     *
+     */
+
+    animate2: function() {
+        var duration = 450;
+        var interval = 25;
         var steps = duration / interval;
         var pointer = 0;
         var stepped;
         var step, from, to;
+        var self = this;
         function computeStep() {
-            if (!values[pointer + 1]) {
-                return false;
+            if (from && to) {
+                to = from;
+                from = self.pullSpectrum();
+            } else {
+                from = [];
+                for(var i = 0; i < self.limit; i++) {
+                    from.push(0);
+                }
+                to = self.pullSpectrum();
             }
-            from = values[pointer],
-            to = values[pointer + 1];
             step = [];
             stepped = steps;
             for (var i = 0; i < from.length; i++) {
@@ -89,15 +139,23 @@ App.RadioSpectrum = App.View.extend({
                 step[i] = val;
             }
             pointer++;
+            //if (pointer > 10) {
+            //    return false;
+            //}
             return true;
         }
         function stepper(){
+            if (!step) {
+                return false;
+            }
             var current = [];
             for (var i = 0; i < from.length; i++) {
                 from[i] = from[i] + step[i];
                 current[i] = parseFloat(from[i].toFixed(2));
             }
-            console.log(current);
+            self.points = current;
+            self.render();
+            //console.log(current);
             if (--stepped) {
                 setTimeout(stepper, interval);
             } else {
@@ -110,27 +168,31 @@ App.RadioSpectrum = App.View.extend({
         stepper();
     },
 
-    render: function() {
-        this.clear();
+    animate: function() {
+        var size = this.spectrum.length;
+        if (!size) {
+            this.pullSpectrum();
+        }
 
-        for(var lineIndex = 0; lineIndex < this.colors.length; lineIndex++) {
-            var pos = 0,
-                points = [],
-                lim = (lineIndex + 1) * this.lineSize;
-            var maxVal = this.height - 10;
-            for (var i = lineIndex * this.lineSize; i < lim; i++) {
-                var val = this.points[i];
-                if (val > maxVal) {
-                    val = maxVal;
+        var change = this.animateTime ? ((new Date()) - this.animateTime) : 0;
+        if (!change || change > 70) {
+            this.animateTime = +new Date();
+
+            for (var i = 0; i < size; i++) {
+                var diff = this.spectrum[i] - this.points[i];
+                if (diff != 0) {
+                    var val = this.points[i] + (diff * (change / 1000));
+                    if (val >= this.spectrum[i]) {
+                        val = this.spectrum[i];
+                    }
+                    this.points[i] = val;
                 }
-                if (val < 0) {
-                    val = 10;
-                }
-                points.push([pos, val]);
-                pos = pos + this.renderStep;
             }
+            this.render();
+        }
 
-            this.drawCurve(points, this.colors[lineIndex]);
+        if (this.running) {
+            requestAnimFrame(this.animate);
         }
     },
 
@@ -143,7 +205,7 @@ App.RadioSpectrum = App.View.extend({
         ctx.shadowColor = color;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 3;
 
         ctx.strokeStyle = color;
         ctx.lineWidth = linewidth;
@@ -185,16 +247,10 @@ App.RadioSpectrum = App.View.extend({
     },
 
     pullSpectrum: function() {
-        this.spectrum = this.player.engine.getSpectrum(this.limit);
-        if (this.running) {
-            setTimeout(this.pullSpectrum, 100);
-        }
+        return this.player.engine.getSpectrum(this.limit);
     },
 
     clear: function() {
         this.canvas.clearRect(0, 0, this.width, this.height);
     }
 });
-
-$(function(){
-})

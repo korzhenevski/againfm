@@ -57,12 +57,19 @@ package {
          var bytes:ByteArray = new ByteArray();
          var val:Number = 0;
 
-         _sound.extract(bytes, length);
+         _sound.extract(bytes, length * 3);
          bytes.position = 0;
          while (bytes.bytesAvailable > 0) {
             val = bytes.readFloat() + bytes.readFloat();
+            bytes.readFloat() + bytes.readFloat();
+            bytes.readFloat() + bytes.readFloat();
             spectrum.push((val + 1) / 2 * 100);
          }
+
+         // расширить диапазон
+         // [--.---.---.---.--]
+         // а не как сейчас
+         // [-.-.-.-.---------]
 
          return spectrum;
       }

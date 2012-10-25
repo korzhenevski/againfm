@@ -84,7 +84,7 @@
         },
         "limit_night_volume": {
             "label": "Limit the startup sound at night",
-            "notice": "from midnight to six a.m., for protect the ears volume will be set at 30%"
+            "notice": "for protect the ears volume will be set at 30%"
         },
         "fading_sound": {
             "label": "Fading the sound when the player is turned off"

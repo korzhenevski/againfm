@@ -1,5 +1,5 @@
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-textshadow-cssgradients-canvas-audio-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes
+ * Build: http://modernizr.com/download/#-textshadow-cssgradients-canvas-audio-cssclasses-prefixed-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes-notification-requestanimationframe
  */
 ;
 
@@ -341,11 +341,36 @@ window.Modernizr = (function( window, document, undefined ) {
     Modernizr.testAllProps  = testPropsAll;
 
 
-    Modernizr.testStyles    = injectElementWithStyles;    docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
+    Modernizr.testStyles    = injectElementWithStyles;
+    Modernizr.prefixed      = function(prop, obj, elem){
+        if(!obj) {
+            return testPropsAll(prop, 'pfx');
+        } else {
+            return testPropsAll(prop, obj, elem);
+        }
+    };
+
+
+    docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
 
         (enableClasses ? ' js ' + classes.join(' ') : '');
 
     return Modernizr;
 
 })(this, this.document);
-;
+// Notifications
+// By Theodoor van Donge
+
+// window.webkitNotifications is only used by Chrome 
+//	http://www.html5rocks.com/en/tutorials/notifications/quick/
+
+// window.Notification only exist in the draft specs 
+//	http://dev.w3.org/2006/webapi/WebNotifications/publish/Notifications.html#idl-if-Notification
+
+Modernizr.addTest('notification', !!Modernizr.prefixed('Notifications', window));
+// requestAnimationFrame
+// Offload animation repainting to browser for optimized performance. 
+// http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/RequestAnimationFrame/Overview.html
+// By Addy Osmani
+
+Modernizr.addTest('raf', !!Modernizr.prefixed('requestAnimationFrame', window));;
