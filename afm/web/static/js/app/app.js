@@ -72,14 +72,6 @@ Handlebars.registerHelper('time', function(ts){
     return padzero(date.getHours()) + ':' + padzero(date.getMinutes());
 });
 
-
-/**
- * Декоратор ссылок. Предваряет путь решеткой, если нет HTML5 pushState.
- */
-Handlebars.registerHelper('link', function(uri) {
-    return '#' + uri;
-});
-
 /**
  * Абстрактное представление c хелперами.
  *
@@ -178,6 +170,7 @@ App.i18n = function(key, options) {
     var def = options && !_.isUndefined(options.default) ? options.default : key;
     return val || def;
 };
+App.i18n_dict = {};
 
 // как-то громоздко, потенциально надо упростить
 (function(){
@@ -246,14 +239,9 @@ App.getUrl = function(path) {
 /**
  * Уведомляем компоненты о выгрузке окна.
  */
-(function(mediator){
-    var playing = false;
-    $(window).bind('beforeunload', function(){
-        mediator.trigger('app:unload');
-    });
-    mediator.on('player:playing', function() { playing = true; });
-    mediator.on('player:stopped', function() { playing = false; });
-})(App.mediator);
+$(window).bind('beforeunload', function(){
+    App.mediator.trigger('app:unload');
+});
 
 /**
  * i18n template helper

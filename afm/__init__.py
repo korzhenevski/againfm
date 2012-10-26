@@ -11,6 +11,7 @@ from .mailer import AmazonMailer
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+app.config.from_envvar('SETTINGS', silent=True)
 
 i18n = I18n(app)
 db = MongoKit(app)

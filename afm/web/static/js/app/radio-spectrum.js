@@ -5,7 +5,109 @@
  * @type {*}
  */
 
+/**
+ * дописать и сделать рефакторинг
+ * @type {*}
+ */
+App.RadioSpectrum = App.View.extend({
+    el: '#spectrum',
+    points: 180,
+    colors: ['#d86b26', '#d72f2e', '#0f9ac5'],
 
+    initialize: function(options) {
+        this.player = options.player;
+        this.player.on('playing', this.start, this);
+        this.player.on('stopped', this.stop, this);
+        this.canvas = this.el.getContext('2d');
+        //_.bindAll(this, 'pullSpectrum', 'animate', '_updateDimensions', 'drawBlankLine');
+        this._trackDimensions();
+        //this.lineSize = Math.floor(this.points / this.colors.length);
+        //this.pointInterval = Math.round(this.width / this.lineSize);
+        $(window).resize(_.throttle(this._trackDimensions, 200));
+    },
+
+    _trackDimensions: function() {
+        this.width = this.$el.width();
+        this.height = this.$el.height();
+    },
+
+    start: function() {
+
+    },
+
+    stop: function() {
+
+    },
+
+    /**
+     * расчитать разницу значений
+     * изменить значения
+     * если все закончено, получить новые данные
+     * новые данные это: from, to, diff
+     *
+     * @param duration
+     * @param interval
+     */
+    animate: function(duration, interval) {
+        var steps = duration / interval;
+        var pointer = 0;
+        var stepped;
+        var step, from, to;
+        var self = this;
+        function computeStep() {
+            if (from && to) {
+                to = from;
+                from = self.pullSpectrum();
+            } else {
+                from = [];
+                for(var i = 0; i < self.limit; i++) {
+                    from.push(0);
+                }
+                to = self.pullSpectrum();
+            }
+            step = [];
+            stepped = steps;
+            for (var i = 0; i < from.length; i++) {
+                var val = (to[i] - from[i]);
+                if (val != 0) {
+                    val = val / steps;
+                }
+                step[i] = val;
+            }
+            pointer++;
+            //if (pointer > 10) {
+            //    return false;
+            //}
+            return true;
+        }
+        function stepper(){
+            if (!step) {
+                return false;
+            }
+            var current = [];
+            for (var i = 0; i < from.length; i++) {
+                from[i] = from[i] + step[i];
+                current[i] = parseFloat(from[i].toFixed(2));
+            }
+            self.points = current;
+            self.render();
+            //console.log(current);
+            if (--stepped) {
+                setTimeout(stepper, interval);
+            } else {
+                if (computeStep()) {
+                    setTimeout(stepper, interval);
+                }
+            }
+        }
+        computeStep();
+        stepper();
+    }
+});
+
+
+
+/*
 App.RadioSpectrum = App.View.extend({
     el: '#spectrum',
     limit: 180,
@@ -108,7 +210,7 @@ App.RadioSpectrum = App.View.extend({
      *
      *
      *
-     */
+     *
 
     animate2: function() {
         var duration = 420;
@@ -254,3 +356,4 @@ App.RadioSpectrum = App.View.extend({
         this.canvas.clearRect(0, 0, this.width, this.height);
     }
 });
+*/

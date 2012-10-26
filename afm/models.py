@@ -261,12 +261,12 @@ class Station(BaseDocument):
         'id': int,
         'title': unicode,
         'website': unicode,
-        'tag': unicode,
+        'tags': [unicode]
     }
 
     indexes = [
         {'fields': 'id', 'unique': True},
-        {'fields': 'tag'},
+        {'fields': 'tags'},
     ]
 
     def get_public_data(self):

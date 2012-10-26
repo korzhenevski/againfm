@@ -111,7 +111,6 @@
     var App = App || {};
     App.i18n_dict = {{ bootstrap.i18n|safe }};
     App.debug = {{ config.DEBUG|tojson }};
-    App.pushState = true;
 </script>
 
 {% assets "core_scripts" %}
@@ -126,11 +125,10 @@
     $(function () {
         $.fn.button.defaults = App.i18n('button');
         $.watermark.options.className = 'placeholder';
-        $.watermark.options.useNative = false;
         App.user.set({{ bootstrap.user|json|safe }});
         App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
         new App.Router();
-        Backbone.history.start({pushState: App.pushState});
+        Backbone.history.start({pushState: true});
     });
 </script>
 

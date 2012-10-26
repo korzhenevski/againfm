@@ -23,6 +23,7 @@
             <tr class="{% if stream.is_online %}success{% else %}error{% endif %}">
                 <td>{{ stream.id }}</td>
                 <td>{{ stream.url }}</td>
+                <td>{{ stream.check_error }}</td>
             </tr>
             {% endfor %}
         {% endfor %}

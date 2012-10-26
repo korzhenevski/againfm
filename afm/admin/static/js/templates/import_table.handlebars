@@ -1,0 +1,8 @@
+<tr>
+    <th>Stream URL</th>
+</tr>
+{{#each list}}
+<tr class="item{{#if this.selected}} info{{/if}}" data-cid="{{ this.cid }}">
+    <td>{{ this.url }}</td>
+</tr>
+{{/each}}
