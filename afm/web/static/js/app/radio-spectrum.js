@@ -8,7 +8,7 @@
 
 App.RadioSpectrum = App.View.extend({
     el: '#spectrum',
-    limit: 300,
+    limit: 180,
     colors: ['#d86b26', '#d72f2e', '#0f9ac5'],
     running: false,
 
@@ -79,7 +79,7 @@ App.RadioSpectrum = App.View.extend({
             var maxVal = this.height - 5;
             var c = 0;
             for (var i = lineIndex * this.lineSize; i < lim; i++) {
-                var val = (this.points[i] + 10 * lineIndex);
+                var val = this.points[i];
                 if (val > maxVal) {
                     val = maxVal;
                 }
@@ -111,8 +111,8 @@ App.RadioSpectrum = App.View.extend({
      */
 
     animate2: function() {
-        var duration = 450;
-        var interval = 25;
+        var duration = 420;
+        var interval = 30;
         var steps = duration / interval;
         var pointer = 0;
         var stepped;

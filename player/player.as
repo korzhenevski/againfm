@@ -57,10 +57,11 @@ package {
          var bytes:ByteArray = new ByteArray();
          var val:Number = 0;
 
-         _sound.extract(bytes, length * 3);
+         _sound.extract(bytes, length * 4);
          bytes.position = 0;
          while (bytes.bytesAvailable > 0) {
             val = bytes.readFloat() + bytes.readFloat();
+            bytes.readFloat() + bytes.readFloat();
             bytes.readFloat() + bytes.readFloat();
             bytes.readFloat() + bytes.readFloat();
             spectrum.push((val + 1) / 2 * 100);
