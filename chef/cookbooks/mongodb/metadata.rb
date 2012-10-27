@@ -32,6 +32,11 @@ attribute "mongodb/port",
   :display_name => "Port",
   :description => "Port the mongodb instance is running on",
   :default => "27017"
+
+attribute "mongodb/bind_ip",
+  :display_name => "Bind address",
+  :description => "Instance bind address",
+  :default => nil
   
 attribute "mongodb/client_roles",
   :display_name => "Client Roles",

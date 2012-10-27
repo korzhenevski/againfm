@@ -3,9 +3,10 @@
     "default_attributes": {
         "timezone": {"value": "Europe/Moscow"},
         "redis": {
-            "config": {
-                "listen_addr": "0.0.0.0"
-            }
+            "config": {"listen_addr": "127.0.0.1"}
+        },
+        "mongodb": {
+            "bind_ip": "127.0.0.1"
         }
     },
     "override_attributes": { },

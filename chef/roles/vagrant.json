@@ -1,0 +1,21 @@
+{
+    "name": "vagrant",
+    "default_attributes": {},
+    "override_attributes": {
+        "redis": {
+            "config": {"listen_addr": "0.0.0.0"}
+        },
+        "mongodb": {"bind_ip": "0.0.0.0"},
+        "vim": {
+            "extra_packages": ["vim-nox"]
+        }
+    },
+    "json_class": "Chef::Role",
+    "description": "Vagrant Development Environment",
+    "chef_type": "role",
+    "run_list": [
+        "role[base]",
+        "recipe[git]",
+        "recipe[vim]"
+    ]
+}
