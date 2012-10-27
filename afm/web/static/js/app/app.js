@@ -72,6 +72,10 @@ Handlebars.registerHelper('time', function(ts){
     return padzero(date.getHours()) + ':' + padzero(date.getMinutes());
 });
 
+Handlebars.registerHelper('escape_uri_comp', function(str){
+    return encodeURIComponent(str);
+});
+
 /**
  * Абстрактное представление c хелперами.
  *

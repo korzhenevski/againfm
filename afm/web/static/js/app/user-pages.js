@@ -22,9 +22,11 @@ App.UserFavoritesView = App.View.extend({
         var $el = $(e.currentTarget),
             template = this.item_template,
             model = this.collection.getByCid($el.data('cid'));
-        model.toggleBookmark().always(function(){
-            $el.replaceWith(template(model.toJSON()));
-        });
+        if (!$(e.target).is('a')) {
+            model.toggleBookmark().always(function(){
+                $el.replaceWith(template(model.toJSON()));
+            });
+        }
     },
 
     render: function() {
