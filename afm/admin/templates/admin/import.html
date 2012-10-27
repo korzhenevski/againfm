@@ -2,42 +2,44 @@
 {% block title %}Import Radio{% endblock %}
 {% block content %}
     <div class="import">
-        <h1>Import</h1>
-        <form class="fetch form-inline">
-            <legend>Fetch</legend>
-            <p class="text-info"></p>
-            <input name="url" type="text" placeholder="Playlist or stream" />
-            <input type="submit" class="btn" value="Load" />
-        </form>
+        <h2>Import</h2>
+        <div class="row">
+            <div class="span4">
+                <form class="fetch form-inline">
+                    <legend>Fetch Playlist</legend>
+                    <input name="url" type="text" placeholder="Playlist or stream" />
+                    <input type="submit" class="btn" value="Fetch" />
+                </form>
+            </div>
+            <div class="span4 select form-inline">
+                <legend>Select Streams</legend>
+                <input type="text" class="search input-medium" placeholder="Search" />
+                <a class="btn toggle">Toggle</a>
+                <a class="btn push" button="submit">Push <i class="icon-arrow-right"></i></a>
+                <br />
+                <table class="table table-hover"></table>
+            </div>
 
-        <div class="save">
-            <legend>Save</legend>
-            <div class="row">
-                <div class="span4">
-                    <button class="btn btn-link toggle-selection">toggle selection</button>
-                    <button class="btn btn-link add">add to station</button>
-                    <input type="text" class="search input-small pull-right" placeholder="Search" /><br />
-                    <table class="import-table table table-hover"></table>
-                </div>
-                <div class="span5 offset2">
-                    <form class="station-save">
-                        <input type="text" placeholder="Title" class="station-title" />
-                        <input type="text" placeholder="Tags" class="station-tags input-small" />
-                        <input type="submit" class="btn btn-link" value="save" />
-                        <button class="btn btn-link clear">clear</button>
-                        <table class="station-streams table table-hover"></table>
-                    </form>
-                </div>
+            <div class="span4">
+                <form class="station">
+                    <legend>Save Station</legend>
+                    <div class="controls">
+                        <input type="text" placeholder="Title" name="title" class="title" />
+                        <input type="text" placeholder="Tags" name="tags" />
+                    </div>
+                    <input type="submit" class="btn" value="Save" />
+                    <p class="text-info"></p>
+                    <table class="table table-hover"></table>
+                </form>
             </div>
         </div>
-
     </div>
 {% endblock %}
 
 {% block js %}
     <script>
         $(function(){
-            //Admin.import = new Admin.ImportView();
+            Admin.import = new Admin.ImportView();
             //Admin.import.submit();
         });
     </script>

@@ -43,7 +43,14 @@ Admin.ImportView = Backbone.View.extend({
 
     initialize: function() {
         this.collection = new Admin.StreamList();
-        this.list = new Admin.ImportListView({collection: this.collection});
+        this.streams = new Admin.StreamList();
+        this.listView = new Admin.ImportListView({
+            collection: this.collection,
+            streams: this.streams
+        });
+        this.stationView = new Admin.ImportStationView({
+            streams: this.streams
+        });
     },
 
     submit: function() {
@@ -54,62 +61,35 @@ Admin.ImportView = Backbone.View.extend({
         var self = this;
         var $button = this.$('.fetch :submit');
         $button.button('loading');
-        //this.collection.reset([{"url": "http://94.25.53.133/nashe-48"}, {"url": "http://94.25.53.133/nashe-192"}, {"url": "http://94.25.53.133/ultra-48"}, {"url": "http://94.25.53.133/nashe-96"}, {"url": "http://94.25.53.133/rock-192"}, {"url": "http://94.25.53.133/best-192"}, {"url": "http://94.25.53.133/ultra-128"}, {"url": "http://94.25.53.133/ultra-320"}, {"url": "http://94.25.53.133/nashe-128"}, {"url": "http://94.25.53.133/ultra-96"}, {"url": "http://94.25.53.133/ultra-64"}, {"url": "http://94.25.53.133/ultra-192"}, {"url": "http://94.25.53.133/ru-192"}]);
         $.getJSON('/admin/import/fetch', {url: url}, function(response){
             if (response && response.streams) {
                 self.collection.reset(response.streams);
             }
         }).always(function(){
             $button.button('reset');
+        }).fail(function(){
+            alert('fetch error');
         });
         return false;
     }
 });
 
-Admin.ImportStationView = Backbone.View.extend({
-
-});
-
 Admin.ImportListView = Backbone.View.extend({
-    el: '.save',
+    el: '.select',
     template: Admin.getTemplate('import_table'),
-    station_template: Admin.getTemplate('station_streams'),
     events: {
         'keyup .search': 'search',
-        'click .toggle-selection': 'toggle',
+        'click .toggle': 'toggle',
         'click .item': 'toggleItem',
-        'click .add': 'addToStation',
-        'click .clear': 'clearStreams',
-        'change .station-title': 'stationChanged',
-        'submit .station-save': 'saveStation'
+        'click .push': 'pushToStation'
     },
 
-    initialize: function() {
-        this.streams = new Admin.StreamList();
-        this.streams.on('reset add', this.renderStationStreams, this);
+    initialize: function(options) {
+        this.streams = options.streams;
         this.collection.on('reset change', this.render, this);
-        this.$('.station-title').typeahead({source: this._typeaheadSearch});
     },
 
-    saveStation: function() {
-        var data = {streams: this.streams.pluck('url')};
-        if (this.stationId) {
-            data.id = this.stationId;
-        } else {
-            data.title = $.trim(this.$('.station-title').val());
-            var tags = $.trim(this.$('.station-tags').val());
-            data.tags = _.compact(tags.split(','));
-        }
-        return $.ajax({
-            url: '/admin/import/station/save',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data)
-        });
-        return false;
-    },
-
-    addToStation: function() {
+    pushToStation: function() {
         var streams = this.streams.pluck('url');
         var newStreams = this.collection.filter(function(item){
             return item.get('selected') && !_.contains(streams, item.get('url'));
@@ -117,42 +97,8 @@ Admin.ImportListView = Backbone.View.extend({
         this.streams.add(newStreams);
     },
 
-    clearStreams: function() {
-        this.streams.reset();
-    },
-
-    renderStationStreams: function() {
-        this.$('.station-streams').html(this.station_template({streams: this.streams.toJSON()}));
-    },
-
-    _typeaheadSearch: function(query, process) {
-        return $.getJSON('/api/playlist/search/' + query, function(response){
-            if (response && response.objects) {
-                process(_.map(response.objects, function(object){
-                    return object.title + ' id:'+object.id;
-                }));
-            }
-        });
-    },
-
-    stationChanged: function(e) {
-        var title = $(e.currentTarget).val();
-        var streams = this.streams;
-        var match = /.+id:(\d+)/g.exec(title);
-        if (match) {
-            this.stationId = parseInt(match[1]);
-            $.getJSON('/admin/import/station/streams/' + this.stationId, function(response){
-                if (response && response.streams) {
-                    streams.reset(response.streams);
-                }
-            })
-        } else {
-            this.stationId = null;
-        }
-    },
-
     renderList: function(list) {
-        this.$('.import-table').html(this.template({list: list.toJSON()}));
+        this.$('.table').html(this.template({list: list.toJSON()}));
     },
 
     render: function() {
@@ -195,5 +141,87 @@ Admin.ImportListView = Backbone.View.extend({
             return pattern.test(item.get('url'));
         });
         this.collection.reset(list);
+    }
+});
+
+Admin.ImportStationView = Backbone.View.extend({
+    el: '.station',
+    template: Admin.getTemplate('station_streams'),
+    events: {
+        'submit': 'submit',
+        'change .title': 'trackTitle'
+    },
+
+    initialize: function(options) {
+        this.streams = options.streams;
+        this.streams.on('reset add', this.render, this);
+        this.$('[name=title]').typeahead({source: this._searchTitle});
+    },
+
+    render: function() {
+        this.$('.table').html(this.template({streams: this.streams.toJSON()}));
+    },
+
+    _searchTitle: function(query, process) {
+        return $.getJSON('/api/playlist/search/' + query, function(response){
+            if (response && response.objects) {
+                process(_.map(response.objects, function(object){
+                    return object.title + ' id:'+object.id;
+                }));
+            }
+        });
+    },
+
+    trackTitle: function(e) {
+        var title = $(e.currentTarget).val(),
+            streams = this.streams,
+            idMatch = /.+id:(\d+)/g.exec(title);
+        if (idMatch) {
+            this.stationId = parseInt(idMatch[1]);
+            $.getJSON('/admin/import/station/streams/' + this.stationId, function(response){
+                if (response && response.streams) {
+                    streams.reset(response.streams);
+                }
+            })
+        } else {
+            this.stationId = null;
+        }
+    },
+
+    submit: function() {
+        var station = {
+            title: $.trim(this.$('[name=title]').val()),
+            tags: $.trim(this.$('[name=tags]').val())
+        };
+
+        if (!station.title) {
+            return false;
+        }
+
+        if (this.stationId) {
+            station.id = this.stationId;
+            delete station.title;
+        }
+
+        station.streams = this.streams.pluck('url');
+        station.tags = _.compact(station.tags.split(','))
+
+        var $label = this.$('.text-info').text('');
+        var $button = this.$(':submit');
+        $button.button('loading');
+        $.ajax({
+            url: '/admin/import/station/save',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(station)
+        }).always(function(){
+            $button.button('reset');
+        }).fail(function(){
+            alert('save error');
+        }).done(function(result){
+            $label.text('Station '+result.station_id+' saved!');
+        });
+
+        return false;
     }
 });

@@ -55,7 +55,7 @@ def import_station_save():
         stream.station_id = station['id']
         stream.save()
 
-    return jsonify({'result': 'ok'})
+    return jsonify({'station_id': station['id']})
 
 @admin.route('/station/<int:station_id>')
 def station_details(station_id):

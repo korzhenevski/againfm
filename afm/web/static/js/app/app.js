@@ -170,7 +170,6 @@ App.i18n = function(key, options) {
     var def = options && !_.isUndefined(options.default) ? options.default : key;
     return val || def;
 };
-App.i18n_dict = {};
 
 // как-то громоздко, потенциально надо упростить
 (function(){

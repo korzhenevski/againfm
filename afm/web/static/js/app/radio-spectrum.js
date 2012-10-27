@@ -27,8 +27,8 @@ App.RadioSpectrum = App.View.extend({
     },
 
     _trackDimensions: function() {
-        this.width = this.$el.width();
-        this.height = this.$el.height();
+        //this.width = this.$el.width();
+        //this.height = this.$el.height();
     },
 
     start: function() {
