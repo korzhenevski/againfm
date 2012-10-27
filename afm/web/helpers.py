@@ -18,7 +18,7 @@ def naturalday(ts, ts_format=None):
     return ts.strftime(ts_format)
 
 def send_mail(**kwargs):
-    if current_app.debug:
+    if not current_app.config['SEND_MAIL']:
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 DEBUG = True
 
 TESTING = DEBUG
@@ -7,9 +10,13 @@ CSRF_ENABLED = False
 
 LANG = 'ru'
 
-AMAZON_SES_ACCESS_KEY = 'AKIAJLSUMU4WCVLPMXAQ'
-AMAZON_SES_SECRET_KEY = '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'
-DEFAULT_MAIL_SENDER = 'mail@again.fm'
+AMAZON_SES_ACCESS_KEY = 'AKIAI35JFXNA25HR2T6A'
+AMAZON_SES_SECRET_KEY = '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'
+DEFAULT_MAIL_SENDER = 'Again.FM <mail@again.fm>'
+DEFAULT_MAIL_SUBJECT = 'Again.FM'
+
+# включить фоновую отправку
+SEND_MAIL = True
 
 MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
@@ -32,11 +39,13 @@ CELERY_MONGODB_BACKEND_SETTINGS = {
 
 BROKER_URL = 'mongodb://%(host)s:%(port)d/%(database)s' % CELERY_MONGODB_BACKEND_SETTINGS
 
+# адрес инбокса для почтового домена
 EMAIL_PROVIDERS = {
     'mail.yandex.ru': ['ya.ru','yandex.ru'],
     'mail.rambler.ru': ['rambler.ru', 'lenta.ru', 'myrambler.ru', 'autorambler.ru', 'ro.ru', 'r0.ru'],
     'mail.google.com': ['gmail.com', 'googlemail.com'],
-    'mail.again.fm': ['again.fm', 'afm.fm']
+    'mail.again.fm': ['again.fm', 'afm.fm'],
+    'e.mail.ru': ['mail.ru', 'inbox.ru', 'bk.ru', 'list.ru']
 }
 
 COMET_SERVER = 'http://comet.againfm.local/'

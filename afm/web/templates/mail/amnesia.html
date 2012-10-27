@@ -1,9 +1,6 @@
-<html>
-
-<p>привет</p>
-
-<p>твой новый пароль {{ password }}</p>
-<p>ты можешь <a href="{{ url_for('token_auth', user_id=user.id, token=token, _external=True) }}">войти на сайт</a>
-    и пароль сразу установится.</p>
-
-</html>
+{% extends 'mail/layout.html' %}
+{% block content %}
+<p><a href="{{ auth_url }}">Войти на сайт</a> с новым паролем: {{ password }}</p>
+<p> Если вы не хотите менять старый пароль, ничего страшного, мы поменяем его только после входа с новым.
+    Вот так.</p>
+{% endblock %}

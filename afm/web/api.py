@@ -3,7 +3,7 @@
 
 import pymongo
 from afm import app, db
-from flask import jsonify, request, render_template
+from flask import jsonify, request, render_template, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from afm.models import UserFavoritesCache
 from .helpers import *
@@ -33,10 +33,10 @@ def amnesia():
     user = db.User.find_one({'email': email})
     if user:
         password, token = user.generate_new_password()
-        body = render_template('mail/password_reset.html', user=user, password=password, token=token)
-        send_mail(subject='Reset password on Again.FM', email=user.email, body=body)
-        email_provider = get_email_provider(user.email)
-        return jsonify({'email_provider': email_provider})
+        auth_url = url_for('web.token_auth', user_id=user.id, token=token, _external=True)
+        body = render_template('mail/amnesia.html', auth_url=auth_url, password=password)
+        send_mail(email=user.email, body=body)
+        return jsonify({'email_provider': get_email_provider(user.email)})
     return jsonify({'error': 'no_user'})
 
 @app.route('/api/user/signup', methods=['POST'])
@@ -52,8 +52,8 @@ def signup():
     # login
     login_user(user)
     # send welcome email
-    body = render_template('mail/welcome.html', user=user)
-    send_mail(subject='Welcome to Again.FM', email=user.email, body=body)
+    body = render_template('mail/signup.html')
+    send_mail(email=user.email, body=body)
     return jsonify(user.get_public_data())
 
 @app.route('/api/user/logout', methods=['DELETE','POST'])

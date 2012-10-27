@@ -19,7 +19,7 @@ def compass():
     local('compass watch afm/web/static')
 
 def celery():
-    local('celery -A afm.web.celery worker -l info')
+    local('celery -A afm.celery worker -l info')
 
 def player():
     with lcd('player'):
