@@ -1,3 +1,0 @@
-cookbook "java" do
-  runtimes []
-end

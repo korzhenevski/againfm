@@ -4,7 +4,7 @@
 import requests
 import logging
 import ujson as json
-from afm import db, login_manager, i18n
+from afm import db, login_manager, i18n, app
 from . import web
 from .connect.vkontakte import VKApi
 from flask import jsonify, render_template, redirect, url_for, request, current_app
@@ -120,7 +120,7 @@ def app_context():
         'user': {},
         'i18n': i18n.get_json_dict(),
         'display': {
-            'genres': db.Genre.public_list(lang=current_app.config['LANG']),
+            'genres': db.Genre.public_list(lang=app.config['LANG']),
         }
     }
     if current_user.is_authenticated():
