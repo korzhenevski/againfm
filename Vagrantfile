@@ -12,7 +12,8 @@ Vagrant::Config.run do |config|
     config.vm.share_folder "v-app", "/var/www/againfm", ".", :create => true, :nfs => true
     config.vm.customize ["modifyvm", :id, "--memory", 512]
     config.vm.provision :chef_solo do |chef|
-        chef.cookbooks_path = "./cookbooks"
+        chef.cookbooks_path = "./vendor/cookbooks"
+        chef.add_role 'dev'
 
         chef.add_recipe "timezone"
         chef.add_recipe "ark"
