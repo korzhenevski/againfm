@@ -31,6 +31,7 @@ define :mongodb_instance, :mongodb_type => "mongod" , :action => [:enable, :star
   service_action = params[:action]
   service_notifies = params[:notifies]
   
+  bind_ip = params[:bind_ip]
   port = params[:port]
 
   logpath = params[:logpath]
@@ -95,6 +96,7 @@ define :mongodb_instance, :mongodb_type => "mongod" , :action => [:enable, :star
       "config" => configfile,
       "configdb" => configserver,
       "port" => port,
+      "bind_ip" => bind_ip,
       "logpath" => logfile,
       "dbpath" => dbpath,
       "replicaset_name" => replicaset_name,
