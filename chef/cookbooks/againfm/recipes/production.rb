@@ -6,8 +6,14 @@
 package "uwsgi"
 package "uwsgi-plugin-python"
 
-service 'uwsgi' do
-  supports :status => true, :restart => true, :reload => true
+directory "/var/www/againfm" do
+  owner "www-data"
+  group "www-data"
+  mode 0755
+  recursive true
+end
+
+service "uwsgi" do
   action :start
 end
 
