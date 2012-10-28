@@ -21,6 +21,7 @@
         "recipe[nginx]",
         "recipe[mongodb::10gen_repo]",
         "recipe[mongodb::default]",
-        "recipe[redis::server]"
+        "recipe[redis::server]",
+        "recipe[againfm]"
     ]
 }

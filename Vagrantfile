@@ -12,25 +12,8 @@ Vagrant::Config.run do |config|
     config.vm.share_folder "v-app", "/var/www/againfm", ".", :create => true, :nfs => true
     config.vm.customize ["modifyvm", :id, "--memory", 512]
     config.vm.provision :chef_solo do |chef|
-        chef.cookbooks_path = "./vendor/cookbooks"
-        chef.add_role 'dev'
-
-        chef.add_recipe "timezone"
-        chef.add_recipe "ark"
-        chef.add_recipe "build-essential"
-        chef.add_recipe "apt"
-        chef.add_recipe "vim"
-        chef.add_recipe "git"
-        chef.add_recipe "python"
-        chef.add_recipe "nginx"
-        chef.add_recipe "redis::server"
-        chef.add_recipe "mongodb::10gen_repo"
-        chef.add_recipe "mongodb::default"
-        #chef.add_recipe "mongodb::replicaset"
-        chef.add_recipe "againfm"
-
-        File.open(File.expand_path("../chef.json", __FILE__)) do |f|
-            chef.json.merge!(JSON.parse(f.read))
-        end
+        chef.cookbooks_path = "chef/cookbooks"
+        chef.roles_path = "chef/roles"
+        chef.add_role('vagrant')
     end
 end
