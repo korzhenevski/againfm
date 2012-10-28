@@ -4,8 +4,6 @@
 
 .webassets-cache
 afm/static/js/deploy
-*.zip
-*.txt
 venv
 .vagrant
 .DS_Store
