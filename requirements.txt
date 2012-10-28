@@ -28,5 +28,5 @@ virtualenv==1.8.2
 validictory==0.8.3
 raven==2.0.7.1
 blinker==1.2
--r git+https://github.com/miracle2k/webassets.git#egg=webassets
--r git+https://github.com/miracle2k/flask-assets.git#egg=flask-assets
+-e git+https://github.com/miracle2k/webassets.git#egg=webassets
+-e git+https://github.com/miracle2k/flask-assets.git#egg=flask-assets
