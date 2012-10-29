@@ -60,9 +60,10 @@ def deploy(rev=None):
     bootstrap()
 
     # деплой конкретной ревизии или откат на предыдущую
+    previous_rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.project_releases)).strip()
     if rev:
         if rev == 'rollback':
-            rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.project_releases)).strip()
+            rev = previous_rev
         release_path = env.project_releases + '/' + rev
     else:
         repo = 'https://github.com/outself/againfm.git'
@@ -79,6 +80,8 @@ def deploy(rev=None):
         if confirm('Update VirtualEnv?'):
             # установка пакетов до линковки
             venv(release_path)
+        else:
+            sudo('cp -R {}/{}/venv {}/'.format(env.project_releases, previous_rev, release_path))
 
     # линкуем релиз в current
     if exists(env.project_current):
@@ -88,6 +91,9 @@ def deploy(rev=None):
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
+
+    #sudo('service uwsgi reload')
+    #sudo('service nginx reload')
 
 def venv(release_path=None):
     if release_path is None:

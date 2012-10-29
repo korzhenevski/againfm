@@ -13,7 +13,7 @@ directory "/var/www/againfm/current" do
   recursive true
 end
 
-execute "chown -R www-data:www-data /var/www/againfm/current"
+execute "chown -R www-data:www-data /var/www/againfm/current/"
 
 service "uwsgi" do
   action [ :enable, :start ]
