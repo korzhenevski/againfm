@@ -91,9 +91,8 @@ def deploy(rev=None):
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
+    sudo('touch {}/restart.txt'.format(env.project_current))
 
-    #sudo('service uwsgi reload')
-    #sudo('service nginx reload')
 
 def venv(release_path=None):
     if release_path is None:

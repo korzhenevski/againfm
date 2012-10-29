@@ -2,5 +2,8 @@
 socket = 127.0.0.1:3031
 master = true
 module = afm:app
+workers = 4
 virtualenv = /var/www/againfm/current/venv
 chdir = /var/www/againfm/current
+single-interpreter = true
+touch-reload = /var/www/againfm/current/restart.txt
