@@ -87,7 +87,9 @@ def deploy(rev=None):
     if exists(env.project_current):
         sudo('rm -rf {}'.format(env.project_current))
     sudo('ln -s {} {}'.format(release_path, env.project_current))
+    update_project()
 
+def update_project():
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))

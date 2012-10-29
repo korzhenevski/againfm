@@ -167,6 +167,7 @@ class User(BaseDocument):
         'avatar_url': unicode,
         'is_active': bool,
         'connect': dict,
+        'is_admin': bool,
         'settings': {
             'throttle_traffic': bool,
             'limit_night_volume': bool,
@@ -183,6 +184,7 @@ class User(BaseDocument):
         'email': u'',
         'is_active': True,
         'connect': {},
+        'is_admin': False,
         'settings.throttle_traffic': False,
         'settings.fading_sound': True,
         'settings.limit_night_volume': True
@@ -200,6 +202,9 @@ class User(BaseDocument):
 
     def _password_hash(self, raw_password):
         return md5hash(app.secret_key + raw_password)
+
+    def is_admin(self):
+        return self['is_admin']
 
     def get_public_data(self):
         return {

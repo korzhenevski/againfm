@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-DEBUG = True
+DEBUG = False
+TESTING = False
+ASSETS_DEBUG = False
+SECRET_KEY = '8b7707cbf3ac84b95361319960654c77'
+SEND_MAIL = True
 
-TESTING = DEBUG
-ASSETS_DEBUG = DEBUG
-SECRET_KEY = 'secret_key'
-CSRF_ENABLED = False
+COMET_SERVER = 'http://comet.again.fm/'
+SEARCH_BACKEND_URL = 'http://127.0.0.1:9200/againfm_stations/_search'
+SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'
 
 LANG = 'ru'
 
@@ -14,9 +17,6 @@ AMAZON_SES_ACCESS_KEY = 'AKIAI35JFXNA25HR2T6A'
 AMAZON_SES_SECRET_KEY = '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'
 DEFAULT_MAIL_SENDER = 'Again.FM <mail@again.fm>'
 DEFAULT_MAIL_SUBJECT = 'Again.FM'
-
-# включить фоновую отправку
-SEND_MAIL = True
 
 MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
@@ -48,14 +48,9 @@ EMAIL_PROVIDERS = {
     'e.mail.ru': ['mail.ru', 'inbox.ru', 'bk.ru', 'list.ru']
 }
 
-COMET_SERVER = 'http://comet.againfm.local/'
-SEARCH_BACKEND_URL = 'http://127.0.0.1:9200/againfm_stations/_search'
-
 VK = {
     'app_id': '3183069',
     'secret': 'YYhwf0e5rqyNli117cL2',
     'authorize_url': 'https://oauth.vk.com/authorize',
     'access_token_url': 'https://oauth.vk.com/access_token',
 }
-
-SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'
