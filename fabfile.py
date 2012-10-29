@@ -77,7 +77,7 @@ def deploy(rev=None):
         release_path = env.project_releases + '/' + release
         sudo('mv {} {}'.format(tmp, release_path))
 
-        if confirm('Update VirtualEnv?'):
+        if confirm('New VirtualEnv?'):
             # установка пакетов до линковки
             venv(release_path)
         else:

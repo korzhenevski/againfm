@@ -16,6 +16,7 @@ end
 execute "chown -R www-data:www-data /var/www/againfm/current/"
 
 service "uwsgi" do
+  supports :status => true, :restart => true, :reload => true
   action [ :enable, :start ]
 end
 
