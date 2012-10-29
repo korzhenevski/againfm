@@ -5,7 +5,8 @@ from fabric.api import env, local, run, lcd, cd, sudo
 from fabric.contrib.files import exists
 
 env.project = '/var/www/againfm'
-
+env.current = env.project + '/current'
+env.releases = env.project + '/releases'
 
 """
 починить рестарт редиса
@@ -49,49 +50,38 @@ def install_chef():
     sudo('aptitude install -y {} {}'.format(core_packages, python_packages))
     sudo('gem install chef --no-ri --no-rdoc')
 
-"""
-chef готовит только конфиги
-деплой делает fab
-venv в текущей версии - если изменился requirements.txt
+def release_list():
+    print sudo('ls -1 {} | sort -n | tail -n1'.format(env.releases))
 
-deploy:
- - update tmp with directory/virtualenv
- - save old, move to current
- - chef update
-
-rollback(id):
- -
-"""
-
-def deploy():
+def deploy(rev=None):
     from datetime import datetime
-    repo = 'https://github.com/outself/againfm.git'
-    tmp = '/tmp/againfm-deploy'
-    if exists(tmp):
-        sudo('rm -rf {}'.format(tmp))
 
-    current = env.project + '/current'
-    releases = env.project + '/releases'
-    sudo('mkdir -p {}'.format(releases))
+    # деплой конкретной ревизии или откат на предыдущую
+    if rev:
+        if rev == 'rollback':
+            rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.releases)).strip()
+        release_path = env.releases + '/' + rev
+    else:
+        repo = 'https://github.com/outself/againfm.git'
+        tmp = '/tmp/againfm-deploy'
+        if exists(tmp):
+            sudo('rm -rf {}'.format(tmp))
 
-    chef = current + '/chef'
+        sudo('git clone {} {}'.format(repo, tmp))
+        #with cd(tmp):
+        #    sudo('virtualenv venv')
+        #    sudo('./venv/bin/pip install -r requirements.txt')
 
-    sudo('git clone {} {}'.format(repo, tmp))
-    with cd(tmp):
-        sudo('virtualenv venv')
-        sudo('./venv/bin/pip install -r requirements.txt')
-
-    # публикуем релиз
-    release = datetime.now().strftime('%Y%m%d%H%M%S')
-    release_path = releases + '/' + release
-    sudo('mv {} {}'.format(tmp, release_path))
-
-    #previous_release = releases + '/' + sudo('ls -1 {} | sort -n | tail -n1'.format(releases)).strip()
+        # публикуем релиз
+        release = datetime.now().strftime('%Y%m%d%H%M%S')
+        release_path = env.releases + '/' + release
+        sudo('mv {} {}'.format(tmp, release_path))
 
     # обновляем
-    if exists(current):
-        sudo('rm -rf {}'.format(current))
-    sudo('ln -s {} {}'.format(release_path, current))
+    if exists(env.current):
+        sudo('rm -rf {}'.format(env.current))
+    sudo('ln -s {} {}'.format(release_path, env.current))
 
-    # обновляем chef
+    # обновляем шеф-рецепты :)
+    chef = env.current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
