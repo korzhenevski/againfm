@@ -93,6 +93,9 @@ def deploy(rev=None):
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
     sudo('touch {}/restart.txt'.format(env.project_current))
 
+def pull():
+    with cd(env.project_current):
+        sudo('git pull')
 
 def venv(release_path=None):
     if release_path is None:
