@@ -9,6 +9,26 @@ from redis import Redis
 from .i18n import I18n
 from .mailer import AmazonMailer
 
+
+"""
+playfm развернуть!
+
+deploy-ssh лучше хранить в /var/cache или вообще в папке юзера
+google analytics
+еще какую нибуй хуйню для мониторинга - через scoutapp
+- отосланные письма
+- монга
+- редис
+- кол-во клиентов в cometfm - это еще можно и в redis писать, потом графики порисуем
+- кол-во online/offline потоков
+
+интерфейс:
+- ползунок, spectrum, смена пароля, смена display name, иконка входа через vkontakte
+- недоступные станции отмечать серым - лучше даже сортировать и в конец плейлиста их
+- ограничение высоты favorites
+
+"""
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
