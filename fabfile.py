@@ -10,6 +10,7 @@ env.project = '/var/www/againfm'
 env.project_current = env.project + '/current'
 env.project_releases = env.project + '/releases'
 env.repo = 'git@github.com:outself/againfm.git'
+env.gitssh = '/tmp/.gitssh'
 
 def production():
     env.hosts = ['46.182.27.6']
@@ -64,13 +65,12 @@ def deploy(rev=None):
             rev = previous_rev
         release_path = env.project_releases + '/' + rev
     else:
-        ssh_tmp = '/tmp/againfm-deploy-ssh'
-        if not exists(ssh_tmp):
-            sudo('mkdir {}'.format(ssh_tmp))
-            put('etc/deploy/*', ssh_tmp)
-        gitssh = ssh_tmp + '/gitssh.sh'
-        sudo('chmod +x {}'.format(gitssh))
-        sudo('chmod 600 {}/id_rsa'.format(ssh_tmp))
+        gitssh = env.gitssh + '/gitssh.sh'
+        if not exists(env.gitssh):
+            sudo('mkdir {}'.format(env.gitssh))
+            put('etc/deploy/*', env.gitssh)
+            sudo('chmod 600 {}/id_rsa'.format(env.gitssh))
+            sudo('chmod +x {}'.format(gitssh))
 
         tmp = '/tmp/againfm-deploy'
         with settings(warn_only=True):
@@ -102,7 +102,7 @@ def publish():
 
 def pull():
     with cd(env.project_current):
-        sudo('git pull')
+        sudo('GIT_SSH="{}" git pull'.format(env.gitssh + '/gitssh.sh'))
 
 def venv(release_path=None):
     if release_path is None:
