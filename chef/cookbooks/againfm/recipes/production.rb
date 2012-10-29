@@ -13,8 +13,10 @@ directory "/var/www/againfm/current" do
   recursive true
 end
 
+execute "chown -R www-data:www-data /var/www/againfm/current"
+
 service "uwsgi" do
-  action :start
+  action [ :enable, :start ]
 end
 
 template "/etc/uwsgi/apps-enabled/againfm.ini" do
@@ -22,7 +24,7 @@ template "/etc/uwsgi/apps-enabled/againfm.ini" do
   owner "root"
   group "root"
   mode 0644
-  notifies :reload, "service[uwsgi]"
+  notifies :reload, "service[uwsgi]", :immediately
 end
 
 template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
@@ -30,7 +32,7 @@ template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
   owner "root"
   group "root"
   mode 0644
-  notifies :reload, "service[nginx]"
+  notifies :reload, "service[nginx]", :immediately
 end
 
 nginx_site "againfm.conf"

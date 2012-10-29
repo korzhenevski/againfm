@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from fabric.api import env, local, run, lcd, cd, sudo
+from datetime import datetime
+from fabric.api import env, local, run, lcd, cd, sudo, settings
 from fabric.contrib.files import exists
+from fabric.contrib.console import confirm
 
 env.project = '/var/www/againfm'
-env.current = env.project + '/current'
-env.releases = env.project + '/releases'
+env.project_current = env.project + '/current'
+env.project_releases = env.project + '/releases'
 
 """
 починить рестарт редиса
@@ -43,45 +45,58 @@ def handlebars():
     with lcd('afm/static/js'):
         local('handlebars templates/*.handlebars --min --output render.js')
 
-def install_chef():
+def bootstrap(force=False):
+    if exists(env.project) and not force:
+        return
+    sudo('mkdir -p {}'.format(env.project))
+    sudo('mkdir -p {}'.format(env.project_releases))
     sudo('aptitude update')
-    core_packages = 'git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential libevent-dev'
+    core_packages = 'git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential libevent-dev curl'
     python_packages = 'python python-dev python-pip python-virtualenv'
     sudo('aptitude install -y {} {}'.format(core_packages, python_packages))
     sudo('gem install chef --no-ri --no-rdoc')
 
-def release_list():
-    print sudo('ls -1 {} | sort -n | tail -n1'.format(env.releases))
-
 def deploy(rev=None):
-    from datetime import datetime
+    bootstrap()
 
     # деплой конкретной ревизии или откат на предыдущую
     if rev:
         if rev == 'rollback':
-            rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.releases)).strip()
-        release_path = env.releases + '/' + rev
+            rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.project_releases)).strip()
+        release_path = env.project_releases + '/' + rev
     else:
         repo = 'https://github.com/outself/againfm.git'
         tmp = '/tmp/againfm-deploy'
-        if exists(tmp):
+        with settings(warn_only=True):
             sudo('rm -rf {}'.format(tmp))
-
         sudo('git clone {} {}'.format(repo, tmp))
-        #with cd(tmp):
-        #    sudo('virtualenv venv')
-        #    sudo('./venv/bin/pip install -r requirements.txt')
 
         # публикуем релиз
         release = datetime.now().strftime('%Y%m%d%H%M%S')
-        release_path = env.releases + '/' + release
+        release_path = env.project_releases + '/' + release
         sudo('mv {} {}'.format(tmp, release_path))
 
-    # обновляем
-    if exists(env.current):
-        sudo('rm -rf {}'.format(env.current))
-    sudo('ln -s {} {}'.format(release_path, env.current))
+        if confirm('Update VirtualEnv?'):
+            # установка пакетов до линковки
+            venv(release_path)
+
+    # линкуем релиз в current
+    if exists(env.project_current):
+        sudo('rm -rf {}'.format(env.project_current))
+    sudo('ln -s {} {}'.format(release_path, env.project_current))
 
     # обновляем шеф-рецепты :)
-    chef = env.current + '/chef'
+    chef = env.project_current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
+
+def venv(release_path=None):
+    if release_path is None:
+        release_path = sudo('readlink {}'.format(env.project_current))
+    with cd(release_path):
+        with settings(warn_only=True):
+            sudo('rm -rf venv')
+        sudo('virtualenv venv')
+        sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
+
+def revlist():
+    print sudo('ls -1 {} | sort -n'.format(env.project_releases))
