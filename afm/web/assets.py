@@ -2,8 +2,7 @@ from flask.ext.assets import Bundle, Environment
 from afm import app
 
 assets = Environment()
-libs = ['handlebars.js'] if app.debug else ['handlebars.runtime.js', 'render.js']
-libs += [
+libs = [
     'jquery.min.js',
     'jquery-ui-1.8.23.custom.min.js',
     # jquery-ui touch events support
@@ -22,6 +21,7 @@ libs += [
     'jquery.cookie.js',
     'comet.js'
 ]
+libs += ['handlebars.js'] if app.debug else ['handlebars.runtime.js', 'render.js']
 libs = ['js/libs/' + lib for lib in libs]
 
 assets.register('core_scripts', Bundle(*libs, filters='uglifyjs', output='js/deploy/core.%(version)s.js'))
