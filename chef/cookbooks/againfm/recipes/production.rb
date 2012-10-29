@@ -20,6 +20,24 @@ service "uwsgi" do
   action [ :enable, :start ]
 end
 
+directory "/var/log/againfm" do
+  owner "www-data"
+  group "www-data"
+  mode 0755
+  recursive true
+end
+
+supervisor_service "celery" do
+  action :enable
+  user "www-data"
+  directory "/var/www/againfm/current/"
+  command "/var/www/againfm/current/venv/bin/celery -A afm.celery worker -l info"
+  startretries 100000
+  autorestart true
+  redirect_stderr true
+  stdout_logfile "/var/log/againfm/celery.log"
+end
+
 template "/etc/uwsgi/apps-enabled/againfm.ini" do
   source "production-uwsgi.ini.erb"
   owner "root"

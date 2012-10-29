@@ -22,6 +22,7 @@
         "recipe[mongodb::10gen_repo]",
         "recipe[mongodb::default]",
         "recipe[redis::server]",
+        "recipe[supervisor]",
         "recipe[againfm]"
     ]
 }
