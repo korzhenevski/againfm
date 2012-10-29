@@ -2,21 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from fabric.api import env, local, run, lcd, cd, sudo, settings
+from fabric.api import env, local, run, lcd, cd, sudo, settings, put
 from fabric.contrib.files import exists
 from fabric.contrib.console import confirm
 
 env.project = '/var/www/againfm'
 env.project_current = env.project + '/current'
 env.project_releases = env.project + '/releases'
+env.repo = 'git@github.com:outself/againfm.git'
 
-"""
-починить рестарт редиса
-починить старт uwsgi
-права на /var/www/againfm
-(Permission denied: '/var/www/againfm/afm/static/.webassets-cache')
-virtualenv и поддержка откатов
-"""
+def production():
+    env.hosts = ['46.182.27.6']
+    env.user = 'root'
+    env.password = 'yaeveH5N'
 
 def vagrant():
     # change from the default user to 'vagrant'
@@ -66,11 +64,17 @@ def deploy(rev=None):
             rev = previous_rev
         release_path = env.project_releases + '/' + rev
     else:
-        repo = 'https://github.com/outself/againfm.git'
+        ssh_tmp = '/tmp/againfm-deploy-ssh'
+        if not exists(ssh_tmp):
+            sudo('mkdir {}'.format(ssh_tmp))
+            put('etc/deploy/*', ssh_tmp)
+        gitssh = ssh_tmp + '/gitssh.sh'
+        sudo('chmod +x {}'.format(gitssh))
+
         tmp = '/tmp/againfm-deploy'
         with settings(warn_only=True):
             sudo('rm -rf {}'.format(tmp))
-        sudo('git clone {} {}'.format(repo, tmp))
+        sudo('GIT_SSH="{}" git clone {} {}'.format(gitssh, env.repo, tmp))
 
         # публикуем релиз
         release = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -87,9 +91,9 @@ def deploy(rev=None):
     if exists(env.project_current):
         sudo('rm -rf {}'.format(env.project_current))
     sudo('ln -s {} {}'.format(release_path, env.project_current))
-    update_project()
+    publish()
 
-def update_project():
+def publish():
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
     sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
