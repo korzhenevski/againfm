@@ -3,7 +3,8 @@
 # Recipe:: default
 #
 
-package 'libevent-dev'
+package "libevent-dev"
+package "uglifyjs"
 
 if node[:instance_role] == 'vagrant'
     include_recipe "againfm::dev"

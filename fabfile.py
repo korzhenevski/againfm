@@ -70,6 +70,7 @@ def deploy(rev=None):
             put('etc/deploy/*', ssh_tmp)
         gitssh = ssh_tmp + '/gitssh.sh'
         sudo('chmod +x {}'.format(gitssh))
+        sudo('chmod 600 {}/id_rsa'.format(ssh_tmp))
 
         tmp = '/tmp/againfm-deploy'
         with settings(warn_only=True):
