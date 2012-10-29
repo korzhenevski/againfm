@@ -6,7 +6,7 @@
 package "uwsgi"
 package "uwsgi-plugin-python"
 
-directory "/var/www/againfm" do
+directory "/var/www/againfm/current" do
   owner "www-data"
   group "www-data"
   mode 0755

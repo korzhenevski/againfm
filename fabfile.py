@@ -1,4 +1,7 @@
-from fabric.api import env, local, run, lcd, cd
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from fabric.api import env, local, run, lcd, cd, sudo
 from fabric.contrib.files import exists
 
 env.project = '/var/www/againfm'
@@ -39,16 +42,56 @@ def handlebars():
     with lcd('afm/static/js'):
         local('handlebars templates/*.handlebars --min --output render.js')
 
-def setup():
-    run('aptitude install -y git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential python-pip python-dev libevent-dev')
-    run('gem install chef --no-ri --no-rdoc')
-    if not exists('/var/www'):
-        run('mkdir /var/www')
-    if exists('/var/www/againfm'):
-        run('rm -rf /var/www/againfm')
-    with cd('/var/www'):
-        run('git clone https://github.com/outself/againfm.git')
-        with cd('againfm'):
-            run('pip install -r requirements.txt')
-            run('mkdir chef/tmp')
-            run('chef-solo -c /var/www/againfm/chef/solo.rb -j /var/www/againfm/chef/production.json')
+def install_chef():
+    sudo('aptitude update')
+    core_packages = 'git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential libevent-dev'
+    python_packages = 'python python-dev python-pip python-virtualenv'
+    sudo('aptitude install -y {} {}'.format(core_packages, python_packages))
+    sudo('gem install chef --no-ri --no-rdoc')
+
+"""
+chef готовит только конфиги
+деплой делает fab
+venv в текущей версии - если изменился requirements.txt
+
+deploy:
+ - update tmp with directory/virtualenv
+ - save old, move to current
+ - chef update
+
+rollback(id):
+ -
+"""
+
+def deploy():
+    from datetime import datetime
+    repo = 'https://github.com/outself/againfm.git'
+    tmp = '/tmp/againfm-deploy'
+    if exists(tmp):
+        sudo('rm -rf {}'.format(tmp))
+
+    current = env.project + '/current'
+    releases = env.project + '/releases'
+    sudo('mkdir -p {}'.format(releases))
+
+    chef = current + '/chef'
+
+    sudo('git clone {} {}'.format(repo, tmp))
+    with cd(tmp):
+        sudo('virtualenv venv')
+        sudo('./venv/bin/pip install -r requirements.txt')
+
+    # публикуем релиз
+    release = datetime.now().strftime('%Y%m%d%H%M%S')
+    release_path = releases + '/' + release
+    sudo('mv {} {}'.format(tmp, release_path))
+
+    #previous_release = releases + '/' + sudo('ls -1 {} | sort -n | tail -n1'.format(releases)).strip()
+
+    # обновляем
+    if exists(current):
+        sudo('rm -rf {}'.format(current))
+    sudo('ln -s {} {}'.format(release_path, current))
+
+    # обновляем chef
+    sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))

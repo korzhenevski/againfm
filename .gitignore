@@ -7,7 +7,7 @@ afm/static/js/deploy
 venv
 .vagrant
 .DS_Store
-deploy/
+chef/tmp
 
 jasmine
 script.js/

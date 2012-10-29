@@ -15,12 +15,12 @@ server {
 	location /static {
 		expires 7d;
 		add_header Cache-Control public;
-		alias /var/www/againfm/afm/static;
+		alias /var/www/againfm/current/afm/static;
 	}
 
 	location /admin/static {
 		expires 7d;
 		add_header Cache-Control public;
-		alias /var/www/againfm/afm/admin/static;
+		alias /var/www/againfm/current/afm/admin/static;
 	}
 }
