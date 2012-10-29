@@ -42,7 +42,7 @@ def player():
 
 def handlebars():
     with lcd('afm/static/js'):
-        local('handlebars templates/*.handlebars --min --output render.js')
+        local('handlebars templates/*.handlebars --min --output libs/render.js')
 
 def bootstrap(force=False):
     if exists(env.project) and not force:
