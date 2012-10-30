@@ -11,7 +11,6 @@ from .mailer import AmazonMailer
 
 
 """
-playfm развернуть!
 
 еще какую нибуй хуйню для мониторинга - через scoutapp
 - отосланные письма

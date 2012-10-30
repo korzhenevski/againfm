@@ -6,29 +6,38 @@ from fabric.api import env, local, run, lcd, cd, sudo, settings, put
 from fabric.contrib.files import exists
 from fabric.contrib.console import confirm
 
-env.project = '/var/www/againfm'
-env.project_current = env.project + '/current'
-env.project_releases = env.project + '/releases'
-env.repo = 'git@github.com:outself/againfm.git'
-env.gitssh = env.project + '/.ssh'
-
 def production():
     env.hosts = ['46.182.27.6']
     env.user = 'root'
     env.password = 'yaeveH5N'
 
+def production2():
+    env.hosts = ['37.200.65.241']
+    env.user = 'root'
+    env.password = 'h5263k93'
+
+def againfm():
+    env.project = '/var/www/againfm'
+    env.project_current = env.project + '/current'
+    env.project_releases = env.project + '/releases'
+    env.repo = 'git@github.com:outself/againfm.git'
+    env.gitssh = env.project + '/.ssh'
+
+def playfm():
+    env.project = '/var/www/playfm'
+    env.project_current = env.project + '/current'
+    env.project_releases = env.project + '/releases'
+    env.repo = 'https://github.com/outself/playfm.git'
+    env.gitssh = env.project + '/.ssh'
+
 def vagrant():
-    # change from the default user to 'vagrant'
     env.user = 'vagrant'
-    # connect to the port-forwarded ssh
     env.hosts = ['10.0.0.2']
- 
-    # use vagrant ssh key
     result = local('vagrant ssh-config | grep IdentityFile', capture=True)
     env.key_filename = result.split()[1]
  
 def init():
-	run('pip install -r {}/requirements.txt'.format(env.project))
+    run('pip install -r {}/requirements.txt'.format(env.project))
 
 def compass():
     local('compass watch afm/static')
@@ -50,7 +59,7 @@ def bootstrap(force=False):
     sudo('mkdir -p {}'.format(env.project))
     sudo('mkdir -p {}'.format(env.project_releases))
     sudo('aptitude update')
-    core_packages = 'git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential libevent-dev curl'
+    core_packages = 'git-core vim-nox ruby1.9.1 ruby1.9.1-dev build-essential libevent-dev libzmq-dev curl'
     python_packages = 'python python-dev python-pip python-virtualenv'
     sudo('aptitude install -y {} {}'.format(core_packages, python_packages))
     sudo('gem install chef --no-ri --no-rdoc')
@@ -111,7 +120,8 @@ def venv(release_path=None):
         with settings(warn_only=True):
             sudo('rm -rf venv')
         sudo('virtualenv venv')
-        sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
+        if exists(release_path + '/requirements.txt'):
+            sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
 
 def revlist():
     sudo('ls -1 {} | sort -n'.format(env.project_releases))
