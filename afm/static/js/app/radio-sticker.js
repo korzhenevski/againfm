@@ -287,6 +287,6 @@ App.StickerView = App.View.extend({
 });
 
 $(function(){
-    App.feed = new App.Feed({url: 'http://comet.againfm.local/'});
+    App.feed = new App.Feed({url: App.comet_url});
     App.sticker = new App.StickerView();
 });

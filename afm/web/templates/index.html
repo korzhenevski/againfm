@@ -111,6 +111,7 @@
     var App = App || {};
     App.i18n_dict = {{ bootstrap.i18n|safe }};
     App.debug = {{ config.DEBUG|tojson }};
+    App.comet_url = {{ config.COMET_URL|tojson|safe }};
 </script>
 
 {% assets "core_scripts" %}
