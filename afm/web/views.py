@@ -36,7 +36,7 @@ def vk_connect(user, code):
         'client_id': config['app_id'],
         'client_secret': config['secret'],
         'code': code,
-        'redirect_uri': url_for('vk_connect_request', _external=True)})
+        'redirect_uri': url_for('web.vk_connect_request', _external=True)})
 
     if not response.ok:
         raise Exception('VKontakte access token {}'.format(response.status_code))
@@ -100,7 +100,7 @@ def vk_connect_request():
         authorize_url += urlencode({
             'scope': scope,
             'client_id': vk['app_id'],
-            'redirect_uri': url_for('vk_connect_request', _external=True),
+            'redirect_uri': url_for('web.vk_connect_request', _external=True),
             'response_type': 'code'
         })
         return redirect(authorize_url)
