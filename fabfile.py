@@ -10,7 +10,7 @@ env.project = '/var/www/againfm'
 env.project_current = env.project + '/current'
 env.project_releases = env.project + '/releases'
 env.repo = 'git@github.com:outself/againfm.git'
-env.gitssh = '/tmp/.gitssh'
+env.gitssh = env.project + '/.ssh'
 
 def production():
     env.hosts = ['46.182.27.6']
@@ -114,4 +114,4 @@ def venv(release_path=None):
         sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
 
 def revlist():
-    print sudo('ls -1 {} | sort -n'.format(env.project_releases))
+    sudo('ls -1 {} | sort -n'.format(env.project_releases))
