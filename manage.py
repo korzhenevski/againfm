@@ -16,7 +16,6 @@ def import_genres(file):
     print 'importing genres...'
     for genre in yaml.load(open(file)):
         print '+ {}'.format(genre['id'])
-        genre['title'] = [({'lang': k, 'value': v}) for k, v in genre['title'].iteritems()]
         db.genres.find_and_modify({'id': genre['id']}, genre, upsert=True)
     print 'completed!'
 

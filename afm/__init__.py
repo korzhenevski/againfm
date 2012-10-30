@@ -14,7 +14,6 @@ from .mailer import AmazonMailer
 playfm развернуть!
 
 deploy-ssh лучше хранить в /var/cache или вообще в папке юзера
-google analytics
 еще какую нибуй хуйню для мониторинга - через scoutapp
 - отосланные письма
 - монга

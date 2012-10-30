@@ -382,7 +382,6 @@ class StationTag(BaseDocument):
 @db.register
 class Genre(BaseDocument):
     __collection__ = 'genres'
-    i18n = ['title']
     structure = {
         'id': unicode,
         'title': unicode,
@@ -392,8 +391,12 @@ class Genre(BaseDocument):
     def get_public_data(self):
         return {
             'id': self.id,
-            'title': self.title
+            'title': self.get_i18n('title')
         }
+
+    def get_i18n(self, name):
+        val = getattr(self, name)
+        return val.get(self._current_lang, val.get(self._fallback_lang))
 
     @staticmethod
     def public_list(lang):

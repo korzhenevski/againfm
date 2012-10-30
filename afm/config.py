@@ -13,9 +13,9 @@ SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684d
 
 LANG = 'ru'
 GA = {
-    'accout': 'UA-21858820-1',
-    'domain': 'again.fm',
-    'site_speed_sample_rate': 100,
+    '_setAccount': 'UA-21858820-1',
+    '_setDomainName': 'again.fm',
+    '_setSiteSpeedSampleRate': 100,
 }
 
 AMAZON_SES_ACCESS_KEY = 'AKIAI35JFXNA25HR2T6A'

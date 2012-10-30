@@ -135,10 +135,9 @@
 {% if config.GA %}
 <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', '{{ config.GA.accout }}']);
-    _gaq.push(['_setDomainName', '{{ config.GA.domain }}']);
-    _gaq.push(['_setSiteSpeedSampleRate', {{ config.GA.site_speed_sample_rate }}]);
-    _gaq.push(['_trackPageview']);
+    {% for key, val in config.GA.items() %}
+    _gaq.push([{{ key|json|safe }}, {{ val|json|safe }}]);
+    {% endfor %}
 
     (function() {
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
