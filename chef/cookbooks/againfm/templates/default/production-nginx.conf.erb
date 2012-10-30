@@ -20,7 +20,7 @@ server {
 	# поисковые запросы идут на отдельного демона
 	location /api/playlist/search {
 		rewrite /api/playlist/search/([^/]+) /search/$1 break;
-		proxy_pass http://10.0.0.3:6100;
+		proxy_pass http://search.testing.again.fm;
 	}
 
 	location /static {

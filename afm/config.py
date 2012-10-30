@@ -7,8 +7,7 @@ ASSETS_DEBUG = False
 SECRET_KEY = '8b7707cbf3ac84b95361319960654c77'
 SEND_MAIL = True
 
-COMET_SERVER = 'http://comet.again.fm/'
-SEARCH_BACKEND_URL = 'http://127.0.0.1:9200/againfm_stations/_search'
+COMET_SERVER = 'http://comet.testing.again.fm/'
 SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'
 
 LANG = 'ru'

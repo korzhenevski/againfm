@@ -11,7 +11,7 @@ def production():
     env.user = 'root'
     env.password = 'yaeveH5N'
 
-def production2():
+def service():
     env.hosts = ['37.200.65.241']
     env.user = 'root'
     env.password = 'h5263k93'
@@ -125,3 +125,7 @@ def venv(release_path=None):
 
 def revlist():
     sudo('ls -1 {} | sort -n'.format(env.project_releases))
+
+def restart_service(services):
+    for service in services.split(','):
+        sudo('service {} restart')
