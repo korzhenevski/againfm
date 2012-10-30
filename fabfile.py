@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from fabric.api import env, local, run, lcd, cd, sudo, settings, put
-from fabric.contrib.files import exists
+from fabric.contrib.files import exists, append, uncomment
 from fabric.contrib.console import confirm
 
 def production():
@@ -66,6 +66,7 @@ def bootstrap(force=False):
 
 def deploy(rev=None):
     bootstrap()
+    revclean()
 
     # деплой конкретной ревизии или откат на предыдущую
     previous_rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.project_releases)).strip()
@@ -128,4 +129,19 @@ def revlist():
 
 def restart_service(services):
     for service in services.split(','):
-        sudo('service {} restart')
+        sudo('service {} restart'.format('service'))
+
+def revclean():
+    releases = sudo('ls -1 {} | sort -n'.format(env.project_releases)).split('\n')
+    for release in releases:
+        path = env.project_releases + '/' + release.strip()
+        if not exists(path + '/venv'):
+            sudo('rm -rf {}'.format(path))
+
+def copy_ssh_id():
+    import os
+    if not exists('~/.ssh'):
+        sudo('mkdir ~/.ssh')
+    local_key = os.path.expanduser('~/.ssh/id_rsa.pub')
+    append('~/.ssh/authorized_keys', open(local_key).read().strip(), use_sudo=True)
+    sudo('cat ~/.ssh/authorized_keys')
