@@ -5,5 +5,5 @@
     "copperegg": {
         "apikey": "Aous1sz2PBP1HBPK"
     },
-	"run_list": ["role[base]", "recipe[revealcloud]",  "recipe[scout]"]
+	"run_list": ["role[base]"]
 }
