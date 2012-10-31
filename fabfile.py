@@ -7,14 +7,13 @@ from fabric.contrib.files import exists, append, uncomment
 from fabric.contrib.console import confirm
 
 def production():
+    env.hosts = ['again.fm']
+    env.user = 'root'
+
+def testing():
     env.hosts = ['46.182.27.6']
     env.user = 'root'
     env.password = 'yaeveH5N'
-
-def service():
-    env.hosts = ['37.200.65.241']
-    env.user = 'root'
-    env.password = 'h5263k93'
 
 def againfm():
     env.project = '/var/www/againfm'
