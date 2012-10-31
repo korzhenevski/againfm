@@ -4,7 +4,7 @@ server {
 }
 
 server {
-	server_name <%= node['againfm']['host'] %>;
+	server_name <%= node['againfm']['host'] %> _;
 
     # output compression saves bandwidth
     gzip on;
@@ -43,4 +43,11 @@ server {
 	location /mu-fa76d39d-fa0a0082-d8815605-c151db4b {
 	    return 200 '42';
 	}
+
+    location /nginx_status {
+        stub_status on;
+        access_log   off;
+        allow 127.0.0.1;
+        deny all;
+    }
 }
