@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from fabric.api import env, local, run, lcd, cd, sudo, settings, put
+from fabric.api import env, local, run, lcd, cd, sudo, settings, put, prefix
 from fabric.contrib.files import exists, append, uncomment
 from fabric.contrib.console import confirm
 
@@ -66,7 +66,6 @@ def bootstrap(force=False):
 
 def deploy(rev=None):
     bootstrap()
-    revclean()
 
     # деплой конкретной ревизии или откат на предыдущую
     previous_rev = sudo('ls -1 {} | sort -n | tail -n1'.format(env.project_releases)).strip()
@@ -123,6 +122,10 @@ def venv(release_path=None):
         sudo('virtualenv venv')
         if exists(release_path + '/requirements.txt'):
             sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
+
+def rebuild_assets():
+    with cd(env.project_current):
+        sudo('./venv/bin/python manage.py assets build')
 
 def revlist():
     sudo('ls -1 {} | sort -n'.format(env.project_releases))
