@@ -2,12 +2,7 @@ server {
     server_name again.fm www.again.fm;
     root /var/www/againfm/current/launch;
 }
-    location /nginx_status {
-        stub_status on;
-        access_log   off;
-        allow 127.0.0.1;
-        deny all;
-    }
+
 server {
 	server_name <%= node['againfm']['host'] %>;
 
