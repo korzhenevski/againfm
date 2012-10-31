@@ -1,3 +1,9 @@
 {
-	"run_list": "role[base]"
+    "scout_agent": {
+        "key": "6b337275-1b7d-45ae-ab81-f0c017fb03d6"
+    },
+    "copperegg": {
+        "apikey": "Aous1sz2PBP1HBPK"
+    },
+	"run_list": ["role[base]", "recipe[revealcloud]",  "recipe[scout]"]
 }
