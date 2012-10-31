@@ -54,6 +54,14 @@ template "/etc/uwsgi/apps-enabled/againfm.ini" do
   notifies :reload, "service[uwsgi]", :immediately
 end
 
+template "#{node[:nginx][:dir]}/conf.d/stats.conf" do
+  source "nginx-stats.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :reload, "service[nginx]", :immediately
+end
+
 template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
   source "production-nginx.conf.erb"
   owner "root"
