@@ -27,6 +27,14 @@ directory "/var/log/againfm" do
   recursive true
 end
 
+template "/var/www/againfm/current/againfm.conf" do
+  source "againfm.conf.erb"
+  owner "www-data"
+  group "www-data"
+  mode 0644
+  notifies :reload, "service[uwsgi]", :immediately
+end
+
 supervisor_service "celery" do
   action :enable
   user "www-data"

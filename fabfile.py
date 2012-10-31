@@ -9,11 +9,12 @@ from fabric.contrib.console import confirm
 def production():
     env.hosts = ['again.fm']
     env.user = 'root'
+    env.chef_role = 'production'
 
 def testing():
-    env.hosts = ['46.182.27.6']
+    env.hosts = ['testing.again.fm']
     env.user = 'root'
-    env.password = 'yaeveH5N'
+    env.chef_role = 'testing'
 
 def againfm():
     env.project = '/var/www/againfm'
@@ -105,7 +106,7 @@ def deploy(rev=None):
 def provision():
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
-    sudo('chef-solo -c {chef}/solo.rb -j {chef}/production.json'.format(chef=chef))
+    sudo('chef-solo -c {chef}/solo.rb -j {chef}/{role}.json'.format(chef=chef, env.chef_role))
     sudo('touch {}/restart.txt'.format(env.project_current))
 
 def pull():

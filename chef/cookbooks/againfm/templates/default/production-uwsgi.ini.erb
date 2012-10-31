@@ -5,6 +5,7 @@ module = afm:app
 workers = 4
 listen = 200
 virtualenv = /var/www/againfm/current/venv
+env = AGAINFM_CONFIG=/var/www/againfm/current/againfm.conf
 chdir = /var/www/againfm/current
 single-interpreter = true
 touch-reload = /var/www/againfm/current/restart.txt
