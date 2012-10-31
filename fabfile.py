@@ -35,7 +35,11 @@ def vagrant():
     env.hosts = ['10.0.0.2']
     result = local('vagrant ssh-config | grep IdentityFile', capture=True)
     env.key_filename = result.split()[1]
- 
+
+def dump():
+    for collection in ['stations', 'streams', 'genres']:
+        local('mongodump -d againfm -c {}'.format(collection))
+
 def init():
     run('pip install -r {}/requirements.txt'.format(env.project))
 
