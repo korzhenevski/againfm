@@ -106,7 +106,7 @@ def deploy(rev=None):
 def provision():
     # обновляем шеф-рецепты :)
     chef = env.project_current + '/chef'
-    sudo('chef-solo -c {chef}/solo.rb -j {chef}/{role}.json'.format(chef=chef, env.chef_role))
+    sudo('chef-solo -c {chef}/solo.rb -j {chef}/{role}.json'.format(chef=chef, role=env.chef_role))
     sudo('touch {}/restart.txt'.format(env.project_current))
 
 def pull():
