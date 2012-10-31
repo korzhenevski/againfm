@@ -112,6 +112,19 @@
     App.i18n_dict = {{ bootstrap.i18n|safe }};
     App.debug = {{ config.DEBUG|tojson }};
     App.comet_url = {{ config.COMET_URL|tojson|safe }};
+    // console noop for old browsers
+    (function(global) {
+        var noop = function(){};
+        if ( !global['console'] ) {
+            var methods = 'log debug info warn error assert clear dir dirxml trace group groupCollapsed ';
+            methods += 'groupEnd time timeEnd profile profileEnd count exception table';
+            methods = methods.split(' ');
+            global.console = {};
+            for (var i=0; i<methods.length; i++) {
+                global.console[methods[i]] = noop;
+            }
+        }
+    })(window);
 </script>
 
 {% assets "core_scripts" %}
