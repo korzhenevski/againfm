@@ -145,6 +145,10 @@ def revclean():
         if not exists(path + '/venv'):
             sudo('rm -rf {}'.format(path))
 
+def mongorestore():
+    with cd(env.project_current):
+        sudo('mongorestore')
+
 def copy_ssh_id():
     import os
     if not exists('~/.ssh'):
