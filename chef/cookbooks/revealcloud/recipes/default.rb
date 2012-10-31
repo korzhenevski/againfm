@@ -11,5 +11,6 @@ script "revealcloud_install" do
   interpreter "bash"
   user "root"
   code "curl http://#{node[:copperegg][:apikey]}@api.copperegg.com/chef.sh | RC_TAG=\"#{node[:copperegg][:tags]}\" RC_LABEL=\"#{node[:copperegg][:label]}\" RC_PROXY=\"#{node[:copperegg][:proxy]}\" sh"
+  not_if do ::File.exists?('/usr/local/revealcloud/revealcloud') end
 end
 
