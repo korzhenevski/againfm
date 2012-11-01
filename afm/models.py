@@ -285,7 +285,8 @@ class Station(BaseDocument):
         return {
             'id': self['id'],
             'title': self['title'],
-            'is_online': bool(self['online_streams'])
+            # TODO: migrate
+            'is_online': bool(self.get('online_streams'))
         }
 
     def find_online(self, query=None):
