@@ -12,12 +12,7 @@ from .helpers import *
 @app.route('/api/user/login', methods=['POST'])
 def login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
-    if '@' in data['login']:
-        # логин по почте
-        where = {'email': data['login']}
-    else:
-        where = {'login': data['login']}
-    user = db.User.find_one(where)
+    user = db.User.find_login(data['login'])
     if user:
         direct_auth = user.check_password(data['password'])
         new_password_auth = user.confirm_new_password(data['password'])
@@ -98,12 +93,12 @@ def change_settings():
 @app.route('/api/playlist/genre/<genre>')
 def genre_playlist(genre):
     genre = db.Genre.find_one_or_404({'id': genre})
-    stations = [station.get_public_data() for station in db.Station.find({'tag': {'$in': genre['tags']}})]
+    stations = [station.get_public_data() for station in db.Station.find_online({'tag': {'$in': genre['tags']}})]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/featured')
 def featured_playlist():
-    stations = [station.get_public_data() for station in db.Station.find()]
+    stations = [station.get_public_data() for station in db.Station.find_online()]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')

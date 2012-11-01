@@ -243,6 +243,12 @@ class User(BaseDocument):
             return True
         return False
 
+    def find_login(self, login):
+        key = 'email' if '@' in login else 'login'
+        where = {}
+        where[key] = login
+        return self.find_one(where)
+
     def is_authenticated(self):
         return True
 
@@ -266,7 +272,8 @@ class Station(BaseDocument):
         'id': int,
         'title': unicode,
         'website': unicode,
-        'tags': [unicode]
+        'tags': [unicode],
+        'online_streams': [int],
     }
 
     indexes = [
@@ -277,8 +284,15 @@ class Station(BaseDocument):
     def get_public_data(self):
         return {
             'id': self['id'],
-            'title': self['title']
+            'title': self['title'],
+            'is_online': bool(self['online_streams'])
         }
+
+    def find_online(self, query=None):
+        if query is None:
+            query = {}
+        query['online_streams'] = {'$not': {'$size': 0}}
+        return self.find(query)
 
     @staticmethod
     def public_list(models):

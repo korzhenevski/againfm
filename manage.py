@@ -102,5 +102,18 @@ def gen():
         fav.save()
         print fav._id
 
+@manager.command
+@manager.option('-u', '--user', dest='login')
+def change_password(login):
+    user = db.User.find_login(login)
+    if not user:
+        print 'user not found'
+        return
+    password = raw_input('New password: ')
+    user.set_password(password)
+    user.save()
+    print 'changed!'
+
+
 if __name__ == "__main__":
     manager.run()
