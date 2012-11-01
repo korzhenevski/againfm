@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pymongo
+from itsdangerous import URLSafeSerializer
 from afm import app, db
 from flask import jsonify, request, render_template, url_for
 from flask.ext.login import login_user, login_required, current_user, logout_user
@@ -133,11 +134,15 @@ def station_getplayinfo(station_id):
     """
     sort_direction = pymongo.ASCENDING if request.args.get('low_bitrate') else pymongo.DESCENDING
     stream = db.Stream.find_one_or_404({'station_id': station_id, 'is_online': True}, sort=[('bitrate', sort_direction)])
+
+    safe_serializer = URLSafeSerializer(secret_key=app.config['SECRET_KEY'])
+    safe_channel = safe_serializer.dumps([station_id, stream['id'], request.remote_addr])
     resp = {
         'stream': {
             'id': stream['id'],
             'url': stream.get_web_url(),
             'bitrate': stream['bitrate'],
+            'channel': safe_channel,
         }
     }
 

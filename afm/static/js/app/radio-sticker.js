@@ -16,12 +16,8 @@ App.Feed = App.klass({
         this.mediator.on('player:stopped player:error radio:error', this.stop, this);
         this.mediator.on('player:playing', this.start, this);
 
-        this.mediator.on('radio:station_changed', function(station){
-            this.params.station_id = station.id;
-        }, this);
-
         this.mediator.on('radio:stream_changed', function(stream){
-            this.params.stream_id = stream.id;
+            this.params.channel = stream.channel;
         }, this);
 
         // рестартуем клиента при смене пользовательского состояния
@@ -38,7 +34,7 @@ App.Feed = App.klass({
 
     // обязательные параметры для comet запроса
     _checkParams: function() {
-        return _.has(this.params, 'station_id') && _.has(this.params, 'stream_id');
+        return _.has(this.params, 'channel');
     },
 
     start: function() {

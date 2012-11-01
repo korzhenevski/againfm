@@ -29,5 +29,6 @@ validictory==0.8.3
 raven==2.0.7.1
 blinker==1.2
 PyYAML==3.10
+itsdangerous==0.17
 -e git+https://github.com/miracle2k/webassets.git#egg=webassets
 -e git+https://github.com/miracle2k/flask-assets.git#egg=flask-assets
