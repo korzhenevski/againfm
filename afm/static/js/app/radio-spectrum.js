@@ -1,13 +1,10 @@
-
-
-
-
-
 App.RadioSpectrum = App.View.extend({
     el: '#spectrum',
     limit: 180,
     colors: ['#d86b26', '#d72f2e', '#0f9ac5'],
     running: false,
+    enabled: true,
+    mediator: App.mediator,
 
     initialize: function(options) {
         this.player = options.player;
@@ -15,8 +12,21 @@ App.RadioSpectrum = App.View.extend({
         this.player.on('stopped', this.stop, this);
         this.canvas = this.el.getContext('2d');
         _.bindAll(this, 'pullSpectrum', 'animate', '_updateDimensions', 'drawBlankLine');
+        this.mediator.on('playback:spectrum', this.setEnabled, this);
         $(window).resize(_.throttle(this._updateDimensions, 200));
         this._updateDimensions();
+    },
+
+    setEnabled: function(enabled) {
+        this.enabled = enabled;
+        if (!this.player.isPlaying()) {
+            return false;
+        }
+        if (this.enabled) {
+            this.start();
+        } else {
+            this.stop();
+        }
     },
 
     _updateDimensions: function() {
@@ -30,7 +40,9 @@ App.RadioSpectrum = App.View.extend({
         this.running = true;
         this.points = [];
         this.drawBlankLine();
-        this.animate();
+        if (this.enabled) {
+            this.animate();
+        }
     },
 
     stop: function() {
@@ -155,7 +167,7 @@ App.RadioSpectrum = App.View.extend({
     },
 
     drawCurve: function(points, color) {
-        var factor = 0.4,
+        var factor = 0.45,
             linewidth = 1,
             ctx = this.canvas;
         ctx.beginPath();

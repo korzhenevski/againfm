@@ -85,6 +85,7 @@ App.UserSettingsView = App.View.extend({
 
     initialize: function() {
         this.model.on('logout', this.hide, this);
+        this.disabled_settings = {spectrum: !Modernizr.canvas};
     },
 
     changeName: function() {
@@ -141,7 +142,10 @@ App.UserSettingsView = App.View.extend({
     },
 
     render: function() {
-        this.setElement(this.template(this.model.toJSON()));
+        this.setElement(this.template({
+            user: this.model.toJSON(),
+            disabled_settings: this.disabled_settings
+        }));
         _.each(this.$('form'), function(form){
             this.setupValidator($(form));
         }, this);
@@ -154,11 +158,13 @@ App.UserSettingsView = App.View.extend({
 });
 
 Handlebars.registerHelper('setting', function(name) {
-    var html = App.getTemplate('user_settings_checkbox')({
+    var context = {
         name: name,
-        value: this.settings[name],
+        disabled: _.has(this.disabled_settings, name) ? this.disabled_settings[name] : false,
+        value: this.user.settings[name],
         label: App.i18n('settings.' + name + '.label'),
         notice: App.i18n('settings.' + name + '.notice', {'default': ''})
-    });
+    };
+    var html = App.getTemplate('user_settings_checkbox')(context);
     return new Handlebars.SafeString(html);
 });

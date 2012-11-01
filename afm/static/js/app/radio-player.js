@@ -363,5 +363,7 @@ $(function() {
     App.faviconView = new App.PlayerFaviconView();
     App.radio = new App.Radio();
     App.playerView = new App.PlayerView({player: player});
-    App.spectrum = new App.RadioSpectrum({player: player});
+    if (Modernizr.canvas) {
+        App.spectrum = new App.RadioSpectrum({player: player});
+    }
 });

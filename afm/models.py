@@ -171,7 +171,8 @@ class User(BaseDocument):
         'settings': {
             'throttle_traffic': bool,
             'limit_night_volume': bool,
-            'fading_sound': bool
+            'fading_sound': bool,
+            'spectrum': bool
         }
     }
 
@@ -187,7 +188,8 @@ class User(BaseDocument):
         'is_admin': False,
         'settings.throttle_traffic': False,
         'settings.fading_sound': True,
-        'settings.limit_night_volume': True
+        'settings.limit_night_volume': True,
+        'settings.spectrum': True,
     }
 
     def check_password(self, raw_password):
