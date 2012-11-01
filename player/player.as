@@ -55,22 +55,26 @@ package {
          }
 
          var bytes:ByteArray = new ByteArray();
+         var soundData:Boolean = false;
          var val:Number = 0;
 
          _sound.extract(bytes, length * 4);
          bytes.position = 0;
          while (bytes.bytesAvailable > 0) {
             val = bytes.readFloat() + bytes.readFloat();
+            if (!soundData && val > 0.0) {
+                soundData = true;
+            }
             bytes.readFloat() + bytes.readFloat();
             bytes.readFloat() + bytes.readFloat();
             bytes.readFloat() + bytes.readFloat();
-            spectrum.push((val + 1) / 2 * 100);
+            val = (val + 1) / 2 * 100;
+            spectrum.push(val);
          }
 
-         // расширить диапазон
-         // [--.---.---.---.--]
-         // а не как сейчас
-         // [-.-.-.-.---------]
+         if (!soundData) {
+             return [];
+         }
 
          return spectrum;
       }

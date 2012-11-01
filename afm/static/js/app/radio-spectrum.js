@@ -1,113 +1,8 @@
-/**
- * player - [...] - значения которые обновляются переодический
- * рисовалка значений
- *
- * @type {*}
- */
-
-/**
- * дописать и сделать рефакторинг
- * @type {*}
- */
-App.RadioSpectrum = App.View.extend({
-    el: '#spectrum',
-    points: 180,
-    colors: ['#d86b26', '#d72f2e', '#0f9ac5'],
-
-    initialize: function(options) {
-        this.player = options.player;
-        this.player.on('playing', this.start, this);
-        this.player.on('stopped', this.stop, this);
-        this.canvas = this.el.getContext('2d');
-        //_.bindAll(this, 'pullSpectrum', 'animate', '_updateDimensions', 'drawBlankLine');
-        this._trackDimensions();
-        //this.lineSize = Math.floor(this.points / this.colors.length);
-        //this.pointInterval = Math.round(this.width / this.lineSize);
-        $(window).resize(_.throttle(this._trackDimensions, 200));
-    },
-
-    _trackDimensions: function() {
-        //this.width = this.$el.width();
-        //this.height = this.$el.height();
-    },
-
-    start: function() {
-
-    },
-
-    stop: function() {
-
-    },
-
-    /**
-     * расчитать разницу значений
-     * изменить значения
-     * если все закончено, получить новые данные
-     * новые данные это: from, to, diff
-     *
-     * @param duration
-     * @param interval
-     */
-    animate: function(duration, interval) {
-        var steps = duration / interval;
-        var pointer = 0;
-        var stepped;
-        var step, from, to;
-        var self = this;
-        function computeStep() {
-            if (from && to) {
-                to = from;
-                from = self.pullSpectrum();
-            } else {
-                from = [];
-                for(var i = 0; i < self.limit; i++) {
-                    from.push(0);
-                }
-                to = self.pullSpectrum();
-            }
-            step = [];
-            stepped = steps;
-            for (var i = 0; i < from.length; i++) {
-                var val = (to[i] - from[i]);
-                if (val != 0) {
-                    val = val / steps;
-                }
-                step[i] = val;
-            }
-            pointer++;
-            //if (pointer > 10) {
-            //    return false;
-            //}
-            return true;
-        }
-        function stepper(){
-            if (!step) {
-                return false;
-            }
-            var current = [];
-            for (var i = 0; i < from.length; i++) {
-                from[i] = from[i] + step[i];
-                current[i] = parseFloat(from[i].toFixed(2));
-            }
-            self.points = current;
-            self.render();
-            //console.log(current);
-            if (--stepped) {
-                setTimeout(stepper, interval);
-            } else {
-                if (computeStep()) {
-                    setTimeout(stepper, interval);
-                }
-            }
-        }
-        computeStep();
-        stepper();
-    }
-});
 
 
 
-/*
+
+
 App.RadioSpectrum = App.View.extend({
     el: '#spectrum',
     limit: 180,
@@ -133,31 +28,21 @@ App.RadioSpectrum = App.View.extend({
 
     start: function() {
         this.running = true;
-        this.spectrum = [];
         this.points = [];
-        this.animateTime = 0;
-        this.spectrumTime = 0;
-        for (var i = 0; i < this.limit; ++i) {
-            this.points[i] = 10;
-        }
-        var self = this;
-        _.delay(function(){
-            //this.drawBlankLine();
-            self.animate2();
-        }, 1000);
+        this.drawBlankLine();
+        this.animate();
     },
 
     stop: function() {
         this.running = false;
-        this.clear();
-        this.drawBlankLine();
+        this.points = [];
     },
 
     drawBlankLine: function() {
         this.clear();
         var ctx = this.canvas,
             color = '#f3f3f3',
-            height = 68;
+            height = 50;
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
@@ -173,6 +58,10 @@ App.RadioSpectrum = App.View.extend({
     },
 
     render: function() {
+        if (!this.points.length || !this.running) {
+            this.drawBlankLine();
+            return;
+        }
         this.clear();
         for(var lineIndex = 0; lineIndex < this.colors.length; lineIndex++) {
             var pos = 0,
@@ -197,40 +86,33 @@ App.RadioSpectrum = App.View.extend({
         }
     },
 
-    /**
-     * 1. exists
-     *
-     * to = from
-     * from = getSpectrum
-     *
-     * 2. not exists
-     *
-     * to = getSpectrum
-     * from = zero fill
-     *
-     *
-     *
-     *
-
-    animate2: function() {
-        var duration = 420;
-        var interval = 30;
+    animate: function() {
+        var duration = 420, interval = 30;
         var steps = duration / interval;
-        var pointer = 0;
         var stepped;
-        var step, from, to;
+        var step = [], from, to;
         var self = this;
+
         function computeStep() {
+            var spectrum = self.pullSpectrum();
+            if (! (spectrum && spectrum.length) ) {
+                if (self.running) {
+                    setTimeout(computeStep, 500);
+                }
+                return;
+            }
+
             if (from && to) {
                 to = from;
-                from = self.pullSpectrum();
+                from = spectrum;
             } else {
                 from = [];
                 for(var i = 0; i < self.limit; i++) {
-                    from.push(0);
+                    from.push(50);
                 }
-                to = self.pullSpectrum();
+                to = spectrum;
             }
+
             step = [];
             stepped = steps;
             for (var i = 0; i < from.length; i++) {
@@ -240,62 +122,36 @@ App.RadioSpectrum = App.View.extend({
                 }
                 step[i] = val;
             }
-            pointer++;
-            //if (pointer > 10) {
-            //    return false;
-            //}
-            return true;
+
+            stepper();
         }
+
         function stepper(){
-            if (!step) {
-                return false;
+            if (!step.length) {
+                return;
             }
+
             var current = [];
             for (var i = 0; i < from.length; i++) {
                 from[i] = from[i] + step[i];
                 current[i] = parseFloat(from[i].toFixed(2));
             }
+
             self.points = current;
             self.render();
-            //console.log(current);
+
+            if (!self.running) {
+                return;
+            }
+
             if (--stepped) {
                 setTimeout(stepper, interval);
             } else {
-                if (computeStep()) {
-                    setTimeout(stepper, interval);
-                }
+                computeStep();
             }
         }
+
         computeStep();
-        stepper();
-    },
-
-    animate: function() {
-        var size = this.spectrum.length;
-        if (!size) {
-            this.pullSpectrum();
-        }
-
-        var change = this.animateTime ? ((new Date()) - this.animateTime) : 0;
-        if (!change || change > 70) {
-            this.animateTime = +new Date();
-
-            for (var i = 0; i < size; i++) {
-                var diff = this.spectrum[i] - this.points[i];
-                if (diff != 0) {
-                    var val = this.points[i] + (diff * (change / 1000));
-                    if (val >= this.spectrum[i]) {
-                        val = this.spectrum[i];
-                    }
-                    this.points[i] = val;
-                }
-            }
-            this.render();
-        }
-
-        if (this.running) {
-            requestAnimFrame(this.animate);
-        }
     },
 
     drawCurve: function(points, color) {
@@ -356,4 +212,3 @@ App.RadioSpectrum = App.View.extend({
         this.canvas.clearRect(0, 0, this.width, this.height);
     }
 });
-*/

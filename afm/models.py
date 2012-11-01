@@ -292,7 +292,7 @@ class Station(BaseDocument):
     def find_online(self, query=None):
         if query is None:
             query = {}
-        query['online_streams'] = {'$not': {'$size': 0}}
+        query['online_streams'] = {'$not': {'$size': 0}, '$exists': True}
         return self.find(query)
 
     @staticmethod
