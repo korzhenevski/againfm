@@ -180,7 +180,7 @@ App.StickerView = App.View.extend({
             if (this.infoTimer) {
                 clearTimeout(this.infoTimer);
             }
-            this.infoTimer = setTimeout(_.bind(this.model.trackUnavailable, this.model), 10000);
+            this.infoTimer = setTimeout(_.bind(this.model.trackUnavailable, this.model), 15000);
         }, this);
 
         // если ограничен трафик, не загружаем обложки
