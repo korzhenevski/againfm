@@ -70,4 +70,12 @@ template "#{node[:nginx][:dir]}/sites-available/againfm.conf" do
   notifies :reload, "service[nginx]", :immediately
 end
 
+template "/var/www/againfm/againfm.passwd" do
+  source "passwd.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :reload, "service[nginx]", :immediately
+end
+
 nginx_site "againfm.conf"

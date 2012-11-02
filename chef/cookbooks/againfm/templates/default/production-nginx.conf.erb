@@ -17,6 +17,9 @@ server {
     # Disable gzip for certain browsers.
     gzip_disable “MSIE [1-6].(?!.*SV1)”;
 
+    auth_basic "Area 42";
+    auth_basic_user_file /var/www/againfm/againfm.passwd;
+
 	location / {
         include uwsgi_params;
 	    uwsgi_pass 127.0.0.1:3031;
@@ -42,6 +45,10 @@ server {
 
 	location /mu-fa76d39d-fa0a0082-d8815605-c151db4b {
 	    return 200 '42';
+	}
+
+	location = /robots.txt {
+	    return 200 'User-Agent: *\nDisallow: /user/';
 	}
 
     location /nginx_status {
