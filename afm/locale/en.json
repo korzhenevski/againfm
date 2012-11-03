@@ -120,7 +120,7 @@
     "favorites": {
         "title": "Favorites",
         "helptext1": "You can store favorite songs here<br /> and find them quickly in Last.FM or Google.",
-        "helptext2": "Click on a star to add a song to favorite.<br /> It is no longer your trouble. The player remember your favorite songs."
+        "helptext2": "Click on a star to add a song to favorite"
     },
 
     "radio": {
