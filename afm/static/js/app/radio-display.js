@@ -292,6 +292,10 @@ App.DisplayView = App.View.extend({
      */
     selectStation: function(e) {
         var station = this.playlist.get($(e.target).data('id'));
+        var currentStation = this.playlist.getStation();
+        if (station && currentStation && currentStation.id == station.id) {
+            return false;
+        }
         this.playlist.setStation(station);
     },
 
