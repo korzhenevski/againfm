@@ -45,20 +45,27 @@ button[disabled]
 .hidden
   display: none
 
-/*.logo
-  visibility: hidden */
 .pseudo-link
   cursor: pointer
-  text-decoration: underline
   color: #999
+  border-bottom: 1px dotted #999
   &:hover
     color: #fe7b2c
+    border-bottom: 1px dotted #fe7b2c
 
 a
   &:link, &:visited
     color: #999
   &:active, &:hover
     color: #fe7b2c
+
+.footer
+  a
+    text-decoration: none
+    &:link, &:visited
+      border-bottom: 1px dotted #999
+    &:active, &:hover
+      border-bottom: 1px dotted #fe7b2c
 
 .wrapper
   background-image: url('../i/background_pattern.png')
@@ -521,7 +528,7 @@ $station-icon-shift: 5px
   .active-station
     font-weight: bold
   .scale-inner
-    padding: 20px 0
+    padding: 17px 0
   .scale-slider
     background-image: url('../i/scale/slider.png')
     background-repeat: repeat-y
@@ -531,18 +538,13 @@ $station-icon-shift: 5px
     height: 110%
     left: -25px
     display: none
-  .empty-line
-    background: none
-    border-bottom: 1px solid #666
   ul
     padding: 0
     margin: 0
     height: 1em
     margin-bottom: 30px
-    background-repeat: repeat-x
-    background-position: bottom center
-    background-image: url('../i/scale/line.png')
     clear: both
+    border-bottom: 2px solid #555
     li
       text-shadow: 0px 1px 1px #fff
       float: left
@@ -550,12 +552,12 @@ $station-icon-shift: 5px
       margin: 0 1em
       overflow: hidden
       white-space: nowrap 
-      margin-top: 1px
       background-image: url('../i/scale/background.png')
       position: absolute
       color: #000
       cursor: pointer
       font-size: 14px
+      line-height: 24px
 
   .line1 li
     background-position: 0 -20px
@@ -777,16 +779,17 @@ $footer-height: 2em
       color: #999
   .state
     width: 53px
-    text-align: center
     color: #999
-    font-size: 0.9em
-  h2, h3
-    line-height: 1.3em
+    text-align: center
+    vertical-align: top
+    font-size: 0.8em
+    line-height: 1.9em
   h2
     font-weight: bold
+    line-height: 1.3em
   h3
     color: #999
-    font-size: 0.9em
+    font-size: 0.8em
   h2, p, dl
     color: #000
 
@@ -971,8 +974,8 @@ $footer-height: 2em
     height: 24px
     display: block
     position: absolute
-    right: 10px
-    bottom: 185px
+    right: 18px
+    bottom: 190px
     background-image: url('../i/favorites/close.png')
     background-repeat: no-repeat
     cursor: pointer

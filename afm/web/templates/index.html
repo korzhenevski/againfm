@@ -95,7 +95,7 @@
     </div>
     <div class="left">
         <p class="left-shift">
-            &copy; 2012, {{ sitename }} &middot; {{ _('site.footer.made_in') }}
+            &copy; 2012 &laquo;{{ sitename }}&raquo; &middot; {{ _('site.footer.made_in') }}
             &middot; <a class="about" href="/about">{{ _('site.footer.about') }}</a>
             &middot; <a class="tos" href="/tos">{{ _('site.footer.tos') }}</a>
             &middot; <a class="feedback" href="/feedback">{{ _('site.footer.feedback') }}</a>
@@ -141,6 +141,7 @@
         $.watermark.options.className = 'placeholder';
         App.user.set({{ bootstrap.user|json|safe }});
         App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
+        App.radioDisplay.selectors.get(App.user.isLogged() ? 'favorite' : 'featured').select();
         new App.Router();
         Backbone.history.start({pushState: true});
     });

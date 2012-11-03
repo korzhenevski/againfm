@@ -177,7 +177,10 @@ App.FavoriteSelector = App.Selector.extend({
         this.set('visible', false);
         this.set('selector', 'favorite');
         this.mediator.on('user:logged', this.show, this);
-        this.mediator.on('user:logout', this.hide, this);
+        this.mediator.on('user:logout', function(){
+            this.collection.get('featured').select();
+            this.hide();
+        }, this);
         this.mediator.on('sticker:bookmark_station', this.refreshPlaylist, this);
     },
 
@@ -511,9 +514,5 @@ _.extend(App.RadioDisplay.prototype, {
 
 
 $(function(){
-    App.radioDisplay = new App.RadioDisplay({tags: [
-        {title: "House", tag: "house"},
-        {title: "Trance", tag: "trance"}
-    ]});
-    App.radioDisplay.selectors.get('featured').select();
+    App.radioDisplay = new App.RadioDisplay();
 });
