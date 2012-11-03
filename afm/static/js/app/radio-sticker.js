@@ -163,10 +163,7 @@ App.StickerView = App.View.extend({
         'click .bookmark-station': 'bookmarkStation',
         'click .bookmark-track': 'bookmarkTrack'
     },
-    icon: {
-        notfound: '/static/i/display/notfound.png',
-        loading: '/static/i/display/loading.png'
-    },
+    nocover: '/static/i/display/notfound.png',
     mediator: App.mediator,
     showCovers: true,
 
@@ -204,7 +201,7 @@ App.StickerView = App.View.extend({
         }
         context.station = attrs.station;
         context.has_station_favorite = _.has(attrs.station, 'favorite');
-        context.image_url = this.icon.notfound;
+        context.image_url = this.nocover;
         if (attrs.error) {
             context.title = App.i18n('radio.errors.radio_unavailable');
         } else if (attrs.trackUnavailable) {
@@ -218,7 +215,6 @@ App.StickerView = App.View.extend({
                 context.title = track.title;
             } else {
                 context.title = App.i18n('radio.loading');
-                context.image_url = this.icon.loading;
             }
             // звездочка - добавление трека в избранное
             context.has_track_favorite = _.has(track, 'favorite');
@@ -231,7 +227,6 @@ App.StickerView = App.View.extend({
             }
         } else {
             context.title = App.i18n('radio.loading');
-            context.image_url = this.icon.loading;
         }
 
         /*var html = this.template(context);
@@ -273,12 +268,12 @@ App.StickerView = App.View.extend({
             $title.delay(delay).animate({
                 'margin-left': overhead < 0 ? 0 : -1 * overhead
             }, duration, 'linear', function() {
-                // анимация в обратную сторону, задержка 3 секунды
-                marquee(-overhead, 3000);
+                // анимация в обратную сторону, задержка 2,5 секунды
+                marquee(-overhead, 2500);
             });
         };
-        // задержка перед анимацией 4 секунды
-        marquee(overhead, 4000);
+        // задержка перед анимацией 3,5 секунды
+        marquee(overhead, 3500);
     }
 });
 

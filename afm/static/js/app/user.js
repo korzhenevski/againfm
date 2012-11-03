@@ -300,12 +300,11 @@ App.UserFavorites = App.Collection.extend({
 /**
  * Хелпер для юзерской граватарки.
  */
-Handlebars.registerHelper('user_gravatar_url', function(user, size) {
-    var url = 'http://www.gravatar.com/avatar/' + user.gravatar_hash + '?s=' + size,
-        avatar_name = (user.sex == 'female') ? 'avatar_female.png' : 'avatar.png';
+Handlebars.registerHelper('user_gravatar_url', function(email_hash, size) {
+    var url = 'http://www.gravatar.com/avatar/' + email_hash + '?s=' + size;
     // gravatar хостит дефолтные изображения, поэтому на локалхосте URL будет недоступен.
     // меняем на заглушку по умолчанию
-    var default_url = App.debug ? 'mm' : encodeURIComponent(App.getUrl('static/i/' + avatar_name));
+    var default_url = App.debug ? 'mm' : encodeURIComponent(App.getUrl('static/i/avatar.png'));
     url += '&d=' + default_url;
     return url;
 });
