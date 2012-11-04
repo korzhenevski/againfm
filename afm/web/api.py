@@ -110,7 +110,7 @@ def favorite_playlist():
     query = {'id': {'$in': favorite_stations.keys()}}
     stations = [station.get_public_data() for station in db.Station.find(query)]
     # сортируем по времени добавления
-    stations.sort(reverse=True, key=lambda station: favorite_stations.get(station['id']))
+    stations.sort(key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
 
 @app.route('/api/station/<int:station_id>')
