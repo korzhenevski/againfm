@@ -16,17 +16,12 @@ App.PanelBox = App.View.extend({
         // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
         view.layout = this;
         view.render();
-        this.$el.css('marginTop', this.panelMarginTop()).show().animate({marginTop: 0}, 450, 'linear');
+        this.$el.css('top', $(window).height()).show().animate({top: 60}, 450, 'linear');
         this.view = view;
     },
 
-    // значение верхнего отступа, что-бы контейнер ушел за пределы экрана
-    panelMarginTop: function() {
-        return -1 * (this.$el.outerHeight() + this.$el.position().top);
-    },
-
     hide: function() {
-        this.$el.animate({marginTop: this.panelMarginTop()}, 'linear', _.bind(function(){
+        this.$el.animate({top: $(window).height()}, 'linear', _.bind(function(){
             this.$el.hide();
             // убиваем после анимации, иначе при скрытии виден только пустой контейнер
             if (this.view) {
