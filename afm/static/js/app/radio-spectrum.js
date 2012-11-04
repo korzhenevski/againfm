@@ -99,7 +99,7 @@ App.RadioSpectrum = App.View.extend({
     },
 
     animate: function() {
-        var duration = 420, interval = 30;
+        var duration = 420, interval = 35;
         var steps = duration / interval;
         var stepped;
         var step = [], from, to;
@@ -167,7 +167,7 @@ App.RadioSpectrum = App.View.extend({
     },
 
     drawCurve: function(points, color) {
-        var factor = 0.45,
+        var factor = 0.4,
             linewidth = 1,
             ctx = this.canvas;
         ctx.beginPath();
