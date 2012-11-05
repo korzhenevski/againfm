@@ -46,6 +46,7 @@ button[disabled]
   display: none
 
 .pseudo-link
+  font-size: 12px
   cursor: pointer
   color: #999
   border-bottom: 1px dotted #999
@@ -216,7 +217,6 @@ form
   float: left
   margin-right: 10px
   .pseudo-link, label, a
-    display: inline-block
     margin-left: 13px
 
 .radio-controls
@@ -667,18 +667,16 @@ $station-icon-shift: 5px
       margin-top: 0.4em
       li
         margin: 0 9px 0 16px
-        float: left
         margin-right: 10px
-        height: 13px
-        line-height: 9px
-    a
-      font-size: 0.8em
-      color: #fff
-      text-decoration: none
-      border-bottom: 1px solid #fff
-      &:hover
-        border-bottom: 1px solid #f60
-        color: #ff6600
+        float: left
+        line-height: 12px
+        font-size: 13px
+        color: #fff
+        cursor: pointer
+        border-bottom: 1px dotted #fff
+        &:hover
+          border-bottom: 1px dotted #f60
+          color: #ff6600
 
 .panel-box
   width: 45%

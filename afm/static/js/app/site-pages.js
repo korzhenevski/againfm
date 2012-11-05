@@ -8,6 +8,17 @@ App.PanelBox = App.View.extend({
     events: {
         'click .close': 'hide'
     },
+    mediator: App.mediator,
+
+    initialize: function() {
+        this.mediator.on('panelbox:show', this.show, this);
+        this.mediator.on('panelbox:hide', this.hide, this);
+        this.mediator.on('app:modal', function(view){
+            if (view != 'panelbox') {
+                this.hide();
+            }
+        }, this);
+    },
 
     show: function(view) {
         if (this.view) {
@@ -16,12 +27,13 @@ App.PanelBox = App.View.extend({
         // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
         view.layout = this;
         view.render();
-        this.$el.css('top', $(window).height()).show().animate({top: 60}, 450, 'linear');
+        this.$el.css('top', $(window).height()).show().animate({top: 60}, 'linear');
         this.view = view;
+        this.mediator.trigger('app:modal', 'panelbox');
     },
 
     hide: function() {
-        this.$el.animate({top: $(window).height()}, 'linear', _.bind(function(){
+        this.$el.fadeOut(_.bind(function(){
             this.$el.hide();
             // убиваем после анимации, иначе при скрытии виден только пустой контейнер
             if (this.view) {
@@ -58,14 +70,21 @@ App.FeedbackView = App.View.extend({
         'submit form': 'submit',
         'click .close': 'hide'
     },
+    mediator: App.mediator,
 
     initialize: function() {
         this.setupValidator();
+        this.mediator.on('app:modal', function(view){
+            if (view != 'feedback') {
+                this.hide();
+            }
+        }, this);
     },
 
     show: function() {
-        this.$el.css('left', $('a.feedback').position().left);
+        this.$el.css('left', $('.feedback').position().left);
         this.$el.fadeIn();
+        this.mediator.trigger('app:modal', 'feedback');
     },
 
     hide: function() {
@@ -112,4 +131,34 @@ App.FeedbackView = App.View.extend({
         }, this);
         this.validator.validateForm();
     }
+});
+
+App.FooterView = App.View.extend({
+    el: '.footer',
+    events: {
+        'click .about': 'showAbout',
+        'click .tos': 'showTos',
+        'click .feedback': 'showFeedback'
+    },
+    mediator: App.mediator,
+
+    initialize: function() {
+        this.feedbackView = new App.FeedbackView();
+    },
+
+    showAbout: function() {
+        this.mediator.trigger('panelbox:show', new App.AboutView());
+    },
+
+    showTos: function() {
+        this.mediator.trigger('panelbox:show', new App.TosView());
+    },
+
+    showFeedback: function() {
+        this.feedbackView.toggle();
+    }
+});
+
+$(function(){
+    App.footerView = new App.FooterView();
 });

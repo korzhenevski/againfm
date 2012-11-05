@@ -91,11 +91,15 @@ App.LoginFormView = App.View.extend({
     template: App.getTemplate('user_login'),
     events: {
         'submit': 'submit',
-        'keyup': '_validate'
+        'keyup': '_validate',
+        'click .signup': 'showSignup',
+        'click .amnesia': 'showAmnesia'
     },
     valid: false,
+    mediator: App.mediator,
 
     initialize: function(options) {
+        this.topbox = new App.TopBox();
         this.user = options.user;
         this.user.on('logged logout', this.render, this);
         // вывод ошибки логина
@@ -109,6 +113,14 @@ App.LoginFormView = App.View.extend({
 
     _clearError: function() {
         this.$('.notice').removeClass('notice-error').text('');
+    },
+
+    showSignup: function() {
+        this.topbox.show(new App.UserSignup({model: this.user}));
+    },
+
+    showAmnesia: function() {
+        this.topbox.show(new App.UserAmnesia({model: this.user}));
     },
 
     render: function() {
@@ -156,12 +168,16 @@ App.UserBarView = App.View.extend({
     el: '.user-profile',
     template: App.getTemplate('userbar'),
     events: {
-        'click .logout': 'logout'
+        'click .logout': 'logout',
+        'click .favorites': 'showFavorites',
+        'click .settings': 'showSettings'
     },
+    mediator: App.mediator,
 
     initialize: function(options) {
         this.user = options.user;
         this.user.on('logged logout change', this.render, this);
+        this.favorites = new App.UserFavorites();
     },
 
     render: function() {
@@ -172,88 +188,17 @@ App.UserBarView = App.View.extend({
         }
     },
 
+    showFavorites: function() {
+        this.mediator.trigger('panelbox:show', new App.UserFavoritesView({collection: this.favorites}));
+    },
+
+    showSettings: function() {
+        this.mediator.trigger('panelbox:show', new App.UserSettingsView({model: this.user}));
+    },
+
     logout: function() {
         this.user.logout();
         return false;
-    }
-});
-
-App.UserRouter = Backbone.Router.extend({
-    routes: {
-        'signup': 'signup',
-        'amnesia': 'amnesia',
-        'user/favorites': 'favorites',
-        'user/settings': 'settings',
-        'about': 'about',
-        'tos': 'tos',
-        'feedback': 'feedback'
-    },
-    mediator: App.mediator,
-
-    initialize: function(options) {
-        this.user = options.user;
-        this.favorites = options.favorites;
-        this.settings = options.settings;
-
-        this.topbox = new App.TopBox();
-        this.topbox.on('hide', this.navigateToPrevious, this);
-
-        this.panelbox = new App.PanelBox();
-        this.panelbox.on('hide', this.navigateToPrevious, this);
-    },
-
-    /**
-     * Регистрация
-     */
-    signup: function() {
-        this.topbox.show(new App.UserSignup({model: this.user}));
-    },
-
-    /**
-     * Сброс пароля
-     */
-    amnesia: function() {
-        this.topbox.show(new App.UserAmnesia({model: this.user}));
-    },
-
-    /**
-     * Избранные треки
-     */
-    favorites: function() {
-        if (!this.user.isLogged()) {
-            this.navigate('/');
-        }
-        this.panelbox.show(new App.UserFavoritesView({collection: this.favorites}));
-    },
-
-    /**
-     * Настройки аккаунта
-     */
-    settings: function() {
-        if (!this.user.isLogged()) {
-            this.navigate('/');
-        }
-        this.panelbox.show(new App.UserSettingsView({model: this.user}));
-    },
-
-    about: function() {
-        this.panelbox.show(new App.AboutView())
-    },
-
-    tos: function() {
-        this.panelbox.show(new App.TosView())
-    },
-
-    feedback: function() {
-        if (!this.feedbackView) {
-            this.feedbackView = new App.FeedbackView();
-            this.feedbackView.on('hide', this.navigateToPrevious, this);
-        }
-        this.feedbackView.toggle();
-    },
-
-    navigateToPrevious: function() {
-        this.navigate('/', {replace: true});
     }
 });
 
@@ -312,20 +257,7 @@ Handlebars.registerHelper('user_gravatar_url', function(email_hash, size) {
 
 $(function(){
     App.user = new App.User();
-    App.userFavorites = new App.UserFavorites();
     App.userBar = new App.UserBarView({user: App.user});
     App.loginForm = new App.LoginFormView({user: App.user});
-    App.userRouter = new App.UserRouter({
-        user: App.user,
-        favorites: App.userFavorites
-    });
-
-    $(document).on("click", "a[href^='/']", function(e) {
-        var url = $(e.currentTarget).attr('href');
-        if (!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
-            url = url.replace(/^\//, '');
-            App.userRouter.navigate(url, {trigger: true})
-            return false;
-        }
-    });
+    App.panelBox = new App.PanelBox();
 });

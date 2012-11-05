@@ -6,6 +6,11 @@ from fabric.api import env, local, run, lcd, cd, sudo, settings, put, prefix
 from fabric.contrib.files import exists, append, uncomment
 from fabric.contrib.console import confirm
 
+"""
+быстрое обновление зависимостей с бекапом venv для легкого отката
+сборка статики и жс-шаблонов
+"""
+
 def production():
     env.hosts = ['again.fm']
     env.user = 'root'
