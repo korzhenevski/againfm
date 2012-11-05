@@ -73,7 +73,16 @@ App.FeedbackView = App.View.extend({
             // сбрасываем класс результата после скрытия
             $(this).removeClass('complete');
         });
+        // кидаем событие и роутер меняет url на предыдущий
         this.trigger('hide');
+    },
+
+    toggle: function() {
+        if (this.$el.is(':visible')) {
+            this.hide();
+        } else {
+            this.show();
+        }
     },
 
     submit: function() {

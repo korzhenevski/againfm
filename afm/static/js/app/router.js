@@ -1,6 +1,7 @@
 var App = App || {};
 
-App.Router = Backbone.Router.extend({
+
+App.StationRouter = Backbone.Router.extend({
     routes: {
         'station/:station_id': 'station'
     },

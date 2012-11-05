@@ -188,6 +188,7 @@ App.UserRouter = Backbone.Router.extend({
         'tos': 'tos',
         'feedback': 'feedback'
     },
+    mediator: App.mediator,
 
     initialize: function(options) {
         this.user = options.user;
@@ -248,7 +249,7 @@ App.UserRouter = Backbone.Router.extend({
             this.feedbackView = new App.FeedbackView();
             this.feedbackView.on('hide', this.navigateToPrevious, this);
         }
-        this.feedbackView.show();
+        this.feedbackView.toggle();
     },
 
     navigateToPrevious: function() {
@@ -322,7 +323,7 @@ $(function(){
     $(document).on("click", "a[href^='/']", function(e) {
         var url = $(e.currentTarget).attr('href');
         if (!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
-            url = url.replace(/^\//, '')
+            url = url.replace(/^\//, '');
             App.userRouter.navigate(url, {trigger: true})
             return false;
         }

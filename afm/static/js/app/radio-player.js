@@ -261,7 +261,7 @@ App.PlayerView = App.View.extend({
 
     streamChanged: function(stream) {
         // индикатор высокого битрейта
-        this.$('.hd').toggle(stream.bitrate >= 192);
+        //this.$('.hd').toggle(stream.bitrate >= 192);
     },
 
     toggle: function() {

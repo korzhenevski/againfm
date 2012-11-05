@@ -1,5 +1,7 @@
 var App = App || {};
 
+App.Router = Backbone.Router.extend({});
+
 App.Model = Backbone.Model.extend({});
 
 /**
