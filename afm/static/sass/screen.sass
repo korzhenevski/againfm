@@ -428,7 +428,6 @@ $station-icon-shift: 5px
     padding-left: 12px
     line-height: 40px
   span
-    +single-transition(color, 0.1s, ease-in-out)
     font-size: 12px
     color: #999
     cursor: pointer
@@ -437,6 +436,9 @@ $station-icon-shift: 5px
   .active
     color: #f8d222
     text-shadow: 0px 0px 3px #f8d222
+    cursor: default
+    &:hover
+      color: #f8d222
   .icon-selector
     text-indent: -9999px
     width: 19px
