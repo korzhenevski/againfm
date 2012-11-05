@@ -20,10 +20,16 @@ App.PanelBox = App.View.extend({
         }, this);
     },
 
-    show: function(view) {
+    show: function(view, name) {
+        if (this.name == name && this.$el.is(':visible')) {
+            this.hide();
+            return;
+        }
+
         if (this.view) {
             this.view.remove();
         }
+        this.name = name;
         // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
         view.layout = this;
         view.render();
@@ -41,7 +47,6 @@ App.PanelBox = App.View.extend({
                 this.view = null;
             }
         }, this));
-        this.trigger('hide');
     }
 });
 
@@ -147,11 +152,11 @@ App.FooterView = App.View.extend({
     },
 
     showAbout: function() {
-        this.mediator.trigger('panelbox:show', new App.AboutView());
+        this.mediator.trigger('panelbox:show', new App.AboutView(), 'about');
     },
 
     showTos: function() {
-        this.mediator.trigger('panelbox:show', new App.TosView());
+        this.mediator.trigger('panelbox:show', new App.TosView(), 'tos');
     },
 
     showFeedback: function() {

@@ -189,11 +189,13 @@ App.UserBarView = App.View.extend({
     },
 
     showFavorites: function() {
-        this.mediator.trigger('panelbox:show', new App.UserFavoritesView({collection: this.favorites}));
+        var view = new App.UserFavoritesView({collection: this.favorites})
+        this.mediator.trigger('panelbox:show', view, 'favorites');
     },
 
     showSettings: function() {
-        this.mediator.trigger('panelbox:show', new App.UserSettingsView({model: this.user}));
+        var view = new App.UserSettingsView({model: this.user});
+        this.mediator.trigger('panelbox:show', view, 'settings');
     },
 
     logout: function() {
