@@ -205,7 +205,8 @@ App.StickerView = App.View.extend({
         if (attrs.error) {
             context.title = App.i18n('radio.errors.radio_unavailable');
         } else if (attrs.trackUnavailable) {
-            context.title = App.i18n('radio.errors.info_unavailable');
+            context.title = App.i18n('radio.errors.unknown_track');
+            context.subtitle = App.i18n('radio.errors.unknown_artist');
         } else if (attrs.track) {
             var track = attrs.track;
             if (track.artist && track.name) {

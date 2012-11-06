@@ -127,6 +127,8 @@
     "radio": {
         "loading": "Загружаю...",
         "errors": {
+            "unknown_track": "Неизвестная песня",
+            "unknown_artist": "Неизвестный исполнитель",
             "info_unavailable": "Информация недоступна",
             "radio_unavailable": "Радио недоступно"
         }

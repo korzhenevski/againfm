@@ -57,10 +57,7 @@ App.TopBoxForm = App.View.extend({
         this.validator.on('validate_field', function(node, error) {
             this.$('label.error').remove();
             if (error) {
-                node.removeClass('valid');
                 node.after($('<label class="error">').text(error));
-            } else {
-                node.addClass('valid');
             }
         }, this);
 
@@ -69,7 +66,7 @@ App.TopBoxForm = App.View.extend({
         }, this);
 
         this.validator.validateForm();
-        this.$('input').bind('textchange', _.bind(this._removeErrorNotice, this));
+        //this.$('input').bind('textchange', _.bind(this._removeErrorNotice, this));
     },
 
     _removeErrorNotice: function() {

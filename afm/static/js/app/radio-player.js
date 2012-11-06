@@ -89,6 +89,7 @@ App.Player = App.klass({
     volume: 50,
     night_volume: 30,
     fading_sound: false,
+    volumeChanged: false,
 
     initialize: function() {
         this.station = {};
@@ -99,7 +100,7 @@ App.Player = App.klass({
         // опция: убавляем громкость во время с полуночи до шести, если текущее значение больше ночного.
         this.mediator.on('playback:limit_night_volume', function(limit){
             var hours = (new Date()).getHours();
-            if (limit && this.volume > this.night_volume && (hours >= 0 || hours <= 6)) {
+            if (limit && this.volume >= this.night_volume && (hours >= 0 || hours <= 6) && !this.volumeChanged) {
                 this.setVolume(this.night_volume);
             }
         }, this);
@@ -164,6 +165,7 @@ App.Player = App.klass({
     },
 
     setVolume: function(volume) {
+        this.volumeChanged = true;
         this.volume = volume;
         this.trigger('volume_changed');
         $.cookie('volume', volume);

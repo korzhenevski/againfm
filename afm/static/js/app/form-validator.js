@@ -4,6 +4,10 @@
  *
  * @type {function}
  */
+
+
+//
+
 var FormValidator = App.klass({
     validators: {
         required: function($el) {
@@ -36,9 +40,11 @@ var FormValidator = App.klass({
         this.options = options;
         this.form = $(form);
         // валидаторы срабатывают по изменению текста и смене фокуса
-        this.form.on('keyup blur', _.bind(this._event, this));
+        this.form.on('focusout', _.bind(this._event, this));
+        this.form.on('keyup', _.bind(this._event2, this));
         // блокируем submit если форма невалидна
         this.form.submit(_.bind(function(){
+            this.validateForm();
             return this.isValid();
         }, this));
     },
@@ -75,6 +81,13 @@ var FormValidator = App.klass({
             name = $field.attr('name');
         this.validateField($field, name);
         this.trigger('validate_field', $field, this.errors[name]);
+        this.trigger('validate', this.isValid());
+    },
+
+    _event2: function(e) {
+        var $field = $(e.target),
+            name = $field.attr('name');
+        this.validateField($field, name);
         this.trigger('validate', this.isValid());
     },
 

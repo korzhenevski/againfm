@@ -109,6 +109,7 @@ App.LoginFormView = App.View.extend({
         }, this);
         this.$('input').bind('textchange', _.bind(this._clearError, this));
         this.render();
+        setTimeout(_.bind(this._validate, this), 1000);
     },
 
     _clearError: function() {
