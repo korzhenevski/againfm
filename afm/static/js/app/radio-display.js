@@ -94,6 +94,10 @@ App.Playlist = App.Collection.extend({
         if (snapshot) {
             this.setStation(this.get(snapshot.currentStation.id));
         }
+    },
+
+    isEmptyFavorites: function() {
+        return this._selector == 'favorite' && !this.length;
     }
 });
 
@@ -236,6 +240,7 @@ App.SelectorsView = App.View.extend({
 App.DisplayView = App.View.extend({
     el: '.radio-scale .scale-inner',
     template: App.getTemplate('scale'),
+    empty_favorites_template: App.getTemplate('empty_favorites_scale'),
     events: {
         'click .station': 'selectStation'
     },
@@ -304,6 +309,16 @@ App.DisplayView = App.View.extend({
      * TODO: переписать без всяких spots и прочей хуйни
      */
     render: function() {
+        /**
+         * всесто пустого списка ибранного, показываем нормальное описание
+         */
+        if (this.playlist.isEmptyFavorites()) {
+            this.$el.html(this.empty_favorites_template()).css('width', '100%');
+            this.$el.parent().removeClass('movable');
+            this.updateScrollbar();
+            return;
+        }
+
         var SLIDER_SIZE = 13,
             space = 150 - Math.round(Math.log(this.playlist.length) * 20),
             maxLimit = Math.round(this.playlist.length * SLIDER_SIZE),
@@ -340,14 +355,6 @@ App.DisplayView = App.View.extend({
                 this.links[station.id] = $station;
             }
         } while (spots.length);
-
-        // помечаем пустые линии
-        _.each($lines, function(line) {
-            var $line = $(line);
-            if (!$line.find('li').size()) {
-                $line.addClass('empty-line');
-            }
-        });
 
         /**
          * меняем ширину контейнера
@@ -391,6 +398,8 @@ App.SearchView = App.View.extend({
         this.selectors = options.selectors;
         this.selectors.on('select', function(selector) {
             this.recentSelector = selector;
+            // при выборе селетора, очищаем поиск
+            this.$el.val('');
         }, this);
         this.$popupEl = $(this.popupEl);
         this.showPlaceholder();
@@ -508,10 +517,7 @@ _.extend(App.RadioDisplay.prototype, {
     setGenres: function(genres) {
         // теги
         _.each(genres, function(genre) {
-            this.selectors.add(new App.Selector({
-                title: genre.title,
-                selector: 'genre/' + genre.id
-            }));
+            this.selectors.add(new App.Selector({title: genre.title, selector: 'genre/' + genre.id}));
         }, this);
     }
 });
