@@ -113,16 +113,22 @@ App.Selectors = App.Collection.extend({
 
     initialize: function() {
         this.mediator.on('user:logout', function(){
-            if (this.get('favorite').isActive()) {
-                this.get('featured').select();
-            }
-        }, this);
-        this.mediator.on('user:logged', function(){
-            if (this.get('featured').isActive()) {
-                this.get('favorite').select();
-            }
+            this.swapIfNotActive('favorite', 'featured');
         }, this);
 
+        this.mediator.on('user:logged', function(){
+            this.swapIfNotActive('featured', 'favorite');
+        }, this);
+    },
+
+    // переключаем селектор, если нет выбранного радио на плейлисте
+    swapIfNotActive: function(from, to) {
+        if (this.playlist.isSelected()) {
+            return;
+        }
+        if (this.get(from).isActive()) {
+            this.get(to).select();
+        }
     },
 
     unselectAll: function() {
