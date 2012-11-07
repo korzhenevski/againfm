@@ -75,6 +75,7 @@ App.Playlist = App.Collection.extend({
             return result.promise();
         }
         this._selector = selector;
+        this.currentStation = null;
         var result = this.fetch();
         if (options.cursor) {
             result.done(_.bind(this.restoreSelectedStation, this));
@@ -98,19 +99,40 @@ App.Playlist = App.Collection.extend({
 
     isEmptyFavorites: function() {
         return this._selector == 'favorite' && !this.length;
+    },
+
+    isSelected: function() {
+        return !!this.currentStation;
     }
 });
 
 App.Selectors = App.Collection.extend({
     model: App.Selector,
+    currentSelector: null,
+    mediator: App.mediator,
+
+    initialize: function() {
+        this.mediator.on('user:logout', function(){
+            if (this.get('favorite').isActive()) {
+                this.get('featured').select();
+            }
+        }, this);
+        this.mediator.on('user:logged', function(){
+            if (this.get('featured').isActive()) {
+                this.get('favorite').select();
+            }
+        }, this);
+
+    },
 
     unselectAll: function() {
         return _.invoke(this.where({'active': true}), 'unselect');
     },
 
     select: function(model) {
-        model.fetchPlaylist(this.playlist);
+        this.unselectAll();
         this.trigger('select', model.id);
+        this.currentSelector = model.id;
     }
 });
 
@@ -138,6 +160,7 @@ App.Selector = App.Model.extend({
 
     select: function() {
         this.collection.select(this);
+        this.collection.playlist.fetchBySelector(this.id);
         this.set('active', true);
     },
 
@@ -147,6 +170,10 @@ App.Selector = App.Model.extend({
 
     fetchPlaylist: function(playlist) {
         playlist.fetchBySelector(this.id, {shuffle: true});
+    },
+
+    isActive: function() {
+        return this.get('active');
     }
 });
 
@@ -168,11 +195,14 @@ App.SelectorView = App.View.extend({
     select: function() {
         // выбирается только один раз
         if (!this.model.get('active')) {
-            this.model.collection.unselectAll();
             this.model.select();
         }
     }
 });
+
+// по умолчанию выбирается избранное или подборка
+// если юзер выбрал плейлист, а потом изменил состояние
+// то
 
 App.FavoriteSelector = App.Selector.extend({
     mediator: App.mediator,
@@ -180,11 +210,11 @@ App.FavoriteSelector = App.Selector.extend({
     initialize: function() {
         this.set('visible', false);
         this.set('selector', 'favorite');
-        this.mediator.on('user:logged', this.show, this);
+        this.mediator.on('user:logged', function(){
+            this.show();
+        }, this);
         this.mediator.on('user:logout', function(){
-            this.collection.get('featured').select();
             this.hide();
-            this.unselect();
         }, this);
         this.mediator.on('sticker:bookmark_station', this.refreshPlaylist, this);
     },
