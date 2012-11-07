@@ -184,6 +184,7 @@ App.FavoriteSelector = App.Selector.extend({
         this.mediator.on('user:logout', function(){
             this.collection.get('featured').select();
             this.hide();
+            this.unselect();
         }, this);
         this.mediator.on('sticker:bookmark_station', this.refreshPlaylist, this);
     },
@@ -192,6 +193,12 @@ App.FavoriteSelector = App.Selector.extend({
         if (this.get('active')) {
             this.collection.playlist.refresh();
         }
+    }
+});
+
+App.FeaturedSelector = App.Selector.extend({
+    initialize: function() {
+        this.set('selector', 'featured');
     }
 });
 
@@ -505,7 +512,7 @@ _.extend(App.RadioDisplay.prototype, {
 
         this.selectors.add([
             new App.FavoriteSelector({hint: App.i18n('display.selectors.favorite')}),
-            new App.Selector({selector: 'featured', title: App.i18n('display.selectors.featured')})
+            new App.FeaturedSelector({title: App.i18n('display.selectors.featured')})
         ]);
 
         // когда пользователь жмет на большую кнопку, проигрывается первая станция

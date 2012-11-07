@@ -144,6 +144,7 @@
         App.radioDisplay.selectors.get(App.user.isLogged() ? 'favorite' : 'featured').select();
         new App.Router();
         Backbone.history.start({pushState: true});
+        console.log('document ready');
     });
 </script>
 
