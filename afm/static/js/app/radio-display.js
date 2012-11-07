@@ -392,6 +392,9 @@ App.DisplayView = App.View.extend({
                     break;
                 }
                 var $station = $(this.make('li', {'class': 'station'}, station.escape('title')));
+                if (!station.get('is_online')) {
+                    $station.prepend('<i class="offline" />');
+                }
                 var leftPos = spot + (pos ? SLIDER_SIZE : 0);
                 $station = $station.data('id', station.id).css('left', leftPos).appendTo($lines[lineIndex]);
                 lineLimits[lineIndex] = spot + $station.width() + space;

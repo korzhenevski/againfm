@@ -163,7 +163,8 @@ App.StickerView = App.View.extend({
         'click .bookmark-station': 'bookmarkStation',
         'click .bookmark-track': 'bookmarkTrack'
     },
-    nocover: '/static/i/display/notfound.png',
+    no_cover: '/static/i/display/no_cover.png',
+    unavailable_cover: '/static/i/display/unavailable_cover.png',
     mediator: App.mediator,
     showCovers: true,
 
@@ -201,9 +202,11 @@ App.StickerView = App.View.extend({
         }
         context.station = attrs.station;
         context.has_station_favorite = _.has(attrs.station, 'favorite');
-        context.image_url = this.nocover;
+        context.image_url = this.no_cover;
         if (attrs.error) {
             context.title = App.i18n('radio.errors.radio_unavailable');
+            context.subtitle = App.i18n('radio.errors.radio_unavailable_hint');
+            context.image_url = this.unavailable_cover;
         } else if (attrs.trackUnavailable) {
             context.title = App.i18n('radio.errors.unknown_track');
             context.subtitle = App.i18n('radio.errors.unknown_artist');

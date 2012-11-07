@@ -130,7 +130,8 @@
             "unknown_track": "Неизвестная песня",
             "unknown_artist": "Неизвестный исполнитель",
             "info_unavailable": "Информация недоступна",
-            "radio_unavailable": "Радио недоступно"
+            "radio_unavailable": "Радио недоступно",
+            "radio_unavailable_hint": "возвращайтесь позже"
         }
     },
 
