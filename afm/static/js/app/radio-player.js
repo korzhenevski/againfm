@@ -35,7 +35,7 @@ App.FlashPlayerEngine = App.View.extend({
         // к функциям флеша нельзя применять apply, поэтому проксируем обертки
         // с проверкой готовности флеша
         var self = this;
-        _.each(['play', 'stop', 'setVolume', 'isPlaying', 'getSpectrum'], function(name){
+        _.each(['play', 'stop', 'setVolume', 'isPlaying', 'getSpectrum', 'playLoop', 'stopLoop'], function(name){
             var fn = self[name];
             self[name] = _.bind(function() {
                 if (this.ready) {
@@ -73,6 +73,14 @@ App.FlashPlayerEngine = App.View.extend({
 
     getSpectrum: function(length) {
         return this.el.getSpectrum(length);
+    },
+
+    playLoop: function(url) {
+        return this.el.playLoop(url);
+    },
+
+    stopLoop: function() {
+        return this.el.stopLoop();
     }
 });
 
@@ -97,13 +105,8 @@ App.Player = App.klass({
         // подписываемся на смену станции
         this.mediator.on('radio:station_changed', this.stationChanged, this);
         this.mediator.on('radio:stream_changed', this.playStream, this);
-        // опция: убавляем громкость во время с полуночи до шести, если текущее значение больше ночного.
-        this.mediator.on('playback:limit_night_volume', function(limit){
-            var hours = (new Date()).getHours();
-            if (limit && this.volume >= this.night_volume && (hours >= 0 || hours <= 6) && !this.volumeChanged) {
-                this.setVolume(this.night_volume);
-            }
-        }, this);
+        // опция: убавляем громкость ночью.
+        this.mediator.on('playback:limit_night_volume', this.limitNightVolume, this);
         // опция: плавное затухание звука
         this.mediator.on('playback:fading_sound', function(fading_sound){
             this.fading_sound = fading_sound;
@@ -122,6 +125,23 @@ App.Player = App.klass({
         }, this);
         // громкость из cookie
         this.volume = $.cookie('volume') ? parseInt($.cookie('volume')) : this.volume;
+        this.mediator.on('radio:error', function(error){
+            this.engine.playLoop('/static/sound/whitenoise.mp3');
+        }, this);
+    },
+
+    limitNightVolume: function(limiting) {
+        if (!limiting) {
+            return;
+        }
+        var hours = (new Date()).getHours(),
+            hightHour = hours >= 0 || hours <= 6;
+        // убавляем громкость с полуночи до шести, если
+        // - значение выше лимита
+        // - ползунок не двигался пользователем
+        if (!this.volumeChanged && this.volume >= this.night_volume && hightHour) {
+            this.setVolume(this.night_volume);
+        }
     },
 
     engineReady: function() {

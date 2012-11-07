@@ -19,7 +19,7 @@ App.RadioSpectrum = App.View.extend({
 
     setEnabled: function(enabled) {
         this.enabled = enabled;
-        if (!this.player.isPlaying()) {
+        if (!this.player.ready || !this.player.isPlaying()) {
             return false;
         }
         if (this.enabled) {

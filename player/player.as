@@ -6,7 +6,8 @@ package {
    import flash.display.MovieClip;
    import flash.events.Event;
    import flash.events.IOErrorEvent;
-   import flash.events.SampleDataEvent;
+   import flash.events.ProgressEvent;
+   import flash.events.IEventDispatcher;
    import flash.media.Sound;
    import flash.media.SoundChannel;
    import flash.media.SoundMixer;
@@ -27,6 +28,8 @@ package {
       private var _soundTransform:SoundTransform;
       private var _soundChannel:SoundChannel;
       private var _sound:Sound;
+      private var _loopSound:Sound;
+      private var _loopChannel:SoundChannel;
 
       private var _fadingTime:Number = 1; //secs
       private var _volume:Number = 0.6;
@@ -36,6 +39,9 @@ package {
          Security.allowDomain("*");
 
          ExternalInterface.addCallback("playStream", playStream);
+         ExternalInterface.addCallback("playLoop", playLoop);
+         ExternalInterface.addCallback("stopLoop", stopLoop);
+         
          ExternalInterface.addCallback("stopStream", stopStream);
          ExternalInterface.addCallback("stopStreamWithFade", stopStreamWithFade);
          ExternalInterface.addCallback("setVolume", setVolume);
@@ -46,47 +52,19 @@ package {
 
          _soundTransform = new SoundTransform(_volume);
          this.callback('ready');
-      }
-
-      public function getSpectrum(length:Number) {
-         var spectrum:Array = [];
-         if (!isPlaying() || _sound == null) {
-             return spectrum;
-         }
-
-         var bytes:ByteArray = new ByteArray();
-         var soundData:Boolean = false;
-         var val:Number = 0;
-
-         _sound.extract(bytes, length * 4);
-         bytes.position = 0;
-         while (bytes.bytesAvailable > 0) {
-            val = bytes.readFloat() + bytes.readFloat();
-            if (!soundData && val > 0.0) {
-                soundData = true;
-            }
-            bytes.readFloat() + bytes.readFloat();
-            bytes.readFloat() + bytes.readFloat();
-            bytes.readFloat() + bytes.readFloat();
-            val = (val + 1) / 2 * 100;
-            spectrum.push(val);
-         }
-
-         if (!soundData) {
-             return [];
-         }
-
-         return spectrum;
+         debug('ready ready');
       }
 
       public function playStream(url:String) {
           try {
+              stopLoop();
               stopStream();
               debug('stream url: '+url);
 
               _sound = new Sound();
               _sound.load(new URLRequest(url));
               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+              _sound.addEventListener(ProgressEvent.PROGRESS, onPlayStart);
 
               _soundChannel = _sound.play();
               _soundChannel.soundTransform = _soundTransform;
@@ -125,12 +103,82 @@ package {
            }
        }
 
+      public function onPlayStart(event:Event) {
+        var eventDispatcher:IEventDispatcher = IEventDispatcher(event.target);
+        eventDispatcher.removeEventListener(event.type, arguments.callee);
+        stopLoop();
+      }
+
+      private function onIOError(event:Event) {
+        stopped(true);
+        stopLoop();
+        _soundChannel = null;
+        _sound = null;
+
+        debug('io-error: '+event.text);
+        this.callbackWithData('error', event.text);
+      }
+
+      public function playLoop(url:String) {
+        stopLoop();
+        _loopSound = new Sound();
+        _loopSound.load(new URLRequest(url));
+
+        _loopChannel = _loopSound.play(250, int.MAX_VALUE);
+        _loopChannel.soundTransform = this._soundTransform;        
+      }
+
+      public function stopLoop() {
+        try {
+          if (_loopSound) {
+            _loopChannel.stop();
+            _loopSound.close();
+          }
+          _loopSound = null;
+        } catch(e:Error) {}
+      }
+
+      public function getSpectrum(length:Number) {
+         var spectrum:Array = [];
+         if (!isPlaying() || _sound == null) {
+             return spectrum;
+         }
+
+         var bytes:ByteArray = new ByteArray();
+         var soundData:Boolean = false;
+         var val:Number = 0;
+
+         _sound.extract(bytes, length * 4);
+         bytes.position = 0;
+         while (bytes.bytesAvailable > 0) {
+            val = bytes.readFloat() + bytes.readFloat();
+            if (!soundData && val > 0.0) {
+                soundData = true;
+            }
+            bytes.readFloat() + bytes.readFloat();
+            bytes.readFloat() + bytes.readFloat();
+            bytes.readFloat() + bytes.readFloat();
+            val = (val + 1) / 2 * 100;
+            spectrum.push(val);
+         }
+
+         if (!soundData) {
+             return [];
+         }
+
+         return spectrum;
+      }
+
        public function setVolume(volume:Number) {
            _soundTransform.volume = volume;
            _volume = volume;
 
            if (_soundChannel != null) {
                _soundChannel.soundTransform = _soundTransform;
+           }
+
+           if (_loopChannel != null) {
+              _loopChannel.soundTransform = _soundTransform;
            }
        }
 
@@ -139,7 +187,7 @@ package {
        }
 
        public function debug(vars:Object): void {
-           //ExternalInterface.call('console.log', 'Player: ' + vars);
+           ExternalInterface.call('console.log', 'Player: ' + vars);
        }
 
        // вызов колбеков без отдельного потока (setTimeout(..., 0)) блокирует HTML UI
@@ -160,14 +208,5 @@ package {
       }
 
 
-
-       private function onIOError(event:Event) {
-           stopped(true);
-           _soundChannel = null;
-           _sound = null;
-
-           debug('io-error: '+event.text);
-           this.callbackWithData('error', event.text);
-       }
    }
 }
