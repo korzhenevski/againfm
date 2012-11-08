@@ -20,6 +20,14 @@ server {
     auth_basic "Area 42";
     auth_basic_user_file /var/www/againfm/againfm.passwd;
 
+    error_page 404 /404.html;
+    error_page 403 /403.html;
+    error_page 500 503 504 /500.html;
+
+    location ~ ^/(404|403|500)\.html {
+        root /var/www/againfm/current/afm/web/templates;
+    }
+
 	location / {
         include uwsgi_params;
 	    uwsgi_pass 127.0.0.1:3031;
@@ -49,6 +57,10 @@ server {
 
 	location = /robots.txt {
 	    return 200 'User-Agent: *\nDisallow: /user/';
+	}
+
+	location = /favicon.ico {
+	    root /var/www/againfm/current/afm/static/i;
 	}
 
     location /nginx_status {

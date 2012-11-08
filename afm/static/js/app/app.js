@@ -248,6 +248,12 @@ $(window).bind('beforeunload', function(){
     App.mediator.trigger('app:unload');
 });
 
+$(document).keyup(function(e){
+    if (e.keyCode == 27) {
+        App.mediator.trigger('app:escape');
+    }
+});
+
 /**
  * i18n template helper
  */

@@ -12,7 +12,7 @@ App.PanelBox = App.View.extend({
 
     initialize: function() {
         this.mediator.on('panelbox:show', this.show, this);
-        this.mediator.on('panelbox:hide', this.hide, this);
+        this.mediator.on('panelbox:hide app:escape', this.hide, this);
         this.mediator.on('app:modal', function(view){
             if (view != 'panelbox') {
                 this.hide();

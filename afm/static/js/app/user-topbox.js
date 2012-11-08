@@ -8,6 +8,11 @@ App.TopBox = App.View.extend({
     events: {
         'click .close': 'hide'
     },
+    mediator: App.mediator,
+
+    initialize: function() {
+        this.mediator.on('app:escape', this.hide, this);
+    },
 
     show: function(view) {
         if (this.view) {

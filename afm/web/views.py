@@ -140,3 +140,15 @@ def station_details(station_id):
         redirect('/')
 
     return render_template('index.html', station=station.get_public_data())
+
+@web.route('/403')
+def forbidden():
+    return render_template('403.html')
+
+@web.route('/404')
+def not_found():
+    return render_template('404.html')
+
+@web.route('/500')
+def server_error():
+    return render_template('500.html')
