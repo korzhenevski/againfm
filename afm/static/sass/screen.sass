@@ -755,25 +755,29 @@ $station-icon-shift: 5px
       cursor: pointer
     .content
       width: 400px
-    .buttons
-      width: 90px
-      a
-        visibility: hidden
-        display: block
-        float: left
-        width: 22px
-        height: 22px
-        margin: 4px
-      .vk
-        @include socialicon-sprite(vkontakte_b)
-      .lastfm
-        @include socialicon-sprite(lastfm_b)
-      .google
-        @include socialicon-sprite(google_b)
     &:hover
       background-color: #fff
-      .buttons a
-        visibility: visible
+      .buttons
+        span
+          text-indent: -2000px
+        .vk
+          @include socialicon-sprite(vkontakte_b)
+        .lastfm
+          @include socialicon-sprite(lastfm_b)
+        .google
+          @include socialicon-sprite(google_b)
+  .buttons
+    width: 90px
+    span
+      float: left
+      width: 22px
+      height: 22px
+      margin: 4px
+      color: #aaa
+      display: block
+      font-size: 20px
+      text-align: center
+      line-height: 25px
   .deleted
     h2
       text-decoration: line-through
