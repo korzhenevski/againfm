@@ -128,6 +128,15 @@ App.Player = App.klass({
         this.mediator.on('radio:error', function(error){
             this.engine.playLoop('/static/sound/whitenoise.mp3');
         }, this);
+
+        var currentStation = null;
+        this.mediator.on('radio:station_changed', function(station){
+            if (currentStation && currentStation.id == station.id) {
+                return;
+            }
+            currentStation = station;
+            this.engine.playLoop('/static/sound/seek.mp3');
+        }, this);
     },
 
     limitNightVolume: function(limiting) {

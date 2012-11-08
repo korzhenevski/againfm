@@ -12,6 +12,7 @@ package {
    import flash.media.SoundChannel;
    import flash.media.SoundMixer;
    import flash.media.SoundTransform;
+   import flash.media.SoundLoaderContext;
    import flash.net.URLRequest;
    import flash.utils.ByteArray;
    import flash.text.TextField;
@@ -57,12 +58,11 @@ package {
 
       public function playStream(url:String) {
           try {
-              stopLoop();
               stopStream();
               debug('stream url: '+url);
 
               _sound = new Sound();
-              _sound.load(new URLRequest(url));
+              _sound.load(new URLRequest(url), new SoundLoaderContext(100));
               _sound.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
               _sound.addEventListener(ProgressEvent.PROGRESS, onPlayStart);
 
@@ -120,6 +120,7 @@ package {
       }
 
       public function playLoop(url:String) {
+        debug('play loop: '+url);
         stopLoop();
         _loopSound = new Sound();
         _loopSound.load(new URLRequest(url));
@@ -129,6 +130,7 @@ package {
       }
 
       public function stopLoop() {
+        debug('stop loop');
         try {
           if (_loopSound) {
             _loopChannel.stop();
@@ -187,7 +189,7 @@ package {
        }
 
        public function debug(vars:Object): void {
-           ExternalInterface.call('console.log', 'Player: ' + vars);
+           //ExternalInterface.call('console.log', 'Player: ' + vars);
        }
 
        // вызов колбеков без отдельного потока (setTimeout(..., 0)) блокирует HTML UI
