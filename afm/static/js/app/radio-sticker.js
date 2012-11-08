@@ -203,10 +203,12 @@ App.StickerView = App.View.extend({
         context.station = attrs.station;
         context.has_station_favorite = _.has(attrs.station, 'favorite');
         context.image_url = this.no_cover;
+        context.glare = true;
         if (attrs.error) {
             context.title = App.i18n('radio.errors.radio_unavailable');
             context.subtitle = App.i18n('radio.errors.radio_unavailable_hint');
             context.image_url = this.unavailable_cover;
+            context.glare = false;
         } else if (attrs.trackUnavailable) {
             context.title = App.i18n('radio.errors.unknown_track');
             context.subtitle = App.i18n('radio.errors.unknown_artist');

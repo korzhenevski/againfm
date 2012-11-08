@@ -321,10 +321,10 @@ form
     margin-left: 2px
     border-top-left-radius: 3px
     border-bottom-left-radius: 4px
-    .loading
-      background-image: url('../i/display/loading.png')
-      background-repeat: no-repeat
-      display: block
+  .glare
+    position: absolute
+    top: 0px
+    left: 0px
   .bookmark-track
     position: absolute
     top: 7px
@@ -339,6 +339,7 @@ form
     @include bbstar-sprite(star-selected)
     &:hover
       @include bbstar-sprite(star-selected)
+
 
 $station-icon: sprite-map("station-icon/*.png", $spacing: 5px)
 $station-icon-shift: 5px
@@ -686,6 +687,9 @@ $station-icon-shift: 5px
         &:hover
           color: #ff6600
 
+#panelbox-favorites
+  height: 87%
+
 .panel-box
   width: 45%
   max-width: 700px
@@ -734,7 +738,7 @@ $station-icon-shift: 5px
  
 .user-favorites
   overflow: auto
-  max-height: 400px
+  max-height: 90%
   .help
     text-align: center
     margin: 1em 0 2em 0
@@ -1038,3 +1042,4 @@ $station-icon-shift: 5px
   .input
     padding-top: 7px
     padding-bottom: 9px
+
