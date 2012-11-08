@@ -84,6 +84,19 @@ App.FeedbackView = App.View.extend({
                 this.hide();
             }
         }, this);
+        this.$email = this.$el.find('input[name=email]');
+        // заполняем поле адреса от текущего юзера
+        // в открытое окно ничего не пишем
+        this.mediator.on('user:logged', function(user){
+            if (!this.$el.is(':visible')) {
+                this.$email.val(user.get('email'));
+            }
+        }, this);
+        this.mediator.on('user:logout', function(){
+            if (!this.$el.is(':visible')) {
+                this.$email.val('');
+            }
+        }, this);
     },
 
     show: function() {
@@ -115,7 +128,7 @@ App.FeedbackView = App.View.extend({
                 // видимость элементов меняется через класс complete
                 this.$el.addClass('complete');
                 // после отправки, показав результат и чуток подождав, скрываем всю форму
-                _.delay(_.bind(this.hide, this), 1400);
+                _.delay(_.bind(this.hide, this), 1000);
             }, this));
         }, 'sending');
         return false;
