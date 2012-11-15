@@ -1,1 +1,0 @@
-{indexes:[{ "v" : 1, "key" : { "_id" : 1 }, "ns" : "againfm.stations", "name" : "_id_" }, { "v" : 1, "key" : { "id" : 1 }, "unique" : true, "ns" : "againfm.stations", "name" : "id_1" }, { "v" : 1, "key" : { "tag" : 1 }, "ns" : "againfm.stations", "name" : "tag_1", "dropDups" : true }]}
