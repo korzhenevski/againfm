@@ -32,7 +32,7 @@ package {
       private var _loopSound:Sound;
       private var _loopChannel:SoundChannel;
 
-      private var _fadingTime:Number = 1; //secs
+      private var _fadingTime:Number = 0.5; //secs
       private var _volume:Number = 0.6;
       private var _stopped:Boolean = true;
 

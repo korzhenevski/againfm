@@ -325,6 +325,7 @@ form
     position: absolute
     top: 0px
     left: 0px
+    +opacity(1)
   .bookmark-track
     position: absolute
     top: 7px
@@ -504,16 +505,32 @@ $station-icon-shift: 5px
 /*.ui-autocomplete-loading
   background: red*/
 
-.search-icon
-  background-image: url('../i/display/search_icon.png')
-  background-repeat: no-repeat
-  height: 19px
-  width: 19px
-  position: relative
-  top: 11px
-  float: left
-  right: -22px
-  z-index: 1100
+.search
+  .search-icon
+    background-image: url('../i/display/search_icon.png')
+    background-repeat: no-repeat
+    height: 19px
+    width: 19px
+    position: relative
+    top: 11px
+    float: left
+    right: -22px
+    z-index: 1100
+
+  .clear-icon
+    @include common-sprite(clear_search)
+    width: 14px
+    height: 14px
+    position: relative
+    top: -15px
+    left: 265px
+    z-index: 1000
+    cursor: pointer
+    display: none
+
+.search.fill
+  .clear-icon
+    display: block
 
 .movable
   cursor: move
@@ -675,7 +692,7 @@ $station-icon-shift: 5px
       &:hover .icon
         @include profile-sprite(settings_hover)
     ul
-      margin-top: 0.5em
+      margin-top: 7px
       li
         margin: 0 9px 0 16px
         margin-right: 10px
@@ -733,7 +750,7 @@ $station-icon-shift: 5px
     border-top: 1px solid #c1c1c1
   legend
     padding: 0 4px
-    font-size: 0.9em
+    font-size: 0.8em
     margin-left: -4px
  
 .user-favorites
@@ -748,10 +765,13 @@ $station-icon-shift: 5px
     p
       font-size: 0.95em
       font-weight: bold
+  fieldset
+    margin-top: 20px
   table
+    margin-top: -20px
     width: 99%
     background-image: url('../i/favorites/back.jpg')
-    margin-bottom: 1em
+    margin-bottom: 5px
   .favorite
     border: 1px solid transparent
     td
@@ -762,7 +782,7 @@ $station-icon-shift: 5px
     &:hover
       background-color: #fff
       .buttons
-        span
+        a
           text-indent: -2000px
         .vk
           @include socialicon-sprite(vkontakte_b)
@@ -772,7 +792,8 @@ $station-icon-shift: 5px
           @include socialicon-sprite(google_b)
   .buttons
     width: 90px
-    span
+    a
+      text-decoration: none
       float: left
       width: 22px
       height: 22px

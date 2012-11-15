@@ -60,7 +60,7 @@ App.datediff = function(ts) {
         return App.i18n('timediff.' + res);
     }
 
-    return date.getFullYear() + '.' + padzero(date.getMonth()) + '.' + padzero(date.getDate());
+    return padzero(date.getDate()) + '/' + padzero(date.getMonth()) + '/' + date.getFullYear();
 };
 
 /**

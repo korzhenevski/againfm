@@ -8,6 +8,7 @@ venv
 .vagrant
 .DS_Store
 local_config.py
+src/
 
 jasmine
 script.js/

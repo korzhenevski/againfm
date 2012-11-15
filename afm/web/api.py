@@ -17,7 +17,7 @@ def login():
         direct_auth = user.check_password(data['password'])
         new_password_auth = user.confirm_new_password(data['password'])
         if direct_auth or new_password_auth:
-            login_user(user)
+            login_user(user, remember=True)
             return jsonify(user.get_public())
         else:
             return jsonify({'error': 'auth'})
@@ -46,7 +46,7 @@ def signup():
     user.set_password(data['password'])
     user.save()
     # login
-    login_user(user)
+    login_user(user, remember=True)
     # send welcome email
     body = render_template('mail/signup.html')
     send_mail(email=user.email, body=body)

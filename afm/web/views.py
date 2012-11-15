@@ -27,7 +27,7 @@ def unauthorized():
 def token_auth(user_id, token):
     user = db.User.find_one({'id': user_id})
     if user and user.confirm_new_password(token):
-        login_user(user)
+        login_user(user, remember=True)
     return redirect('/')
 
 def vk_connect(user, code):
@@ -89,7 +89,7 @@ def vk_connect_request():
         user = current_user if current_user.is_authenticated() else None
         try:
             user = vk_connect(user, code)
-            login_user(user)
+            login_user(user, remember=True)
             return redirect('/')
         except Exception as exc:
             logging.exception(exc)
@@ -124,7 +124,7 @@ def app_context():
         }
     }
     if current_user.is_authenticated():
-        bootstrap['user'] = current_user.get_public_data()
+        bootstrap['user'] = current_user.get_public()
 
     return {
         'sitename': 'Again.FM',

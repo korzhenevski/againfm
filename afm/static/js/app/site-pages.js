@@ -103,6 +103,7 @@ App.FeedbackView = App.View.extend({
     show: function() {
         this.$el.css('left', $('.feedback').position().left);
         this.$el.fadeIn();
+        this.$el.find('textarea').focus();
         this.mediator.trigger('app:modal', 'feedback');
     },
 
@@ -136,19 +137,19 @@ App.FeedbackView = App.View.extend({
     },
 
     setupValidator: function() {
-        this.validator = new FormValidator(this.$('form'), {
+        var validator = new FormValidator(this.$('form'), {
             rules: {
                 text: {required: true},
                 email: {required: true}
             }
         });
-        this.validator.on('validate_field', function(field, error){
+        validator.on('validate_field', function(field, error){
             field.toggleClass('error', !!error);
         });
-        this.validator.on('validate', function(valid){
+        validator.on('validate', function(valid){
             this.$('form :submit').prop('disabled', !valid);
         }, this);
-        this.validator.validateForm();
+        this.$('form :submit').prop('disabled', true);
     }
 });
 

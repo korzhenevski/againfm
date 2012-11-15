@@ -116,44 +116,12 @@ def change_password(login):
 def itunes():
     import requests
     from lxml import etree
-    import urlnorm
-    import re
 
     def fetch_xml(tuning_id):
         baseurl = 'http://pri.kts-af.net/xml/index.xml?sid=09A05772824906D82E3679D21CB1158B'
         xml = requests.get(baseurl, params={'tuning_id':tuning_id}).content
         xml = xml.replace('kb:', '').replace(' xmlns:kb="http://www.kerbango.com/xml"', '')
         return etree.fromstring(xml)
-
-    def normalize_url(url):
-        try:
-            return urlnorm.norm(url)
-        except urlnorm.InvalidUrl:
-            pass
-        return None
-
-    def extract_streams(text):
-        regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
-        urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
-        return filter(None, urls)
-
-    def import_playlist_streams(station_id, playlist_url):
-        print 'fetch '+ playlist_url
-        response = requests.get(playlist_url, timeout=1, config={'safe_mode': True})
-        if not response.ok:
-            return False
-        content_type = response.headers.get('content-type', '').split(';')[0].lower()
-        if content_type not in ('application/pls+xml', 'audio/x-mpegurl', 'audio/x-scpls', 'text/plain', 'audio/scpls'):
-            return False
-        urls = extract_streams(response.text)
-        print urls
-        for stream_url in urls:
-            stream = db.Stream()
-            stream['url'] = stream_url
-            stream['station_id'] = station_id
-            stream['playlist_url'] = playlist_url
-            stream.save()
-            print 'station {} stream {}'.format(station_id, stream['id'])
 
     results = fetch_xml('1').find('results')
     top_genres = [(item.find('menu_id').text, item.find('name').text) for item in results.findall('menu_record')]
@@ -182,64 +150,80 @@ def itunes():
             })
             station.save()
             print station['id']
-            #import_playlist_streams(station['id'], playlist_url)
-
 
 @manager.command
-def download_playlists():
-    import requests
-    from lxml import etree
-    import urlnorm
-    import re
+def housekeep_streams():
+    station_ids = [station['id'] for station in db.stations.find({}, fields=['id'])]
+    db.streams.remove({'station_id': {'$nin': station_ids}})
 
-    def normalize_url(url):
-        try:
-            return urlnorm.norm(url)
-        except urlnorm.InvalidUrl:
-            pass
-        return None
+@manager.command
+@manager.option('-s', '--station_id', dest='station_id')
+def radio(station_id=None):
+    req = lambda prompt: raw_input(prompt).decode('utf8')
+    station = db.Station()
+    if station_id:
+        print '-- edit radio --'
+        station = db.Station.find_one({'id': int(station_id)})
+        if not station:
+            print 'station not found'
+            return
+    else:
+        print '-- add radio --'
+    station['title'] = req('title: ')
+    #station['website'] = req('website: ')
+    #station['status'] = station.ACTIVE
+    station.save()
+    print '- station_id: {}'.format(station['id'])
+    while True:
+        stream = db.Stream()
+        stream['station_id'] = station['id']
+        stream_url = req('stream: ')
+        if not stream_url:
+            break
+        if not stream_url.startswith('http://'):
+            print 'stream url must be start from "http://"'
+            break
+        stream['url'] = stream_url
+        stream.save()
+        print '- stream_id: {}'.format(stream['id'])
 
-    def extract_streams(text):
-        regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
-        urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
-        return filter(None, urls)
-
-    def import_playlist_streams(station_id, playlist_url):
-        response = requests.get(playlist_url, timeout=2, config={'safe_mode': True})
-        if not response.ok:
-            print response.error
-            return False
-        content_type = response.headers.get('content-type', '').split(';')[0].lower()
-        if content_type not in ('application/pls+xml', 'audio/x-mpegurl', 'audio/x-scpls', 'text/plain', 'audio/scpls'):
-            return False
-        urls = extract_streams(response.text)
-        for stream_url in urls:
-            stream = db.Stream()
-            stream['url'] = stream_url
-            stream['station_id'] = station_id
-            stream['playlist_url'] = playlist_url
-            print stream.__dict__
-            #stream.save()
-            #print 'station {} stream {}'.format(station_id, stream['id'])
-
-    from gevent.queue import Queue
-    from gevent.pool import Pool
-
-    q = Queue(50)
-
-    def worker():
-        for station_id, playlist_url in q:
-            import_playlist_streams(station_id, playlist_url)
-
-    for i in xrange(30):
-        gevent.spawn(worker)
-
-    for station in db.stations.find({'playlist':{'$exists':True}}, fields=['playlist','id']):
-        q.put((station['id'], station['playlist'][0]))
-        gevent.sleep(0)
-
-    q.put(StopIteration)
+@manager.command
+@manager.option('-id', '--station_id', dest='station_id')
+def remove_radio(station_id):
+    station_id = int(station_id)
+    station = db.Station.find_one({'id': station_id})
+    if not station:
+        print 'station not found'
+        return
+    station.soft_delete()
+    print 'station {} deleted'.format(station_id)
+    for stream in db.Stream.find({'station_id': station_id}):
+        stream.soft_delete()
+        print '- stream {} deleted'.format(stream['id'])
 
 
+"""
+@manager.command
+def convert_streams():
+    for old_stream in db.streams2.find():
+        stream = db.Stream()
+        stream['id'] = old_stream['id']
+        stream['url'] = old_stream['url']
+        stream['station_id'] = old_stream['station_id']
+        stream.save()
+        print stream['id']
+
+@manager.command
+def convert_stations():
+    for old_station in db.stations2.find():
+        station = db.Station()
+        station['id'] = int(old_station['id'])
+        station['tags'] = old_station.get('tags', [])
+        station['streams'] = old_station['streams']
+        station['title'] = old_station['title']
+        station['status'] = int(old_station['status'])
+        station.save()
+        print station['id']
+"""
 if __name__ == "__main__":
     manager.run()

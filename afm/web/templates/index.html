@@ -60,7 +60,7 @@
                         <div class="search-icon"></div>
                         <input type="text" placeholder="{{ _('search.placeholder') }}" autocomplete="off"
                                class="search-input" name="q"/>
-
+                        <i class="clear-icon"></i>
                         <div class="search-popup"></div>
                     </div>
                 </div>
@@ -142,8 +142,7 @@
         App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
         App.radioDisplay.selectors.get(App.user.isLogged() ? 'favorite' : 'featured').select();
         new App.Router();
-        Backbone.history.start({pushState: true});
-        console.log('document ready');
+        Backbone.history.start({pushState: false});
     });
 </script>
 

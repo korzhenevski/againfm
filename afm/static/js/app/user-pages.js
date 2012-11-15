@@ -8,25 +8,30 @@ App.UserFavoritesView = App.View.extend({
     },
     mediator: App.mediator,
 
+    initialize: function() {
+        this.collection.on('reset', this.render, this);
+    },
+
     playRadio: function(e) {
         var station = $(e.currentTarget).data();
         this.mediator.trigger('radio:play', station);
         return false;
     },
 
-    initialize: function() {
-        this.collection.on('reset', this.render, this);
-    },
-
     toggleFavorite: function(e) {
+        // пропускаем клики по ссылкам
+        if ($(e.target).is('a')) {
+            return;
+        }
+
         var $el = $(e.currentTarget),
             template = this.item_template,
             model = this.collection.getByCid($el.data('cid'));
-        if (!$(e.target).is('a')) {
-            model.toggleBookmark().always(function(){
-                $el.replaceWith(template(model.toJSON()));
-            });
-        }
+
+        model.toggleBookmark().always(function(){
+            $el.replaceWith(template(model.toJSON()));
+        });
+        return false;
     },
 
     render: function() {

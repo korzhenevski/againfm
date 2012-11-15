@@ -34,6 +34,11 @@ class BaseDocument(Document):
                 new=True, upsert=True)['next']
         return super(BaseDocument, self).save(*args, **kwargs)
 
+    def soft_delete(self):
+        if 'deleted_at' in self.structure:
+            self['deleted_at'] = get_ts()
+            self.save()
+
 class UserFavoritesCache(object):
     def __init__(self, user_id, redis=None):
         if redis is None:
@@ -278,7 +283,7 @@ class Station(BaseDocument):
     ACTIVE = 1
     # потоки не отвечают менее шести часов
     # радио отмечено, есть возможность добавить в избранное
-    ERROR = 2
+    DOWN = 2
 
     structure = {
         'id': int,
@@ -286,41 +291,45 @@ class Station(BaseDocument):
         'title': unicode,
         'status': int,
         'website': unicode,
-        'playlist': [unicode],
-        'playlist_updated_at': int,
-        'itunes': dict,
-        'online_streams': [int],
+        'streams': [int],
+        'online_at': int,
+        'created_at': int,
+        'deleted_at': int,
     }
 
     indexes = [
         {'fields': 'id', 'unique': True},
         {'fields': 'tags'},
         {'fields': 'status'},
+        {'fields': 'deleted_at'},
     ]
 
     default_values = {
         'status': 0,
-        'playlist_updated_at': 0,
+        'online_at': 0,
+        'deleted_at': 0,
+        'created_at': get_ts(),
     }
 
     def get_public(self):
         return {
             'id': self['id'],
             'title': self['title'],
-            'is_online': self['status'] != self.OFFLINE
+            # статус показывает живое упавшее радио
+            # мертвые станции (status==0) исключены из любых списков
+            'is_online': self['status'] == 1
         }
 
-    def find_public(self, query=None):
+    def find_public(self, query=None, **kwargs):
         if query is None:
             query = {}
-        query['online_streams'] = {'$not': {'$size': 0}, '$exists': True}
         query['status'] = {'$ne': self.OFFLINE}
-        return self.find(query)
+        query['deleted_at'] = 0
+        return self.find(query, sort=[('status', 1), ('id', -1)], **kwargs)
 
     @staticmethod
     def public_list(models):
         return [(model['id'], model['title']) for model in models]
-
 
 @db.register
 class Stream(BaseDocument):
@@ -331,32 +340,31 @@ class Stream(BaseDocument):
         'url': unicode,
         'station_id': int,
         'bitrate': int,
-        'perform_check': bool,
+        'content_type': unicode,
         'is_shoutcast': bool,
         'is_online': bool,
-        'content_type': unicode,
-        'check_error': unicode,
-        'checked_at': int,
-        'playlist_url': unicode,
-        'created_at': datetime,
+        'error': unicode,
         'error_at': int,
+        'checked_at': int,
+        'created_at': int,
+        'deleted_at': int,
     }
 
     indexes = [
         {'fields': 'id', 'unique': True},
         {'fields': 'url', 'unique': True},
-        {'fields': ['checked_at', 'perform_check']},
-        {'fields': ['station_id', 'is_online']}
+        #{'fields': ['checked_at', 'perform_check']},
+        #{'fields': ['station_id', 'is_online']}
     ]
 
     default_values = {
-        'created_at': datetime.now,
         'bitrate': 0,
-        'checked_at': 0,
-        'error_at': 0,
-        'perform_check': True,
-        'is_online': True,
+        'is_online': False,
         'is_shoutcast': False,
+        'error_at': 0,
+        'deleted_at': 0,
+        'checked_at': 0,
+        'created_at': get_ts,
     }
 
     def get_web_url(self):

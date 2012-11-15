@@ -431,12 +431,12 @@ App.DisplayView = App.View.extend({
  * @type {function}
  */
 App.SearchView = App.View.extend({
-    el: '.search-input',
-    popupEl: '.search-popup',
+    el: '.search',
     recentSelector: null,
 
     events: {
-        'keyup': 'changeText'
+        'keyup .search-input': 'changeText',
+        'click .clear-icon': 'clearAndRestore'
     },
 
     initialize: function(options) {
@@ -445,35 +445,48 @@ App.SearchView = App.View.extend({
         this.selectors.on('select', function(selector) {
             this.recentSelector = selector;
             // при выборе селетора, очищаем поиск
-            this.$el.val('');
+            this.clear();
         }, this);
-        this.$popupEl = $(this.popupEl);
         this.showPlaceholder();
     },
 
     // состыковка с полем ввода
     dockPopup: function() {
-        var offset = this.$el.offset();
-        offset.top += Math.ceil(this.$el.height() / 2);
-        this.$popupEl.offset(offset);
+        var offset = this.$(':text').offset();
+        offset.top += Math.ceil(this.$(':text').height() / 2);
+        this.$('.search-popup').offset(offset);
     },
 
     showPopup: function(type) {
-        this.$popupEl.html(App.i18n('display.search.' + type)).show();
+        this.$('.search-popup').html(App.i18n('display.search.' + type)).show();
         this.dockPopup();
     },
 
     changeText: _.debounce(function() {
-        this.$popupEl.hide();
-        var query = $.trim(this.$el.val());
+        this.$('.search-popup').hide();
+        var query = $.trim(this.$(':text').val());
         if (query) {
+            this.$el.addClass('fill');
             this.selectors.unselectAll();
             this.search(query);
-        } else if (this.recentSelector) {
+        } else {
+            this.clearAndRestore();
+        }
+    }, 200),
+
+    clear: function() {
+        this.$el.removeClass('fill');
+        this.$(':text').val('');
+        this.$('.search-popup').hide();
+    },
+
+    clearAndRestore: function() {
+        this.clear();
+        if (this.recentSelector) {
             var selector = this.selectors.get(this.recentSelector);
             selector.select();
         }
-    }, 200),
+    },
 
     search: function(query) {
         var self = this;
