@@ -37,5 +37,5 @@ assets.register('scripts', Bundle(
     'js/app/user-topbox.js',
     'js/app/site-pages.js',
     'js/app/user.js',
-    'js/app/router.js',
+    'js/app/radio-router.js',
     filters='uglifyjs', output='js/deploy/app.%(version)s.js'))

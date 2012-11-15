@@ -141,7 +141,10 @@
         App.user.set({{ bootstrap.user|json|safe }});
         App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
         App.radioDisplay.selectors.get(App.user.isLogged() ? 'favorite' : 'featured').select();
-        new App.Router();
+        new App.RadioRouter();
+        {% if radio %}
+        App.mediator.trigger('radio:play', {{ radio|json|safe }});
+        {% endif %}
         Backbone.history.start({pushState: false});
     });
 </script>

@@ -132,14 +132,13 @@ def app_context():
         '_': i18n_template_filter,
     }
 
-# TODO: rename to station
-@web.route('/station/<int:station_id>')
+@web.route('/radio/<int:station_id>')
 def station_details(station_id):
     station = db.Station.find_one({'id': station_id})
     if not station:
         redirect('/')
 
-    return render_template('index.html', station=station.get_public())
+    return render_template('index.html', radio=station.get_public())
 
 @web.route('/403')
 def forbidden():
