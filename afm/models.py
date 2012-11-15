@@ -121,7 +121,7 @@ class FavoriteTrack(AbstractFavorite):
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
 
-    def get_public_data(self):
+    def get_public(self):
         fields = self.structure.keys()
         data = dict([(k, v) for k, v in self.iteritems() if k in fields])
         ts = datetime.utcfromtimestamp(data['created_at'])
@@ -208,7 +208,7 @@ class User(BaseDocument):
     def is_admin(self):
         return self['is_admin']
 
-    def get_public_data(self):
+    def get_public(self):
         return {
             'id': self['id'],
             'email': self['email'],
@@ -267,39 +267,60 @@ class User(BaseDocument):
     def gravatar_hash(self):
         return md5hash(self['email'].lower())
 
+
 @db.register
 class Station(BaseDocument):
     __collection__ = 'stations'
+    # Константы статуса
+    # потоки не отвечают более шести часов
+    OFFLINE = 0
+    # есть хоть один живой поток
+    ACTIVE = 1
+    # потоки не отвечают менее шести часов
+    # радио отмечено, есть возможность добавить в избранное
+    ERROR = 2
+
     structure = {
         'id': int,
-        'title': unicode,
-        'website': unicode,
         'tags': [unicode],
+        'title': unicode,
+        'status': int,
+        'website': unicode,
+        'playlist': [unicode],
+        'playlist_updated_at': int,
+        'itunes': dict,
         'online_streams': [int],
     }
 
     indexes = [
         {'fields': 'id', 'unique': True},
         {'fields': 'tags'},
+        {'fields': 'status'},
     ]
 
-    def get_public_data(self):
+    default_values = {
+        'status': 0,
+        'playlist_updated_at': 0,
+    }
+
+    def get_public(self):
         return {
             'id': self['id'],
             'title': self['title'],
-            # TODO: migrate
-            'is_online': bool(self.get('online_streams'))
+            'is_online': self['status'] != self.OFFLINE
         }
 
-    def find_online(self, query=None):
+    def find_public(self, query=None):
         if query is None:
             query = {}
         query['online_streams'] = {'$not': {'$size': 0}, '$exists': True}
+        query['status'] = {'$ne': self.OFFLINE}
         return self.find(query)
 
     @staticmethod
     def public_list(models):
         return [(model['id'], model['title']) for model in models]
+
 
 @db.register
 class Stream(BaseDocument):
@@ -313,13 +334,17 @@ class Stream(BaseDocument):
         'perform_check': bool,
         'is_shoutcast': bool,
         'is_online': bool,
+        'content_type': unicode,
         'check_error': unicode,
         'checked_at': int,
+        'playlist_url': unicode,
         'created_at': datetime,
+        'error_at': int,
     }
 
     indexes = [
         {'fields': 'id', 'unique': True},
+        {'fields': 'url', 'unique': True},
         {'fields': ['checked_at', 'perform_check']},
         {'fields': ['station_id', 'is_online']}
     ]
@@ -328,6 +353,7 @@ class Stream(BaseDocument):
         'created_at': datetime.now,
         'bitrate': 0,
         'checked_at': 0,
+        'error_at': 0,
         'perform_check': True,
         'is_online': True,
         'is_shoutcast': False,
@@ -341,7 +367,7 @@ class Stream(BaseDocument):
             return self.url + u';'
         return self.url
 
-    def get_public_data(self):
+    def get_public(self):
         return {
             'id': self['id'],
             'url': self.get_web_url(),
@@ -390,7 +416,7 @@ class StationTag(BaseDocument):
 
     indexes = [{'fields': 'id', 'unique': True}]
 
-    def get_public_data(self):
+    def get_public(self):
         return {
             'id': self['id'],
             'title': self['tag'],
@@ -405,7 +431,7 @@ class Genre(BaseDocument):
         'tags': [unicode]
     }
 
-    def get_public_data(self):
+    def get_public(self):
         return {
             'id': self.id,
             'title': self.get_i18n('title')
@@ -420,7 +446,7 @@ class Genre(BaseDocument):
         genres = []
         for genre in db.Genre.find():
             genre.set_lang(lang)
-            genres.append(genre.get_public_data())
+            genres.append(genre.get_public())
         return genres
 
 @db.register

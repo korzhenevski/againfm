@@ -139,7 +139,7 @@ def station_details(station_id):
     if not station:
         redirect('/')
 
-    return render_template('index.html', station=station.get_public_data())
+    return render_template('index.html', station=station.get_public())
 
 @web.route('/403')
 def forbidden():

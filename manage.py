@@ -4,8 +4,6 @@
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 from afm import app, db, assets
-from datetime import datetime
-from pprint import pprint
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
 
@@ -113,6 +111,134 @@ def change_password(login):
     user.set_password(password)
     user.save()
     print 'changed!'
+
+@manager.command
+def itunes():
+    import requests
+    from lxml import etree
+    import urlnorm
+    import re
+
+    def fetch_xml(tuning_id):
+        baseurl = 'http://pri.kts-af.net/xml/index.xml?sid=09A05772824906D82E3679D21CB1158B'
+        xml = requests.get(baseurl, params={'tuning_id':tuning_id}).content
+        xml = xml.replace('kb:', '').replace(' xmlns:kb="http://www.kerbango.com/xml"', '')
+        return etree.fromstring(xml)
+
+    def normalize_url(url):
+        try:
+            return urlnorm.norm(url)
+        except urlnorm.InvalidUrl:
+            pass
+        return None
+
+    def extract_streams(text):
+        regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
+        urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
+        return filter(None, urls)
+
+    def import_playlist_streams(station_id, playlist_url):
+        print 'fetch '+ playlist_url
+        response = requests.get(playlist_url, timeout=1, config={'safe_mode': True})
+        if not response.ok:
+            return False
+        content_type = response.headers.get('content-type', '').split(';')[0].lower()
+        if content_type not in ('application/pls+xml', 'audio/x-mpegurl', 'audio/x-scpls', 'text/plain', 'audio/scpls'):
+            return False
+        urls = extract_streams(response.text)
+        print urls
+        for stream_url in urls:
+            stream = db.Stream()
+            stream['url'] = stream_url
+            stream['station_id'] = station_id
+            stream['playlist_url'] = playlist_url
+            stream.save()
+            print 'station {} stream {}'.format(station_id, stream['id'])
+
+    results = fetch_xml('1').find('results')
+    top_genres = [(item.find('menu_id').text, item.find('name').text) for item in results.findall('menu_record')]
+    top_genres = dict(top_genres)
+
+    for genre_id, genre_title in top_genres.iteritems():
+        print '- ' + genre_title
+        genre = fetch_xml(genre_id)
+        for station_item in genre.find('results').findall('station_record'):
+            url_record = station_item.find('station_url_record')
+            bitrate = int(url_record.find('bandwidth_kbps').text)
+            playlist_url = unicode(url_record.find('url').text.strip())
+            if not playlist_url.startswith('http://'):
+                playlist_url = 'http://' + playlist_url
+            station = db.Station()
+            station.update({
+                'title': unicode(station_item.find('station').text),
+                'playlist': [playlist_url],
+                'itunes': {
+                    'description': station_item.find('description').text,
+                    'bitrate': bitrate,
+                    'id': station_item.find('esid').text,
+                    'genre': genre_title,
+                    'genre_id': genre_id
+                }
+            })
+            station.save()
+            print station['id']
+            #import_playlist_streams(station['id'], playlist_url)
+
+
+@manager.command
+def download_playlists():
+    import requests
+    from lxml import etree
+    import urlnorm
+    import re
+
+    def normalize_url(url):
+        try:
+            return urlnorm.norm(url)
+        except urlnorm.InvalidUrl:
+            pass
+        return None
+
+    def extract_streams(text):
+        regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
+        urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
+        return filter(None, urls)
+
+    def import_playlist_streams(station_id, playlist_url):
+        response = requests.get(playlist_url, timeout=2, config={'safe_mode': True})
+        if not response.ok:
+            print response.error
+            return False
+        content_type = response.headers.get('content-type', '').split(';')[0].lower()
+        if content_type not in ('application/pls+xml', 'audio/x-mpegurl', 'audio/x-scpls', 'text/plain', 'audio/scpls'):
+            return False
+        urls = extract_streams(response.text)
+        for stream_url in urls:
+            stream = db.Stream()
+            stream['url'] = stream_url
+            stream['station_id'] = station_id
+            stream['playlist_url'] = playlist_url
+            print stream.__dict__
+            #stream.save()
+            #print 'station {} stream {}'.format(station_id, stream['id'])
+
+    from gevent.queue import Queue
+    from gevent.pool import Pool
+
+    q = Queue(50)
+
+    def worker():
+        for station_id, playlist_url in q:
+            import_playlist_streams(station_id, playlist_url)
+
+    for i in xrange(30):
+        gevent.spawn(worker)
+
+    for station in db.stations.find({'playlist':{'$exists':True}}, fields=['playlist','id']):
+        q.put((station['id'], station['playlist'][0]))
+        gevent.sleep(0)
+
+    q.put(StopIteration)
 
 
 if __name__ == "__main__":

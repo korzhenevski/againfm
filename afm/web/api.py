@@ -18,7 +18,7 @@ def login():
         new_password_auth = user.confirm_new_password(data['password'])
         if direct_auth or new_password_auth:
             login_user(user)
-            return jsonify(user.get_public_data())
+            return jsonify(user.get_public())
         else:
             return jsonify({'error': 'auth'})
     return jsonify({'error': 'no_user'})
@@ -50,7 +50,7 @@ def signup():
     # send welcome email
     body = render_template('mail/signup.html')
     send_mail(email=user.email, body=body)
-    return jsonify(user.get_public_data())
+    return jsonify(user.get_public())
 
 @app.route('/api/user/logout', methods=['DELETE','POST'])
 @login_required
@@ -93,12 +93,12 @@ def change_settings():
 @app.route('/api/playlist/genre/<genre>')
 def genre_playlist(genre):
     genre = db.Genre.find_one_or_404({'id': genre})
-    stations = [station.get_public_data() for station in db.Station.find_online({'tag': {'$in': genre['tags']}})]
+    stations = [station.get_public() for station in db.Station.find_public({'tag': {'$in': genre['tags']}})]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/featured')
 def featured_playlist():
-    stations = [station.get_public_data() for station in db.Station.find_online()]
+    stations = [station.get_public() for station in db.Station.find_public()]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')
@@ -108,7 +108,7 @@ def favorite_playlist():
     favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
     # выборка по списку айдишников
     query = {'id': {'$in': favorite_stations.keys()}}
-    stations = [station.get_public_data() for station in db.Station.find(query)]
+    stations = [station.get_public() for station in db.Station.find(query)]
     # сортируем по времени добавления
     stations.sort(key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
@@ -116,7 +116,7 @@ def favorite_playlist():
 @app.route('/api/station/<int:station_id>')
 def station_detail(station_id):
     station = db.Station.find_one_or_404({'id': station_id})
-    return jsonify(station.get_public_data())
+    return jsonify(station.get_public())
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
 def station_getplayinfo(station_id):
@@ -187,7 +187,7 @@ def bookmark_track(track_id):
 @login_required
 def favorites():
     favorites = db.FavoriteTrack.find({'user_id': current_user.id})
-    favorites = [favorite.get_public_data() for favorite in favorites]
+    favorites = [favorite.get_public() for favorite in favorites]
     return jsonify({'objects': favorites})
 
 @app.route('/api/feedback', methods=['POST'])
