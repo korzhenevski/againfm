@@ -1,9 +1,4 @@
 server {
-    server_name again.fm www.again.fm;
-    root /var/www/againfm/current/launch;
-}
-
-server {
 	server_name <%= node['againfm']['host'] %>;
 
     # output compression saves bandwidth
