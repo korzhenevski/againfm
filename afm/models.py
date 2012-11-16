@@ -291,6 +291,7 @@ class Station(BaseDocument):
         'title': unicode,
         'status': int,
         'website': unicode,
+        'screen_name': unicode,
         'streams': [int],
         'online_at': int,
         'created_at': int,
@@ -299,6 +300,7 @@ class Station(BaseDocument):
 
     indexes = [
         {'fields': 'id', 'unique': True},
+        {'fields': 'screen_name', 'unique': True},
         {'fields': 'tags'},
         {'fields': 'status'},
         {'fields': 'deleted_at'},

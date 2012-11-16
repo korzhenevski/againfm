@@ -93,7 +93,7 @@ def change_settings():
 @app.route('/api/playlist/genre/<genre>')
 def genre_playlist(genre):
     genre = db.Genre.find_one_or_404({'id': genre})
-    stations = [station.get_public() for station in db.Station.find_public({'tag': {'$in': genre['tags']}})]
+    stations = [station.get_public() for station in db.Station.find_public({'tags': {'$in': genre['tags']}})]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/featured')

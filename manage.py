@@ -225,5 +225,20 @@ def convert_stations():
         station.save()
         print station['id']
 """
+
+@manager.command
+def housekeep_stations():
+    ids = set()
+    for stream in db.streams.find({}, fields=['id','station_id']):
+        ids.add(stream['station_id'])
+
+    disable_ids = set()
+    for station in db.stations.find({'status': {'$ne': 0}}, fields=['id']):
+        if station['id'] not in ids:
+            disable_ids.add(station['id'])
+
+    print disable_ids
+    db.stations.update({'id': {'$in': list(disable_ids)}}, {'$set': {'status': 0, 'streams': []}}, multi=True)
+
 if __name__ == "__main__":
     manager.run()

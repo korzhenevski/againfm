@@ -25,12 +25,12 @@ App.PanelBox = App.View.extend({
             this.hide();
             return;
         }
-
         if (this.view) {
             this.view.remove();
         }
         this.name = name;
         // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
+        this.$el.removeAttr('id');
         view.layout = this;
         view.render();
         this.$el.css('top', $(window).height()).show().animate({top: 60}, 'linear');
