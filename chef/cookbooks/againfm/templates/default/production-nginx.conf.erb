@@ -12,12 +12,9 @@ server {
     # Disable gzip for certain browsers.
     gzip_disable “MSIE [1-6].(?!.*SV1)”;
 
-    auth_basic "Area 42";
-    auth_basic_user_file /var/www/againfm/againfm.passwd;
-
     error_page 404 /404.html;
     error_page 403 /403.html;
-    error_page 500 503 504 /500.html;
+    error_page 500 502 503 504 /500.html;
 
     location ~ ^/(404|403|500)\.html {
         root /var/www/againfm/current/afm/web/templates;
