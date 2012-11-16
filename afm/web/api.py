@@ -93,12 +93,14 @@ def change_settings():
 @app.route('/api/playlist/genre/<genre>')
 def genre_playlist(genre):
     genre = db.Genre.find_one_or_404({'id': genre})
-    stations = [station.get_public() for station in db.Station.find_public({'tags': {'$in': genre['tags']}})]
+    stations = [station.get_public() for station in db.Station.find_public({'tags': {'$in': genre['tags']}}, only_online=True)]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/featured')
 def featured_playlist():
-    stations = [station.get_public() for station in db.Station.find_public()]
+    #ids = [1, 28345, 28344, 28343, 28340, 28341, 28342]
+    #stations = [station.get_public() for station in db.Station.find_public({'id': {'$in': ids}}, only_online=True)]
+    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(40)]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')
@@ -115,7 +117,7 @@ def favorite_playlist():
 
 @app.route('/api/station/<int:station_id>')
 def station_detail(station_id):
-    station = db.Station.find_one_or_404({'id': station_id})
+    station = db.Station.find_one_or_404({'id': station_id, 'deleted_at': 0})
     return jsonify(station.get_public())
 
 @app.route('/api/station/<int:station_id>/getplayinfo')

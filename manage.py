@@ -167,6 +167,7 @@ def radio(station_id=None):
         if not station:
             print 'station not found'
             return
+        print 'current title: {}'.format(station['title'])
     else:
         print '-- add radio --'
     station['title'] = req('title: ')
@@ -197,12 +198,13 @@ def remove_radio(station_id):
         return
     station.soft_delete()
     print 'station {} deleted'.format(station_id)
+
     for stream in db.Stream.find({'station_id': station_id}):
         stream.soft_delete()
         print '- stream {} deleted'.format(stream['id'])
 
 
-"""
+
 @manager.command
 def convert_streams():
     for old_stream in db.streams2.find():
@@ -224,7 +226,6 @@ def convert_stations():
         station['status'] = int(old_station['status'])
         station.save()
         print station['id']
-"""
 
 @manager.command
 def housekeep_stations():

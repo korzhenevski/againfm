@@ -322,10 +322,10 @@ class Station(BaseDocument):
             'is_online': self['status'] == 1
         }
 
-    def find_public(self, query=None, **kwargs):
+    def find_public(self, query=None, only_online=False, **kwargs):
         if query is None:
             query = {}
-        query['status'] = {'$ne': self.OFFLINE}
+        query['status'] = self.ACTIVE if only_online else {'$ne': self.OFFLINE}
         query['deleted_at'] = 0
         return self.find(query, sort=[('status', 1), ('id', -1)], **kwargs)
 
@@ -345,6 +345,8 @@ class Stream(BaseDocument):
         'content_type': unicode,
         'is_shoutcast': bool,
         'is_online': bool,
+        'check_retries': int,
+        'check_time': float,
         'error': unicode,
         'error_at': int,
         'checked_at': int,
