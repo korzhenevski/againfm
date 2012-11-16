@@ -101,8 +101,9 @@
         </p>
     </div>
     <div class="social">
-        <a class="addthis_button_facebook_like" fb:like:locale="en_GB"></a>
-        <a class="addthis_button_tweet"></a>
+        <a href="https://twitter.com/share" class="twitter-share-button"
+           data-url="http://again.fm/" data-via="againfm" data-lang="en"
+           data-text="Теплый ламповый радиоплеер">Tweet</a>
         <div id="vk-like"></div>
     </div>
 </div>
@@ -156,14 +157,12 @@
 
 {% if not config.DEBUG %}
     <script>
-        var addthis_config = {ui_language: "en", ui_click: true};
         $(function(){
             VK.init({apiId: 3183069, onlyWidgets: true});
             VK.Widgets.Like('vk-like', {type: 'mini'});
-            addthis.init();
         });
     </script>
-    <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50a602f01d26d267&async=1"></script>
+    <script src="https://platform.twitter.com/widgets.js" id="twitter-wjs"></script>
     <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 {% endif %}
 
