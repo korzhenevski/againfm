@@ -3,7 +3,7 @@ var App = App || {};
 App.RadioRouter = App.Router.extend({
     mediator: App.mediator,
     routes: {
-        '!radio/:station_id': 'radio'
+        '!/radio/:station_id': 'radio'
     },
 
     initialize: function() {
