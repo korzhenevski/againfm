@@ -41,7 +41,11 @@ App.UserFavoritesView = App.View.extend({
         }, this);
         this.setElement(this.template({content: content.join('')}));
         this.layout.$el.html(this.$el);
-        this.placeDateLabels();
+        var not_empty = !!this.collection.length;
+        if (not_empty) {
+            this.placeDateLabels();
+        }
+        this.layout.$el.toggleClass('panelbox-favorites', not_empty);
     },
 
     // поскольку список отсортирован убыванию времени создания

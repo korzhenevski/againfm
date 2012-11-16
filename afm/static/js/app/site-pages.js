@@ -33,7 +33,6 @@ App.PanelBox = App.View.extend({
         // прокидываем во вьюху ссылку на лейаут, путь делает что хочет :)
         view.layout = this;
         view.render();
-        this.$el.attr('id', 'panelbox-' + name);
         this.$el.css('top', $(window).height()).show().animate({top: 60}, 'linear');
         this.view = view;
         this.mediator.trigger('app:modal', 'panelbox');
