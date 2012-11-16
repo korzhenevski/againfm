@@ -105,6 +105,8 @@ def deploy(rev=None):
             venv(release_path)
         else:
             sudo('cp -R {}/{}/venv {}/'.format(env.project_releases, previous_rev, release_path))
+            if exists(release_path + '/requirements.txt'):
+                sudo('./venv/bin/pip install --download-cache /tmp/pip-cache -r requirements.txt')
 
     # линкуем релиз в current
     if exists(env.project_current):
