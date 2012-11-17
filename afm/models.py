@@ -251,6 +251,7 @@ class User(BaseDocument):
         return False
 
     def find_login(self, login):
+        login = login.lower()
         key = 'email' if '@' in login else 'login'
         where = {}
         where[key] = login
