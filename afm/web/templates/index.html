@@ -160,29 +160,27 @@
 </script>
 
 {% if not config.DEBUG %}
-    <script>
+    <script src="https://platform.twitter.com/widgets.js" id="twitter-wjs"></script>
+    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-21858820-1']);
+        _gaq.push(['_setDomainName', 'again.fm']);
+        _gaq.push(['_setAllowLinker', true]);
+        _gaq.push(['_setSiteSpeedSampleRate', 100]);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
         $(function(){
             VK.init({apiId: 3183069, onlyWidgets: true});
             VK.Widgets.Like('vk-like', {type: 'mini'});
         });
     </script>
-    <script src="https://platform.twitter.com/widgets.js" id="twitter-wjs"></script>
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
-{% endif %}
-
-{% if config.GA %}
-<script type="text/javascript">
-    var _gaq = _gaq || [];
-    {% for key, val in config.GA.items() %}
-    _gaq.push([{{ key|json|safe }}, {{ val|json|safe }}]);
-    {% endfor %}
-
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-</script>
 {% endif %}
 </body>
 </html>

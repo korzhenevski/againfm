@@ -11,11 +11,6 @@ COMET_URL = 'http://comet.testing.again.fm/'
 SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'
 
 LANG = 'ru'
-GA = {
-    '_setAccount': 'UA-21858820-1',
-    '_setDomainName': 'again.fm',
-    '_setSiteSpeedSampleRate': 100,
-}
 
 AMAZON_SES_ACCESS_KEY = 'AKIAI35JFXNA25HR2T6A'
 AMAZON_SES_SECRET_KEY = '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'
