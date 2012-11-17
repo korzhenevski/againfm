@@ -100,7 +100,8 @@ App.FeedbackView = App.View.extend({
     },
 
     show: function() {
-        this.$el.css('left', $('.feedback').position().left);
+        this.$el.css('left', $('span.feedback').position().left);
+        this.$el.css('top', $('span.feedback').position().top - this.$el.height() - 5);
         this.$el.fadeIn();
         this.$el.find('textarea').focus();
         this.mediator.trigger('app:modal', 'feedback');
