@@ -182,6 +182,10 @@ App.Player = App.klass({
         return this.engine.isPlaying();
     },
 
+    isReady: function() {
+        return this.engine && this.engine.ready;
+    },
+
     play: function() {
         if (this.engine.ready) {
             this.engine.play(this.stream.url);

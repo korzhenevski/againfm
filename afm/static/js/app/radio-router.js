@@ -11,7 +11,7 @@ App.RadioRouter = App.Router.extend({
         this.mediator.on('radio:station_changed radio:play', function(station){
             if (!this.station || this.station != station) {
                 this.station = station;
-                this.navigate('!radio/' + station.id);
+                this.navigate('!/radio/' + station.id);
             }
         }, this);
     },
