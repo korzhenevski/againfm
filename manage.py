@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import string
+from pprint import pprint
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 from afm import app, db, assets
@@ -162,17 +164,31 @@ def radio(station_id=None):
     req = lambda prompt: raw_input(prompt).decode('utf8')
     station = db.Station()
     if station_id:
-        print '-- edit radio --'
+        print '- Edit radio #{}'.format(station_id)
         station = db.Station.find_one({'id': int(station_id)})
         if not station:
             print 'station not found'
             return
-        print 'current title: {}'.format(station['title'])
+        pprint(station)
     else:
-        print '-- add radio --'
-    station['title'] = req('title: ')
-    #station['website'] = req('website: ')
-    #station['status'] = station.ACTIVE
+        print '- Add radio'
+    title = req('title: ')
+    if title:
+        station['title'] = title.strip()
+    tags = req('tags: ')
+    if tags:
+        tags = tags.split(',')
+        tags = map(string.strip, tags)
+        station['tags'] = tags
+    status = req('status: ')
+    if status:
+        station['status'] = int(status)
+    screen_name = req('screen_name: ')
+    if screen_name:
+        station['screen_name'] = screen_name.strip()
+    if not station_id and not station['title']:
+        print 'error: title for new station required'
+        return
     station.save()
     print '- station_id: {}'.format(station['id'])
     while True:
