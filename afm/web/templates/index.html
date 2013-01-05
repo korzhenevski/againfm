@@ -1,214 +1,134 @@
 <!DOCTYPE html>
-<!--[if IE]><html class="no-js ie" xmlns:fb="http://ogp.me/ns/fb#"> <![endif]-->
-<!--[if !IE]><!--><html class="no-js" xmlns:fb="http://ogp.me/ns/fb#"> <!--<![endif]-->
+<html>
 <head>
-    <meta charset="utf-8"/>
-    <title>{{ sitename }}</title>
-    <meta name="description" content="{{ _('site.description') }}"/>
-    <link href="/static/css/screen.css" rel="stylesheet"/>
+    <title>v2</title>
+    <link href="/static/css/normalize.css" rel="stylesheet"/>
     <link href="/static/css/common.css" rel="stylesheet"/>
-    <link id="favicon" rel="shortcut icon" type="image/x-icon" href="/static/i/favicon.ico"/>
-    <meta name="og:title" content="Again.FM" />
-    <meta name="og:description" content="Тёплый ламповый радиоплеер" />
-    <meta name="og:url" content="http://again.fm/" />
-    <meta name="og:image" content="http://again.fm/static/i/social-logo.png" />
+    <link href="/static/css/style.css" rel="stylesheet"/>
 </head>
 <body>
-
-<div class="wrapper">
-    <div class="top-box hidden"></div>
-    <div class="panel-box"></div>
-    <div class="main">
-        <div class="wrapper-left">
-            <div class="wrapper-left-content">
-                <img src="/static/i/logo_rus.png" width="308" height="135" class="logo" alt="logo"/>
-
-                <div class="radio-controls">
-                    <div class="radio-control valign">
-                        <span class="prev"></span>
-                    </div>
-                    <div class="radio-control">
-                        <span class="power"></span>
-                        <!-- плеер поверх кнопки для активации при заблокированном флеше -->
-                        <div class="flash-player" id="flash-player"></div>
-                    </div>
-                    <div class="radio-control valign">
-                        <span class="next"></span>
-                    </div>
-                    <div class="radio-controls-status">
-                        <div class="inner">
-                            <div class="sound"></div>
-                            <div class="slider"></div>
-                            <div class="hd hidden">HD</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="header">
+        <div class="container">
+            <form class="login">
+                <input class="field" type="text" name="email" />
+                <input class="field" type="password" name="password" />
+                <input type="submit" value="Поехали!" />
+                или войти через
+                <button class="login__button-fb">Фейсбук</button>
+                <button class="login__button-vk">ВКонтакте</button>
+                <button class="login__button">...</button>
+            </form>
+            <a class="pull-right" href="http://play.again.fm/">Вещать свою музыку</a>
         </div>
-
-        <div class="wrapper-right">
-            <div class="wrapper-right-content">
-                <div class="box-holder">
-                    <form class="head-form login"></form>
-                    <div class="user-profile hidden"></div>
-                </div>
-                <div class="radio-sticker"></div>
-            </div>
+    </div>
+    <div class="container">
+        <div class="main-top">
+            <p class="pull-right">Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки</a>!</p>
         </div>
-
-        <div class="wrapper-wide">
-            <div class="radio-display">
-                <div class="radio-display-head">
-                    <ul class="filters"></ul>
-                    <div class="search">
-                        <div class="search-icon"></div>
-                        <input type="text" placeholder="{{ _('search.placeholder') }}" autocomplete="off"
-                               class="search-input" name="q"/>
-                        <i class="clear-icon"></i>
-                        <div class="search-popup"></div>
-                    </div>
+        <div class="radio">
+            <div class="visual">
+                <div class="bar">
+                    <p>НАШЕ Радио</p>
+                    <p>Кино - Звезды останутся здесь</p>
+                    <button>Ласт.фм</button>
+                    <button>Шарить в Фейсубук</button>
+                </div>
+                <div class="controls">
+                    <button>запись</button>
+                    <button>предыдущая</button>
+                    <button>играть</button>
+                    <button>перемешать</button>
+                    <button>громкость</button>
+                </div>
+                <div class="favorites">
+                    <ul class="inline justified">
+                        <li>Наше Радио</li>
+                        <li>DI Classic Vocal Trance</li>
+                        <li>Чипльдук</li>
+                        <li>DI Classic Euro Dance</li>
+                    </ul>
                 </div>
             </div>
-            <div class="radio-scroll">
-                <div class="radio-scale viewport">
-                    <div class="scale-inner overview"></div>
-                </div>
-                <div class="scrollbar">
-                    <div class="track">
-                        <div class="thumb"></div>
+            <div class="table">
+                <div class="controls">
+                    <form>
+                        <input type="search" name="filter" />
+                    </form>
+                    <div class="format pull-right">
+                        <button>сетка</button>
+                        <button>список</button>
                     </div>
                 </div>
+                <ul class="nav inline justified">
+                    <li>Подборка</li>
+                    <li>Транс</li>
+                    <li>Хаус</li>
+                    <li>Драм-н-Бейс</li>
+                    <li>Рок</li>
+                    <li>Джаз</li>
+                    <li>Новости</li>
+                    <li>Поп</li>
+                    <li>Релакс</li>
+                </ul>
+                <ul class="list inline justified">
+                    <li>FM5280 Jazz Vocal Channel</li>
+                    <li>Classic And Jazz</li>
+                    <li>V98.9 :: Aleasha Smooth Jazz & Neo Soul</li>
+                    <li>The Wave KHJZ-HD2</li>
+                    <li>The Oasis</li>
+                    <li>Bebop - SKY.FM</li>
+                    <li>Datempo Lounge - SKY.FM</li>
+                    <li>Piano Jazz - SKY.FM</li>
+                    <li>Uptempo Smooth Jazz - SKY.FM</li>
+                    <li>JAZZRADIO.com - Classic Jazz</li>
+                    <li>JAZZRADIO.com - Cool Jazz</li>
+                    <li>JAZZRADIO.com - Bebop</li>
+                    <li>JAZZRADIO.com - Swing & Big Band</li>
+                    <li>JAZZRADIO.com - Hard Bop</li>
+                    <li>JAZZRADIO.com - Mellow Jazz</li>
+                    <li>JAZZRADIO.com - Piano Jazz</li>
+                    <li>JAZZRADIO.com - Guitar Jazz</li>
+                    <li>JAZZRADIO.com - Vocal Jazz</li>
+                    <li>JAZZRADIO.com - Avant-Garde</li>
+                    <li>JAZZRADIO.com - Smooth Jazz</li>
+                    <li>JAZZRADIO.com - Bossa Nova</li>
+                    <li>JAZZRADIO.com - Latin Jazz</li>
+                    <li>JAZZRADIO.com - Smooth Uptempo</li>
+                    <li>JAZZRADIO.com - Fusion Lounge</li>
+                    <li>Bossa Nova - SKY.FM</li>
+                    <li>Sonic Universe from SomaFM</li>
+                    <li>Absolutely Smooth Jazz - SKY.FM</li>
+                    <li>1.FM TM - Bay Smooth Jazz</li>
+                    <li>1.FM TM - Adore Vocal Jazz</li>
+                    <li>Jazzloft</li>
+                    <li>Dimensions in Jazz</li>
+                    <li>La Yaute Jazz</li>
+                    <li>Traxx Jazz</li>
+                    <li>Jazz in Bolz</li>
+                    <li>NOCTAMBLUES</li>
+                    <li>Solace.FM Smooth Jazz</li>
+                    <li>eurosmoothjazz</li>
+                    <li>Dreamradio Stardust</li>
+                    <li>Smoothbeats.com Nu Jazz</li>
+                    <li>thejazzofwiesbaden</li>
+                    <li>M2 JAZZ</li>
+                    <li>TSF Jazz</li>
+                    <li>AZFamily.com Zona Lounge</li>
+                    <li>Ganymed Jazz</li>
+                    <li>WUSF 89.7</li>
+                    <li>BOOZIK JAZZY</li>
+                    <li>All Smooth Jazz ^ 111 East Radio</li>
+                    <li>All Jazz Radio</li>
+                    <li>Radio Swing Worldwide</li>
+                    <li>CALMRADIO.COM - JUST JAZZ - Free Stream</li>
+                </ul>
             </div>
         </div>
     </div>
-
     <div class="footer">
-        <div class="feedback-box hidden">
-            <div class="answer">{{ _('feedback.title') }}</div>
-            <div class="answer answer-complete hidden">{{ _('feedback.tnx') }}</div>
-            <div class="question">
-                <form>
-                    <textarea name="text"></textarea>
-                    <input type="text" name="email" placeholder="{{ _('feedback.email') }}" />
-                    <input type="submit" value="{{ _('feedback.send') }}" />
-                </form>
-                <div class="close"></div>
-            </div>
-        </div>
-        <div class="left">
-            <p class="left-shift">
-                &copy; 2012 &laquo;Again.FM&raquo; &middot; {{ _('site.footer.made_in') }}
-                &middot; <span class="pseudo-link about">{{ _('site.footer.about') }}</span>
-                &middot; <span class="pseudo-link feedback">{{ _('site.footer.feedback') }}</span>
-            </p>
-        </div>
-        <div class="social">
-            <a href="https://twitter.com/share" class="twitter-share-button"
-               data-url="http://again.fm/" data-via="againfm" data-lang="en"
-               data-text="Тёплый ламповый радиоплеер"></a>
-            <div id="vk-like"></div>
+        <div class="container">
+        <p>Сделано в России</p>
         </div>
     </div>
-</div>
-
-<div id="player-container"></div>
-<canvas id="spectrum"></canvas>
-
-<script>
-    {# словарь мультиязычности #}
-    var App = App || {};
-    App.i18n_dict = {{ bootstrap.i18n|safe }};
-    App.debug = {{ config.DEBUG|tojson }};
-    App.comet_url = {{ config.COMET_URL|tojson|safe }};
-    // console noop for old browsers
-    (function(global) {
-        var noop = function(){};
-        if ( !global['console'] ) {
-            var methods = 'log debug info warn error assert clear dir dirxml trace group groupCollapsed ';
-            methods += 'groupEnd time timeEnd profile profileEnd count exception table';
-            methods = methods.split(' ');
-            global.console = {};
-            for (var i=0; i<methods.length; i++) {
-                global.console[methods[i]] = noop;
-            }
-        }
-    })(window);
-</script>
-
-{% assets "core_scripts" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-
-{% assets "scripts" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-
-<script>
-    $(function () {
-        $.fn.button.defaults = App.i18n('button');
-        $.watermark.options.className = 'placeholder';
-        App.user.set({{ bootstrap.user|json|safe }});
-        App.radioDisplay.setGenres({{ bootstrap.display.genres|json|safe }});
-        App.radioDisplay.selectors.get(App.user.isLogged() ? 'favorite' : 'featured').select();
-        new App.RadioRouter();
-        {% if radio %}
-        App.mediator.trigger('radio:play', {{ radio|json|safe }});
-        {% endif %}
-        Backbone.history.start({pushState: false});
-    });
-</script>
-
-{% if not config.DEBUG %}
-    <script src="https://platform.twitter.com/widgets.js" id="twitter-wjs"></script>
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
-    <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-21858820-1']);
-        _gaq.push(['_setDomainName', 'again.fm']);
-        _gaq.push(['_setAllowLinker', true]);
-        _gaq.push(['_setSiteSpeedSampleRate', 100]);
-        _gaq.push(['_trackPageview']);
-
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
-
-        $(function(){
-            VK.init({apiId: 3183069, onlyWidgets: true});
-            VK.Widgets.Like('vk-like', {type: 'mini'});
-        });
-    </script>
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter18922339 = new Ya.Metrika({id:18922339,
-                        webvisor:true,
-                        clickmap:true,
-                        accurateTrackBounce:true,
-                        trackHash:true});
-                } catch(e) { }
-            });
-
-            var n = d.getElementsByTagName("script")[0],
-                    s = d.createElement("script"),
-                    f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
-
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="//mc.yandex.ru/watch/18922339" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-{% endif %}
 </body>
 </html>
-
-

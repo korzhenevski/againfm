@@ -140,6 +140,7 @@ def station_details(station_id):
 
     return render_template('index.html', radio=station.get_public())
 
+
 @web.route('/403')
 def forbidden():
     return render_template('403.html')

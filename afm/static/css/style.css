@@ -1,0 +1,126 @@
+/* line 1, ../sass/style.sass */
+.container {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+/* line 5, ../sass/style.sass */
+.login {
+  display: inline;
+}
+/* line 8, ../sass/style.sass */
+.login .field {
+  width: 110px;
+}
+
+/* line 11, ../sass/style.sass */
+.main-top {
+  margin-top: 5em;
+  height: 70px;
+}
+
+/* line 15, ../sass/style.sass */
+.radio {
+  clear: both;
+}
+/* line 18, ../sass/style.sass */
+.radio .visual {
+  width: 30%;
+  float: left;
+}
+/* line 22, ../sass/style.sass */
+.radio .visual .bar {
+  height: 150px;
+}
+/* line 25, ../sass/style.sass */
+.radio .visual .controls {
+  height: 100px;
+}
+/* line 29, ../sass/style.sass */
+.radio .visual .favorites li {
+  padding: 0.5em;
+}
+/* line 32, ../sass/style.sass */
+.radio .table {
+  width: 65%;
+  float: right;
+}
+/* line 36, ../sass/style.sass */
+.radio .table .controls {
+  width: 100%;
+  clear: both;
+}
+/* line 39, ../sass/style.sass */
+.radio .table .controls form {
+  display: inline;
+}
+/* line 42, ../sass/style.sass */
+.radio .table .nav {
+  width: 100%;
+  clear: both;
+  /* for overflow */
+  overflow: hidden;
+  height: 30px;
+  margin: 2em 0;
+}
+/* line 49, ../sass/style.sass */
+.radio .table .nav li {
+  margin: 1em;
+  cursor: pointer;
+}
+/* line 53, ../sass/style.sass */
+.radio .table .list {
+  width: 100%;
+  clear: both;
+}
+/* line 57, ../sass/style.sass */
+.radio .table .list li {
+  padding-left: 1em;
+}
+/* line 59, ../sass/style.sass */
+.radio .table .list li:after {
+  content: "";
+  width: 100%;
+  display: inline-block;
+}
+
+/* line 64, ../sass/style.sass */
+.footer {
+  clear: both;
+}
+
+/* line 67, ../sass/style.sass */
+body {
+  background-color: #453745;
+  font-size: 14px;
+  color: white;
+  text-shadow: black 0px 1px 1px;
+}
+
+/* line 73, ../sass/style.sass */
+a {
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid #7f777f;
+}
+
+/* line 78, ../sass/style.sass */
+ul.inline {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+/* line 82, ../sass/style.sass */
+ul.inline li {
+  float: left;
+}
+
+/* line 85, ../sass/style.sass */
+ul.justified {
+  text-align: justify;
+}
+/* line 87, ../sass/style.sass */
+ul.justified li {
+  float: none;
+  display: inline-block;
+}
