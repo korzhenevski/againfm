@@ -44,31 +44,67 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 30px;
+  height: 59px;
   width: 100%;
-  opacity: 0.5;
-  background-color: pink;
 }
-/* line 43, ../sass/style.sass */
+/* line 41, ../sass/style.sass */
+.radio .top .top-left {
+  background-image: url("/static/i/table-top-left.png");
+  width: 52px;
+  background-repeat: no-repeat;
+}
+/* line 46, ../sass/style.sass */
+.radio .top .top-line {
+  background-image: url("/static/i/table-top.png");
+  background-repeat: repeat-x;
+}
+/* line 50, ../sass/style.sass */
+.radio .top .top-right {
+  background-image: url("/static/i/table-top-right.png");
+  width: 52px;
+  background-repeat: no-repeat;
+}
+/* line 55, ../sass/style.sass */
 .radio .bottom {
-  height: 30px;
-  background-color: green;
-  opacity: 0.5;
-  margin-top: -30px;
+  height: 70px;
+  margin: 0 -30px;
+  margin-top: -65px;
 }
-/* line 49, ../sass/style.sass */
+/* line 60, ../sass/style.sass */
+.radio .bottom .inner {
+  height: 70px;
+  width: 100%;
+}
+/* line 64, ../sass/style.sass */
+.radio .bottom .bottom-left {
+  background-image: url("/static/i/table-bottom-left.png");
+  width: 95px;
+  background-repeat: no-repeat;
+}
+/* line 69, ../sass/style.sass */
+.radio .bottom .bottom-line {
+  background-image: url("/static/i/table-bottom.png");
+  background-repeat: repeat-x;
+  background-position: bottom left;
+}
+/* line 74, ../sass/style.sass */
+.radio .bottom .bottom-right {
+  background-image: url("/static/i/table-bottom-right.png");
+  width: 95px;
+  background-repeat: no-repeat;
+}
+/* line 80, ../sass/style.sass */
 .radio .content {
   margin: 0 -30px;
-  border: 1px dashed;
   padding: 0 30px;
 }
 
-/* line 55, ../sass/style.sass */
+/* line 86, ../sass/style.sass */
 .footer {
   clear: both;
 }
 
-/* line 58, ../sass/style.sass */
+/* line 89, ../sass/style.sass */
 body {
   background-color: #453745;
   font-size: 14px;
@@ -81,29 +117,29 @@ body {
   background-size: cover;
 }
 
-/* line 66, ../sass/style.sass */
+/* line 97, ../sass/style.sass */
 a {
   color: white;
   text-decoration: none;
   border-bottom: 1px solid #7f777f;
 }
 
-/* line 71, ../sass/style.sass */
+/* line 102, ../sass/style.sass */
 ul.inline {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-/* line 75, ../sass/style.sass */
+/* line 106, ../sass/style.sass */
 ul.inline li {
   float: left;
 }
 
-/* line 78, ../sass/style.sass */
+/* line 109, ../sass/style.sass */
 ul.justified {
   text-align: justify;
 }
-/* line 80, ../sass/style.sass */
+/* line 111, ../sass/style.sass */
 ul.justified li {
   float: none;
   display: inline-block;

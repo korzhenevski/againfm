@@ -35,20 +35,51 @@
     position: absolute
     top: 0
     left: 0
-    height: 30px
+    height: 59px
     width: 100%
-    opacity: 0.5
-    background-color: pink
+
+    .top-left
+      background-image: url('/static/i/table-top-left.png')
+      width: 52px
+      background-repeat: no-repeat
+
+    .top-line
+      background-image: url('/static/i/table-top.png')
+      background-repeat: repeat-x
+
+    .top-right
+      background-image: url('/static/i/table-top-right.png')
+      width: 52px
+      background-repeat: no-repeat
 
   .bottom
-    height: 30px
-    background-color: green
-    opacity: 0.5
-    margin-top: -30px
+    height: 70px
+    margin: 0 -30px
+    margin-top: -65px
+
+    .inner
+      height: 70px
+      width: 100%
+
+    .bottom-left
+      background-image: url('/static/i/table-bottom-left.png')
+      width: 95px
+      background-repeat: no-repeat
+
+    .bottom-line
+      background-image: url('/static/i/table-bottom.png')
+      background-repeat: repeat-x
+      background-position: bottom left
+
+    .bottom-right
+      background-image: url('/static/i/table-bottom-right.png')
+      width: 95px
+      background-repeat: no-repeat
+
 
   .content
     margin: 0 -30px
-    border: 1px dashed
+    //border: 1px dashed
     padding: 0 30px
 
 
