@@ -17,100 +17,161 @@
   margin-top: 5em
   height: 70px
 
-.radio .bar
-  visibility: hidden
 
-.radio-top, .radio-bottom
-  background-repeat: no-repeat
-
-.radio-top
-  background-image: url('/static/i/table_top_background.png')
-  height: 31px
-
-.radio-bottom
-  background-image: url('/static/i/table_bottom_background.png')
-  height: 43px
-  margin: 0 -18px
-
-.radio-wrapper
-  background-image: url('/static/i/table_center_background.png')
-  background-repeat: repeat-y
-  clear: both
-  overflow: hidden
-
-.radio *
-  visibility: hidden
+//.radio .top
+//  .top-left, .top-right
+//    top: 0
+//    position: absolute
+//    width: 54px
+//    height: 59px
+//    background-repeat: no-repeat
+//
+//  .top-left
+//    left: 0
+//    background-image: url('/static/i/table-top-left.png')
+//
+//  .top-right
+//    right: 0
+//    background-image: url('/static/i/table-top-right.png')
+//
+//  .top-line
+//    position: absolute
+//    top: 0px
+//    left: 53px
+//    background-image: url('/static/i/table-top.png')
+//    background-repeat: repeat-x
+//    width: 938px
+//    height: 25px
+//
+//.radio .content
+//  .left-side
+//    width: 16px
+//    height: 100%
+//    background-image: url('/static/i/table-left.png')
+//    background-repeat: repeat-y
+//
+//  .right-side
+//    background-image: url('/static/i/table-right.png')
+//    background-repeat: repeat-y
+//    width: 16px
+//    height: 100%
+//
+//.radio .bottom
+//
+//  .bottom-left, .bottom-right
+//    width: 95px
+//    height: 70px
+//    background-repeat: no-repeat
+//
+//  .bottom-left
+//    left: -23px
+//    background-image: url('/static/i/table-bottom-left.png')
+//
+//  .bottom-right
+//    right: -23px
+//    background-image: url('/static/i/table-bottom-right.png')
+//
+//  .bottom-line
+//    position: absolute
+//    bottom: 0
+//    left: 70px
+//    width: 904px
+//    background-image: url('/static/i/table-bottom.png')
+//    background-repeat: repeat-x
+//    height: 26px
 
 
 .radio
-  text-shadow: none
-  overflow: hidden
+  border: 1px solid white
+  position: relative
+  width: 1045px
 
-  .visual
-    width: 30%
+.radio .top
+  position: absolute
+  top: 0
+  width: 100%
+  height: 60px
+
+  .top-left, .top-right
+    top: 0
+    position: absolute
+    width: 54px
+    height: 59px
+    background-repeat: no-repeat
+
+  .top-left
+    left: 0
+    background-image: url('/static/i/table-top-left.png')
+
+  .top-right
+    right: 0
+    background-image: url('/static/i/table-top-right.png')
+
+  .top-line
+    position: absolute
+    top: 0px
+    left: 53px
+    background-image: url('/static/i/table-top.png')
+    background-repeat: repeat-x
+    width: 938px
+    height: 25px
+
+.radio .side
+  width: 100%
+  margin-top: 59px
+
+  .left-side
     float: left
+    width: 16px
+    height: 100%
+    background-image: url('/static/i/table-left.png')
+    background-repeat: repeat-y
 
-    .bar
-      height: 150px
-
-    .controls
-      height: 100px
-
-    .favorites
-      background-image: url('/static/i/favorites_background.png')
-      min-height: 180px
-      width: 290px
-      padding: 9px
-      +border-radius(4px)
-
-      li
-        border: 1px solid #e9ebea
-        +border-radius(2px)
-        +background(linear-gradient(#d4d9d7, #c1c8c5))
-        +box-shadow(#000 0px 2px 3px 1px)
-        color: #314647
-        padding: 7px 9px
-        margin-bottom: 9px
-        cursor: pointer
-
-      .signage
-        display: block
-        margin: 0 auto
-        margin-top: 15px
-
-  .table-wrapper
-    background-image: url('/static/i/table_background.png')
-    overflow: hidden
-    width: 65%
+  .right-side
     float: right
+    background-image: url('/static/i/table-right.png')
+    background-repeat: repeat-y
+    width: 16px
+    height: 100%
 
-  .table
-    color: #292112
-    +background(linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 226, 124, 0.4)))
+.radio .content
+  position: absolute
+  top:  0
+  height: 75%
+  width: 1023px
+  margin: 10px
+  z-index: -1000
+  background-color: #d5d3cc
+  background-image: url('/static/i/noise.png')
 
-    .controls
-      width: 100%
-      clear: both
-      form
-        display: inline
+.radio .bottom
+  width: 100%
+  height: 70px
 
-    .nav
-      width: 100%
-      clear: both
-      /* for overflow
-      overflow: hidden
-      height: 30px
-      margin: 2em 0
-      li
-        margin: 10px
-        cursor: pointer
+  .bottom-left, .bottom-right
+    position: absolute
+    bottom: 0
+    width: 96px
+    height: 70px
+    background-repeat: no-repeat
 
-    .list
-      width: 100%
-      clear: both
-      li
-        padding-left: 10px
-        margin-bottom: 25px
+  .bottom-left
+    left: -23px
+    background-image: url('/static/i/table-bottom-left.png')
+
+  .bottom-right
+    right: -23px
+    background-image: url('/static/i/table-bottom-right.png')
+
+  .bottom-line
+    position: absolute
+    bottom: 0
+    left: 70px
+    width: 904px
+    background-image: url('/static/i/table-bottom.png')
+    background-repeat: repeat-x
+    height: 26px
+
 
 .footer
   clear: both
