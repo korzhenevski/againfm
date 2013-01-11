@@ -21,25 +21,28 @@
 
 /* line 21, ../sass/style.sass */
 .radio {
-  border: 1px solid pink;
+  border: 1px solid transparent;
   position: relative;
+  width: 1043px;
+  color: black;
+  text-shadow: none;
 }
-/* line 25, ../sass/style.sass */
+/* line 28, ../sass/style.sass */
 .radio .back {
   background-image: url("/static/i/noise-small-1.png");
   background-color: #d5d3cc;
-  margin: 15px;
+  margin: 10px;
 }
-/* line 30, ../sass/style.sass */
+/* line 33, ../sass/style.sass */
 .radio .back-shadow {
-  padding: 15px;
+  padding: 25px 20px;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(255, 255, 255, 0.1)), color-stop(100%, rgba(0, 0, 0, 0.1)));
   background: -webkit-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
   background: -moz-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
   background: -o-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
   background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
 }
-/* line 34, ../sass/style.sass */
+/* line 37, ../sass/style.sass */
 .radio .top {
   position: absolute;
   top: 0;
@@ -47,64 +50,69 @@
   height: 59px;
   width: 100%;
 }
-/* line 41, ../sass/style.sass */
+/* line 44, ../sass/style.sass */
 .radio .top .top-left {
   background-image: url("/static/i/table-top-left.png");
   width: 52px;
   background-repeat: no-repeat;
 }
-/* line 46, ../sass/style.sass */
+/* line 49, ../sass/style.sass */
 .radio .top .top-line {
   background-image: url("/static/i/table-top.png");
   background-repeat: repeat-x;
 }
-/* line 50, ../sass/style.sass */
+/* line 53, ../sass/style.sass */
 .radio .top .top-right {
   background-image: url("/static/i/table-top-right.png");
   width: 52px;
   background-repeat: no-repeat;
 }
-/* line 55, ../sass/style.sass */
+/* line 58, ../sass/style.sass */
 .radio .bottom {
-  height: 70px;
-  margin: 0 -30px;
-  margin-top: -65px;
+  margin: 0 -26px;
+  margin-top: -62px;
 }
-/* line 60, ../sass/style.sass */
+/* line 62, ../sass/style.sass */
 .radio .bottom .inner {
   height: 70px;
   width: 100%;
 }
-/* line 64, ../sass/style.sass */
+/* line 66, ../sass/style.sass */
 .radio .bottom .bottom-left {
   background-image: url("/static/i/table-bottom-left.png");
   width: 95px;
   background-repeat: no-repeat;
 }
-/* line 69, ../sass/style.sass */
+/* line 71, ../sass/style.sass */
 .radio .bottom .bottom-line {
   background-image: url("/static/i/table-bottom.png");
   background-repeat: repeat-x;
   background-position: bottom left;
 }
-/* line 74, ../sass/style.sass */
+/* line 76, ../sass/style.sass */
 .radio .bottom .bottom-right {
   background-image: url("/static/i/table-bottom-right.png");
   width: 95px;
   background-repeat: no-repeat;
 }
-/* line 80, ../sass/style.sass */
+/* line 81, ../sass/style.sass */
 .radio .content {
+  background: url("/static/i/table-middle.png");
+  background-repeat: repeat-y;
   margin: 0 -30px;
   padding: 0 30px;
 }
+/* line 87, ../sass/style.sass */
+.radio .player {
+  width: 100%;
+}
 
-/* line 86, ../sass/style.sass */
+/* line 91, ../sass/style.sass */
 .footer {
   clear: both;
 }
 
-/* line 89, ../sass/style.sass */
+/* line 94, ../sass/style.sass */
 body {
   background-color: #453745;
   font-size: 14px;
@@ -117,29 +125,29 @@ body {
   background-size: cover;
 }
 
-/* line 97, ../sass/style.sass */
+/* line 102, ../sass/style.sass */
 a {
   color: white;
   text-decoration: none;
   border-bottom: 1px solid #7f777f;
 }
 
-/* line 102, ../sass/style.sass */
+/* line 107, ../sass/style.sass */
 ul.inline {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-/* line 106, ../sass/style.sass */
+/* line 111, ../sass/style.sass */
 ul.inline li {
   float: left;
 }
 
-/* line 109, ../sass/style.sass */
+/* line 114, ../sass/style.sass */
 ul.justified {
   text-align: justify;
 }
-/* line 111, ../sass/style.sass */
+/* line 116, ../sass/style.sass */
 ul.justified li {
   float: none;
   display: inline-block;

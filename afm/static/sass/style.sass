@@ -19,16 +19,19 @@
 
 
 .radio
-  border: 1px solid pink
+  border: 1px solid transparent
   position: relative
+  width: 1043px
+  color: #000
+  text-shadow: none
 
   .back
     background-image: url('/static/i/noise-small-1.png')
     background-color: #d5d3cc
-    margin: 15px
+    margin: 10px
 
   .back-shadow
-    padding: 15px
+    padding: 25px 20px
     +background(linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1)))
 
   .top
@@ -53,9 +56,8 @@
       background-repeat: no-repeat
 
   .bottom
-    height: 70px
-    margin: 0 -30px
-    margin-top: -65px
+    margin: 0 -26px
+    margin-top: -62px
 
     .inner
       height: 70px
@@ -76,11 +78,14 @@
       width: 95px
       background-repeat: no-repeat
 
-
   .content
+    background: url('/static/i/table-middle.png')
+    background-repeat: repeat-y
     margin: 0 -30px
-    //border: 1px dashed
     padding: 0 30px
+
+  .player
+    width: 100%
 
 
 .footer
