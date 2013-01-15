@@ -4,6 +4,10 @@ afm.controller('PlaylistCtrl', function($scope){
     $scope.filters = [
         {title: 'Подборка', selected: true},
         {title: 'Транс'},
+        {title: 'Транс'},
+        {title: 'Транс'},
+        {title: 'Хауз'},
+        {title: 'Хауз'},
         {title: 'Хауз'},
         {title: 'Джаз'}
     ];

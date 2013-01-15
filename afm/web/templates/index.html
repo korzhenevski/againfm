@@ -38,15 +38,17 @@
             <div class="back">
             <div class="back-shadow">
                 <div class="content">
-                    <table class="player">
+                    <table class="radio-box">
                         <tr valign="top">
-                            <td width="310px"><div class="display">
+                            <td width="310px"><div class="display-back">
                                 <div class="display-inner">
+                                    <div class="display">
                                     <h1>НАШЕ Радио</h1>
                                     <h2>Особенный Трек - Длинный Трек (очень длинный трек)</h2>
+                                    </div>
                                 </div>
                             </div></td>
-                            <td rowspan="3" height="1px"><div class="table">
+                            <td rowspan="3" height="1px"><div class="radio-table">
                                 <div class="table-inner" ng-controller="PlaylistCtrl">
                                     <input type="search" class="search" placeholder="Поиск по названию радио" />
 
@@ -71,7 +73,7 @@
                             </div></td>
                         </tr>
                         <tr>
-                            <td height="1px"><div class="favorites">
+                            <td height="281px"><div class="favorites">
                                 <div class="favorites-inner">
                                     <ul class="favorites-list justified">
                                         <li ng-repeat="station in favorites">
