@@ -25,6 +25,9 @@ app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
 app.config.from_envvar('AGAINFM_CONFIG', silent=True)
 
+app.jinja_env.variable_start_string = '{{{'
+app.jinja_env.variable_end_string = '}}}'
+
 i18n = I18n(app)
 db = MongoKit(app)
 redis = Redis(**app.config['REDIS'])
