@@ -11,6 +11,7 @@
     <div class="header">
         <div class="container">
             <form class="login">
+                <!--
                 <input class="field" type="text" name="email" placeholder="эл. почта" />
                 <input class="field" type="password" name="password" placeholder="пароль" />
                 <input type="submit" class="button" value="Войти" />
@@ -19,7 +20,7 @@
                 <button class="login__button-vk">ВКонтакте</button>
                 <button class="login__button">...</button>-->
             </form>
-            <a class="pull-right" href="http://play.again.fm/">Вещать свою музыку</a>
+            <!--a class="pull-right" href="http://play.again.fm/">Вещать свою музыку</a-->
         </div>
     </div>
 
@@ -29,6 +30,8 @@
         </div-->
 
         <div class="radio">
+            <player src="/static/swf/player.swf"></player>
+
             <table class="top">
                 <tr>
                     <td class="top-left"></td>
@@ -55,7 +58,7 @@
 
                                     <ul class="filters justified">
                                         <li ng-repeat="filter in filters">
-                                            <span class="block" ng-class="{active: filter.selected}">{{ filter.title }}</span>
+                                            <span class="block" ng-class="filterClass(filter)" ng-click="selectFilter(filter)">{{ filter.title }}</span>
                                         </li>
                                     </ul>
 
@@ -69,16 +72,22 @@
                             </div></td>
                         </tr>
                         <tr>
-                            <td height="100px"><div class="controls">
-
-                            </div></td>
+                            <td height="100px"><table class="controls" width="100%">
+                                <tr align="center">
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td><button class="play">play</button></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </table></td>
                         </tr>
                         <tr>
                             <td height="281px"><div class="favorites">
                                 <div class="favorites-inner">
                                     <ul class="favorites-list justified">
-                                        <li ng-repeat="station in favorites">
-                                            {{station.title}}
+                                        <li ng-repeat="favorite in favorites">
+                                            {{favorite.title}}
                                         </li>
                                     </ul>
                                     <img src="/static/i/my_favorites.png" class="signage" />
@@ -105,7 +114,10 @@
         <p>Сделано в России</p>
         </div>
     </div>
+    <!--script src="/static/js/script.js"></script-->
     <script src="/static/js/angular.js"></script>
+    <script src="/static/js/angular-resource.js"></script>
+    <script src="/static/js/swfobject.js"></script>
     <script src="/static/js/radio.js"></script>
 </body>
 </html>

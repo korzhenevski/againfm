@@ -257,5 +257,26 @@ def housekeep_stations():
     print disable_ids
     db.stations.update({'id': {'$in': list(disable_ids)}}, {'$set': {'status': 0, 'streams': []}}, multi=True)
 
+@manager.command
+def group_itunes():
+    from pprint import pprint
+    from collections import Counter, defaultdict
+    counter = Counter()
+    agg = defaultdict(set)
+    import nltk
+    from nltk.tokenize.punkt import PunktWordTokenizer
+    tokenizer = PunktWordTokenizer()
+    for station in db.itunes.find({}, fields=['title',]):
+        title = station['title']
+        tokens = tokenizer.tokenize(title)
+        tokens = [token for token in tokens if len(token) > 1]
+        if tokens:
+            token = tokens[0]
+            agg[token].add(station['title'])
+            counter[token] += 1
+
+    #print agg
+    pprint(counter.most_common(50))
+
 if __name__ == "__main__":
     manager.run()

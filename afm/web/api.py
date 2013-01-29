@@ -9,6 +9,10 @@ from flask.ext.login import login_user, login_required, current_user, logout_use
 from afm.models import UserFavoritesCache
 from .helpers import *
 
+@app.route('/a/filters')
+def filters():
+    filters = []
+
 @app.route('/api/user/login', methods=['POST'])
 def login():
     data = safe_input_object({'login': 'string', 'password': 'string'})

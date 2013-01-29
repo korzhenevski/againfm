@@ -1,36 +1,45 @@
-var afm = angular.module('afm', []);
+var afm = angular.module('afm', ['ngResource']);
 
-afm.controller('PlaylistCtrl', function($scope){
+/*
+afm.directive('player', function($document){
+    return {
+        restrict: 'E',
+        template: '<div></div>',
+        link: function(scope, element, attrs) {
+            console.log(arguments);
+        }
+    }
+});*/
+
+afm.controller('PlaylistCtrl', function($scope, $resource){
     $scope.filters = [
-        {title: 'Подборка', selected: true},
-        {title: 'Транс'},
-        {title: 'Транс'},
-        {title: 'Транс'},
-        {title: 'Хауз'},
-        {title: 'Хауз'},
-        {title: 'Хауз'},
-        {title: 'Джаз'}
+        {id: 'featured', title: 'Подборка'},
+        {id: 'genre/trance', title: 'Транс'},
+        {id: 'genre/house', title: 'Хауз'},
+        {id: 'genre/dnb', title: 'Драм-н-бейс'},
+        {id: 'genre/pop', title: 'Поп'},
+        {id: 'genre/metal', title: 'Метал'},
+        {id: 'genre/news', title: 'Новости'},
+        {id: 'genre/chillout', title: 'Чилаут'}
     ];
 
-    $scope.playlist = [
-        { "id" : 30, "title" : "Deep Nu-Disco" },
-        { "id" : 13, "title" : "Covers" },
-        { "id" : 68, "title" : "DI - Chiptunes" },
-        { "id" : 35, "title" : "Hard Dance" },
-        { "id" : 20, "title" : "cliqhop idm" },
-        { "id" : 60, "title" : "DI - Classic EuroDance" },
-        { "id" : 70, "title" : "42FM" },
-        { "id" : 86, "title" : "hirschmilch - electronic" },
-        { "id" : 64, "title" : "DI - Dubstep", selected: true },
-        { "title" : "Again.FM best radio", "id" : 75 },
-        { "title" : "iwayhigh - dub electro chill", "id" : 81 },
-        { "id" : 83, "title" : "hirschmilch - progressive" },
-        { "id" : 84, "title" : "hirschmilch - progressive house" },
-        { "id" : 8, "title" : "Soma - Digitalis" },
-        { "title" : "DI - Latin House", "id" : 66 },
-        { "title" : "Tech House", "id" : 56 },
-        { "id" : 44, "title" : "Classic Electronica" },
-        { "title" : "Garage.FM", "id" : 73 },
-        { "id" : 1, "title" : "Afterhours" }
-    ];
+    // TODO(outself): rename filter for anything for proper semantics
+    $scope.playlist = [];
+    $scope.currentFilter = null;
+    var Playlist = $resource('/api/playlist/:filter');
+
+    $scope.selectFilter = function(filter) {
+        $scope.playlist = [];
+        Playlist.get({filter: filter.id}, function(response){
+            $scope.playlist = response.objects;
+        });
+        $scope.currentFilter = filter;
+    };
+
+    $scope.filterClass = function(filter) {
+        var selected = $scope.currentFilter && $scope.currentFilter.id == filter.id;
+        return {selected: selected};
+    };
+
+    $scope.selectFilter($scope.filters[0]);
 });
