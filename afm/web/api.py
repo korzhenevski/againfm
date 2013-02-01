@@ -9,9 +9,32 @@ from flask.ext.login import login_user, login_required, current_user, logout_use
 from afm.models import UserFavoritesCache
 from .helpers import *
 
-@app.route('/a/filters')
-def filters():
-    filters = []
+"""
+/api/station/genres
+/api/station/featured
+/api/station/genres
+/api/station/genre/:genre_id
+/api/station/search?query=
+/api/station/:station_id
+
+station.get()
+station.getGenres()
+station.getFeatured()
+station.getByGenre(station_id)
+station.search(query)
+
+favs.add()
+favs.remove()
+
+tracks.add()
+tracks.remove()
+tracks.get()
+"""
+
+@app.route('/api/station/random')
+def station_random():
+    station = db.Station.find_random()
+    return jsonify({'station': station.get_public()})
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -123,6 +146,16 @@ def favorite_playlist():
 def station_detail(station_id):
     station = db.Station.find_one_or_404({'id': station_id, 'deleted_at': 0})
     return jsonify(station.get_public())
+
+
+@app.route('/api/station/get/<int:station_id>')
+def station_play_url(station_id):
+    stream = db.Stream.find_one_or_404({'station_id': station_id}, fields={'_id': 0}, sort=[('bitrate', -1)])
+    return jsonify({
+        'stream': {
+            'url': stream.get_web_url(),
+        }
+    })
 
 @app.route('/api/station/<int:station_id>/getplayinfo')
 def station_getplayinfo(station_id):

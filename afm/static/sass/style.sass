@@ -5,6 +5,15 @@
 @import "compass/css3/text-shadow"
 @import "compass/css3/opacity"
 
+.modalbox
+  position: absolute
+  height: 100%
+  width: 100%
+  overflow: hidden
+  background-color: #000
+  z-index: 1000
+  +opacity(0.5)
+
 .container
   width: 1045px
   margin: 0 auto
@@ -182,7 +191,7 @@
     padding-left: 2px
     padding-bottom: 65px
 
-    li
+    .block
       max-width: 272px
       overflow: hidden
       border: 1px solid #dee1e0

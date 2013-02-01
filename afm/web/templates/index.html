@@ -5,9 +5,12 @@
     <link href="/static/css/normalize.css" rel="stylesheet"/>
     <link href="/static/css/common.css" rel="stylesheet"/>
     <link href="/static/css/style.css" rel="stylesheet"/>
+    <meta name="fragment" content="!" />
 </head>
 <body>
+    <!--div class="modalbox">
 
+    </div-->
     <div class="header">
         <div class="container">
             <form class="login">
@@ -30,6 +33,7 @@
         </div-->
 
         <div class="radio">
+            <div class="blah" ng-view></div>
             <player src="/static/swf/player.swf"></player>
 
             <table class="top">
@@ -42,29 +46,29 @@
             <div class="back">
             <div class="back-shadow">
                 <div class="content">
-                    <table class="radio-box">
+                    <table class="radio-box" ng-controller="RadioCtrl">
                         <tr valign="top">
                             <td width="310px"><div class="display-back">
                                 <div class="display-inner">
                                     <div class="display">
-                                    <h1>НАШЕ Радио</h1>
-                                    <h2>Особенный Трек - Длинный Трек (очень длинный трек)</h2>
+                                    <h1 ng-show="currentStation"><button ng-class="{selected: favorites.exists(currentStation)}">fave</button> {{ currentStation.title }}</h1>
+                                    <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
                                     </div>
                                 </div>
                             </div></td>
                             <td rowspan="3" height="1px"><div class="radio-table">
-                                <div class="table-inner" ng-controller="PlaylistCtrl">
-                                    <input type="search" class="search" placeholder="Поиск по названию радио" />
+                                <div class="table-inner">
+                                    <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchText" />
 
                                     <ul class="filters justified">
                                         <li ng-repeat="filter in filters">
-                                            <span class="block" ng-class="filterClass(filter)" ng-click="selectFilter(filter)">{{ filter.title }}</span>
+                                            <span class="block" ng-class="itemClass(filter, currentFilter)" ng-click="selectFilter(filter)">{{ filter.title }}</span>
                                         </li>
                                     </ul>
 
                                     <ul class="playlist justified">
-                                        <li ng-repeat="station in playlist">
-                                            <span class="block" ng-class="{active: station.selected}">{{station.title}}</span>
+                                        <li ng-repeat="station in playlist | filter:searchText">
+                                            <span class="block" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
                                         </li>
                                     </ul>
 
@@ -75,9 +79,16 @@
                             <td height="100px"><table class="controls" width="100%">
                                 <tr align="center">
                                     <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td><button class="play">play</button></td>
-                                    <td>&nbsp;</td>
+                                    <td>
+                                        <button class="prev" ng-disabled="!previousStation" ng-click="selectStation(previousStation)">previous</button>
+                                    </td>
+                                    <td>
+                                        <button class="play" ng-hide="player.playing" ng-click="player.play()">play</button>
+                                        <button class="play" ng-hide="!player.playing" ng-click="player.stop()">stop</button>
+                                    </td>
+                                    <td>
+                                        <button class="random" ng-click="selectRandomStation()">random</button>
+                                    </td>
                                     <td>&nbsp;</td>
                                 </tr>
                             </table></td>
@@ -86,8 +97,11 @@
                             <td height="281px"><div class="favorites">
                                 <div class="favorites-inner">
                                     <ul class="favorites-list justified">
-                                        <li ng-repeat="favorite in favorites">
-                                            {{favorite.title}}
+                                        <li ng-repeat="station in favorites">
+                                            <span class="block" ng-click="selectStation(station)">
+                                                {{ station.title }}
+                                                <button ng-click="removeFavoriteStation(station)">X</button>
+                                            </span>
                                         </li>
                                     </ul>
                                     <img src="/static/i/my_favorites.png" class="signage" />
@@ -118,6 +132,6 @@
     <script src="/static/js/angular.js"></script>
     <script src="/static/js/angular-resource.js"></script>
     <script src="/static/js/swfobject.js"></script>
-    <script src="/static/js/radio.js"></script>
+    <script src="/static/js/app/radio.js"></script>
 </body>
 </html>

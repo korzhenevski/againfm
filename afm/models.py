@@ -320,7 +320,7 @@ class Station(BaseDocument):
             'title': self['title'],
             # статус показывает живое упавшее радио
             # мертвые станции (status==0) исключены из любых списков
-            'is_online': self['status'] == 1
+            #'is_online': self['status'] == 1
         }
 
     def find_public(self, query=None, only_online=False, **kwargs):
