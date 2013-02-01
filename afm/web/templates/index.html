@@ -66,12 +66,17 @@
                                         </li>
                                     </ul>
 
-                                    <ul class="playlist justified">
-                                        <li ng-repeat="station in playlist | filter:searchText">
-                                            <span class="block" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
-                                        </li>
-                                    </ul>
+                                    <div class="line-box">
+                                        <hr class="line" />
 
+                                        <div class="play-pointer" ng-hide="playlist.indexOf(currentStation) == -1" id="play-pointer"></div>
+
+                                        <ul class="playlist justified">
+                                            <li ng-repeat="station in playlist | filter:searchText">
+                                                <span class="block station-link" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div></td>
                         </tr>
@@ -131,7 +136,9 @@
     <!--script src="/static/js/script.js"></script-->
     <script src="/static/js/angular.js"></script>
     <script src="/static/js/angular-resource.js"></script>
+    <script src="/static/js/angular-cookies.js"></script>
     <script src="/static/js/swfobject.js"></script>
+    <!--script src="/static/js/modernizr.js"></script-->
     <script src="/static/js/app/radio.js"></script>
 </body>
 </html>

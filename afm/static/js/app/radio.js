@@ -47,6 +47,31 @@ afm.factory('Favorite', ['$resource', function($resource){
     });
 }]);
 
+afm.directive('playPointer', function($rootScope){
+    return {
+        restrict: 'C',
+        link: function($scope, element, attrs) {
+            $rootScope.$on('playlist.currentElement', function(ev, el){
+                var left = el.prop('offsetLeft') + 25;
+                element.css('left', left + 'px');
+            })
+        }
+    };
+});
+
+afm.directive('stationLink', function($rootScope){
+    return {
+        restrict: 'C',
+        link: function($scope, element) {
+            $scope.$watch('currentStation', function(currentStation){
+                if (element.hasClass('selected')) {
+                    $rootScope.$broadcast('playlist.currentElement', element);
+                }
+            })
+        }
+    };
+});
+
 afm.factory('Favorites', function(Auth, Favorite) {
     var favorites = {};
 
@@ -87,7 +112,7 @@ afm.factory('player', function(audio) {
                 player.url = url;
             }
 
-            if (player.url) {
+            if (false && player.url) {
                 audio.src = player.url;
                 audio.play();
             }

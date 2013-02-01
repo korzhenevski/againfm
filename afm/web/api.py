@@ -127,7 +127,7 @@ def genre_playlist(genre):
 def featured_playlist():
     #ids = [1, 28345, 28344, 28343, 28340, 28341, 28342]
     #stations = [station.get_public() for station in db.Station.find_public({'id': {'$in': ids}}, only_online=True)]
-    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(40)]
+    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(100)]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/favorite')
