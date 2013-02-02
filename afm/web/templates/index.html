@@ -51,7 +51,10 @@
                             <td width="310px"><div class="display-back">
                                 <div class="display-inner">
                                     <div class="display">
-                                    <h1 ng-show="currentStation"><button ng-class="{selected: favorites.exists(currentStation)}">fave</button> {{ currentStation.title }}</h1>
+                                    <h1 ng-show="currentStation">
+                                        <button class="fave-button" ng-show="currentStation && favorites.exists(currentStation.id)" ng-click="favorites.remove(currentStation.id)">-</button>
+                                        <button class="fave-button" ng-show="currentStation && !favorites.exists(currentStation.id)" ng-click="favorites.add(currentStation)">+</button>
+                                        {{ currentStation.title }}</h1>
                                     <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
                                     </div>
                                 </div>
@@ -96,16 +99,21 @@
                                     </td>
                                     <td>&nbsp;</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <input type="range" min="0" max="1" step="0.1" ng-change="setVolume()" ng-model="volume" />
+                                    </td>
+                                </tr>
                             </table></td>
                         </tr>
                         <tr>
                             <td height="281px"><div class="favorites">
                                 <div class="favorites-inner">
                                     <ul class="favorites-list justified">
-                                        <li ng-repeat="station in favorites">
+                                        <li ng-repeat="(id, station) in favorites.stations">
                                             <span class="block" ng-click="selectStation(station)">
                                                 {{ station.title }}
-                                                <button ng-click="removeFavoriteStation(station)">X</button>
+                                                <button ng-click="favorites.remove(id)">X</button>
                                             </span>
                                         </li>
                                     </ul>

@@ -1,8 +1,4 @@
-var afm = angular.module('afm', ['ngResource']);
-
-afm.controller('StationCtrl', function($scope, $routeParams){
-    alert('radio');
-});
+var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.controller('LoginCtrl', function($scope, Auth){
     $scope.Auth = Auth;
@@ -20,7 +16,7 @@ afm.controller('LoginCtrl', function($scope, Auth){
 
 afm.factory('Auth', ['$http', function($http){
     var user = null;
-    var Auth = {
+    return {
         login: function(data) {
             return $http.post('/api/user/login', data).success(function(newUser){
                 user = newUser;
@@ -37,7 +33,6 @@ afm.factory('Auth', ['$http', function($http){
             return user;
         }
     };
-    return Auth;
 }]);
 
 afm.factory('Favorite', ['$resource', function($resource){
@@ -63,7 +58,7 @@ afm.directive('stationLink', function($rootScope){
     return {
         restrict: 'C',
         link: function($scope, element) {
-            $scope.$watch('currentStation', function(currentStation){
+            $scope.$watch('currentStation', function(){
                 if (element.hasClass('selected')) {
                     $rootScope.$broadcast('playlist.currentElement', element);
                 }
@@ -71,23 +66,6 @@ afm.directive('stationLink', function($rootScope){
         }
     };
 });
-
-afm.factory('Favorites', function(Auth, Favorite) {
-    var favorites = {};
-
-    return {
-        add: function(station) {
-            favorites[station.id] = station;
-        },
-
-        remove: function(station_id) {
-            if (favorites.hasOwnProperty(station_id)) {
-                delete favorites[station_id];
-            }
-        }
-    };
-});
-
 
 afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
@@ -103,16 +81,18 @@ afm.factory('audio', function($document) {
 // player.play('http://www.example.com/stream')
 // player.stop()
 // player.play()
-afm.factory('player', function(audio) {
+afm.factory('player', function(audio, $cookieStore) {
     var player = {
         url: null,
         playing: false,
+        volume: 0.7,
+
         play: function(url) {
             if (url) {
                 player.url = url;
             }
 
-            if (false && player.url) {
+            if (player.url) {
                 audio.src = player.url;
                 audio.play();
             }
@@ -125,8 +105,24 @@ afm.factory('player', function(audio) {
                 audio.load();
             }
             player.playing = false;
+        },
+
+        loadVolume: function() {
+            var volume = $cookieStore.get('volume');
+            // громкость не установлена в куках - берем по умолчанию
+            volume = angular.isUndefined(volume) ? player.volume : volume;
+            player.setVolume(volume);
+        },
+
+        setVolume: function(volume) {
+            volume = parseFloat(volume);
+            audio.volume = volume;
+            player.volume = volume;
+            $cookieStore.put('volume', volume);
         }
     };
+
+    player.loadVolume();
 
     audio.addEventListener('play', function(){
         player.playing = true;
@@ -136,12 +132,45 @@ afm.factory('player', function(audio) {
         audio.addEventListener(event, function(){
             player.playing = false;
         });
-    })
+    });
 
     return player;
 });
 
-afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http){
+afm.factory('favorites', function($cookieStore) {
+    var favs = {
+        stations: {},
+        add: function(station) {
+            favs.stations[station.id] = station;
+            favs.save();
+        },
+
+        exists: function(id) {
+            return favs.stations.hasOwnProperty(id);
+        },
+
+        remove: function(id) {
+            if (favs.stations.hasOwnProperty(id)) {
+                delete favs.stations[id];
+            }
+            favs.save();
+        },
+
+        clear: function() {
+            favs.stations = {};
+            favs.save();
+        },
+
+        save: function() {
+            $cookieStore.put('favorites', favs.stations);
+        }
+    };
+
+    favs.stations = $cookieStore.get('favorites') || {};
+    return favs;
+});
+
+afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
         {id: 'genre/trance', title: 'Транс'},
@@ -184,7 +213,7 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
         }
         $scope.currentStation = station;
         $http.get('/api/station/get/' + station.id).success(function(response){
-            $location.path('/radio/' + station.id);
+            //$location.path('/radio/' + station.id);
             player.play(response.stream.url);
         });
     };
@@ -195,15 +224,12 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
         });
     };
 
+    $scope.volume = player.volume;
+    $scope.setVolume = function() {
+        player.setVolume($scope.volume);
+    };
+
     // ---
 
-    $scope.favorites = [{title: 'AH.FM'},{title: 'Afterhours.FM'},{title: 'Afterhours.FM'},{title: 'Afterhours.FM'}];
-    $scope.addFavoriteStation = function(station) {
-
-    };
-
-    $scope.removeFavoriteStation = function(station) {
-        var index = $scope.favorites.indexOf(station);
-        $scope.favorites.splice(index, 1);
-    };
+    $scope.favorites = favorites;
 });
