@@ -53,7 +53,7 @@ $viewport-width: 1000px
   position: relative
   text-shadow: none
   border: 1px solid transparent
-  width: $viewport-width + 62
+  width: $viewport-width + 43
 
   .top
     position: absolute
@@ -63,7 +63,7 @@ $viewport-width: 1000px
     width: 100%
 
     .top-left
-      background-image: url('/static/i/table-top-left.png')
+      background-image: url('/static/i/table-top-left2.png')
       width: 52px
       background-repeat: no-repeat
 
@@ -72,7 +72,7 @@ $viewport-width: 1000px
       background-repeat: repeat-x
 
     .top-right
-      background-image: url('/static/i/table-top-right.png')
+      background-image: url('/static/i/table-top-right2.png')
       width: 52px
       background-repeat: no-repeat
 
@@ -94,19 +94,21 @@ $viewport-width: 1000px
       width: 100%
 
     .bottom-left
-      background-image: url('/static/i/table-bottom-left.png')
+      background-image: url('/static/i/table-bottom-left2.png')
       width: 95px
       background-repeat: no-repeat
-
-    .bottom-line
-      background-image: url('/static/i/table-bottom.png')
-      background-repeat: repeat-x
       background-position: bottom left
 
+    .bottom-line
+      background-image: url('/static/i/table-bottom2.png')
+      background-repeat: repeat-x
+      background-position: bottom center
+
     .bottom-right
-      background-image: url('/static/i/table-bottom-right.png')
+      background-image: url('/static/i/table-bottom-right2.png')
       width: 95px
       background-repeat: no-repeat
+      background-position: bottom right
 
   .content
     background: url('/static/i/table-middle.png')
@@ -210,6 +212,7 @@ $viewport-width: 1000px
       position: relative
       display: inline-block
       +border-radius(2px)
+      +text-shadow(rgba(#314647, 0.2) 0px 1px 1px)
       +box-shadow(#0c0c0c 0px 2px 3px 1px)
       +background(linear-gradient(#d4d9d7, #c1c8c5))
       &:active
