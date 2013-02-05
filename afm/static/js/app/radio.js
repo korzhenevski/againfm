@@ -1,5 +1,16 @@
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
+/**
+ * причесать состояние кнопок
+ * регулятор звука
+ * подключить флеш проигрыватель
+ * фейд в избранном
+ * последний элемент justify должен быть прибит к краю
+ * тень текста в таблице и избранном
+ * выложить на v2 - показать Максу
+ *
+ */
+
 afm.controller('LoginCtrl', function($scope, Auth){
     $scope.Auth = Auth;
     $scope.login = function() {
@@ -170,6 +181,24 @@ afm.factory('favorites', function($cookieStore) {
     return favs;
 });
 
+afm.directive('volumeSlider', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs){
+            element.slider({
+                min: 0,
+                max: 1,
+                value: attrs.value,
+                step: 0.1,
+                orientation: 'vertical',
+                slide: function(event, ui) {
+                    console.log(ui.value);
+                }
+            });
+        }
+    };
+});
+
 afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
@@ -218,10 +247,27 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
         });
     };
 
+    $scope.isFaved = function() {
+        return $scope.currentStation && $scope.favorites.exists($scope.currentStation.id);
+    }
+
     $scope.selectRandomStation = function() {
         $http.get('/api/station/random').success(function(response){
             $scope.selectStation(response.station);
         });
+    };
+
+    $scope.fave = function() {
+        var station = $scope.currentStation;
+        if (!station) {
+            return;
+        }
+
+        if (favorites.exists(station.id)) {
+            favorites.remove(station.id);
+        } else {
+            favorites.add(station);
+        }
     };
 
     $scope.volume = player.volume;

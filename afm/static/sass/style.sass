@@ -6,18 +6,7 @@
 @import "compass/css3/opacity"
 @import "compass/css3/transition"
 
-.modalbox
-  position: absolute
-  height: 100%
-  width: 100%
-  overflow: hidden
-  background-color: #000
-  z-index: 1000
-  +opacity(0.5)
-
-.container
-  width: 1045px
-  margin: 0 auto
+$viewport-width: 1000px
 
 .login
   display: inline
@@ -27,10 +16,10 @@
     border: 1px solid #696a75
     color: #dcdcde
     padding: 4px 9px
+    margin-right: 9px
     +background(linear-gradient(#4c4e5d, #484955))
     +box-shadow(#4b4a56 0 0 0px 1px inset)
     +border-radius(1px)
-    margin-right: 9px
     &:focus
       outline: none
 
@@ -41,32 +30,30 @@
     +border-radius(1px)
     +background(linear-gradient(#68acb9, #3892a3))
 
-.header
+.modalbox
+  position: absolute
+  height: 100%
+  width: 100%
+  overflow: hidden
+  background-color: #000
+  z-index: 1000
+  +opacity(0.5)
+
+.topline
   padding: 10px 0
   border-top: 1px solid #525362
   border-bottom: 1px solid #24252a
+  margin-bottom: 40px
   +background(linear-gradient(rgba(#4e4d5c, 0.5), rgba(#393944, 0.5)))
   +box-shadow(#4b4c5b 0px -4px 3px -2px inset, #26242c 0px 0px 3px 1px)
-  margin-bottom: 40px
-
-.header, .footer
-  .container
-    width: 978px
-    padding: 0 33px
-
-.main-top
-  margin-top: 5em
-  height: 70px
 
 .radio
-  border: 1px solid transparent
-  position: relative
-  width: 1043px
+  margin: 0 auto
   color: #000
+  position: relative
   text-shadow: none
-
-  .fave-button
-    display: none
+  border: 1px solid transparent
+  width: $viewport-width + 62
 
   .top
     position: absolute
@@ -89,12 +76,12 @@
       width: 52px
       background-repeat: no-repeat
 
-  .back
+  .ground
     background-image: url('/static/i/noise-small-1.png')
     background-color: #d5d3cc
     margin: 10px
 
-    .back-shadow
+    .ground-shadow
       padding: 25px 20px
       +background(linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1)))
 
@@ -130,7 +117,7 @@
 .radio-box
   width: 100%
 
-  .display-back
+  .display-ground
     +border-radius(4px)
     border: 1px solid #e5e4e0
     width: 310px
@@ -142,14 +129,28 @@
     // +background(linear-gradient(rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.2)))
 
   .display
-    +background(linear-gradient(rgba(#fff, 0.6), rgba(white, 0.0)))
     padding: 20px
     min-height: 88px
     overflow: hidden
-    +box-shadow(#526464 0 0 3px 2px inset)
     +border-radius(4px)
+    +box-shadow(#526464 0 0 3px 2px inset)
+    +background(linear-gradient(rgba(#fff, 0.6), rgba(white, 0.0)))
+
+    .fave-button
+      position: absolute
+      top: 0px
+      right: 0px
+      border: none
+      background-image: url('/static/i/display-star.png')
+      background-repeat: no-repeat
+      background-color: transparent
+      width: 27px
+      height: 27px
+      &:hover
+        background-image: url('/static/i/display-star-hover.png')
 
     h1
+      position: relative
       line-height: 1.3em
       font-size: 22px
       white-space: nowrap
@@ -196,36 +197,97 @@
     padding-bottom: 65px
 
     .block
+      text-align: center
       max-width: 272px
+      min-width: 50px
       overflow: hidden
       border: 1px solid #dee1e0
-      +border-radius(2px)
-      +background(linear-gradient(#d4d9d7, #c1c8c5))
-      +box-shadow(#0c0c0c 0px 2px 3px 1px)
       color: #314647
       padding: 5px 9px
       margin-bottom: 10px
       margin-left: 7px
       cursor: pointer
+      position: relative
+      display: inline-block
+      +border-radius(2px)
+      +box-shadow(#0c0c0c 0px 2px 3px 1px)
+      +background(linear-gradient(#d4d9d7, #c1c8c5))
+      &:active
+        border: 1px solid #a3d3dd
+        +background(linear-gradient(#54adc0, #88c6d3))
+      &:hover
+        text-align: left
+        .remove
+          display: block
+
+    .remove
+      display: none
+      top: 5px
+      right: 5px
+      width: 17px
+      height: 17px
+      background-color: #cad0ce
+      background-image: url('/static/i/favs-remove.png')
+      background-repeat: no-repeat
+      position: absolute
+      +border-radius(1px)
 
   .controls
     min-height: 100px
 
+    button
+      border: 0
+      background-color: transparent
+      background-repeat: no-repeat
+      margin: 4px
+
+    .play, .pause
+      height: 59px
+      width: 59px
+
+    .back, .random
+      width: 49px
+      height: 49px
+
+    .record, .volume
+      width: 41px
+      height: 41px
+
     .play
-      height: 60px
-      width: 60px
-      border-radius: 30px
-      border: 1px solid #aaaaaa
-      background: #f5f5f5
+      background-image: url('/static/i/play-button.png')
+
+    .pause
+      background-image: url('/static/i/pause-button.png')
+
+    .random
+      background-image: url('/static/i/random-button.png')
+      &:active
+        background-image: url('/static/i/random-button-active.png')
+
+    button[disabled]
+      +opacity(0.4)
+      cursor: normal
+
+    .back
+      background-image: url('/static/i/back-button.png')
+      &:active
+        background-image: url('/static/i/back-button-active.png')
+
+    .volume
+      background-image: url('/static/i/volume-button.png')
+
+    .record
+      background-image: url('/static/i/record-button.png')
 
 .radio-table
-  +border-radius(4px)
+  height: 100%
   border: 1px solid #e5e4e0
   margin-left: 30px
   background-color: #d9ae1a
   background-image: url('/static/i/table-pattern.png')
   overflow: hidden
   max-width: 635px
+  +border-radius(4px)
 
   .line
     height: 5px
@@ -243,7 +305,6 @@
     +opacity(0.7)
     +transition(left 0.7s ease 0)
 
-
   .line-box
     position: relative
     min-height: 380px
@@ -251,23 +312,22 @@
 
   .table-inner
     height: 100%
-    +border-radius(4px)
-    +box-shadow(#5b4518 0 0 3px 2px inset)
-    //+background(linear-gradient(rgba(236, 214, 134, 0.4), rgba(218, 175, 29, 0.4)))
-    +background(linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.0)))
     min-height: 475px
     overflow: hidden
     padding: 20px
     padding-bottom: 0px
+    +border-radius(4px)
+    +box-shadow(#5b4518 0 0 3px 2px inset)
+    +background(linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.0)))
 
   .search
     border: none
-    background-color: #836636
-    +border-radius(3px)
-    +opacity(0.8)
     padding: 6px 10px
     color: #fff
     min-width: 250px
+    background-color: #836636
+    +opacity(0.8)
+    +border-radius(3px)
 
     &:focus
       outline: none
@@ -301,6 +361,7 @@
 
   .filters, .playlist
     color: #3d3017
+    +text-shadow(rgba(#000000, 0.15) 1px 1px 0px)
     .selected
       background-color: rgba(#c5ab65, 0.6)
       font-weight: bold
@@ -310,13 +371,18 @@
 .footer
   clear: both
 
+.centroid
+  width: $viewport-width
+  margin: 0 auto
+
 body
   background-color: #453745
   font-size: 14px
+  font-family: Helvetica, Arial, sans-serif
   color: #fff
-  +text-shadow(shade(#000, 30%) 0px 1px 1px)
-  background: url("/static/i/background.jpg")
+  background: url('/static/i/background.jpg')
   +background-size(cover)
+  +text-shadow(shade(#000, 30%) 0px 1px 1px)
 
 a
   color: #fff

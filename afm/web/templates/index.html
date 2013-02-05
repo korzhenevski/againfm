@@ -5,143 +5,148 @@
     <link href="/static/css/normalize.css" rel="stylesheet"/>
     <link href="/static/css/common.css" rel="stylesheet"/>
     <link href="/static/css/style.css" rel="stylesheet"/>
+    <link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/>
     <meta name="fragment" content="!" />
 </head>
 <body>
-    <!--div class="modalbox">
-
-    </div-->
-    <div class="header">
-        <div class="container">
-            <form class="login">
-                <!--
-                <input class="field" type="text" name="email" placeholder="эл. почта" />
-                <input class="field" type="password" name="password" placeholder="пароль" />
-                <input type="submit" class="button" value="Войти" />
-                <!--или войти через
-                <button class="login__button-fb">Фейсбук</button>
-                <button class="login__button-vk">ВКонтакте</button>
-                <button class="login__button">...</button>-->
-            </form>
-            <!--a class="pull-right" href="http://play.again.fm/">Вещать свою музыку</a-->
+    <div class="topline">
+        <div class="centroid">
+            <a href="">Любимые треки и эфиры</a>
+            <a href="">Добавить радиостанцию</a>
         </div>
     </div>
 
-    <div class="container">
-        <!--div class="main-top">
-            <p class="pull-right">Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки</a>!</p>
-        </div-->
+    <table class="roof centroid">
+        <tr>
+            <td>
+                <img src="" />
+            </td>
+            <td>
 
-        <div class="radio">
-            <div class="blah" ng-view></div>
-            <player src="/static/swf/player.swf"></player>
+            </td>
+            <td align="right">
+                <p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки</a>!</p>
+            </td>
+        </tr>
+    </table>
 
-            <table class="top">
-                <tr>
-                    <td class="top-left"></td>
-                    <td class="top-line"></td>
-                    <td class="top-right"></td>
-                </tr>
-            </table>
-            <div class="back">
-            <div class="back-shadow">
-                <div class="content">
-                    <table class="radio-box" ng-controller="RadioCtrl">
-                        <tr valign="top">
-                            <td width="310px"><div class="display-back">
-                                <div class="display-inner">
-                                    <div class="display">
-                                    <h1 ng-show="currentStation">
-                                        <button class="fave-button" ng-show="currentStation && favorites.exists(currentStation.id)" ng-click="favorites.remove(currentStation.id)">-</button>
-                                        <button class="fave-button" ng-show="currentStation && !favorites.exists(currentStation.id)" ng-click="favorites.add(currentStation)">+</button>
-                                        {{ currentStation.title }}</h1>
-                                    <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
-                                    </div>
+    <div class="radio">
+        <player src="/static/swf/player.swf"></player>
+
+        <table class="top">
+            <tr>
+                <td class="top-left"></td>
+                <td class="top-line"></td>
+                <td class="top-right"></td>
+            </tr>
+        </table>
+        <div class="ground">
+        <div class="ground-shadow">
+            <div class="content">
+                <table class="radio-box" ng-controller="RadioCtrl">
+                    <tr valign="top">
+                        <td width="310px"><div class="display-ground">
+                            <div class="display-inner">
+                                <div class="display">
+                                <h1 ng-show="currentStation">
+                                    {{ currentStation.title }}
+                                    <button class="fave-button" ng-hide="isFaved()" ng-click="fave()"></button>
+                                </h1>
+                                <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
                                 </div>
-                            </div></td>
-                            <td rowspan="3" height="1px"><div class="radio-table">
-                                <div class="table-inner">
-                                    <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchText" />
+                            </div>
+                        </div></td>
+                        <td rowspan="3" height="1px"><div class="radio-table">
+                            <div class="table-inner">
+                                <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchText" />
 
-                                    <ul class="filters justified">
-                                        <li ng-repeat="filter in filters">
-                                            <span class="block" ng-class="itemClass(filter, currentFilter)" ng-click="selectFilter(filter)">{{ filter.title }}</span>
+                                <ul class="filters justified">
+                                    <li ng-repeat="filter in filters">
+                                        <span class="block" ng-class="itemClass(filter, currentFilter)" ng-click="selectFilter(filter)">{{ filter.title }}</span>
+                                    </li>
+                                </ul>
+
+                                <div class="line-box">
+                                    <hr class="line" />
+
+                                    <div class="play-pointer" ng-hide="playlist.indexOf(currentStation) == -1" id="play-pointer"></div>
+
+                                    <ul class="playlist justified">
+                                        <li ng-repeat="station in playlist | filter:searchText">
+                                            <span class="block station-link" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
                                         </li>
                                     </ul>
-
-                                    <div class="line-box">
-                                        <hr class="line" />
-
-                                        <div class="play-pointer" ng-hide="playlist.indexOf(currentStation) == -1" id="play-pointer"></div>
-
-                                        <ul class="playlist justified">
-                                            <li ng-repeat="station in playlist | filter:searchText">
-                                                <span class="block station-link" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
                                 </div>
-                            </div></td>
-                        </tr>
-                        <tr>
-                            <td height="100px"><table class="controls" width="100%">
-                                <tr align="center">
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <button class="prev" ng-disabled="!previousStation" ng-click="selectStation(previousStation)">previous</button>
-                                    </td>
-                                    <td>
-                                        <button class="play" ng-hide="player.playing" ng-click="player.play()">play</button>
-                                        <button class="play" ng-hide="!player.playing" ng-click="player.stop()">stop</button>
-                                    </td>
-                                    <td>
-                                        <button class="random" ng-click="selectRandomStation()">random</button>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="5">
-                                        <input type="range" min="0" max="1" step="0.1" ng-change="setVolume()" ng-model="volume" />
-                                    </td>
-                                </tr>
-                            </table></td>
-                        </tr>
-                        <tr>
-                            <td height="281px"><div class="favorites">
-                                <div class="favorites-inner">
-                                    <ul class="favorites-list justified">
-                                        <li ng-repeat="(id, station) in favorites.stations">
-                                            <span class="block" ng-click="selectStation(station)">
-                                                {{ station.title }}
-                                                <button ng-click="favorites.remove(id)">X</button>
-                                            </span>
-                                        </li>
-                                    </ul>
-                                    <img src="/static/i/my_favorites.png" class="signage" />
-                                </div>
-                            </div></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            </div>
-            <div class="bottom">
-            <table class="inner">
-                <tr>
-                    <td class="bottom-left"></td>
-                    <td class="bottom-line"></td>
-                    <td class="bottom-right"></td>
-                </tr>
-            </table>
+                            </div>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td height="100px" align="center">
+                            <table class="controls" width="80%">
+                            <tr align="center">
+                                <td>
+                                    <button class="record" disabled="disabled"></button>
+                                </td>
+                                <td>
+                                    <button class="back" ng-disabled="!previousStation" ng-click="selectStation(previousStation)"></button>
+                                </td>
+                                <td>
+                                    <button class="pause" ng-hide="!player.playing" ng-click="player.stop()"></button>
+                                    <button class="play" ng-hide="player.playing" ng-click="player.play()"></button>
+                                </td>
+                                <td>
+                                    <button class="random" ng-click="selectRandomStation()"></button>
+                                </td>
+                                <td>
+                                    <button class="volume"></button>
+                                </td>
+                            </tr>
+                            <!--tr>
+                                <td colspan="5">
+                                    <input type="range" min="0" max="1" step="0.1" ng-change="setVolume()" ng-model="volume" />
+                                </td>
+                            </tr-->
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="281px"><div class="favorites">
+                            <div class="favorites-inner">
+                                <ul class="favorites-list justified">
+                                    <li ng-repeat="(id, station) in favorites.stations">
+                                        <div class="block" ng-click="selectStation(station)">
+                                            {{ station.title }} <i class="remove" ng-click="favorites.remove(station.id)"></i>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <img src="/static/i/my_favorites.png" class="signage" />
+                            </div>
+                        </div></td>
+                    </tr>
+                </table>
             </div>
         </div>
+        </div>
+        <div class="bottom">
+        <table class="inner">
+            <tr>
+                <td class="bottom-left"></td>
+                <td class="bottom-line"></td>
+                <td class="bottom-right"></td>
+            </tr>
+        </table>
+        </div>
     </div>
-    <div class="footer">
+
+    <div class="footer centroid">
         <div class="container">
         <p>Сделано в России</p>
         </div>
     </div>
+
     <!--script src="/static/js/script.js"></script-->
+    <script src="/static/js/jquery-1.9.0.js"></script>
+    <script src="/static/js/jquery-ui-1.10.0.custom.js"></script>
     <script src="/static/js/angular.js"></script>
     <script src="/static/js/angular-resource.js"></script>
     <script src="/static/js/angular-cookies.js"></script>
