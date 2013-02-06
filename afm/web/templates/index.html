@@ -11,8 +11,7 @@
 <body>
     <div class="topline">
         <div class="centroid">
-            <a href="">Любимые треки и эфиры</a>
-            <a href="">Добавить радиостанцию</a>
+            <a href="">ВКонтакте</a>
         </div>
     </div>
 
@@ -25,7 +24,7 @@
 
             </td>
             <td align="right">
-                <p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки</a>!</p>
+                <p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p>
             </td>
         </tr>
     </table>
@@ -45,7 +44,8 @@
             <div class="content">
                 <table class="radio-box" ng-controller="RadioCtrl">
                     <tr valign="top">
-                        <td width="310px"><div class="display-ground">
+                        <td style="min-width: 310px">
+                            <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
                                 <h1 ng-show="currentStation">
@@ -55,8 +55,10 @@
                                 <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
                                 </div>
                             </div>
-                        </div></td>
-                        <td rowspan="3" height="1px"><div class="radio-table">
+                            </div>
+                        </td>
+                        <td rowspan="3">
+                            <div class="radio-table">
                             <div class="table-inner">
                                 <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchText" />
 
@@ -66,11 +68,9 @@
                                     </li>
                                 </ul>
 
-                                <div class="line-box">
-                                    <hr class="line" />
-
-                                    <div class="play-pointer" ng-hide="playlist.indexOf(currentStation) == -1" id="play-pointer"></div>
-
+                                <div class="table-wrapper">
+                                    <hr class="radio-line" />
+                                    <div id="radio-cursor" class="radio-cursor" ng-hide="playlist.indexOf(currentStation) == -1"></div>
                                     <ul class="playlist justified">
                                         <li ng-repeat="station in playlist | filter:searchText">
                                             <span class="block station-link" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
@@ -78,10 +78,11 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div></td>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
-                        <td height="100px" align="center">
+                        <td align="center">
                             <table class="controls" width="80%">
                             <tr align="center">
                                 <td>
@@ -140,7 +141,7 @@
 
     <div class="footer centroid">
         <div class="container">
-        <p>Сделано в России</p>
+        <p>Made in China (更壞)</p>
         </div>
     </div>
 

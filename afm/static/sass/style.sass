@@ -6,7 +6,9 @@
 @import "compass/css3/opacity"
 @import "compass/css3/transition"
 
-$viewport-width: 1000px
+.centroid
+  width: 980px
+  margin: 0 auto
 
 .login
   display: inline
@@ -53,7 +55,7 @@ $viewport-width: 1000px
   position: relative
   text-shadow: none
   border: 1px solid transparent
-  width: $viewport-width + 43
+  width: 1043px
 
   .top
     position: absolute
@@ -277,7 +279,15 @@ $viewport-width: 1000px
         background-image: url('/static/i/back-button-active.png')
 
     .volume
+      position: relative
       background-image: url('/static/i/volume-button.png')
+
+    .volume-popup
+      height: 100px
+      bottom: 24px
+      padding: 10px
+      background-color: #f5f5f5
+      position: absolute
 
     .record
       background-image: url('/static/i/record-button.png')
@@ -292,23 +302,25 @@ $viewport-width: 1000px
   max-width: 635px
   +border-radius(4px)
 
-  .line
+  .radio-line
     height: 5px
-    background-color: #8e7238
     border: none
     margin: 15px -20px 0 -20px
+    background-image: url('/static/i/hr.png')
+    background-repeat: repeat-x
 
-  .play-pointer
+  .radio-cursor
     width: 4px
-    background-color: #e2641e
     height: 110%
     position: absolute
+    background-color: #e2641e
     top: 0px
     left: 40px
     +opacity(0.7)
+    +box-shadow(rgba(#000, 0.1) 2px 0px 2px)
     +transition(left 0.7s ease 0)
 
-  .line-box
+  .table-wrapper
     position: relative
     min-height: 380px
     margin-bottom: 20px
@@ -321,7 +333,7 @@ $viewport-width: 1000px
     padding-bottom: 0px
     +border-radius(4px)
     +box-shadow(#5b4518 0 0 3px 2px inset)
-    +background(linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.0)))
+    +background(linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.0)))
 
   .search
     border: none
@@ -366,17 +378,13 @@ $viewport-width: 1000px
     color: #3d3017
     +text-shadow(rgba(#000000, 0.15) 1px 1px 0px)
     .selected
-      background-color: rgba(#c5ab65, 0.6)
-      font-weight: bold
       color: #3d3017
+      background-color: rgba(#c5ab65, 0.6)
       +border-radius(4px)
+      +text-shadow(#3d3017 0px 0px 1px)
 
 .footer
   clear: both
-
-.centroid
-  width: $viewport-width
-  margin: 0 auto
 
 body
   background-color: #453745
@@ -390,7 +398,7 @@ body
 a
   color: #fff
   text-decoration: none
-  border-bottom: 1px solid #7f777f
+  border-bottom: 1px dashed #a49ca3
 
 ul.inline
   list-style-type: none

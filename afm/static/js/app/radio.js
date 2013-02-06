@@ -1,58 +1,12 @@
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
-/**
- * причесать бекграунд
- * подключить флеш проигрыватель
- * - причесать состояние кнопок
- * - регулятор звука
- * - фейд в избранном
- * выложить на v2 - показать Максу
- *
- */
-
-afm.controller('LoginCtrl', function($scope, Auth){
-    $scope.Auth = Auth;
-    $scope.login = function() {
-        Auth.login({
-            login: $scope.login,
-            password: $scope.password
-        }).success(function(){
-            $scope.$broadcast('logged');
-        }).error(function(){
-
-        });
-    }
+afm.config(function($routeProvider, $locationProvider){
+    $locationProvider.html5Mode(true);
+    $locationProvider.hashPrefix('!');
+    //$routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''}).otherwise({redirectTo: '/'});
 });
 
-afm.factory('Auth', ['$http', function($http){
-    var user = null;
-    return {
-        login: function(data) {
-            return $http.post('/api/user/login', data).success(function(newUser){
-                user = newUser;
-            }).error(function(){
-                user = null;
-            });
-        },
-
-        isLogged: function() {
-            return !!user;
-        },
-
-        get: function() {
-            return user;
-        }
-    };
-}]);
-
-afm.factory('Favorite', ['$resource', function($resource){
-    return $resource('/api/user/favorites/:action', {}, {
-        add: {method: 'POST', params: {action: 'add'}},
-        remove: {method: 'POST', params: {action: 'remove'}}
-    });
-}]);
-
-afm.directive('playPointer', function($rootScope){
+afm.directive('radioCursor', function($rootScope){
     return {
         restrict: 'C',
         link: function($scope, element, attrs) {
@@ -77,10 +31,22 @@ afm.directive('stationLink', function($rootScope){
     };
 });
 
-afm.config(function($routeProvider, $locationProvider){
-    $locationProvider.html5Mode(true);
-    $locationProvider.hashPrefix('!');
-    //$routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''}).otherwise({redirectTo: '/'});
+afm.directive('volumeSlider', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs){
+            element.slider({
+                min: 0,
+                max: 1,
+                value: attrs.value,
+                step: 0.1,
+                orientation: 'vertical',
+                slide: function(event, ui) {
+                    console.log(ui.value);
+                }
+            });
+        }
+    };
 });
 
 afm.factory('audio', function($document) {
@@ -180,22 +146,39 @@ afm.factory('favorites', function($cookieStore) {
     return favs;
 });
 
-afm.directive('volumeSlider', function() {
+afm.factory('Auth', ['$http', function($http){
+    var user = null;
     return {
-        restrict: 'A',
-        link: function(scope, element, attrs){
-            element.slider({
-                min: 0,
-                max: 1,
-                value: attrs.value,
-                step: 0.1,
-                orientation: 'vertical',
-                slide: function(event, ui) {
-                    console.log(ui.value);
-                }
-            });
+        login: function(data) {
+            return $http.post('/api/user/login', data).success(function(newUser){
+                user = newUser;
+            }).error(function(){
+                    user = null;
+                });
+        },
+
+        isLogged: function() {
+            return !!user;
+        },
+
+        get: function() {
+            return user;
         }
     };
+}]);
+
+afm.controller('LoginCtrl', function($scope, Auth){
+    $scope.Auth = Auth;
+    $scope.login = function() {
+        Auth.login({
+            login: $scope.login,
+            password: $scope.password
+        }).success(function(){
+                $scope.$broadcast('logged');
+            }).error(function(){
+
+            });
+    }
 });
 
 afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){
