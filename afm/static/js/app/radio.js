@@ -35,6 +35,25 @@ afm.directive('stationLink', function($rootScope){
     };
 });
 
+afm.directive('modal', function(){
+    return {
+        restrict: 'E',
+        replace: true,
+        transclude: true,
+        scope: {
+            title: '@'
+        },
+        template: '<div class="modal"><h1 class="header">{{ title }} <i class="close"></i></h1><div ng-transclude></div></div>',
+        link: function(scope, element, attrs) {
+            element.addClass('modal-' + attrs.role);
+            element.find('.close').on('click', function(){
+                element.parent().hide();
+            });
+        }
+    }
+});
+
+/*
 afm.directive('volumeSlider', function($rootScope) {
     return {
         restrict: 'AC',
@@ -56,7 +75,7 @@ afm.directive('volumeSlider', function($rootScope) {
             });
         }
     };
-});
+});*/
 
 afm.factory('audio', function($document) {
     var audio = $document[0].createElement('audio');
@@ -262,7 +281,7 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
     };
 
     $scope.volume = player.volume;
-    $scope.setVolume = function() {
+    $scope.saveVolume = function() {
         player.setVolume($scope.volume);
     };
 

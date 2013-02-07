@@ -9,9 +9,19 @@
     <meta name="fragment" content="!" />
 </head>
 <body>
-    <div class="box" ng-view>
-
-    </div>
+    <!--div class="modalbox">
+        <modal role="login" title="Авторизация">
+            <form>
+                <input class="field" name="email" type="text" placeholder="Электронная почта" />
+                <input class="field" name="password" type="password" placeholder="Пароль" />
+                <div class="controls">
+                    <input type="submit" class="button" value="Войти в профиль" />
+                    <a href="/amnesia" class="amnesia">восстановить пароль</a>
+                </div>
+                <hr class="line" />
+            </form>
+        </modal>
+    </div-->
 
     <div class="topline">
         <table class="centroid">
@@ -112,11 +122,9 @@
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>
                                 </td>
-                                <td class="volume-box">
-                                    <div class="volume-slider-box">
-                                        <div class="volume-slider" value="volume"></div>
-                                    </div>
+                                <td>
                                     <button class="volume"></button>
+                                    <input class="volume-slider" type="range" min="0" max="1" step="0.1" ng-change="saveVolume()" ng-model="volume" />
                                 </td>
                             </tr>
                             </table>

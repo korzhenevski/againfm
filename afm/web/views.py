@@ -16,6 +16,7 @@ def load_user(user_id):
     return db.User.find_one({'id': user_id})
 
 @web.route('/')
+@web.route('/login')
 def index():
     return render_template('index.html')
 
