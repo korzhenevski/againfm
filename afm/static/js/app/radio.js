@@ -3,7 +3,11 @@ var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');
-    //$routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''}).otherwise({redirectTo: '/'});
+
+    $routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''});
+    $routeProvider.when('/login', {controller: 'LoginCtrl', template: ''});
+
+    $routeProvider.otherwise({redirectTo: '/'});
 });
 
 afm.directive('radioCursor', function($rootScope){
@@ -31,18 +35,23 @@ afm.directive('stationLink', function($rootScope){
     };
 });
 
-afm.directive('volumeSlider', function() {
+afm.directive('volumeSlider', function($rootScope) {
     return {
-        restrict: 'A',
+        restrict: 'AC',
+        scope: {
+            value: '=value'
+        },
         link: function(scope, element, attrs){
             element.slider({
                 min: 0,
                 max: 1,
-                value: attrs.value,
                 step: 0.1,
+                value: scope.value,
                 orientation: 'vertical',
                 slide: function(event, ui) {
-                    console.log(ui.value);
+                    $rootScope.$apply(function(){
+                        scope.value = ui.value;
+                    });
                 }
             });
         }

@@ -9,10 +9,24 @@
     <meta name="fragment" content="!" />
 </head>
 <body>
+    <div class="box" ng-view>
+
+    </div>
+
     <div class="topline">
-        <div class="centroid">
-            <a href="">ВКонтакте</a>
-        </div>
+        <table class="centroid">
+            <tr>
+                <td width="20%">
+                    <a href="">Любимые треки и эфиры</a>
+                </td>
+                <td>
+                    <a href="">Добавить радио</a>
+                </td>
+                <td>
+                    <a href="/login">Войти</a>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <table class="roof centroid">
@@ -98,7 +112,10 @@
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>
                                 </td>
-                                <td>
+                                <td class="volume-box">
+                                    <div class="volume-slider-box">
+                                        <div class="volume-slider" value="volume"></div>
+                                    </div>
                                     <button class="volume"></button>
                                 </td>
                             </tr>
