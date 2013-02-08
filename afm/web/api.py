@@ -9,32 +9,17 @@ from flask.ext.login import login_user, login_required, current_user, logout_use
 from afm.models import UserFavoritesCache
 from .helpers import *
 
-"""
-/api/station/genres
-/api/station/featured
-/api/station/genres
-/api/station/genre/:genre_id
-/api/station/search?query=
-/api/station/:station_id
-
-station.get()
-station.getGenres()
-station.getFeatured()
-station.getByGenre(station_id)
-station.search(query)
-
-favs.add()
-favs.remove()
-
-tracks.add()
-tracks.remove()
-tracks.get()
-"""
-
 @app.route('/api/station/random')
 def station_random():
     station = db.Station.find_random()
     return jsonify({'station': station.get_public()})
+
+@app.route('/api/user', methods=['POST'])
+def user():
+    user = None
+    if current_user.is_authenticated():
+        user = current_user.get_public()
+    return jsonify({'user': user})
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -45,7 +30,7 @@ def login():
         new_password_auth = user.confirm_new_password(data['password'])
         if direct_auth or new_password_auth:
             login_user(user, remember=True)
-            return jsonify(user.get_public())
+            return jsonify({'user': user.get_public()})
         else:
             return jsonify({'error': 'auth'})
     return jsonify({'error': 'no_user'})
@@ -69,17 +54,17 @@ def signup():
         return jsonify({'error': 'email_exists'})
         # create
     user = db.User()
-    user.email = data['email']
+    user.email = unicode(data['email'])
     user.set_password(data['password'])
     user.save()
     # login
     login_user(user, remember=True)
     # send welcome email
-    body = render_template('mail/signup.html')
-    send_mail(email=user.email, body=body)
-    return jsonify(user.get_public())
+    #body = render_template('mail/signup.html')
+    #send_mail(email=user.email, body=body)
+    return jsonify({'user': user.get_public()})
 
-@app.route('/api/user/logout', methods=['DELETE','POST'])
+@app.route('/api/user/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()

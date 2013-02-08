@@ -1,13 +1,23 @@
+
+/**
+ * Треклист - авторизованный и не очень
+ * Добавление удаление авторизованное Избранное
+ * Ошибки в модальных окнах: пользователь уже существует, etc...
+ * http-interceptor для json ошибок
+ * Регулятор громкости
+ * [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
+ * Поиск по треклисту
+ * Прокидывание в регистрацию избранного и треклиста
+ * Проигрывание через флеш
+ */
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
-    //$locationProvider.hashPrefix('!');
 
-    //$routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''});
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
-    $routeProvider.when('/signup', {templateUrl: '/signup.html', modal: true});
-    $routeProvider.when('/amnesia', {templateUrl: '/amnesia.html', modal: true});
+    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
+    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
 
     $routeProvider.otherwise({redirectTo: '/'});
 });
@@ -68,40 +78,15 @@ afm.directive('modalBox', function($route){
             }
         }
     }
-})
+});
 
-/*
-afm.directive('volumeSlider', function($rootScope) {
-    return {
-        restrict: 'AC',
-        scope: {
-            value: '=value'
-        },
-        link: function(scope, element, attrs){
-            element.slider({
-                min: 0,
-                max: 1,
-                step: 0.1,
-                value: scope.value,
-                orientation: 'vertical',
-                slide: function(event, ui) {
-                    $rootScope.$apply(function(){
-                        scope.value = ui.value;
-                    });
-                }
-            });
-        }
-    };
-});*/
 
 afm.factory('audio', function($document) {
     var audio = $document[0].createElement('audio');
     return audio;
 });
 
-// player.play('http://www.example.com/stream')
-// player.stop()
-// player.play()
+
 afm.factory('player', function(audio, $cookieStore) {
     var player = {
         url: null,
@@ -191,39 +176,124 @@ afm.factory('favorites', function($cookieStore) {
     return favs;
 });
 
-afm.factory('Auth', ['$http', function($http){
+afm.factory('currentUser', function(){
     var user = null;
     return {
-        login: function(data) {
-            return $http.post('/api/user/login', data).success(function(newUser){
-                user = newUser;
-            }).error(function(){
-                user = null;
-            });
+        update: function(userUpdate) {
+            user = userUpdate;
+        },
+
+        clear: function() {
+            user = null;
         },
 
         isLogged: function() {
             return !!user;
-        },
-
-        get: function() {
-            return user;
         }
     };
-}]);
+});
 
-afm.controller('LoginCtrl', function($scope, $location, Auth){
-    $scope.login = 'test@testing.com';
-    $scope.password = 'password';
-    $scope.authLogin = function() {
+afm.factory('User', function($http){
+    return {
+        login: function(params) {
+            return $http.post('/api/user/login', params);
+        },
+
+        signup: function(params) {
+            return $http.post('/api/user/signup', params);
+        },
+
+        amnesia: function(params) {
+            return $http.post('/api/user/amnesia', params);
+        },
+
+        logout: function() {
+            return $http.post('/api/user/logout');
+        },
+
+        load: function() {
+            return $http.post('/api/user');
+        }
+    };
+});
+
+afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
+    //$scope.login = 'test@testing.com';
+    //$scope.password = 'password';
+
+    if (currentUser.isLogged()) {
+        $location.path('/');
+        return;
+    }
+
+    $scope.user = {};
+    $scope.auth = function() {
         $scope.error = null;
-        Auth.login({login: $scope.login, password: $scope.password}).success(function(){
-            $location.path('/');
+        User.login($scope.user).success(function(response){
+            currentUser.update(response.user);
             $scope.$broadcast('userLogged');
+            $location.path('/');
         }).error(function(){
             $scope.error = 'Error';
         });
     };
+});
+
+afm.controller('SignupCtrl', function($scope, $location, currentUser, User){
+    if (currentUser.isLogged()) {
+        $location.path('/');
+        return;
+    }
+
+    $scope.user = {};
+    $scope.signup = function() {
+        $scope.error = null;
+        User.signup($scope.user).success(function(response){
+            currentUser.update(response.user);
+            $scope.$broadcast('userLogged');
+            $location.path('/');
+        }).error(function(){
+            $scope.error = 'Error';
+        });
+    };
+});
+
+afm.factory('apiHttpInterceptor', function($q){
+    return function(promise) {
+        return promise.then(function(response){
+            return response;
+        }, function(response){
+            return $q.reject(response);
+        });
+    };
+});
+
+
+afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User){
+    if (currentUser.isLogged()) {
+        $location.path('/');
+        return;
+    }
+
+    $scope.user = {};
+    $scope.amnesia = function() {
+        User.amnesia($scope.user).success(function(result){
+            $scope.result = result;
+        });
+    };
+});
+
+afm.run(function($rootScope, $http, currentUser, User){
+    $rootScope.currentUser = currentUser;
+    $rootScope.logout = function() {
+        if (currentUser.isLogged()) {
+            currentUser.clear();
+            User.logout();
+        }
+    };
+    User.load().success(function(response){
+        currentUser.update(response.user);
+    });
 });
 
 afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){
@@ -276,7 +346,7 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
 
     $scope.isFaved = function() {
         return $scope.currentStation && $scope.favorites.exists($scope.currentStation.id);
-    }
+    };
 
     $scope.selectRandomStation = function() {
         $http.get('/api/station/random').success(function(response){

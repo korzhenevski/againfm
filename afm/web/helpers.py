@@ -47,14 +47,13 @@ def safe_input(schema, data=None, **kwargs):
         return data
     except ValueError, error:
         logging.exception(error)
-        print data
         abort(400)
     return None
 
 # HTTP-адрес инбокса по почтовому ящику
 def get_email_provider(email):
-    domain = email.split('@')[1].lower()
-    for link, domains in current_app.config['EMAIL_PROVIDERS'].items():
-        if domain in domains:
-            return link
+    email_domain = email.split('@')[1].lower()
+    for domain, domains in current_app.config['EMAIL_PROVIDERS'].items():
+        if email_domain in domains:
+            return u'http://{}/'.format(domain)
     return None

@@ -9,17 +9,6 @@ from redis import Redis
 from .i18n import I18n
 from .mailer import AmazonMailer
 
-
-"""
-searchfm 
-- можно юзать что-то из Whoosh
-
-интерфейс:
-- ползунок, spectrum, смена пароля, смена display name, иконка входа через vkontakte
-- ограничение высоты favorites
-
-"""
-
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
@@ -27,6 +16,8 @@ app.config.from_envvar('AGAINFM_CONFIG', silent=True)
 
 app.jinja_env.variable_start_string = '{{{'
 app.jinja_env.variable_end_string = '}}}'
+app.jinja_env.block_start_string = '{{%'
+app.jinja_env.block_end_string = '%}}'
 
 i18n = I18n(app)
 db = MongoKit(app)

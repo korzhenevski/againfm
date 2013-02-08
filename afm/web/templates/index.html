@@ -13,26 +13,40 @@
     <div class="modal-box ng-cloak" ng-view></div>
 
     <script type="text/ng-template" id="/login.html">
-        <modal role="login" title="Авторизация">
-            <form name="loginForm">
-                <input class="field" name="login" ng-model="login" required type="email" placeholder="Электронная почта" />
-                <input class="field" name="password" ng-model="password" required type="password" placeholder="Пароль" />
+        <modal id="login" title="Войти с паролем">
+            <form name="loginForm" ng-submit="auth()">
+                <input class="field" name="login" ng-model="user.login" type="email" placeholder="Электронная почта" required="" autofocus="" />
+                <input class="field" name="password" ng-model="user.password" type="password" placeholder="Пароль" required />
                 <div class="controls">
-                    <input type="submit" class="button" value="Войти в профиль" ng-disabled="loginForm.$invalid" ng-click="authLogin()" />
+                    <input type="submit" class="button" value="Войти в профиль" ng-disabled="loginForm.$invalid" />
                     <a href="/amnesia" class="amnesia">восстановить пароль</a>
                 </div>
-                <p ng-show="error">{{ error }}</p>
                 <hr class="line" />
             </form>
         </modal>
     </script>
 
+    <script type="text/ng-template" id="/signup.html">
+        <modal id="signup" title="Регистрация">
+            <form name="signupForm" ng-submit="signup()">
+                <input class="field" name="email" ng-model="user.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
+                <input class="field" name="password" ng-model="user.password" type="password" placeholder="Пароль" required="" />
+                <input type="submit" class="button" value="Создать аккаунт" ng-disabled="signupForm.$invalid" />
+            </form>
+        </modal>
+    </script>
+
     <script type="text/ng-template" id="/amnesia.html">
-        <modal role="amnesia" title="Сброс пароля">
-            <form>
-                <input class="field" name="email" ng-model="email" required type="email" placeholder="Электронная почта" />
+        <modal id="amnesia" title="Сброс пароля">
+            <form name="amnesiaForm" ng-hide="result" ng-submit="amnesia()">
+                <input class="field" name="email" ng-model="user.email" required type="email" placeholder="Электронная почта" />
                 <input type="submit" class="button" value="Выслать на почту" />
             </form>
+            <p ng-show="result">
+                Пароль сброшен.
+                <a href="{{ result.email_provider }}" ng-show="result.email_provider" target="_blank">Проверьте почту</a>
+                <span ng-hide="result.email_provider">Проверьте почту</span>
+            </p>
         </modal>
     </script>
 
@@ -46,7 +60,12 @@
                     <a href="">Добавить радио</a>
                 </td>
                 <td>
-                    <a href="/login">Войти</a>
+                    <p ng-hide="currentUser.isLogged()">
+                        <a href="/login">Войти</a>, <a href="/amnesia">восстановить пароль</a> или <a href="/signup">Зарегистрироватся</a>
+                    </p>
+                    <p ng-hide="!currentUser.isLogged()">
+                        <a ng-click="logout()">Выход</a>
+                    </p>
                 </td>
             </tr>
         </table>
