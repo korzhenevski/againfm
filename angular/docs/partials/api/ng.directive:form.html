@@ -75,12 +75,12 @@ related scope, under this name.</p></li>
  
  <form name="myForm" ng-controller="Ctrl">
    userType: <input name="input" ng-model="userType" required>
-   <span class="error" ng-show="myForm.input.$error.REQUIRED">Required!</span><br>
+   <span class="error" ng-show="myForm.input.$error.required">Required!</span><br>
    <tt>userType = {{userType}}</tt><br>
    <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br>
    <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br>
    <tt>myForm.$valid = {{myForm.$valid}}</tt><br>
-   <tt>myForm.$error.REQUIRED = {{!!myForm.$error.REQUIRED}}</tt><br>
+   <tt>myForm.$error.required = {{!!myForm.$error.required}}</tt><br>
   </form>
 </script>
 </div>

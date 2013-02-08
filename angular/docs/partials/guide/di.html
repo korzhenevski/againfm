@@ -43,7 +43,7 @@ is simply handed the <code>greeter</code> at runtime.</p>
 <p>This is desirable, but it puts the responsibility of getting hold of the dependency onto the
 code responsible for the construction of <code>SomeClass</code>.</p>
 
-<p>To manage the responsibility of dependency creation, each angular application has an <a href="api/angular.injector"><code>injector</code></a>. The injector is a service locator that is responsible for
+<p>To manage the responsibility of dependency creation, each Angular application has an <a href="api/angular.injector"><code>injector</code></a>. The injector is a service locator that is responsible for
 construction and lookup of dependencies.</p>
 
 <p>Here is an example of using  the injector service. 
@@ -61,11 +61,11 @@ construction and lookup of dependencies.</p>
           $window.alert(text);
         }
       };
-    }).
-    
+    });
+
   // New injector is created from the module. 
   // (This is usually done automatically by angular bootstrap)
-  var injector = angular.injector('myModule');
+  var injector = angular.injector(['myModule', 'ng']);
   
   // Request any dependency from the injector
   var greeter = injector.get('greeter');
@@ -85,7 +85,7 @@ dependency lookup responsibility to the injector by declaring the dependencies a
   // And this controller definition
   function MyController($scope, greeter) {
     $scope.sayHello = function() {
-      greeter('Hello World');
+      greeter.greet('Hello World');
     };
   }
   
@@ -102,7 +102,7 @@ deal with the injector. This setup does not break the Law of Demeter.</p>
 
 <p>How does the injector know what service needs to be injected? </p>
 
-<p>The application developer needs to provide annotation information, that the injector uses in order
+<p>The application developer needs to provide annotation information that the injector uses in order
 to resolve the dependencies. Throughout Angular certain API functions are invoked using the
 injector, as per the API documentation. The injector needs to know what services to inject into
 the function. Below are three equivalent ways of annotating your code with service name
@@ -184,24 +184,23 @@ where injection is supported.</p>
 
 <h3>DI in controllers</h3>
 
-<p>Controllers are classes which are responsible for application behavior. Recommended way of 
+<p>Controllers are classes which are responsible for application behavior. The recommended way of 
 declaring controllers is:</p>
 
 <pre class="prettyprint linenums">
-  var MyController = function(dep1, dep2) {
+  var MyController = function($scope, dep1, dep2) {
     ...
+    $scope.aMethod = function() {
+      ...
+    }
   }
-  MyController.$inject = ['dep1', 'dep2'];
-  
-  MyController.prototype.aMethod = function() {
-    ...
-  }
+  MyController.$inject = ['$scope', 'dep1', 'dep2'];
 </pre>
 
 <h3>Factory methods</h3>
 
 <p>Factory methods are responsible for creating most objects in Angular. Examples are directives,
-services, and filters. The factory methods are register with the module, and the recommended way
+services, and filters. The factory methods are registered with the module, and the recommended way
 of declaring factories is:</p>
 
 <pre class="prettyprint linenums">

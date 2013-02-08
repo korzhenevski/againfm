@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.1.1
+ * @license AngularJS v1.0.4
  * (c) 2010-2012 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -627,13 +627,15 @@ function equals(o1, o2) {
         if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2)) return false;
         keySet = {};
         for(key in o1) {
-          if (key.charAt(0) !== '$' && !isFunction(o1[key]) && !equals(o1[key], o2[key])) {
-            return false;
-          }
+          if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
+          if (!equals(o1[key], o2[key])) return false;
           keySet[key] = true;
         }
         for(key in o2) {
-          if (!keySet[key] && key.charAt(0) !== '$' && !isFunction(o2[key])) return false;
+          if (!keySet[key] &&
+              key.charAt(0) !== '$' &&
+              o2[key] !== undefined &&
+              !isFunction(o2[key])) return false;
         }
         return true;
       }
@@ -1247,11 +1249,11 @@ function setupModuleLoader(window) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.1.1',    // all of these placeholder strings will be replaced by rake's
+  full: '1.0.4',    // all of these placeholder strings will be replaced by rake's
   major: 1,    // compile task
-  minor: 1,
-  dot: 1,
-  codeName: 'pathological-kerning'
+  minor: 0,
+  dot: 4,
+  codeName: 'bewildering-hair'
 };
 
 
@@ -1423,7 +1425,7 @@ function publishExternalAPI(angular){
  * - [val()](http://api.jquery.com/val/)
  * - [wrap()](http://api.jquery.com/wrap/)
  *
- * ## In addtion to the above, Angular privides an additional method to both jQuery and jQuery lite:
+ * ## In addtion to the above, Angular provides additional methods to both jQuery and jQuery lite:
  *
  * - `controller(name)` - retrieves the controller of the current element or its parent. By default
  *   retrieves controller associated with the `ngController` directive. If `name` is provided as
@@ -2011,21 +2013,20 @@ forEach({
   children: function(element) {
     var children = [];
     forEach(element.childNodes, function(element){
-      if (element.nodeName != '#text')
+      if (element.nodeType === 1)
         children.push(element);
     });
     return children;
   },
 
   contents: function(element) {
-    return element.childNodes;
+    return element.childNodes || [];
   },
 
   append: function(element, node) {
     forEach(new JQLite(node), function(child){
-      if (element.nodeType === 1 || element.nodeType === 11) {
+      if (element.nodeType === 1)
         element.appendChild(child);
-      }
     });
   },
 
@@ -2082,7 +2083,16 @@ forEach({
   },
 
   next: function(element) {
-    return element.nextSibling;
+    if (element.nextElementSibling) {
+      return element.nextElementSibling;
+    }
+
+    // IE8 doesn't have nextElementSibling
+    var elm = element.nextSibling;
+    while (elm != null && elm.nodeType !== 1) {
+      elm = elm.nextSibling;
+    }
+    return elm;
   },
 
   find: function(element, selector) {
@@ -2638,10 +2648,9 @@ function createInjector(modulesToLoad) {
             decorator: decorator
           }
       },
-      providerInjector = (providerCache.$injector =
-          createInternalInjector(providerCache, function() {
-            throw Error("Unknown provider: " + path.join(' <- '));
-          })),
+      providerInjector = createInternalInjector(providerCache, function() {
+        throw Error("Unknown provider: " + path.join(' <- '));
+      }),
       instanceCache = {},
       instanceInjector = (instanceCache.$injector =
           createInternalInjector(instanceCache, function(servicename) {
@@ -2669,7 +2678,7 @@ function createInjector(modulesToLoad) {
   }
 
   function provider(name, provider_) {
-    if (isFunction(provider_)) {
+    if (isFunction(provider_) || isArray(provider_)) {
       provider_ = providerInjector.instantiate(provider_);
     }
     if (!provider_.$get) {
@@ -2718,7 +2727,9 @@ function createInjector(modulesToLoad) {
         try {
           for(var invokeQueue = moduleFn._invokeQueue, i = 0, ii = invokeQueue.length; i < ii; i++) {
             var invokeArgs = invokeQueue[i],
-                provider = providerInjector.get(invokeArgs[0]);
+                provider = invokeArgs[0] == '$injector'
+                    ? providerInjector
+                    : providerInjector.get(invokeArgs[0]);
 
             provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
           }
@@ -2784,7 +2795,7 @@ function createInjector(modulesToLoad) {
         args.push(
           locals && locals.hasOwnProperty(key)
           ? locals[key]
-          : getService(key, path)
+          : getService(key)
         );
       }
       if (!fn.$inject) {
@@ -2884,7 +2895,7 @@ function $AnchorScrollProvider() {
     }
 
     // does not scroll when user clicks on anchor link that is currently on
-    // (no url change, no $locaiton.hash() change), browser native does scroll
+    // (no url change, no $location.hash() change), browser native does scroll
     if (autoScrollingEnabled) {
       $rootScope.$watch(function autoScrollWatch() {return $location.hash();},
         function autoScrollWatchAction() {
@@ -3172,13 +3183,14 @@ function Browser(window, document, $log, $sniffer) {
       } else {
         if (isString(value)) {
           cookieLength = (rawDocument.cookie = escape(name) + '=' + escape(value) + ';path=' + cookiePath).length + 1;
+
+          // per http://www.ietf.org/rfc/rfc2109.txt browser must allow at minimum:
+          // - 300 cookies
+          // - 20 cookies per unique domain
+          // - 4096 bytes per cookie
           if (cookieLength > 4096) {
             $log.warn("Cookie '"+ name +"' possibly not set or overflowed because it was too large ("+
               cookieLength + " > 4096 bytes)!");
-          }
-          if (lastCookies.length > 20) {
-            $log.warn("Cookie '"+ name +"' possibly not set or overflowed because too many cookies " +
-              "were already set (" + lastCookies.length + " > 20 )");
           }
         }
       }
@@ -3272,7 +3284,7 @@ function $BrowserProvider(){
  * @returns {object} Newly created cache object with the following set of methods:
  *
  * - `{object}` `info()` — Returns id, size, and options of cache.
- * - `{{*}}` `put({string} key, {*} value)` — Puts a new key-value pair into the cache and returns it.
+ * - `{void}` `put({string} key, {*} value)` — Puts a new key-value pair into the cache.
  * - `{{*}}` `get({string} key)` — Returns cached value for `key` or undefined for cache miss.
  * - `{void}` `remove({string} key)` — Removes a key-value pair from the cache.
  * - `{void}` `removeAll()` — Removes all cached values.
@@ -3311,8 +3323,6 @@ function $CacheFactoryProvider() {
           if (size > capacity) {
             this.remove(staleEnd.key);
           }
-
-          return value;
         },
 
 
@@ -3747,7 +3757,7 @@ function $CompileProvider($provide) {
       // We can not compile top level text elements since text nodes can be merged and we will
       // not be able to attach scope data to them, so we will wrap them in <span>
       forEach($compileNodes, function(node, index){
-        if (node.nodeType == 3 /* text node */) {
+        if (node.nodeType == 3 /* text node */ && node.nodeValue.match(/\S+/) /* non-empty */ ) {
           $compileNodes[index] = jqLite(node).wrap('<span></span>').parent()[0];
         }
       });
@@ -3796,68 +3806,74 @@ function $CompileProvider($provide) {
      * @returns {?function} A composite linking function of all of the matched directives or null.
      */
     function compileNodes(nodeList, transcludeFn, $rootElement, maxPriority) {
-     var linkFns = [],
-         nodeLinkFn, childLinkFn, directives, attrs, linkFnFound;
+      var linkFns = [],
+          nodeLinkFn, childLinkFn, directives, attrs, linkFnFound;
 
-     for(var i = 0; i < nodeList.length; i++) {
-       attrs = new Attributes();
+      for(var i = 0; i < nodeList.length; i++) {
+        attrs = new Attributes();
 
-       // we must always refer to nodeList[i] since the nodes can be replaced underneath us.
-       directives = collectDirectives(nodeList[i], [], attrs, maxPriority);
+        // we must always refer to nodeList[i] since the nodes can be replaced underneath us.
+        directives = collectDirectives(nodeList[i], [], attrs, maxPriority);
 
-       nodeLinkFn = (directives.length)
-           ? applyDirectivesToNode(directives, nodeList[i], attrs, transcludeFn, $rootElement)
-           : null;
+        nodeLinkFn = (directives.length)
+            ? applyDirectivesToNode(directives, nodeList[i], attrs, transcludeFn, $rootElement)
+            : null;
 
-       childLinkFn = (nodeLinkFn && nodeLinkFn.terminal || !nodeList[i].childNodes.length)
-           ? null
-           : compileNodes(nodeList[i].childNodes,
-                nodeLinkFn ? nodeLinkFn.transclude : transcludeFn);
+        childLinkFn = (nodeLinkFn && nodeLinkFn.terminal || !nodeList[i].childNodes.length)
+            ? null
+            : compileNodes(nodeList[i].childNodes,
+                 nodeLinkFn ? nodeLinkFn.transclude : transcludeFn);
 
-       linkFns.push(nodeLinkFn);
-       linkFns.push(childLinkFn);
-       linkFnFound = (linkFnFound || nodeLinkFn || childLinkFn);
-     }
+        linkFns.push(nodeLinkFn);
+        linkFns.push(childLinkFn);
+        linkFnFound = (linkFnFound || nodeLinkFn || childLinkFn);
+      }
 
-     // return a linking function if we have found anything, null otherwise
-     return linkFnFound ? compositeLinkFn : null;
+      // return a linking function if we have found anything, null otherwise
+      return linkFnFound ? compositeLinkFn : null;
 
-     function compositeLinkFn(scope, nodeList, $rootElement, boundTranscludeFn) {
-       var nodeLinkFn, childLinkFn, node, childScope, childTranscludeFn;
+      function compositeLinkFn(scope, nodeList, $rootElement, boundTranscludeFn) {
+        var nodeLinkFn, childLinkFn, node, childScope, childTranscludeFn, i, ii, n;
 
-       for(var i = 0, n = 0, ii = linkFns.length; i < ii; n++) {
-         node = nodeList[n];
-         nodeLinkFn = linkFns[i++];
-         childLinkFn = linkFns[i++];
+        // copy nodeList so that linking doesn't break due to live list updates.
+        var stableNodeList = [];
+        for (i = 0, ii = nodeList.length; i < ii; i++) {
+          stableNodeList.push(nodeList[i]);
+        }
 
-         if (nodeLinkFn) {
-           if (nodeLinkFn.scope) {
-             childScope = scope.$new(isObject(nodeLinkFn.scope));
-             jqLite(node).data('$scope', childScope);
-           } else {
-             childScope = scope;
-           }
-           childTranscludeFn = nodeLinkFn.transclude;
-           if (childTranscludeFn || (!boundTranscludeFn && transcludeFn)) {
-             nodeLinkFn(childLinkFn, childScope, node, $rootElement,
-                 (function(transcludeFn) {
-                   return function(cloneFn) {
-                     var transcludeScope = scope.$new();
+        for(i = 0, n = 0, ii = linkFns.length; i < ii; n++) {
+          node = stableNodeList[n];
+          nodeLinkFn = linkFns[i++];
+          childLinkFn = linkFns[i++];
 
-                     return transcludeFn(transcludeScope, cloneFn).
-                         bind('$destroy', bind(transcludeScope, transcludeScope.$destroy));
+          if (nodeLinkFn) {
+            if (nodeLinkFn.scope) {
+              childScope = scope.$new(isObject(nodeLinkFn.scope));
+              jqLite(node).data('$scope', childScope);
+            } else {
+              childScope = scope;
+            }
+            childTranscludeFn = nodeLinkFn.transclude;
+            if (childTranscludeFn || (!boundTranscludeFn && transcludeFn)) {
+              nodeLinkFn(childLinkFn, childScope, node, $rootElement,
+                  (function(transcludeFn) {
+                    return function(cloneFn) {
+                      var transcludeScope = scope.$new();
+
+                      return transcludeFn(transcludeScope, cloneFn).
+                          bind('$destroy', bind(transcludeScope, transcludeScope.$destroy));
                     };
                   })(childTranscludeFn || transcludeFn)
-             );
-           } else {
-             nodeLinkFn(childLinkFn, childScope, node, undefined, boundTranscludeFn);
-           }
-         } else if (childLinkFn) {
-           childLinkFn(scope, node.childNodes, undefined, boundTranscludeFn);
-         }
-       }
-     }
-   }
+              );
+            } else {
+              nodeLinkFn(childLinkFn, childScope, node, undefined, boundTranscludeFn);
+            }
+          } else if (childLinkFn) {
+            childLinkFn(scope, node.childNodes, undefined, boundTranscludeFn);
+          }
+        }
+      }
+    }
 
 
     /**
@@ -4004,7 +4020,7 @@ function $CompileProvider($provide) {
           if (directiveValue == 'element') {
             $template = jqLite(compileNode);
             $compileNode = templateAttrs.$$element =
-                jqLite('<!-- ' + directiveName + ': ' + templateAttrs[directiveName]  + ' -->');
+                jqLite(document.createComment(' ' + directiveName + ': ' + templateAttrs[directiveName] + ' '));
             compileNode = $compileNode[0];
             replaceWith($rootElement, jqLite($template[0]), compileNode);
             childTranscludeFn = compile($template, transcludeFn, terminalPriority);
@@ -4669,11 +4685,12 @@ function $DocumentProvider(){
  * the browser console.
  *
  * In unit tests, if `angular-mocks.js` is loaded, this service is overridden by
- * {@link ngMock.$exceptionHandler mock $exceptionHandler}
+ * {@link ngMock.$exceptionHandler mock $exceptionHandler} which aids in testing.
  *
  * @param {Error} exception Exception associated with the error.
  * @param {string=} cause optional information about the context in which
  *       the error was thrown.
+ *
  */
 function $ExceptionHandlerProvider() {
   this.$get = ['$log', function($log){
@@ -4735,7 +4752,7 @@ function $InterpolateProvider() {
   };
 
 
-  this.$get = ['$parse', '$exceptionHandler', function($parse, $exceptionHandler) {
+  this.$get = ['$parse', function($parse) {
     var startSymbolLength = startSymbol.length,
         endSymbolLength = endSymbol.length;
 
@@ -4807,24 +4824,18 @@ function $InterpolateProvider() {
       if (!mustHaveExpression  || hasInterpolation) {
         concat.length = length;
         fn = function(context) {
-          try {
-            for(var i = 0, ii = length, part; i<ii; i++) {
-              if (typeof (part = parts[i]) == 'function') {
-                part = part(context);
-                if (part == null || part == undefined) {
-                  part = '';
-                } else if (typeof part != 'string') {
-                  part = toJson(part);
-                }
+          for(var i = 0, ii = length, part; i<ii; i++) {
+            if (typeof (part = parts[i]) == 'function') {
+              part = part(context);
+              if (part == null || part == undefined) {
+                part = '';
+              } else if (typeof part != 'string') {
+                part = toJson(part);
               }
-              concat[i] = part;
             }
-            return concat.join('');
+            concat[i] = part;
           }
-          catch(err) {
-            var newErr = new Error('Error while interpolating: ' + text + '\n' + err.toString());
-            $exceptionHandler(newErr);
-          }
+          return concat.join('');
         };
         fn.exp = text;
         fn.parts = parts;
@@ -6479,7 +6490,7 @@ function $ParseProvider() {
  * performed asynchronously, and may or may not be finished at any given point in time.
  *
  * From the perspective of dealing with error handling, deferred and promise apis are to
- * asynchronous programing what `try`, `catch` and `throw` keywords are to synchronous programing.
+ * asynchronous programming what `try`, `catch` and `throw` keywords are to synchronous programming.
  *
  * <pre>
  *   // for the purpose of this example let's assume that variables `$q` and `scope` are
@@ -6589,6 +6600,30 @@ function $ParseProvider() {
  *   you can treat promises attached to a scope as if they were the resulting values.
  * - Q has many more features that $q, but that comes at a cost of bytes. $q is tiny, but contains
  *   all the important functionality needed for common async tasks.
+ * 
+ *  # Testing
+ * 
+ *  <pre>
+ *    it('should simulate promise', inject(function($q, $rootSCope) {
+ *      var deferred = $q.defer();
+ *      var promise = deferred.promise;
+ *      var resolvedValue;
+ * 
+ *      promise.then(function(value) { resolvedValue = value; });
+ *      expect(resolvedValue).toBeUndefined();
+ * 
+ *      // Simulate resolving of promise
+ *      defered.resolve(123);
+ *      // Note that the 'then' function does not get called synchronously.
+ *      // This is because we want the promise API to always be async, whether or not
+ *      // it got called synchronously or asynchronously.
+ *      expect(resolvedValue).toBeUndefined();
+ * 
+ *      // Propagate promise resolution to 'then' functions using $apply().
+ *      $rootScope.$apply();
+ *      expect(resolvedValue).toEqual(123);
+ *    });
+ *  </pre>
  */
 function $QProvider() {
 
@@ -6875,8 +6910,13 @@ function $RouteProvider(){
    *
    * @param {string} path Route path (matched against `$location.path`). If `$location.path`
    *    contains redundant trailing slash or is missing one, the route will still match and the
-   *    `$location.path` will be updated to add or drop the trailing slash to exacly match the
+   *    `$location.path` will be updated to add or drop the trailing slash to exactly match the
    *    route definition.
+   *
+   *    `path` can contain named groups starting with a colon (`:name`). All characters up to the
+   *    next slash are matched and stored in `$routeParams` under the given `name` when the route
+   *    matches.
+   *
    * @param {Object} route Mapping information to be assigned to `$route.current` on route
    *    match.
    *
@@ -7141,8 +7181,7 @@ function $RouteProvider(){
      * instance of the Controller.
      */
 
-    var matcher = switchRouteMatcher,
-        forceReload = false,
+    var forceReload = false,
         $route = {
           routes: routes,
 
@@ -7170,21 +7209,36 @@ function $RouteProvider(){
 
     /////////////////////////////////////////////////////
 
+    /**
+     * @param on {string} current url
+     * @param when {string} route when template to match the url against
+     * @return {?Object}
+     */
     function switchRouteMatcher(on, when) {
       // TODO(i): this code is convoluted and inefficient, we should construct the route matching
       //   regex only once and then reuse it
-      var regex = '^' + when.replace(/([\.\\\(\)\^\$])/g, "\\$1") + '$',
+
+      // Escape regexp special characters.
+      when = '^' + when.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&") + '$';
+      var regex = '',
           params = [],
           dst = {};
-      forEach(when.split(/\W/), function(param) {
-        if (param) {
-          var paramRegExp = new RegExp(":" + param + "([\\W])");
-          if (regex.match(paramRegExp)) {
-            regex = regex.replace(paramRegExp, "([^\\/]*)$1");
-            params.push(param);
-          }
-        }
-      });
+
+      var re = /:(\w+)/g,
+          paramMatch,
+          lastMatchedIndex = 0;
+
+      while ((paramMatch = re.exec(when)) !== null) {
+        // Find each :param in `when` and replace it with a capturing group.
+        // Append all other sections of when unchanged.
+        regex += when.slice(lastMatchedIndex, paramMatch.index);
+        regex += '([^\\/]*)';
+        params.push(paramMatch[1]);
+        lastMatchedIndex = re.lastIndex;
+      }
+      // Append trailing path part.
+      regex += when.substr(lastMatchedIndex);
+
       var match = on.match(new RegExp(regex));
       if (match) {
         forEach(params, function(name, index) {
@@ -7273,7 +7327,7 @@ function $RouteProvider(){
       // Match a route
       var params, match;
       forEach(routes, function(route, path) {
-        if (!match && (params = matcher($location.path(), path))) {
+        if (!match && (params = switchRouteMatcher($location.path(), path))) {
           match = inherit(route, {
             params: extend({}, $location.search(), params),
             pathParams: params});
@@ -7425,7 +7479,7 @@ function $RootScopeProvider(){
            expect(scope.greeting).toEqual(undefined);
 
            scope.$watch('name', function() {
-             this.greeting = this.salutation + ' ' + this.name + '!';
+             scope.greeting = scope.salutation + ' ' + scope.name + '!';
            }); // initialize the watch
 
            expect(scope.greeting).toEqual(undefined);
@@ -7468,6 +7522,7 @@ function $RootScopeProvider(){
                      this.$$nextSibling = this.$$prevSibling =
                      this.$$childHead = this.$$childTail = null;
       this['this'] = this.$root =  this;
+      this.$$destroyed = false;
       this.$$asyncQueue = [];
       this.$$listeners = {};
     }
@@ -7529,6 +7584,7 @@ function $RootScopeProvider(){
         child['this'] = child;
         child.$$listeners = {};
         child.$parent = this;
+        child.$$asyncQueue = [];
         child.$$watchers = child.$$nextSibling = child.$$childHead = child.$$childTail = null;
         child.$$prevSibling = this.$$childTail;
         if (this.$$childHead) {
@@ -7585,7 +7641,7 @@ function $RootScopeProvider(){
            scope.counter = 0;
 
            expect(scope.counter).toEqual(0);
-           scope.$watch('name', function(newValue, oldValue) { counter = counter + 1; });
+           scope.$watch('name', function(newValue, oldValue) { scope.counter = scope.counter + 1; });
            expect(scope.counter).toEqual(0);
 
            scope.$digest();
@@ -7678,7 +7734,7 @@ function $RootScopeProvider(){
 
            expect(scope.counter).toEqual(0);
            scope.$watch('name', function(newValue, oldValue) {
-             counter = counter + 1;
+             scope.counter = scope.counter + 1;
            });
            expect(scope.counter).toEqual(0);
 
@@ -7695,7 +7751,7 @@ function $RootScopeProvider(){
       $digest: function() {
         var watch, value, last,
             watchers,
-            asyncQueue = this.$$asyncQueue,
+            asyncQueue,
             length,
             dirty, ttl = TTL,
             next, current, target = this,
@@ -7704,19 +7760,18 @@ function $RootScopeProvider(){
 
         beginPhase('$digest');
 
-        do { // "while dirty" loop
+        do {
           dirty = false;
           current = target;
-
-          while(asyncQueue.length) {
-            try {
-              current.$eval(asyncQueue.shift());
-            } catch (e) {
-              $exceptionHandler(e);
+          do {
+            asyncQueue = current.$$asyncQueue;
+            while(asyncQueue.length) {
+              try {
+                current.$eval(asyncQueue.shift());
+              } catch (e) {
+                $exceptionHandler(e);
+              }
             }
-          }
-
-          do { // "traverse the scopes" loop
             if ((watchers = current.$$watchers)) {
               // process our watches
               length = watchers.length;
@@ -7801,10 +7856,12 @@ function $RootScopeProvider(){
        * perform any necessary cleanup.
        */
       $destroy: function() {
-        if ($rootScope == this) return; // we can't remove the root node;
+        // we can't destroy the root scope or a scope that has been already destroyed
+        if ($rootScope == this || this.$$destroyed) return;
         var parent = this.$parent;
 
         this.$broadcast('$destroy');
+        this.$$destroyed = true;
 
         if (parent.$$childHead == this) parent.$$childHead = this.$$nextSibling;
         if (parent.$$childTail == this) parent.$$childTail = this.$$prevSibling;
@@ -8151,7 +8208,6 @@ function $RootScopeProvider(){
  *
  * @name ng.$sniffer
  * @requires $window
- * @requires $document
  *
  * @property {boolean} history Does the browser support html5 history api ?
  * @property {boolean} hashchange Does the browser support hashchange event ?
@@ -8160,10 +8216,9 @@ function $RootScopeProvider(){
  * This is very simple implementation of testing browser's features.
  */
 function $SnifferProvider() {
-  this.$get = ['$window', '$document', function($window, $document) {
+  this.$get = ['$window', function($window) {
     var eventSupport = {},
-        android = int((/android (\d+)/.exec(lowercase($window.navigator.userAgent)) || [])[1]),
-        document = $document[0];
+        android = int((/android (\d+)/.exec(lowercase($window.navigator.userAgent)) || [])[1]);
 
     return {
       // Android has history.pushState, but it does not update location correctly
@@ -8173,7 +8228,7 @@ function $SnifferProvider() {
       history: !!($window.history && $window.history.pushState && !(android < 4)),
       hashchange: 'onhashchange' in $window &&
                   // IE8 compatible mode lies
-                  (!document.documentMode || document.documentMode > 7),
+                  (!$window.document.documentMode || $window.document.documentMode > 7),
       hasEvent: function(event) {
         // IE9 implements 'input' event it's so fubared that we rather pretend that it doesn't have
         // it. In particular the event is not fired when backspace or delete key are pressed or
@@ -8181,13 +8236,14 @@ function $SnifferProvider() {
         if (event == 'input' && msie == 9) return false;
 
         if (isUndefined(eventSupport[event])) {
-          var divElm = document.createElement('div');
+          var divElm = $window.document.createElement('div');
           eventSupport[event] = 'on' + event in divElm;
         }
 
         return eventSupport[event];
       },
-      csp: document.securityPolicy ? document.securityPolicy.isActive : false
+      // TODO(i): currently there is no way to feature detect CSP without triggering alerts
+      csp: false
     };
   }];
 }
@@ -8245,43 +8301,6 @@ function parseHeaders(headers) {
   });
 
   return parsed;
-}
-
-
-var IS_SAME_DOMAIN_URL_MATCH = /^(([^:]+):)?\/\/(\w+:{0,1}\w*@)?([\w\.-]*)?(:([0-9]+))?(.*)$/;
-
-
-/**
- * Parse a request and location URL and determine whether this is a same-domain request.
- *
- * @param {string} requestUrl The url of the request.
- * @param {string} locationUrl The current browser location url.
- * @returns {boolean} Whether the request is for the same domain.
- */
-function isSameDomain(requestUrl, locationUrl) {
-  var match = IS_SAME_DOMAIN_URL_MATCH.exec(requestUrl);
-  // if requestUrl is relative, the regex does not match.
-  if (match == null) return true;
-
-  var domain1 = {
-      protocol: match[2],
-      host: match[4],
-      port: int(match[6]) || DEFAULT_PORTS[match[2]] || null,
-      // IE8 sets unmatched groups to '' instead of undefined.
-      relativeProtocol: match[2] === undefined || match[2] === ''
-    };
-
-  match = URL_MATCH.exec(locationUrl);
-  var domain2 = {
-      protocol: match[1],
-      host: match[3],
-      port: int(match[5]) || DEFAULT_PORTS[match[1]] || null
-    };
-
-  return (domain1.protocol == domain2.protocol || domain1.relativeProtocol) &&
-         domain1.host == domain2.host &&
-         (domain1.port == domain2.port || (domain1.relativeProtocol &&
-             domain2.port == DEFAULT_PORTS[domain2.protocol]));
 }
 
 
@@ -8344,7 +8363,7 @@ function $HttpProvider() {
       JSON_END = /[\}\]]\s*$/,
       PROTECTION_PREFIX = /^\)\]\}',?\n/;
 
-  var defaults = this.defaults = {
+  var $config = this.defaults = {
     // transform incoming response data
     transformResponse: [function(data) {
       if (isString(data)) {
@@ -8364,7 +8383,8 @@ function $HttpProvider() {
     // default headers
     headers: {
       common: {
-        'Accept': 'application/json, text/plain, */*'
+        'Accept': 'application/json, text/plain, */*',
+        'X-Requested-With': 'XMLHttpRequest'
       },
       post: {'Content-Type': 'application/json;charset=utf-8'},
       put:  {'Content-Type': 'application/json;charset=utf-8'}
@@ -8391,7 +8411,7 @@ function $HttpProvider() {
     /**
      * @ngdoc function
      * @name ng.$http
-     * @requires $httpBacked
+     * @requires $httpBackend
      * @requires $browser
      * @requires $cacheFactory
      * @requires $rootScope
@@ -8427,8 +8447,7 @@ function $HttpProvider() {
      *     }).
      *     error(function(data, status, headers, config) {
      *       // called asynchronously if an error occurs
-     *       // or server returns response with status
-     *       // code outside of the <200, 400) range
+     *       // or server returns response with an error status.
      *     });
      * </pre>
      *
@@ -8437,6 +8456,10 @@ function $HttpProvider() {
      * an object representing the response. See the api signature and type info below for more
      * details.
      *
+     * A response status code that falls in the [200, 300) range is considered a success status and
+     * will result in the success callback being called. Note that if the response is a redirect,
+     * XMLHttpRequest will transparently follow it, meaning that the error callback will not be
+     * called for such responses.
      *
      * # Shortcut methods
      *
@@ -8467,6 +8490,7 @@ function $HttpProvider() {
      *
      * - `$httpProvider.defaults.headers.common` (headers that are common for all requests):
      *   - `Accept: application/json, text/plain, * / *`
+     *   - `X-Requested-With: XMLHttpRequest`
      * - `$httpProvider.defaults.headers.post`: (header defaults for HTTP POST requests)
      *   - `Content-Type: application/json`
      * - `$httpProvider.defaults.headers.put` (header defaults for HTTP PUT requests)
@@ -8601,7 +8625,7 @@ function $HttpProvider() {
      * to counter XSRF. When performing XHR requests, the $http service reads a token from a cookie
      * called `XSRF-TOKEN` and sets it as the HTTP header `X-XSRF-TOKEN`. Since only JavaScript that
      * runs on your domain could read the cookie, your server can be assured that the XHR came from
-     * JavaScript running on your domain. The header will not be set for cross-domain requests.
+     * JavaScript running on your domain.
      *
      * To take advantage of this, your server needs to set a token in a JavaScript readable session
      * cookie called `XSRF-TOKEN` on first HTTP GET request. On subsequent non-GET requests the
@@ -8635,8 +8659,6 @@ function $HttpProvider() {
      *    - **withCredentials** - `{boolean}` - whether to to set the `withCredentials` flag on the
      *      XHR object. See {@link https://developer.mozilla.org/en/http_access_control#section_5
      *      requests with credentials} for more information.
-     *    - **responseType** - `{string}` - see {@link
-     *      https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest#responseType requestType}.
      *
      * @returns {HttpPromise} Returns a {@link ng.$q promise} object with the
      *   standard `then` method and two http specific methods: `success` and `error`. The `then`
@@ -8729,12 +8751,10 @@ function $HttpProvider() {
     function $http(config) {
       config.method = uppercase(config.method);
 
-      var reqTransformFn = config.transformRequest || defaults.transformRequest,
-          respTransformFn = config.transformResponse || defaults.transformResponse,
-          defHeaders = defaults.headers,
-          xsrfToken = isSameDomain(config.url, $browser.url()) ?
-                          $browser.cookies()['XSRF-TOKEN'] : undefined,
-          reqHeaders = extend({'X-XSRF-TOKEN': xsrfToken},
+      var reqTransformFn = config.transformRequest || $config.transformRequest,
+          respTransformFn = config.transformResponse || $config.transformResponse,
+          defHeaders = $config.headers,
+          reqHeaders = extend({'X-XSRF-TOKEN': $browser.cookies()['XSRF-TOKEN']},
               defHeaders.common, defHeaders[lowercase(config.method)], config.headers),
           reqData = transformData(config.data, headersGetter(reqHeaders), reqTransformFn),
           promise;
@@ -8742,10 +8762,6 @@ function $HttpProvider() {
       // strip content-type if data is undefined
       if (isUndefined(config.data)) {
         delete reqHeaders['Content-Type'];
-      }
-
-      if (isUndefined(config.withCredentials) && !isUndefined(defaults.withCredentials)) {
-        config.withCredentials = defaults.withCredentials;
       }
 
       // send request
@@ -8879,11 +8895,11 @@ function $HttpProvider() {
          *
          * @description
          * Runtime equivalent of the `$httpProvider.defaults` property. Allows configuration of
-         * default headers, withCredentials as well as request and response transformations.
+         * default headers as well as request and response transformations.
          *
          * See "Setting HTTP Headers" and "Transforming Requests and Responses" sections above.
          */
-    $http.defaults = defaults;
+    $http.defaults = $config;
 
 
     return $http;
@@ -8918,7 +8934,7 @@ function $HttpProvider() {
      * Makes the request
      *
      * !!! ACCESSES CLOSURE VARS:
-     * $httpBackend, defaults, $log, $rootScope, defaultCache, $http.pendingRequests
+     * $httpBackend, $config, $log, $rootScope, defaultCache, $http.pendingRequests
      */
     function sendReq(config, reqData, reqHeaders) {
       var deferred = $q.defer(),
@@ -8959,7 +8975,7 @@ function $HttpProvider() {
       // if we won't have the response in cache, send the request to the backend
       if (!cachedResp) {
         $httpBackend(config.method, url, reqData, done, reqHeaders, config.timeout,
-            config.withCredentials, config.responseType);
+            config.withCredentials);
       }
 
       return promise;
@@ -9014,15 +9030,10 @@ function $HttpProvider() {
           var parts = [];
           forEachSorted(params, function(value, key) {
             if (value == null || value == undefined) return;
-            if (!isArray(value)) value = [value];
-
-            forEach(value, function(v) {
-              if (isObject(v)) {
-                v = toJson(v);
-              }
-              parts.push(encodeURIComponent(key) + '=' +
-                         encodeURIComponent(v));
-            });
+            if (isObject(value)) {
+              value = toJson(value);
+            }
+            parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
           });
           return url + ((url.indexOf('?') == -1) ? '?' : '&') + parts.join('&');
         }
@@ -9064,7 +9075,7 @@ function $HttpBackendProvider() {
 
 function createHttpBackend($browser, XHR, $browserDefer, callbacks, rawDocument, locationProtocol) {
   // TODO(vojta): fix the signature
-  return function(method, url, post, callback, headers, timeout, withCredentials, responseType) {
+  return function(method, url, post, callback, headers, timeout, withCredentials) {
     $browser.$$incOutstandingRequestCount();
     url = url || $browser.url();
 
@@ -9097,17 +9108,13 @@ function createHttpBackend($browser, XHR, $browserDefer, callbacks, rawDocument,
       // always async
       xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
-          completeRequest(callback, status || xhr.status, xhr.response || xhr.responseText,
-                          xhr.getAllResponseHeaders());
+          completeRequest(
+              callback, status || xhr.status, xhr.responseText, xhr.getAllResponseHeaders());
         }
       };
 
       if (withCredentials) {
         xhr.withCredentials = true;
-      }
-
-      if (responseType) {
-        xhr.responseType = responseType;
       }
 
       xhr.send(post || '');
@@ -10290,7 +10297,6 @@ var htmlAnchorDirective = valueFn({
         // if we have no href url, then don't navigate anywhere.
         if (!element.attr('href')) {
           event.preventDefault();
-          return false; // Needed for opera
         }
       });
     }
@@ -10618,8 +10624,7 @@ var nullFormCtrl = {
   $addControl: noop,
   $removeControl: noop,
   $setValidity: noop,
-  $setDirty: noop,
-  $setPristine: noop
+  $setDirty: noop
 };
 
 /**
@@ -10628,13 +10633,13 @@ var nullFormCtrl = {
  *
  * @property {boolean} $pristine True if user has not interacted with the form yet.
  * @property {boolean} $dirty True if user has already interacted with the form.
- * @property {boolean} $valid True if all of the containg forms and controls are valid.
+ * @property {boolean} $valid True if all of the containing forms and controls are valid.
  * @property {boolean} $invalid True if at least one containing control or form is invalid.
  *
  * @property {Object} $error Is an object hash, containing references to all invalid controls or
  *  forms, where:
  *
- *  - keys are validation tokens (error names) — such as `REQUIRED`, `URL` or `EMAIL`),
+ *  - keys are validation tokens (error names) — such as `required`, `url` or `email`),
  *  - values are arrays of controls or forms that are invalid with given error.
  *
  * @description
@@ -10651,8 +10656,7 @@ function FormController(element, attrs) {
   var form = this,
       parentForm = element.parent().controller('form') || nullFormCtrl,
       invalidCount = 0, // used to easily determine if we are valid
-      errors = form.$error = {},
-      controls = [];
+      errors = form.$error = {};
 
   // init state
   form.$name = attrs.name;
@@ -10676,8 +10680,6 @@ function FormController(element, attrs) {
   }
 
   form.$addControl = function(control) {
-    controls.push(control);
-
     if (control.$name && !form.hasOwnProperty(control.$name)) {
       form[control.$name] = control;
     }
@@ -10690,8 +10692,6 @@ function FormController(element, attrs) {
     forEach(errors, function(queue, validationToken) {
       form.$setValidity(validationToken, true, control);
     });
-
-    arrayRemove(controls, control);
   };
 
   form.$setValidity = function(validationToken, isValid, control) {
@@ -10739,29 +10739,6 @@ function FormController(element, attrs) {
     parentForm.$setDirty();
   };
 
-  /**
-   * @ngdoc function
-   * @name ng.directive:form.FormController#$setPristine
-   * @methodOf ng.directive:form.FormController
-   *
-   * @description
-   * Sets the form to its pristine state.
-   *
-   * This method can be called to remove the 'ng-dirty' class and set the form to its pristine
-   * state (ng-pristine class). This method will also propagate to all the controls contained
-   * in this form.
-   *
-   * Setting a form back to a pristine state is often useful when we want to 'reuse' a form after
-   * saving or resetting it.
-   */
-  form.$setPristine = function () {
-    element.removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
-    form.$dirty = false;
-    form.$pristine = true;
-    forEach(controls, function(control) {
-      control.$setPristine();
-    });
-  };
 }
 
 
@@ -10775,7 +10752,7 @@ function FormController(element, attrs) {
  * does not allow nesting of form elements. It is useful to nest forms, for example if the validity of a
  * sub-group of controls needs to be determined.
  *
- * @param {string=} ngForm|name Name of the form. If specified, the form controller will be published into
+ * @param {string=} name|ngForm Name of the form. If specified, the form controller will be published into
  *                       related scope, under this name.
  *
  */
@@ -10848,12 +10825,12 @@ function FormController(element, attrs) {
        </script>
        <form name="myForm" ng-controller="Ctrl">
          userType: <input name="input" ng-model="userType" required>
-         <span class="error" ng-show="myForm.input.$error.REQUIRED">Required!</span><br>
+         <span class="error" ng-show="myForm.input.$error.required">Required!</span><br>
          <tt>userType = {{userType}}</tt><br>
          <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br>
          <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br>
          <tt>myForm.$valid = {{myForm.$valid}}</tt><br>
-         <tt>myForm.$error.REQUIRED = {{!!myForm.$error.REQUIRED}}</tt><br>
+         <tt>myForm.$error.required = {{!!myForm.$error.required}}</tt><br>
         </form>
       </doc:source>
       <doc:scenario>
@@ -10958,8 +10935,6 @@ var inputType = {
    *    patterns defined as scope expressions.
    * @param {string=} ngChange Angular expression to be executed when input changes due to user
    *    interaction with the input element.
-   * @param {boolean=} [ngTrim=true] If set to false Angular will not automatically trimming the
-   *    input.
    *
    * @example
       <doc:example>
@@ -10967,12 +10942,12 @@ var inputType = {
          <script>
            function Ctrl($scope) {
              $scope.text = 'guest';
-             $scope.word = /^\s*\w*\s*$/;
+             $scope.word = /^\w*$/;
            }
          </script>
          <form name="myForm" ng-controller="Ctrl">
            Single word: <input type="text" name="input" ng-model="text"
-                               ng-pattern="word" required ng-trim="false">
+                               ng-pattern="word" required>
            <span class="error" ng-show="myForm.input.$error.required">
              Required!</span>
            <span class="error" ng-show="myForm.input.$error.pattern">
@@ -11000,12 +10975,6 @@ var inputType = {
           it('should be invalid if multi word', function() {
             input('text').enter('hello world');
             expect(binding('myForm.input.$valid')).toEqual('false');
-          });
-
-          it('should not be trimmed', function() {
-            input('text').enter('untrimmed ');
-            expect(binding('text')).toEqual('untrimmed ');
-            expect(binding('myForm.input.$valid')).toEqual('true');
           });
         </doc:scenario>
       </doc:example>
@@ -11320,14 +11289,7 @@ function isEmpty(value) {
 function textInputType(scope, element, attr, ctrl, $sniffer, $browser) {
 
   var listener = function() {
-    var value = element.val();
-
-    // By default we will trim the value
-    // If the attribute ng-trim exists we will avoid trimming
-    // e.g. <input ng-model="foo" ng-trim="false">
-    if (toBoolean(attr.ngTrim || 'T')) {
-      value = trim(value);
-    }
+    var value = trim(element.val());
 
     if (ctrl.$viewValue !== value) {
       scope.$apply(function() {
@@ -11908,22 +11870,6 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
     parentForm.$setValidity(validationErrorKey, isValid, this);
   };
 
-  /**
-   * @ngdoc function
-   * @name ng.directive:ngModel.NgModelController#$setPristine
-   * @methodOf ng.directive:ngModel.NgModelController
-   *
-   * @description
-   * Sets the control to its pristine state.
-   *
-   * This method can be called to remove the 'ng-dirty' class and set the control to its pristine
-   * state (ng-pristine class).
-   */
-  this.$setPristine = function () {
-    this.$dirty = false;
-    this.$pristine = true;
-    $element.removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
-  };
 
   /**
    * @ngdoc function
@@ -13474,14 +13420,17 @@ var ngRepeatDirective = ngDirective({
       scope.$watch(function ngRepeatWatch(scope){
         var index, length,
             collection = scope.$eval(rhs),
-            collectionLength = size(collection, true),
-            childScope,
+            cursor = iterStartElement,     // current position of the node
             // Same as lastOrder but it has the current state. It will become the
             // lastOrder on the next iteration.
             nextOrder = new HashQueueMap(),
+            arrayLength,
+            childScope,
             key, value, // key/value of iteration
-            array, last,       // last object information {scope, element, index}
-            cursor = iterStartElement;     // current position of the node
+            array,
+            last;       // last object information {scope, element, index}
+
+
 
         if (!isArray(collection)) {
           // if object, extract keys, sort them and use to determine order of iteration over obj props
@@ -13495,6 +13444,8 @@ var ngRepeatDirective = ngDirective({
         } else {
           array = collection || [];
         }
+
+        arrayLength = array.length;
 
         // we are not using forEach for perf reasons (trying to avoid #call)
         for (index = 0, length = array.length; index < length; index++) {
@@ -13531,7 +13482,7 @@ var ngRepeatDirective = ngDirective({
           childScope.$index = index;
 
           childScope.$first = (index === 0);
-          childScope.$last = (index === (collectionLength - 1));
+          childScope.$last = (index === (arrayLength - 1));
           childScope.$middle = !(childScope.$first || childScope.$last);
 
           if (!last) {
@@ -13752,52 +13703,53 @@ var ngStyleDirective = ngDirective(function(scope, element, attr) {
 var NG_SWITCH = 'ng-switch';
 var ngSwitchDirective = valueFn({
   restrict: 'EA',
-  compile: function(element, attr) {
+  require: 'ngSwitch',
+  controller: function ngSwitchController() {
+    this.cases = {};
+  },
+  link: function(scope, element, attr, ctrl) {
     var watchExpr = attr.ngSwitch || attr.on,
-        cases = {};
+        selectedTransclude,
+        selectedElement,
+        selectedScope;
 
-    element.data(NG_SWITCH, cases);
-    return function(scope, element){
-      var selectedTransclude,
-          selectedElement,
-          selectedScope;
-
-      scope.$watch(watchExpr, function ngSwitchWatchAction(value) {
-        if (selectedElement) {
-          selectedScope.$destroy();
-          selectedElement.remove();
-          selectedElement = selectedScope = null;
-        }
-        if ((selectedTransclude = cases['!' + value] || cases['?'])) {
-          scope.$eval(attr.change);
-          selectedScope = scope.$new();
-          selectedTransclude(selectedScope, function(caseElement) {
-            selectedElement = caseElement;
-            element.append(caseElement);
-          });
-        }
-      });
-    };
+    scope.$watch(watchExpr, function ngSwitchWatchAction(value) {
+      if (selectedElement) {
+        selectedScope.$destroy();
+        selectedElement.remove();
+        selectedElement = selectedScope = null;
+      }
+      if ((selectedTransclude = ctrl.cases['!' + value] || ctrl.cases['?'])) {
+        scope.$eval(attr.change);
+        selectedScope = scope.$new();
+        selectedTransclude(selectedScope, function(caseElement) {
+          selectedElement = caseElement;
+          element.append(caseElement);
+        });
+      }
+    });
   }
 });
 
 var ngSwitchWhenDirective = ngDirective({
   transclude: 'element',
   priority: 500,
+  require: '^ngSwitch',
   compile: function(element, attrs, transclude) {
-    var cases = element.inheritedData(NG_SWITCH);
-    assertArg(cases);
-    cases['!' + attrs.ngSwitchWhen] = transclude;
+    return function(scope, element, attr, ctrl) {
+      ctrl.cases['!' + attrs.ngSwitchWhen] = transclude;
+    };
   }
 });
 
 var ngSwitchDefaultDirective = ngDirective({
   transclude: 'element',
   priority: 500,
+  require: '^ngSwitch',
   compile: function(element, attrs, transclude) {
-    var cases = element.inheritedData(NG_SWITCH);
-    assertArg(cases);
-    cases['?'] = transclude;
+    return function(scope, element, attr, ctrl) {
+      ctrl.cases['?'] = transclude;
+    };
   }
 });
 
@@ -13886,7 +13838,7 @@ var ngTranscludeDirective = ngDirective({
           <hr />
 
           <pre>$location.path() = {{$location.path()}}</pre>
-          <pre>$route.current.template = {{$route.current.template}}</pre>
+          <pre>$route.current.templateUrl = {{$route.current.templateUrl}}</pre>
           <pre>$route.current.params = {{$route.current.params}}</pre>
           <pre>$route.current.scope.name = {{$route.current.scope.name}}</pre>
           <pre>$routeParams = {{$routeParams}}</pre>
@@ -14332,7 +14284,7 @@ var selectDirective = ['$compile', '$parse', function($compile,   $parse) {
         var lastView;
         ctrl.$render = function() {
           var items = new HashMap(ctrl.$viewValue);
-          forEach(selectElement.children(), function(option) {
+          forEach(selectElement.find('option'), function(option) {
             option.selected = isDefined(items.get(option.value));
           });
         };
@@ -14349,7 +14301,7 @@ var selectDirective = ['$compile', '$parse', function($compile,   $parse) {
         selectElement.bind('change', function() {
           scope.$apply(function() {
             var array = [];
-            forEach(selectElement.children(), function(option) {
+            forEach(selectElement.find('option'), function(option) {
               if (option.selected) {
                 array.push(option.value);
               }

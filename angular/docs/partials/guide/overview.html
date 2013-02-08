@@ -14,7 +14,7 @@ declarative language for static documents. It does not contain much in the way o
 applications, and as a result building web applications is an exercise in <em>what do I have to do, so
 that I trick the browser in to doing what I want.</em></p>
 
-<p>Impedance mismatch between dynamic applications and static documents are often solved as:</p>
+<p>The impedance mismatch between dynamic applications and static documents is often solved as:</p>
 
 <ul>
 <li><strong>library</strong> - a collection of functions which are useful when writing web apps. Your code is
@@ -77,10 +77,10 @@ concepts which the application developer may face:</p>
 </ul>
 
 <h3>Source</h3>
-<div source-edit="" source-edit-deps="angular.js script.js" source-edit-html="index.html-80" source-edit-css="" source-edit-js="script.js-79" source-edit-unit="" source-edit-scenario="scenario.js-81"></div>
+<div source-edit="" source-edit-deps="angular.js script.js" source-edit-html="index.html-73" source-edit-css="" source-edit-js="script.js-72" source-edit-unit="" source-edit-scenario="scenario.js-74"></div>
 <div class="tabbable"><div class="tab-pane" title="index.html">
-<pre class="prettyprint linenums" ng-set-text="index.html-80" ng-html-wrap=" angular.js script.js"></pre>
-<script type="text/ng-template" id="index.html-80">
+<pre class="prettyprint linenums" ng-set-text="index.html-73" ng-html-wrap=" angular.js script.js"></pre>
+<script type="text/ng-template" id="index.html-73">
     <div ng-controller="InvoiceCntl">
       <b>Invoice:</b>
       <br>
@@ -98,8 +98,8 @@ concepts which the application developer may face:</p>
   </script>
 </div>
 <div class="tab-pane" title="script.js">
-<pre class="prettyprint linenums" ng-set-text="script.js-79"></pre>
-<script type="text/ng-template" id="script.js-79">
+<pre class="prettyprint linenums" ng-set-text="script.js-72"></pre>
+<script type="text/ng-template" id="script.js-72">
     function InvoiceCntl($scope) {
       $scope.qty = 1;
       $scope.cost = 19.95;
@@ -107,8 +107,8 @@ concepts which the application developer may face:</p>
   </script>
 </div>
 <div class="tab-pane" title="End to end test">
-<pre class="prettyprint linenums" ng-set-text="scenario.js-81"></pre>
-<script type="text/ng-template" id="scenario.js-81">
+<pre class="prettyprint linenums" ng-set-text="scenario.js-74"></pre>
+<script type="text/ng-template" id="scenario.js-74">
     it('should show of angular binding', function() {
       expect(binding('qty * cost')).toEqual('$19.95');
       input('qty').enter('2');
@@ -118,12 +118,12 @@ concepts which the application developer may face:</p>
   </script>
 </div>
 </div><h3>Demo</h3>
-<div class="well doc-example-live" ng-embed-app="" ng-set-html="index.html-80" ng-eval-javascript="script.js-79"></div>
+<div class="well doc-example-live" ng-embed-app="" ng-set-html="index.html-73" ng-eval-javascript="script.js-72"></div>
 
 <p>Try out the Live Preview above, and then let's walk through the example and describe what's going
 on.</p>
 
-<p>In the <code>&lt;html&gt;</code> tag, we specify that it is an angular
+<p>In the <code>&lt;html&gt;</code> tag, we specify that it is an Angular
 application with the <code>ng-app</code> directive. The <code>ng-app</code> will cause Angular to <a href="guide/bootstrap">auto initialize</a> your application.</p>
 
 <pre><code>&lt;html ng-app&gt;
@@ -134,7 +134,7 @@ application with the <code>ng-app</code> directive. The <code>ng-app</code> will
 <pre><code>&lt;script src="https://ajax.googleapis.com/ajax/libs/angularjs/?.?.?/angular.min.js"&gt;&lt;/script&gt;
 </code></pre>
 
-<p>From the <code>ng-model</code> attribute of the <code>&lt;input&gt;</code> tags, angular automatically sets up two-way data
+<p>From the <code>ng-model</code> attribute of the <code>&lt;input&gt;</code> tags, Angular automatically sets up two-way data
 binding, and we also demonstrate some easy input validation:</p>
 
 <pre><code>Quantity: &lt;input type="integer" min="0" ng-model="qty" required &gt;
@@ -144,7 +144,7 @@ Cost: &lt;input type="number" ng-model="cost" required &gt;
 <p>These input widgets look normal enough, but consider these points:</p>
 
 <ul>
-<li>When this page loaded, angular bound the names of the input widgets (<code>qty</code> and <code>cost</code>) to
+<li>When this page loaded, Angular bound the names of the input widgets (<code>qty</code> and <code>cost</code>) to
 variables of the same name. Think of those variables as the "Model" component of the
 Model-View-Controller design pattern.</li>
 <li>Note that the HTML widget <a href="api/ng.directive:input"><code>input</code></a>
@@ -209,7 +209,7 @@ returning to an internal model, and then back to the server, creates a lot of bo
 code. Angular eliminates almost all of this boilerplate, leaving code that describes the
 overall flow of the application rather than all of the implementation details.</li>
 <li><strong>Writing tons of initialization code just to get started:</strong> Typically you need to write a lot
-of plumbing just to get a basic "Hello World" AJAX app working. With angular you can bootstrap
+of plumbing just to get a basic "Hello World" AJAX app working. With Angular you can bootstrap
 your app easily using services, which are auto-injected into your application in a <a href="http://code.google.com/p/google-guice/">Guice</a>-like dependency-injection style. This allows you
 to get started developing features quickly. As a bonus, you get full control over the
 initialization process in automated tests.</li>

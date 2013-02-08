@@ -11,9 +11,9 @@ Server-side validation is still necessary for a secure application.</p>
 
 <h2>Simple form</h2>
 
-<p>The key directive in understanding two-way data-binding is  <a href="api/ng.directive:ngModel"><code>ngModel</code></a>.
+<p>The key directive in understanding two-way data-binding is <a href="api/ng.directive:ngModel"><code>ngModel</code></a>.
 The <code>ngModel</code> directive provides the two-way data-binding by synchronizing the model to the view, as well as view to the model.
-In addition it provides <a href="api/ng.directive:ngModel.NgModelController"><code>API</code></a> for other directives to augment its behavior.</p>
+In addition it provides an <a href="api/ng.directive:ngModel.NgModelController"><code>API</code></a> for other directives to augment its behavior.</p>
 
 <h3>Source</h3>
 <div source-edit="" source-edit-deps="angular.js script.js" source-edit-html="index.html-59" source-edit-css="" source-edit-js="script.js-58" source-edit-unit="" source-edit-scenario=""></div>
@@ -70,7 +70,7 @@ In addition it provides <a href="api/ng.directive:ngModel.NgModelController"><co
 <li><code>ng-dirty</code></li>
 </ul>
 
-<p>Following example uses the CSS to display validity of each form control.
+<p>The following example uses the CSS to display validity of each form control.
 In the example both <code>user.name</code> and <code>user.email</code> are required, but are rendered with red background only when they are dirty.
 This ensures that the user is not distracted with an error until after interacting with the control, and failing to satisfy its validity.</p>
 
@@ -213,7 +213,7 @@ The validation can occur in two places:</p>
 Whenever the bound model changes, all functions in <a href="api/ng.directive:ngModel.NgModelController#$formatters"><code>NgModelController#$formatters</code></a> array are pipe-lined, so that each of these functions has an opportunity to format the value and change validity state of the form control through <a href="api/ng.directive:ngModel.NgModelController#$setValidity"><code>NgModelController#$setValidity</code></a>.</p></li>
 <li><p><strong>View to Model update</strong> -
 In a similar way, whenever a user interacts with a control it calls <a href="api/ng.directive:ngModel.NgModelController#$setViewValue"><code>NgModelController#$setViewValue</code></a>.
-This in turn pipelines all functions in <a href="api/ng.directive:ngModel.NgModelController#$parsers"><code>NgModelController#$parsers</code></a> array, so that each of these functions has an opportunity to convert the value and change validity state of the form control through <a href="api/ng.directive:ngModel.NgModelController#$setValidity"><code>NgModelController#$setValidity</code></a>.</p></li>
+This in turn pipelines all functions in the <a href="api/ng.directive:ngModel.NgModelController#$parsers"><code>NgModelController#$parsers</code></a> array, so that each of these functions has an opportunity to convert the value and change validity state of the form control through <a href="api/ng.directive:ngModel.NgModelController#$setValidity"><code>NgModelController#$setValidity</code></a>.</p></li>
 </ul>
 
 <p>In the following example we create two directives.</p>
@@ -221,11 +221,11 @@ This in turn pipelines all functions in <a href="api/ng.directive:ngModel.NgMode
 <ul>
 <li><p>The first one is <code>integer</code> and it validates whether the input is a valid integer.
 For example <code>1.23</code> is an invalid value, since it contains a fraction.
-Note, that we unshift the array instead of pushing.
+Note that we unshift the array instead of pushing.
 This is because we want to be first parser and consume the control string value, as we need to execute the validation function before a conversion to number occurs.</p></li>
 <li><p>The second directive is a <code>smart-float</code>.
 It parses both <code>1.2</code> and <code>1,2</code> into a valid float number <code>1.2</code>.
-Note that, we can't use input type <code>number</code> here as HTML5 browsers would not allow the user to type what it would consider an invalid number such as <code>1,2</code>.</p></li>
+Note that we can't use input type <code>number</code> here as HTML5 browsers would not allow the user to type what it would consider an invalid number such as <code>1,2</code>.</p></li>
 </ul>
 
 <h3>Source</h3>
@@ -304,7 +304,7 @@ Note that, we can't use input type <code>number</code> here as HTML5 browsers wo
 </div><h3>Demo</h3>
 <div class="well doc-example-live" ng-embed-app="form-example1" ng-set-html="index.html-65" ng-eval-javascript="script.js-64"></div>
 
-<h2>Implementing custom form control (using <code>ngModel</code>)</h2>
+<h2>Implementing custom form controls (using <code>ngModel</code>)</h2>
 
 <p>Angular implements all of the basic HTML form controls (<a href="api/ng.directive:input"><code>input</code></a>, <a href="api/ng.directive:select"><code>select</code></a>, <a href="api/ng.directive:textarea"><code>textarea</code></a>), which should be sufficient for most cases.
 However, if you need more flexibility, you can write your own form control as a directive.</p>
@@ -353,8 +353,8 @@ However, if you need more flexibility, you can write your own form control as a 
         });
 
         // model -> view
-        ctrl.$render = function(value) {
-          elm.html(value);
+        ctrl.$render = function() {
+          elm.html(ctrl.$viewValue);
         };
 
         // load init value from DOM

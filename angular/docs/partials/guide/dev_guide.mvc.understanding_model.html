@@ -1,15 +1,15 @@
 <h1><code ng:non-bindable=""></code>
 <span class="hint"></span>
 </h1>
-<div><p>Depending on the context of the discussion in angular documentation, the term <em>model</em> can refer to
+<div><p>Depending on the context of the discussion in the Angular documentation, the term <em>model</em> can refer to
 either a single object representing one entity (for example, a model called "phones" with its value
 being an array of phones) or the entire data model for the application (all entities).</p>
 
-<p>In angular, a model is any data that is reachable as a property of an angular <a href="guide/scope">Scope</a> object. The name of the property is the model identifier and the value is
+<p>In Angular, a model is any data that is reachable as a property of an angular <a href="guide/scope">Scope</a> object. The name of the property is the model identifier and the value is
 any JavaScript object (including arrays and primitives).</p>
 
-<p>The only requirement for a JavaScript object to be a model in angular is that the object must be
-referenced by an angular scope as a property of that scope object. This property reference can be
+<p>The only requirement for a JavaScript object to be a model in Angular is that the object must be
+referenced by an Angular scope as a property of that scope object. This property reference can be
 created explicitly or implicitly.</p>
 
 <p>You can create models by explicitly creating scope properties referencing JavaScript objects in the
@@ -56,11 +56,11 @@ cloud".</p></li>
 object (model) on each of these scopes with its value set to the value of "phone" in the array.</p></li>
 </ul>
 
-<p>In angular, a JavaScript object stops being a model when:</p>
+<p>In Angular, a JavaScript object stops being a model when:</p>
 
 <ul>
-<li><p>No angular scope contains a property that references the object.</p></li>
-<li><p>All angular scopes that contain a property referencing the object become stale and eligible for
+<li><p>No Angular scope contains a property that references the object.</p></li>
+<li><p>All Angular scopes that contain a property referencing the object become stale and eligible for
 garbage collection.</p></li>
 </ul>
 

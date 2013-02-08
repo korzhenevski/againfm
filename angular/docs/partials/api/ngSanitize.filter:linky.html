@@ -10,13 +10,11 @@ plain email address links.</p></div>
 <div class="in-html-template-binding"><code ng:non-bindable="">&lt;span ng-bind-html="linky_expression | linky"&gt;&lt;/span&gt;</code>
 </div>
 <h3 id="In.JavaScript">In JavaScript</h3>
-<div class="in-javascript"><code ng:non-bindable="">$filter('linky')(text, target)</code>
+<div class="in-javascript"><code ng:non-bindable="">$filter('linky')(text)</code>
 </div>
 <h3 id="Parameters">Parameters</h3>
 <ul class="parameters"><li><code ng:non-bindable="">text – {string} – </code>
 <p>Input text.</p></li>
-<li><code ng:non-bindable="">target – {string} – </code>
-<p>Window (<em>blank|</em>self|<em>parent|</em>top) or named frame to open links in.</p></li>
 </ul>
 <h3 id="Returns">Returns</h3>
 <div class="returns"><code ng:non-bindable="">{string}</code>
@@ -46,15 +44,6 @@ plain email address links.</p></div>
         <div ng-bind-html="snippet | linky"></div>
       </td>
     </tr>
-    <tr id="linky-target">
-     <td>linky target</td>
-     <td>
-       <pre>&lt;div ng-bind-html="snippetWithTarget | linky:'_blank'"&gt;<br>&lt;/div&gt;</pre>
-     </td>
-     <td>
-       <div ng-bind-html="snippetWithTarget | linky:'_blank'"></div>
-     </td>
-    </tr>
     <tr id="escaped-html">
       <td>no filter</td>
       <td><pre>&lt;div ng-bind="snippet"&gt;<br>&lt;/div&gt;</pre></td>
@@ -73,7 +62,6 @@ plain email address links.</p></div>
         'mailto:us@somewhere.org,\n'+
         'another@somewhere.org,\n'+
         'and one more: ftp://127.0.0.1/.';
-      $scope.snippetWithTarget = 'http://angularjs.org/';
     }
   </script>
 </div>
@@ -103,11 +91,6 @@ plain email address links.</p></div>
     expect(using('#linky-filter').binding('snippet | linky')).
       toBe('new <a href="http://link">http://link</a>.');
     expect(using('#escaped-html').binding('snippet')).toBe('new http://link.');
-  });
-
-  it('should work with the target property', function() {
-   expect(using('#linky-target').binding("snippetWithTarget | linky:'_blank'")).
-     toBe('<a target="_blank" href="http://angularjs.org/">http://angularjs.org/</a>');
   });
 </script>
 </div>

@@ -5,7 +5,7 @@ afm.config(function($routeProvider, $locationProvider){
     $locationProvider.hashPrefix('!');
 
     $routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''});
-    $routeProvider.when('/login', {controller: 'LoginCtrl', template: ''});
+    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
 
     $routeProvider.otherwise({redirectTo: '/'});
 });
@@ -35,7 +35,7 @@ afm.directive('stationLink', function($rootScope){
     };
 });
 
-afm.directive('modal', function(){
+afm.directive('modal', function($window){
     return {
         restrict: 'E',
         replace: true,
@@ -46,12 +46,29 @@ afm.directive('modal', function(){
         template: '<div class="modal"><h1 class="header">{{ title }} <i class="close"></i></h1><div ng-transclude></div></div>',
         link: function(scope, element, attrs) {
             element.addClass('modal-' + attrs.role);
-            element.find('.close').on('click', function(){
-                element.parent().hide();
+            element.find('i').bind('click', function(){
+                $window.history.back();
             });
         }
     }
 });
+
+afm.directive('modalBox', function($route){
+    return {
+        restrict: 'AC',
+        link: function(scope, element, attrs) {
+            scope.$on('$routeChangeSuccess', update);
+            scope.template = '';
+
+            function update() {
+                var locals = $route.current && $route.current.modal && $route.current.locals,
+                    template = locals && locals.$template;
+
+                scope.template = template ? $route.current.templateUrl : '';
+            }
+        }
+    }
+})
 
 /*
 afm.directive('volumeSlider', function($rootScope) {
@@ -196,17 +213,7 @@ afm.factory('Auth', ['$http', function($http){
 }]);
 
 afm.controller('LoginCtrl', function($scope, Auth){
-    $scope.Auth = Auth;
-    $scope.login = function() {
-        Auth.login({
-            login: $scope.login,
-            password: $scope.password
-        }).success(function(){
-                $scope.$broadcast('logged');
-            }).error(function(){
-
-            });
-    }
+    $scope.text = 'Very Text';
 });
 
 afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){

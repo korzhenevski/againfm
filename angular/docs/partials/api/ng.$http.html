@@ -29,8 +29,7 @@ with two $http specific methods: <code>success</code> and <code>error</code>.</p
     }).
     error(function(data, status, headers, config) {
       // called asynchronously if an error occurs
-      // or server returns response with status
-      // code outside of the &lt;200, 400) range
+      // or server returns response with an error status.
     });
 </pre>
 
@@ -38,6 +37,11 @@ with two $http specific methods: <code>success</code> and <code>error</code>.</p
 the <code>then</code> method to register callbacks, and these callbacks will receive a single argument –
 an object representing the response. See the api signature and type info below for more
 details.</p>
+
+<p>A response status code that falls in the [200, 300) range is considered a success status and
+will result in the success callback being called. Note that if the response is a redirect,
+XMLHttpRequest will transparently follow it, meaning that the error callback will not be
+called for such responses.</p>
 
 <h3>Shortcut methods</h3>
 
@@ -69,7 +73,8 @@ object, which currently contains this default configuration:</p>
 
 <ul>
 <li><code>$httpProvider.defaults.headers.common</code> (headers that are common for all requests):
-<ul><li><code>Accept: application/json, text/plain, * / *</code></li></ul></li>
+<ul><li><code>Accept: application/json, text/plain, * / *</code></li>
+<li><code>X-Requested-With: XMLHttpRequest</code></li></ul></li>
 <li><code>$httpProvider.defaults.headers.post</code>: (header defaults for HTTP POST requests)
 <ul><li><code>Content-Type: application/json</code></li></ul></li>
 <li><code>$httpProvider.defaults.headers.put</code> (header defaults for HTTP PUT requests)
@@ -203,7 +208,7 @@ an unauthorized site can gain your user's private data. Angular provides followi
 to counter XSRF. When performing XHR requests, the $http service reads a token from a cookie
 called <code>XSRF-TOKEN</code> and sets it as the HTTP header <code>X-XSRF-TOKEN</code>. Since only JavaScript that
 runs on your domain could read the cookie, your server can be assured that the XHR came from
-JavaScript running on your domain. The header will not be set for cross-domain requests.</p>
+JavaScript running on your domain.</p>
 
 <p>To take advantage of this, your server needs to set a token in a JavaScript readable session
 cookie called <code>XSRF-TOKEN</code> on first HTTP GET request. On subsequent non-GET requests the
@@ -213,7 +218,7 @@ unique for each user and must be verifiable by the server (to prevent the JavaSc
 up its own tokens). We recommend that the token is a digest of your site's authentication
 cookie with <a href="http://en.wikipedia.org/wiki/Rainbow_table">salt for added security</a>.</p></div>
 <h2 id="Dependencies">Dependencies</h2>
-<ul class="dependencies"><li><code ng:non-bindable=""><a href="api/ng.$httpBacked">$httpBacked</a></code>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="api/ng.$httpBackend">$httpBackend</a></code>
 </li>
 <li><code ng:non-bindable=""><a href="api/ng.$browser">$browser</a></code>
 </li>
@@ -253,7 +258,6 @@ caching.</li>
 <li><strong>timeout</strong> – <code>{number}</code> – timeout in milliseconds.</li>
 <li><strong>withCredentials</strong> - <code>{boolean}</code> - whether to to set the <code>withCredentials</code> flag on the
 XHR object. See <a href="https://developer.mozilla.org/en/http_access_control#section_5">requests with credentials</a> for more information.</li>
-<li><strong>responseType</strong> - <code>{string}</code> - see <a href="https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest#responseType">requestType</a>.</li>
 </ul></li>
 </ul>
 <h3 id="Returns">Returns</h3>
@@ -356,7 +360,7 @@ Should contain <code>JSON_CALLBACK</code> string.</p></li>
 <div class="member property"><h2 id="Properties">Properties</h2>
 <ul class="properties"><li><h3 id="defaults">defaults</h3>
 <div class="defaults"><p>Runtime equivalent of the <code>$httpProvider.defaults</code> property. Allows configuration of
-default headers, withCredentials as well as request and response transformations.</p>
+default headers as well as request and response transformations.</p>
 
 <p>See "Setting HTTP Headers" and "Transforming Requests and Responses" sections above.</p></div>
 </li>

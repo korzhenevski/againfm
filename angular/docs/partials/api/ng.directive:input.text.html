@@ -13,8 +13,7 @@
        [ng-minlength="{number}"]
        [ng-maxlength="{number}"]
        [ng-pattern="{string}"]
-       [ng-change="{string}"]
-       [ng-trim="{boolean}"]&gt;</pre>
+       [ng-change="{string}"]&gt;</pre>
 <h3 id="Parameters">Parameters</h3>
 <ul class="parameters"><li><code ng:non-bindable="">ngModel – {string} – </code>
 <p>Assignable angular expression to data-bind to.</p></li>
@@ -39,9 +38,6 @@ patterns defined as scope expressions.</p></li>
 <li><code ng:non-bindable="">ngChange<i>(optional)</i> – {string=} – </code>
 <p>Angular expression to be executed when input changes due to user
 interaction with the input element.</p></li>
-<li><code ng:non-bindable="">ngTrim<i>(optional=true)</i> – {boolean=} – </code>
-<p>If set to false Angular will not automatically trimming the
-input.</p></li>
 </ul>
 </div>
 <h2 id="Example">Example</h2>
@@ -53,7 +49,7 @@ input.</p></li>
  
  <form name="myForm" ng-controller="Ctrl">
    Single word: <input type="text" name="input" ng-model="text"
-                       ng-pattern="word" required ng-trim="false">
+                       ng-pattern="word" required>
    <span class="error" ng-show="myForm.input.$error.required">
      Required!</span>
    <span class="error" ng-show="myForm.input.$error.pattern">
@@ -72,7 +68,7 @@ input.</p></li>
 <script type="text/ng-template" id="script.js-107">
    function Ctrl($scope) {
      $scope.text = 'guest';
-     $scope.word = /^\s*\w*\s*$/;
+     $scope.word = /^\w*$/;
    }
  </script>
 </div>
@@ -93,12 +89,6 @@ input.</p></li>
   it('should be invalid if multi word', function() {
     input('text').enter('hello world');
     expect(binding('myForm.input.$valid')).toEqual('false');
-  });
-
-  it('should not be trimmed', function() {
-    input('text').enter('untrimmed ');
-    expect(binding('text')).toEqual('untrimmed ');
-    expect(binding('myForm.input.$valid')).toEqual('true');
   });
 </script>
 </div>

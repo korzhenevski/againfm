@@ -15,8 +15,8 @@ into the <code>$exceptionHandler</code>.</p></div>
 <li><code>rethrow</code>: If any errors are are passed into the handler in tests, it typically
            means that there is a bug in the application or test, so this mock will
            make these tests fail.</li>
-<li><code>log</code>: Sometimes it is desirable to test that an error is throw, for this case the <code>log</code> mode stores the
-       error and allows later assertion of it.
+<li><code>log</code>: Sometimes it is desirable to test that an error is throw, for this case the <code>log</code> mode stores an
+       array of errors in <code>$exceptionHandler.errors</code>, to allow later assertion of them.
        See <a href="api/ngMock.$log#assertEmpty">assertEmpty()</a> and
         <a href="api/ngMock.$log#reset">reset()</a></li>
 </ul></li>

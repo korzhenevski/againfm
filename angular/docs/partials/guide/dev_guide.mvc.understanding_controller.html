@@ -1,10 +1,10 @@
 <h1><code ng:non-bindable=""></code>
 <span class="hint"></span>
 </h1>
-<div><p>In angular, a controller is a JavaScript function(type/class) that is used to augment instances of
-angular <a href="guide/scope">Scope</a>, excluding the root scope. When you or angular create a new
+<div><p>In Angular, a controller is a JavaScript function(type/class) that is used to augment instances of
+angular <a href="guide/scope">Scope</a>, excluding the root scope. When you or Angular create a new
 child scope object via the <a href="api/ng.$rootScope.Scope#$new"><code>scope.$new</code></a> API        , there is an
-option to pass in a controller as a method argument. This will tell angular to associate the
+option to pass in a controller as a method argument. This will tell Angular to associate the
 controller with the new scope and to augment its behavior.</p>
 
 <p>Use controllers to:</p>
@@ -16,10 +16,10 @@ controller with the new scope and to augment its behavior.</p>
 
 <h2>Setting up the initial state of a scope object</h2>
 
-<p>Typically, when you create an application you need to set up an initial state for an angular scope.</p>
+<p>Typically, when you create an application you need to set up an initial state for an Angular scope.</p>
 
 <p>Angular applies (in the sense of JavaScript's <code>Function#apply</code>) the controller constructor function
-to a new angular scope object, which sets up an initial scope state. This means that angular never
+to a new Angular scope object, which sets up an initial scope state. This means that Angular never
 creates instances of the controller type (by invoking the <code>new</code> operator on the controller
 constructor). Constructors are always applied to an existing scope object.</p>
 
@@ -31,9 +31,23 @@ constructor). Constructors are always applied to an existing scope object.</p>
 
 <p>The <code>GreetingCtrl</code> controller creates a <code>greeting</code> model which can be referred to in a template.</p>
 
+<p><strong>NOTE</strong>: Many of the examples in the documentation show the creation of functions
+in the global scope. This is only for demonstration purposes - in a real
+application you should use the <code>.controller</code> method of your Angular module for
+your application as follows:</p>
+
+<p>var myApp = angular.module('myApp',[]);</p>
+
+<p>myApp.controller('GreetingCtrl', ['$scope', function(scope) {
+  scope.greeting = 'Hola!';
+}]);</p>
+
+<p>Note also that we use the array notation to explicitly specify the dependency
+of the controller on the <code>$scope</code> service provided by Angular.</p>
+
 <h2>Adding Behavior to a Scope Object</h2>
 
-<p>Behavior on an angular scope object is in the form of scope method properties available to the
+<p>Behavior on an Angular scope object is in the form of scope method properties available to the
 template/view. This behavior interacts with and modifies the application model.</p>
 
 <p>As discussed in the <a href="guide/dev_guide.mvc.understanding_model">Model</a> section of this guide, any
@@ -56,13 +70,13 @@ This is discussed in the <a href="guide/di">Dependency Injection</a> <a href="gu
 <li>Any kind of DOM manipulation — Controllers should contain only business logic. DOM
 manipulation—the presentation logic of an application—is well known for being hard to test.
 Putting any presentation logic into controllers significantly affects testability of the business
-logic. Angular offers <a href="guide/dev_guide.templates.databinding">dev_guide.templates.databinding</a> for automatic DOM manipulation. If
+logic. Angular offers <a href="guide/dev_guide.templates.databinding">databinding</a> for automatic DOM manipulation. If
 you have to perform your own manual DOM manipulation, encapsulate the presentation logic in
 <a href="guide/directive">directives</a>.</li>
 <li>Input formatting — Use <a href="guide/forms">angular form controls</a> instead.</li>
 <li>Output filtering — Use <a href="guide/dev_guide.templates.filters">angular filters</a> instead.</li>
-<li>Run stateless or stateful code shared across controllers — Use <a href="guide/dev_guide.services">angular services</a> instead.</li>
-<li>Instantiate or manage the life-cycle of other components (for example, to create service
+<li>To run stateless or stateful code shared across controllers — Use <a href="guide/dev_guide.services">angular services</a> instead.</li>
+<li>To instantiate or manage the life-cycle of other components (for example, to create service
 instances).</li>
 </ul>
 
@@ -155,7 +169,7 @@ input box) in the second button.</p>
 
 <h3>Controller Inheritance Example</h3>
 
-<p>Controller inheritance in angular is based on <a href="api/ng.$rootScope.Scope"><code>Scope</code></a> inheritance. Let's
+<p>Controller inheritance in Angular is based on <a href="api/ng.$rootScope.Scope"><code>Scope</code></a> inheritance. Let's
 have a look at an example:</p>
 
 <pre class="prettyprint linenums">
@@ -197,7 +211,7 @@ model defined in the ChildCtrl</li>
 examples, all of the models could be replaced with controller methods that return string values.</p>
 
 <p>Note: Standard prototypical inheritance between two controllers doesn't work as one might expect,
-because as we mentioned earlier, controllers are not instantiated directly by angular, but rather
+because as we mentioned earlier, controllers are not instantiated directly by Angular, but rather
 are applied to the scope object.</p>
 
 <h3>Testing Controllers</h3>
@@ -239,8 +253,8 @@ describe('myController function', function() {
 });
 </pre>
 
-<p>If you need to test a nested controller one needs to create the same scope hierarchy
-in your test as exist in the DOM.</p>
+<p>If you need to test a nested controller you need to create the same scope hierarchy
+in your test that exists in the DOM.</p>
 
 <pre class="prettyprint linenums">
 describe('state', function() {

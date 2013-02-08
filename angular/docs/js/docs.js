@@ -37,7 +37,8 @@ docsApp.directive.sourceEdit = function(getEmbeddedTemplate) {
         '<ul class="dropdown-menu">' +
         '  <li><a ng-click="plunkr($event)" href="">In Plunkr</a></li>' +
         '  <li><a ng-click="fiddle($event)" href="">In JsFiddle</a></li>' +
-        '</ul>',
+        '</ul>' +
+        '</div>',
     scope: true,
     controller: function($scope, $attrs, openJsFiddle, openPlunkr) {
       var sources = {
@@ -189,7 +190,9 @@ docsApp.serviceFactory.openPlunkr = function(templateMerge, formPostData, angula
     });
 
     postData['files[index.html]'] = templateMerge(indexHtmlContent, indexProp);
-
+    postData['tags[]'] = "angularjs";
+    
+    postData.private = true;
     postData.description = 'AngularJS Example Plunkr';
 
     formPostData('http://plnkr.co/edit/?p=preview', postData);

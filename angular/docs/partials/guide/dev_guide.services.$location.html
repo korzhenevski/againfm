@@ -74,7 +74,7 @@ the current URL in the browser.</p>
 
 <h3>What does it not do?</h3>
 
-<p>Does not cause a full page reload when the browser URL is changed. To reload the page after
+<p>It does not cause a full page reload when the browser URL is changed. To reload the page after
 changing the URL, use the lower-level API, <code>$window.location.href</code>.</p>
 
 <h2>General overview of the API</h2>
@@ -134,12 +134,12 @@ current URL without creating a new browser history record you can call:
   // or you can chain these as: $location.path('/someNewPath').replace();
 </pre>
 
-<p>Note that the setters don't update <code>window.location</code> immediately. Instead, <code>$location</code> service is
+<p>Note that the setters don't update <code>window.location</code> immediately. Instead, the <code>$location</code> service is
 aware of the <a href="api/ng.$rootScope.Scope"><code>scope</code></a> life-cycle and coalesces multiple <code>$location</code>
 mutations into one "commit" to the <code>window.location</code> object during the scope <code>$digest</code> phase. Since
 multiple changes to the $location's state will be pushed to the browser as a single change, it's
 enough to call the <code>replace()</code> method just once to make the entire "commit" a replace operation
-rather than addition to the browser history. Once the browser is updated, the $location service
+rather than an addition to the browser history. Once the browser is updated, the $location service
 resets the flag set by <code>replace()</code> method and future mutations will create new history records,
 unless <code>replace()</code> is called again.</p>
 
@@ -215,7 +215,7 @@ facilitate the browser URL change and history management.</p>
 <pre class="prettyprint linenums">
 it('should show example', inject(
   function($locationProvider) {
-    $locationProvider.html5mode = false;
+    $locationProvider.html5Mode(false);
     $locationProvider.hashPrefix = '!';
   },
   function($location) {
@@ -265,7 +265,7 @@ having to worry about whether the browser displaying your app supports the histo
 <pre class="prettyprint linenums">
 it('should show example', inject(
   function($locationProvider) {
-    $locationProvider.html5mode = true;
+    $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix = '!';
   },
   function($location) {
@@ -308,7 +308,7 @@ history API  or not; the <code>$location</code> service makes this transparent t
 
 <h4>Html link rewriting</h4>
 
-<p>When you use the history API mode, you will need different links in different browser, but all you
+<p>When you use HTML5 history API mode, you will need different links in different browsers, but all you
 have to do is specify regular URL links, such as: <code>&lt;a href="/some?foo=bar"&gt;link&lt;/a&gt;</code></p>
 
 <p>When a user clicks on this link,</p>

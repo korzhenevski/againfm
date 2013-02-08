@@ -1,7 +1,7 @@
 <h1><code ng:non-bindable=""></code>
 <span class="hint"></span>
 </h1>
-<div><p>MVC allows for a clean an testable separation between the behavior (controller) and the view
+<div><p>MVC allows for a clean and testable separation between the behavior (controller) and the view
 (HTML template). A Controller is just a JavaScript class which is grafted onto the scope of the
 view. This makes it very easy for the controller and the view to share the model.</p>
 
@@ -11,10 +11,10 @@ controller and test without a view, because there is no connection between the c
 view.</p>
 
 <h3>Source</h3>
-<div source-edit="" source-edit-deps="angular.js script.js" source-edit-html="index.html-27" source-edit-css="" source-edit-js="script.js-26" source-edit-unit="" source-edit-scenario="scenario.js-28"></div>
+<div source-edit="" source-edit-deps="angular.js script.js" source-edit-html="index.html-13" source-edit-css="" source-edit-js="script.js-12" source-edit-unit="" source-edit-scenario="scenario.js-14"></div>
 <div class="tabbable"><div class="tab-pane" title="index.html">
-<pre class="prettyprint linenums" ng-set-text="index.html-27" ng-html-wrap=" angular.js script.js"></pre>
-<script type="text/ng-template" id="index.html-27">
+<pre class="prettyprint linenums" ng-set-text="index.html-13" ng-html-wrap=" angular.js script.js"></pre>
+<script type="text/ng-template" id="index.html-13">
     
 
     <h4>Tic-Tac-Toe</h4>
@@ -32,8 +32,8 @@ view.</p>
   </script>
 </div>
 <div class="tab-pane" title="script.js">
-<pre class="prettyprint linenums" ng-set-text="script.js-26"></pre>
-<script type="text/ng-template" id="script.js-26">
+<pre class="prettyprint linenums" ng-set-text="script.js-12"></pre>
+<script type="text/ng-template" id="script.js-12">
     function TicTacToeCntl($scope, $location) {
       $scope.cellStyle= {
         'height': '20px',
@@ -100,8 +100,8 @@ view.</p>
     </script>
 </div>
 <div class="tab-pane" title="End to end test">
-<pre class="prettyprint linenums" ng-set-text="scenario.js-28"></pre>
-<script type="text/ng-template" id="scenario.js-28">
+<pre class="prettyprint linenums" ng-set-text="scenario.js-14"></pre>
+<script type="text/ng-template" id="scenario.js-14">
     it('should play a game', function() {
      piece(1, 1);
      expect(binding('nextMove')).toEqual('O');
@@ -119,13 +119,13 @@ view.</p>
   </script>
 </div>
 </div><h3>Demo</h3>
-<div class="well doc-example-live" ng-embed-app="" ng-set-html="index.html-27" ng-eval-javascript="script.js-26"></div>
+<div class="well doc-example-live" ng-embed-app="" ng-set-html="index.html-13" ng-eval-javascript="script.js-12"></div>
 
 <h2>Things to notice</h2>
 
 <ul>
 <li>The controller is defined in JavaScript and has no reference to the rendering logic.</li>
-<li>The controller is instantiated by <angular/> and injected into the view.</li>
+<li>The controller is instantiated by Angular and injected into the view.</li>
 <li>The controller can be instantiated in isolation (without a view) and the code will still execute.
 This makes it very testable.</li>
 <li>The HTML view is a projection of the model. In the above example, the model is stored in the

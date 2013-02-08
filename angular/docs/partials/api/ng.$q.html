@@ -10,7 +10,7 @@ interface for interacting with an object that represents the result of an action
 performed asynchronously, and may or may not be finished at any given point in time.</p>
 
 <p>From the perspective of dealing with error handling, deferred and promise apis are to
-asynchronous programing what <code>try</code>, <code>catch</code> and <code>throw</code> keywords are to synchronous programing.</p>
+asynchronous programming what <code>try</code>, <code>catch</code> and <code>throw</code> keywords are to synchronous programming.</p>
 
 <pre class="prettyprint linenums">
   // for the purpose of this example let's assume that variables `$q` and `scope` are
@@ -121,8 +121,32 @@ mechanism in angular, which means faster propagation of resolution or rejection 
 models and avoiding unnecessary browser repaints, which would result in flickering UI.</li>
 <li>$q promises are recognized by the templating engine in angular, which means that in templates
 you can treat promises attached to a scope as if they were the resulting values.</li>
-<li>Q has many more features that $q, but that comes at a cost of bytes. $q is tiny, but contains
-all the important functionality needed for common async tasks.</li>
+<li><p>Q has many more features that $q, but that comes at a cost of bytes. $q is tiny, but contains
+all the important functionality needed for common async tasks.</p>
+
+<h3>Testing</h3>
+
+<pre class="prettyprint linenums">
+   it('should simulate promise', inject(function($q, $rootSCope) {
+     var deferred = $q.defer();
+     var promise = deferred.promise;
+     var resolvedValue;
+
+     promise.then(function(value) { resolvedValue = value; });
+     expect(resolvedValue).toBeUndefined();
+
+     // Simulate resolving of promise
+     defered.resolve(123);
+     // Note that the 'then' function does not get called synchronously.
+     // This is because we want the promise API to always be async, whether or not
+     // it got called synchronously or asynchronously.
+     expect(resolvedValue).toBeUndefined();
+
+     // Propagate promise resolution to 'then' functions using $apply().
+     $rootScope.$apply();
+     expect(resolvedValue).toEqual(123);
+   });
+ </pre></li>
 </ul></div>
 <h2 id="Dependencies">Dependencies</h2>
 <ul class="dependencies"><li><code ng:non-bindable=""><a href="api/ng.$rootScope">$rootScope</a></code>

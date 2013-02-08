@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 2012-11-28T21:34:34.922Z
+# 2013-01-23T19:59:39.184Z
 
 # cache all of these
 CACHE:
@@ -80,7 +80,7 @@ partials/api/angular.isObject.html
 partials/api/angular.isString.html
 partials/api/angular.isUndefined.html
 partials/api/angular.lowercase.html
-partials/api/angular.mock.debug.html
+partials/api/angular.mock.dump.html
 partials/api/angular.mock.html
 partials/api/angular.mock.inject.html
 partials/api/angular.mock.module.html
