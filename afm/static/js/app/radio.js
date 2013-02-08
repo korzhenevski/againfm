@@ -2,10 +2,12 @@ var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
-    $locationProvider.hashPrefix('!');
+    //$locationProvider.hashPrefix('!');
 
-    $routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''});
+    //$routeProvider.when('/radio/:radioId', {controller: 'StationCtrl', template: ''});
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
+    $routeProvider.when('/signup', {templateUrl: '/signup.html', modal: true});
+    $routeProvider.when('/amnesia', {templateUrl: '/amnesia.html', modal: true});
 
     $routeProvider.otherwise({redirectTo: '/'});
 });
@@ -58,13 +60,11 @@ afm.directive('modalBox', function($route){
         restrict: 'AC',
         link: function(scope, element, attrs) {
             scope.$on('$routeChangeSuccess', update);
-            scope.template = '';
+            update();
 
             function update() {
-                var locals = $route.current && $route.current.modal && $route.current.locals,
-                    template = locals && locals.$template;
-
-                scope.template = template ? $route.current.templateUrl : '';
+                var modal = $route.current && $route.current.modal;
+                element.css('display', modal ? 'block' : 'none');
             }
         }
     }
@@ -198,8 +198,8 @@ afm.factory('Auth', ['$http', function($http){
             return $http.post('/api/user/login', data).success(function(newUser){
                 user = newUser;
             }).error(function(){
-                    user = null;
-                });
+                user = null;
+            });
         },
 
         isLogged: function() {
@@ -212,8 +212,18 @@ afm.factory('Auth', ['$http', function($http){
     };
 }]);
 
-afm.controller('LoginCtrl', function($scope, Auth){
-    $scope.text = 'Very Text';
+afm.controller('LoginCtrl', function($scope, $location, Auth){
+    $scope.login = 'test@testing.com';
+    $scope.password = 'password';
+    $scope.authLogin = function() {
+        $scope.error = null;
+        Auth.login({login: $scope.login, password: $scope.password}).success(function(){
+            $location.path('/');
+            $scope.$broadcast('userLogged');
+        }).error(function(){
+            $scope.error = 'Error';
+        });
+    };
 });
 
 afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http, favorites){

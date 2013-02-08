@@ -14,10 +14,17 @@
   z-index: 1000
   background-color: rgba(#000, 0.5)
 
+input[disabled], button[disabled]
+  cursor: normal
+  +opacity(0.4)
+
 .modal
   +border-radius(7px)
   border: 3px solid rgba(#252523, 0.5)
   background-color: #4b4c5b
+  width: 375px
+  margin: 10% auto
+  padding: 19px
 
   h1
     font-size: 22px
@@ -66,10 +73,6 @@
     margin: 20px -19px
 
 .modal-login
-  width: 375px
-  margin: 10% auto
-  padding: 19px
-
   .field
     margin-bottom: 9px
 
@@ -85,6 +88,11 @@
       position: absolute
       right: 0
       top: 0
+
+  form.ng-dirty
+    input.ng-invalid
+      color: #ff6f7d
+      border: 1px solid #963841
 
 .centroid
   width: 980px
@@ -338,10 +346,6 @@
       background-image: url('/static/i/random-button.png')
       &:active
         background-image: url('/static/i/random-button-active.png')
-
-    button[disabled]
-      +opacity(0.4)
-      cursor: normal
 
     .back
       background-image: url('/static/i/back-button.png')

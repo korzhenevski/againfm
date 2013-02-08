@@ -17,6 +17,8 @@ def load_user(user_id):
 
 @web.route('/')
 @web.route('/login')
+@web.route('/signup')
+@web.route('/amnesia')
 def index():
     return render_template('index.html')
 

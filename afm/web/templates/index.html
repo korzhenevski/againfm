@@ -9,19 +9,29 @@
     <meta name="fragment" content="!" />
 </head>
 <body class="ng-cloak">
-    <div class="modal-box ng-cloak" ng-show="template" ng-include="template"></div>
+    <!--div class="modal-box ng-cloak" ng-show="template" ng-include="template"></div-->
+    <div class="modal-box ng-cloak" ng-view></div>
 
     <script type="text/ng-template" id="/login.html">
         <modal role="login" title="Авторизация">
-            <form>
-                <input class="field" name="email" type="text" placeholder="Электронная почта" />
-                <input class="field" name="password" type="password" placeholder="Пароль" />
+            <form name="loginForm">
+                <input class="field" name="login" ng-model="login" required type="email" placeholder="Электронная почта" />
+                <input class="field" name="password" ng-model="password" required type="password" placeholder="Пароль" />
                 <div class="controls">
-                    <input type="submit" class="button" value="Войти в профиль" />
+                    <input type="submit" class="button" value="Войти в профиль" ng-disabled="loginForm.$invalid" ng-click="authLogin()" />
                     <a href="/amnesia" class="amnesia">восстановить пароль</a>
                 </div>
+                <p ng-show="error">{{ error }}</p>
                 <hr class="line" />
-                <p>{{ text }}</p>
+            </form>
+        </modal>
+    </script>
+
+    <script type="text/ng-template" id="/amnesia.html">
+        <modal role="amnesia" title="Сброс пароля">
+            <form>
+                <input class="field" name="email" ng-model="email" required type="email" placeholder="Электронная почта" />
+                <input type="submit" class="button" value="Выслать на почту" />
             </form>
         </modal>
     </script>
