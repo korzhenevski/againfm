@@ -14,6 +14,7 @@ def station_random():
     station = db.Station.find_random()
     return jsonify({'station': station.get_public()})
 
+# bootstrap this on template
 @app.route('/api/user', methods=['POST'])
 def user():
     user = None
@@ -68,8 +69,9 @@ def signup():
 @login_required
 def logout():
     logout_user()
-    return jsonify({'success': True})
+    return jsonify({'logout': True})
 
+"""
 @app.route('/api/user/password', methods=['POST'])
 @login_required
 def change_password():
@@ -90,6 +92,7 @@ def change_name():
     current_user.name = name
     current_user.save()
     return jsonify({'name': current_user.name})
+"""
 
 @app.route('/api/user/settings', methods=['GET','POST'])
 @login_required
@@ -132,6 +135,13 @@ def station_detail(station_id):
     station = db.Station.find_one_or_404({'id': station_id, 'deleted_at': 0})
     return jsonify(station.get_public())
 
+# cool method
+@app.route('/api/station/<int:station_id>/tunein')
+def station_play_url(station_id):
+    stream = db.Stream.find_one_or_404({'station_id': station_id}, fields={'_id': 0}, sort=[('bitrate', -1)])
+    return jsonify({
+        'stream': {'url': stream.get_web_url(),}
+    })
 
 @app.route('/api/station/get/<int:station_id>')
 def station_play_url(station_id):

@@ -126,13 +126,20 @@ class FavoriteTrack(AbstractFavorite):
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
 
-    def get_public(self):
+    def get_public_old(self):
         fields = self.structure.keys()
         data = dict([(k, v) for k, v in self.iteritems() if k in fields])
         ts = datetime.utcfromtimestamp(data['created_at'])
         data['time'] = ts.strftime("%H:%M")
         data['favorite'] = bool(data['favorite'] % 2)
         return data
+
+    def get_public(self):
+        return {
+            'id': self['track']['id'],
+            'title': self['track']['title']
+        }
+
 
 # TODO: сюда хорошо добавить dbref на station
 @db.register

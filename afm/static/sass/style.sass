@@ -137,9 +137,22 @@
   position: relative
   width: 1017px
 
+  .tracks-toggle
+    position: relative
+    margin-left: 23px
+
+    .tracks-icon
+      top: 0px
+      left: -23px
+      width: 19px
+      height: 19px
+      position: absolute
+      background-image: url('/static/i/tracks-icon.png')
+      background-repeat: no-repeat
+
 .tracks-box
   top: 100%
-  width: 485px
+  width: 465px
   height: 333px
   z-index: 1000
   position: absolute
@@ -147,10 +160,20 @@
   +background(linear-gradient(#474857, #4b4c5b))
   +border-radius(0px 0px 3px 3px)
 
+  .tracks-corner
+    top: -10px
+    left: 20px
+    width: 19px
+    height: 10px
+    position: absolute
+    background-repeat: no-repeat
+    background-image: url('/static/i/tracks-corner.png')
+
   // скролл
   .tracks-inner
-    overflow: hidden
     margin: 15px 0
+    max-height: 300px
+    overflow: scroll
 
   .search
     margin: 0 13px
