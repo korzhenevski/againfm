@@ -4,6 +4,7 @@
  * Добавление удаление авторизованное Избранное
  * Ошибки в модальных окнах: пользователь уже существует, etc...
  * http-interceptor для json ошибок
+ * фильтрация через контроллер - в скопе уже отфильтрованный список (треки, плейлист)
  * Регулятор громкости
  * [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
  * Поиск по треклисту
@@ -375,4 +376,19 @@ afm.controller('RadioCtrl', function($scope, $location, $resource, player, $http
     // ---
 
     $scope.favorites = favorites;
+});
+
+afm.controller('TracksCtrl', function($scope, $filter){
+    $scope.searchQuery = '';
+    $scope.tracks = [
+        {title: 'Massive Attack – Paradise Circus', id: 1000},
+        {title: 'Massive Attack – Paradise Circus', id: 1000},
+        {title: 'Massive Attack – Paradise Circus', id: 1000, removed: true},
+        {title: 'Massive Attack – Paradise Circus', id: 1000},
+        {title: 'Massive Attack – Paradise Circus', id: 1000}
+    ];
+
+    $scope.tracksList = function() {
+        return $filter('filter')($scope.tracks, $scope.searchQuery);
+    };
 });

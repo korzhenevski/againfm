@@ -2,21 +2,31 @@
 @import "compass/css3/border-radius"
 @import "compass/css3/images"
 @import "compass/css3/box-shadow"
+@import "compass/css3/box-sizing"
 @import "compass/css3/text-shadow"
 @import "compass/css3/opacity"
 @import "compass/css3/transition"
+
+@mixin placeholder-color($color)
+  &.placeholder
+    color: $color
+
+  &::-webkit-input-placeholder
+    color: $color
+
+  &:-moz-placeholder
+    color: $color
+
+  &:-ms-input-placeholder
+    color: $color
 
 .modal-box
   position: absolute
   height: 100%
   width: 100%
   overflow: hidden
-  z-index: 1000
+  z-index: 1500
   background-color: rgba(#000, 0.5)
-
-input[disabled], button[disabled]
-  cursor: normal
-  +opacity(0.4)
 
 .modal
   +border-radius(7px)
@@ -78,9 +88,6 @@ input[disabled], button[disabled]
   .button
     padding: 10px 13px
 
-  .amnesia
-    border-bottom-style: solid
-
   .controls
     position: relative
     .amnesia
@@ -120,12 +127,67 @@ input[disabled], button[disabled]
     +background(linear-gradient(#68acb9, #3892a3))
 
 .topline
-  padding: 10px 0
   border-top: 1px solid #525362
   border-bottom: 1px solid #24252a
   margin-bottom: 40px
   +background(linear-gradient(rgba(#4e4d5c, 0.5), rgba(#393944, 0.5)))
   +box-shadow(#4b4c5b 0px -4px 3px -2px inset, #26242c 0px 0px 3px 1px)
+
+.topline-inner
+  position: relative
+  width: 1017px
+
+.tracks-box
+  top: 100%
+  width: 485px
+  height: 333px
+  z-index: 1000
+  position: absolute
+  border-top: 2px solid #192825
+  +background(linear-gradient(#474857, #4b4c5b))
+  +border-radius(0px 0px 3px 3px)
+
+  // скролл
+  .tracks-inner
+    overflow: hidden
+    margin: 15px 0
+
+  .search
+    margin: 0 13px
+    margin-bottom: 7px
+
+    .search-field
+      width: 100%
+      font-size: 12px
+      padding: 6px 8px
+      +box-sizing(border-box)
+
+  .tracks
+    width: 100%
+    font-size: 12px
+
+    .track
+      &:hover
+        background-color: #3f404f
+
+    .track-removed
+      +opacity(0.2)
+
+    .title
+      padding: 6px 10px 6px 15px
+
+    .controls
+      width: 50px
+      padding: 6px 15px 6px 10px
+
+    .remove
+      border: none
+      width: 17px
+      height: 17px
+      background-repeat: no-repeat
+      background-color: transparent
+      background-image: url('/static/i/tracks-remove.png')
+      +border-radius(1px)
 
 .radio
   margin: 0 auto
@@ -451,22 +513,54 @@ input[disabled], button[disabled]
       +border-radius(4px)
       +text-shadow(#3d3017 0px 0px 1px)
 
+.page
+  background-color: #4b4c5b
+  padding: 30px
+  min-height: 500px
+  border: 3px solid #2b2b2b
+  +border-radius(8px)
+
+input[disabled], button[disabled]
+  cursor: normal
+  +opacity(0.4)
+
+.input-text, .page input[type=text]
+  color: #7b7c87
+  outline: none
+  border: 1px solid #505160
+  padding: 9px 11px
+  outline: none
+  background-color: #3f404f
+  +background(linear-gradient(#3f404f, #454757))
+  +border-radius(4px)
+  +box-shadow(#505160 0 1px 1px 0px, #3a3b48 0 2px 5px 1px inset)
+  @include placeholder-color(#7b7c87)
+
+  &:focus
+    color: #f2f2f4
+
 .footer
   clear: both
 
 body
   background-color: #453745
   font-size: 14px
-  font-family: Helvetica, Arial, sans-serif
+  font-family: Helvetica, Arial, sans-serif !important
   color: #fff
   background: url('/static/i/background.jpg')
   +background-size(cover)
-  //+text-shadow(shade(#000, 30%) 0px 1px 1px)
 
 a
   color: #fff
   text-decoration: none
-  border-bottom: 1px dashed #a49ca3
+  border-bottom: 1px solid #a49ca3
+
+.logo
+  margin-left: -2px
+
+.topmenu, .roof
+  a
+    border-bottom: 1px dashed #a49ca3
 
 ul.inline
   list-style-type: none
@@ -485,13 +579,3 @@ ul.justified
     display: inline
   .block
     display: inline-block
-
-\::-webkit-input-placeholder
-  color: white
-
-\::-moz-placeholder
-  color: white
-
-\:-ms-input-placeholder
-  color: white
-

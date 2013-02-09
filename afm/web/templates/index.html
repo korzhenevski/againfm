@@ -5,7 +5,7 @@
     <link href="/static/css/normalize.css" rel="stylesheet"/>
     <link href="/static/css/common.css" rel="stylesheet"/>
     <link href="/static/css/style.css" rel="stylesheet"/>
-    <link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/>
+    <!--link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/-->
     <meta name="fragment" content="!" />
 </head>
 <body class="ng-cloak">
@@ -50,31 +50,49 @@
         </modal>
     </script>
 
-    <div class="topline">
-        <table class="centroid">
-            <tr>
-                <td width="20%">
-                    <a href="">Любимые треки и эфиры</a>
-                </td>
-                <td>
-                    <a href="">Добавить радио</a>
-                </td>
-                <td>
-                    <p ng-hide="currentUser.isLogged()">
-                        <a href="/login">Войти</a>, <a href="/amnesia">восстановить пароль</a> или <a href="/signup">Зарегистрироватся</a>
-                    </p>
-                    <p ng-hide="!currentUser.isLogged()">
-                        <a ng-click="logout()">Выход</a>
-                    </p>
-                </td>
-            </tr>
-        </table>
+    <div class="topline" ng-init="showTracks=true">
+        <div class="topline-inner centroid">
+            <table class="topmenu centroid">
+                <tr>
+                    <td width="20%">
+                        <a ng-click="showTracks=!showTracks">Любимые треки и эфиры</a>
+                    </td>
+                    <td>
+                        <a href="">Добавить радио</a>
+                    </td>
+                    <td>
+                        <p ng-hide="currentUser.isLogged()">
+                            <a href="/login">Войти</a>, <a href="/amnesia">восстановить пароль</a> или <a href="/signup">Зарегистрироватся</a>
+                        </p>
+                        <p ng-hide="!currentUser.isLogged()">
+                            <a ng-click="logout()">Выход</a>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <div class="tracks-box" ng-controller="TracksCtrl" ng-hide="!showTracks">
+                <div class="tracks-inner">
+                    <div class="search">
+                        <input type="text" class="input-text search-field" ng-model="searchQuery" placeholder="поиск треков" />
+                    </div>
+                    <table class="tracks">
+                        <tr ng-class="{'track-removed': track.removed, track: !track.removed}" ng-repeat="track in tracksList()">
+                            <td class="title">{{ track.title }}</td>
+                            <td class="controls" align="right">
+                                <button ng-click="remove(track)" class="remove" ng-hide="track.removed"></button>
+                                <a ng-click="restore(track)" ng-hide="!track.removed">отмена</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <table class="roof centroid">
         <tr>
             <td>
-                <img src="/static/i/logo.png" />
+                <img src="/static/i/logo.png" class="logo" />
             </td>
             <td>
 

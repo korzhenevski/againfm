@@ -22,6 +22,10 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
+@web.route('/guideline')
+def guideline():
+    return render_template('guideline.html')
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return jsonify({'error': 'Auth required'}), 401
