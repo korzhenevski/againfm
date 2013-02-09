@@ -352,7 +352,7 @@ afm.run(function($rootScope, $http, currentUser, User){
     });
 });
 
-afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, player, $http, favorites, userTracks){
+afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, player, $http, favorites){
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
         {id: 'genre/trance', title: 'Транс'},
@@ -434,13 +434,10 @@ afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, play
         player.setVolume($scope.volume);
     };
 
-    // ---
-
     $scope.favorites = favorites;
-    $scope.userTracks = userTracks;
 });
 
-
+/*
 afm.factory('UserTrack', function($http){
     return {
         list: function(cb) {
@@ -463,14 +460,11 @@ afm.factory('userTracks', function(){
         }
     };
 });
+*/
 
-afm.controller('TracksCtrl', function($scope, $filter, currentUser, userTracks, UserTrack){
+afm.controller('TracksCtrl', function($scope, $filter){
     $scope.tracks = [];
     $scope.searchQuery = '';
-
-    UserTrack.list(function(tracks){
-        $scope.tracks = tracks;
-    });
 
     $scope.getTracks = function() {
         return $filter('filter')($scope.tracks, $scope.searchQuery);

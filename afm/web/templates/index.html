@@ -13,7 +13,7 @@
     <div class="modal-box ng-cloak" ng-view></div>
 
     <script type="text/ng-template" id="/login.html">
-        <modal id="login" title="Войти с паролем">
+        <modal id="login" title="Вход с паролем">
             <form name="loginForm" ng-submit="auth()">
                 <input class="field" name="login" ng-model="form.login" type="email" placeholder="Электронная почта" required="" autofocus="" />
                 <input class="field" name="password" ng-model="form.password" type="password" placeholder="Пароль" required />
@@ -50,8 +50,8 @@
         </modal>
     </script>
 
-    <div class="topline" ng-init="showTracks=true">
-        <!-- нахера два центройда? -->
+    <div class="topline" ng-init="showTracks=false">
+        <!-- TODO: нахера два центройда? -->
         <div class="topline-inner centroid">
             <table class="topmenu centroid">
                 <tr>
@@ -66,18 +66,19 @@
                     </td>
                     <td align="right">
                         <p ng-hide="currentUser.isLogged()">
-                            <a href="/login">Войти</a>, <a href="/amnesia">восстановить пароль</a> или <a href="/signup">Зарегистрироватся</a>
+                            <a href="/login">вход с паролем</a> или <a href="/signup">завести аккаунт</a>
                         </p>
                         <p ng-hide="!currentUser.isLogged()">
-                            <a ng-click="logout()">Выход</a>
+                            <a ng-click="logout()">выйти</a>
                         </p>
                     </td>
                 </tr>
             </table>
             <div class="tracks-box" ng-controller="TracksCtrl" ng-hide="!showTracks">
                 <span class="tracks-corner"></span>
+                <!-- TODO: выровнять высоту зоны прокрутки, не обрезать строчки треков. -->
                 <div class="tracks-inner">
-                    <div class="search">
+                    <div class="search" ng-hide="!tracks.length">
                         <input type="text" class="input-text search-field" ng-model="searchQuery" placeholder="поиск треков" />
                     </div>
                     <table class="tracks">
@@ -94,7 +95,7 @@
         </div>
     </div>
 
-    <table class="roof centroid">
+    <table class="roof">
         <tr>
             <td>
                 <img src="/static/i/logo.png" class="logo" />
@@ -103,7 +104,8 @@
 
             </td>
             <td align="right">
-                <p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p>
+                <!--p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p-->
+                <p>Двести тысяч пользователей слушают радио. А мы играем ;)</p>
             </td>
         </tr>
     </table>
