@@ -192,12 +192,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td height="281px"><div class="favorites">
+                        <td height="281px"><div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
-                                    <li ng-repeat="(id, station) in favorites.stations">
+                                    <li ng-repeat="station in stations">
                                         <div class="block" ng-click="selectStation(station)">
-                                            {{ station.title }} <i class="remove" ng-click="favorites.remove(station.id)"></i>
+                                            {{ station.title }} <i class="remove"></i>
                                         </div>
                                     </li>
                                 </ul>

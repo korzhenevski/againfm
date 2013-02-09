@@ -118,9 +118,9 @@ def featured_playlist():
     stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(50)]
     return jsonify({'objects': stations})
 
-@app.route('/api/playlist/favorite')
+@app.route('/api/user/favorites')
 @login_required
-def favorite_playlist():
+def user_favorites():
     favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
     favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
     # выборка по списку айдишников
@@ -128,7 +128,13 @@ def favorite_playlist():
     stations = [station.get_public() for station in db.Station.find(query)]
     # сортируем по времени добавления
     stations.sort(key=lambda station: favorite_stations.get(station['id']))
-    return jsonify({'objects': stations})
+    return jsonify({'stations': stations})
+
+@app.route('/api/user/favorites/add')
+@app.route('/api/user/favorites/remove')
+@login_required
+def user_favorites_action():
+    return jsonify({'status': 'ok'})
 
 @app.route('/api/station/<int:station_id>')
 def station_detail(station_id):
