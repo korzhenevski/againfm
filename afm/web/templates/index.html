@@ -131,6 +131,7 @@
                             <div class="display-inner">
                                 <div class="display">
                                     <h1 class="station-title">{{ currentStation.title }}</h1>
+                                    <button ng-click="faveStation()" ng-hide="isStationFaved()">fave</button>
                                     <!--div class="track">
                                         <button class="like"></button>
                                         <h2>Very Long Artist - Very Long TrackName</h2>
@@ -196,9 +197,9 @@
                         <td height="281px"><div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
-                                    <li ng-repeat="station in favorites">
+                                    <li ng-repeat="station in getFavorites()">
                                         <div class="block" ng-click="selectStation(station)">
-                                            {{ station.title }} <i class="remove"></i>
+                                            {{ station.title }} <i class="remove" ng-click="remove(station.id)"></i>
                                         </div>
                                     </li>
                                 </ul>

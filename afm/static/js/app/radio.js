@@ -16,7 +16,7 @@ var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
 
-afm.config(function($routeProvider, $locationProvider){
+afm.config(function($routeProvider, $locationProvider, $httpProvider){
     $locationProvider.html5Mode(true);
 
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
@@ -25,8 +25,21 @@ afm.config(function($routeProvider, $locationProvider){
     //$routeProvider.when('/radio/:stationId', {controller: function($routeParams){
     //    console.log($routeParams);
     //}});
-
     $routeProvider.otherwise({redirectTo: '/'});
+
+    //  $httpProvider.responseInterceptors.push('apiHttpInterceptor');
+});
+
+afm.run(function($rootScope, $http, currentUser, bootstrapUser, User){
+    $rootScope.currentUser = currentUser;
+    $rootScope.logout = function() {
+        if (currentUser.isLogged()) {
+            currentUser.clear();
+            User.logout();
+        }
+    };
+
+    currentUser.update(bootstrapUser);
 });
 
 afm.directive('radioCursor', function($rootScope){
@@ -115,11 +128,22 @@ afm.directive('modalBox', function($route){
 });
 
 
+afm.factory('apiHttpInterceptor', function($q){
+    return function(promise) {
+        return promise.then(function(response){
+            console.log('response: ',response);
+            return response;
+        }, function(response){
+            console.log('error response: '+response);
+            return $q.reject(response);
+        });
+    };
+});
+
 afm.factory('audio', function($document) {
     var audio = $document[0].createElement('audio');
     return audio;
 });
-
 
 afm.factory('player', function(audio, $cookieStore) {
     var player = {
@@ -200,7 +224,7 @@ afm.factory('storage', function($window, $cacheFactory, $log){
         }
     } catch(e) {}
     // fallback
-    $log.warn('use storage runtime fallback');
+    $log.warn('localStorage not available. fallback used.');
     return $cacheFactory('storage');
 });
 
@@ -217,6 +241,66 @@ afm.factory('currentUser', function($rootScope){
 
         isLogged: function() {
             return !!user;
+        }
+    };
+});
+
+afm.factory('favorites', function($rootScope, currentUser, storage, UserFavorite) {
+    var STORAGE_ID = 'favorites';
+    var favorites = storage.get(STORAGE_ID) || {};
+
+    // sync favorites to localstorage
+    $rootScope.$watch(function() { return favorites; }, function(data){
+        if (!currentUser.isLogged()) {
+            storage.put(STORAGE_ID, data);
+        }
+    }, true);
+
+    $rootScope.$watch(function() {
+        return currentUser.isLogged();
+    }, function(logged){
+        console.log('User ' + (logged ? 'online' : 'offline'));
+        if (logged) {
+            // clean local favorites
+            storage.put(STORAGE_ID, {});
+            UserFavorite.list(function(objects){
+                angular.forEach(objects, function(obj){
+                    favorites[obj.id] = obj;
+                });
+            });
+        } else {
+            favorites = storage.get(STORAGE_ID);
+        }
+    });
+
+    return {
+        add: function(id, title) {
+            var ts = +(new Date());
+            favorites[id] = {id: id, title: title, ts: ts};
+            if (currentUser.isLogged()) {
+                UserFavorite.add(id);
+            }
+        },
+
+        remove: function(id) {
+            if (favorites.hasOwnProperty(id)) {
+                delete favorites[id];
+            }
+            if (currentUser.isLogged()) {
+                UserFavorite.remove(id);
+            }
+        },
+
+        exists: function(id) {
+            return favorites.hasOwnProperty(id);
+        },
+
+        get: function() {
+            var result = [];
+            angular.forEach(favorites, function(obj){
+                result.push(obj);
+            });
+            return result;
         }
     };
 });
@@ -245,6 +329,36 @@ afm.factory('User', function($http){
     };
 });
 
+afm.factory('Station', function($http){
+    return {
+        get: function(stationId) {
+            return $http.get('/api/station/' + stationId);
+        }
+    }
+});
+
+afm.factory('Playlist', function($resource){
+    return $resource('/api/playlist/:filter');
+});
+
+afm.factory('UserFavorite', function($http){
+    return {
+        add: function(id) {
+            $http.post('/api/user/favorites/add', {station_id: id});
+        },
+
+        remove: function(id) {
+            $http.post('/api/user/favorites/remove', {station_id: id});
+        },
+
+        list: function(cb) {
+            $http.get('/api/user/favorites').success(function(response){
+                cb(response['objects']);
+            });
+        }
+    }
+});
+
 afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
     if (currentUser.isLogged()) {
         $location.path('/');
@@ -262,8 +376,8 @@ afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
             currentUser.update(response.user);
             $location.path('/');
         }).error(function(){
-            $scope.error = 'Error';
-        });
+                $scope.error = 'Error';
+            });
     };
 });
 
@@ -280,8 +394,8 @@ afm.controller('SignupCtrl', function($scope, $location, currentUser, User){
             currentUser.update(response.user);
             $location.path('/');
         }).error(function(){
-            $scope.error = 'Error';
-        });
+                $scope.error = 'Error';
+            });
     };
 });
 
@@ -297,40 +411,6 @@ afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User){
             $scope.result = result;
         });
     };
-});
-
-afm.factory('apiHttpInterceptor', function($q){
-    return function(promise) {
-        return promise.then(function(response){
-            return response;
-        }, function(response){
-            return $q.reject(response);
-        });
-    };
-});
-
-afm.run(function($rootScope, $http, currentUser, bootstrapUser, User){
-    $rootScope.currentUser = currentUser;
-    $rootScope.logout = function() {
-        if (currentUser.isLogged()) {
-            currentUser.clear();
-            User.logout();
-        }
-    };
-
-    currentUser.update(bootstrapUser);
-});
-
-afm.factory('Station', function($http){
-    return {
-        get: function(stationId) {
-            return $http.get('/api/station/' + stationId);
-        }
-    }
-});
-
-afm.factory('Playlist', function($resource){
-    return $resource('/api/playlist/:filter');
 });
 
 /**
@@ -396,117 +476,32 @@ afm.controller('RadioCtrl', function($scope, $filter, player, $http){
     };
 });
 
-afm.factory('localFavorites', function($rootScope, storage) {
-    var STORAGE_ID = 'favorites';
-    var favorites = storage.get(STORAGE_ID) || {};
-    $rootScope.$watch(function() { return favorites; }, function(stations){
-        storage.put(STORAGE_ID, stations);
-    });
-
-    return {
-        add: function(id, title) {
-            var ts = +(new Date());
-            favorites[id] = {id: id, title: title, ts: ts};
-        },
-
-        remove: function(id) {
-            if (favorites.hasOwnProperty(id)) {
-                delete favorites[id];
-            }
-        },
-
-        exists: function(id) {
-            return favorites.hasOwnProperty(id);
-        },
-
-        clear: function() {
-            favorites = {};
-        },
-
-        list: function() {
-            var result = [];
-            angular.forEach(favorites, function(id, obj){
-                result.push(obj);
-            });
-            return result;
-        }
-    };
-});
-
-afm.factory('userFavorites', function($http){
-    return {
-        add: function(station) {
-            $http.post('/api/user/favorites/add', {station_id: station.id});
-        },
-
-        remove: function(station_id) {
-            $http.post('/api/user/favorites/remove', {station_id: station_id});
-        },
-
-        list: function(cb) {
-            $http.get('/api/user/favorites').success(function(response){
-                cb(response['objects']);
-            });
-        }
+afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
+    $scope.getFavorites = function() {
+        return favorites.get();
     }
-});
 
-afm.controller('FavoritesCtrl', function($scope, $rootScope, currentUser, localFavorites, userFavorites){
-    $scope.favorites = [];
-
-    $rootScope.$watch(function() {
-        return currentUser.isLogged();
-    }, function(logged){
-        console.log('User ' + (logged ? 'online' : 'offline'));
-
-        if (logged) {
-            localFavorites.clear();
-            userFavorites.list(function(favorites){
-                $scope.favorites = favorites;
-            })
-        } else {
-            $scope.favorites = localFavorites.list();
-        }
-    });
+    $scope.remove = function(id) {
+        favorites.remove(id);
+    };
 });
 
 /**
  * на сайте отображаем состояние,
  */
-afm.controller('DisplayCtrl', function($scope, currentUser, Station){
-    $scope.station = null;
+afm.controller('DisplayCtrl', function($scope, currentUser, Station, favorites){
     $scope.track = null;
 
+    $scope.faveStation = function() {
+        favorites.add($scope.currentStation.id, $scope.currentStation.title);
+    };
+
     $scope.isStationFaved = function() {
-        if (!$scope.station) {
+        if (!$scope.currentStation) {
             return false;
         }
-
-        if (currentUser.isLogged()) {
-            return $scope.station.faved;
-        }
-
-        return favorites.isFaved($scope.station.id);
+        return favorites.exists($scope.currentStation.id);
     };
-
-    $scope.isTrackFaved = function() {
-        if (!$scope.track) {
-            return false;
-        }
-
-        if (currentUser.isLogged()) {
-            return $scope.track.faved;
-        }
-
-        return tracks.isFaved($scope.track.id);
-    };
-
-    function update(stationId) {
-        Station.get(stationId).success(function(data){
-            $scope.station = data.station;
-            $scope.track = data.track;
-        });
-    }
 });
 
 afm.controller('TracksCtrl', function($scope, $filter){
