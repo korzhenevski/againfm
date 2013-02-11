@@ -14,6 +14,8 @@
  */
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
+afm.value('bootstrapUser', null);
+
 afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
 
@@ -202,56 +204,6 @@ afm.factory('storage', function($window, $cacheFactory, $log){
     return $cacheFactory('storage');
 });
 
-afm.factory('guestFavorites', function($rootScope, storage) {
-    var STORAGE_ID = 'favorites';
-    var stations = storage.get(STORAGE_ID) || {};
-    $rootScope.$watch(function() { return stations; }, function(stations){
-        storage.put(STORAGE_ID, stations);
-    });
-
-    return {
-        add: function(station) {
-            stations[station.id] = station;
-        },
-
-        remove: function(id) {
-            if (stations.hasOwnProperty(id)) {
-                delete stations[id];
-            }
-        },
-
-        clear: function() {
-            stations = {};
-        },
-
-        query: function(cb) {
-            var result = [];
-            angular.forEach(stations, function(id, station){
-                result.push(station);
-            });
-            cb(result);
-        }
-    };
-});
-
-afm.factory('userFavorites', function($http){
-    return {
-        add: function(station) {
-            $http.post('/api/user/favorites/add', {station_id: station.id});
-        },
-
-        remove: function(station_id) {
-            $http.post('/api/user/favorites/remove', {station_id: station_id});
-        },
-
-        query: function(cb) {
-            $http.get('/api/user/favorites').success(function(response){
-                cb(response['stations']);
-            });
-        }
-    }
-});
-
 afm.factory('currentUser', function($rootScope){
     var user = null;
     return {
@@ -357,7 +309,7 @@ afm.factory('apiHttpInterceptor', function($q){
     };
 });
 
-afm.run(function($rootScope, $http, currentUser, User){
+afm.run(function($rootScope, $http, currentUser, bootstrapUser, User){
     $rootScope.currentUser = currentUser;
     $rootScope.logout = function() {
         if (currentUser.isLogged()) {
@@ -365,9 +317,8 @@ afm.run(function($rootScope, $http, currentUser, User){
             User.logout();
         }
     };
-    User.load().success(function(response){
-        currentUser.update(response.user);
-    });
+
+    currentUser.update(bootstrapUser);
 });
 
 afm.factory('Station', function($http){
@@ -445,11 +396,77 @@ afm.controller('RadioCtrl', function($scope, $filter, player, $http){
     };
 });
 
-afm.controller('FavoritesCtrl', function($scope, $rootScope, currentUser){
+afm.factory('localFavorites', function($rootScope, storage) {
+    var STORAGE_ID = 'favorites';
+    var favorites = storage.get(STORAGE_ID) || {};
+    $rootScope.$watch(function() { return favorites; }, function(stations){
+        storage.put(STORAGE_ID, stations);
+    });
+
+    return {
+        add: function(id, title) {
+            var ts = +(new Date());
+            favorites[id] = {id: id, title: title, ts: ts};
+        },
+
+        remove: function(id) {
+            if (favorites.hasOwnProperty(id)) {
+                delete favorites[id];
+            }
+        },
+
+        exists: function(id) {
+            return favorites.hasOwnProperty(id);
+        },
+
+        clear: function() {
+            favorites = {};
+        },
+
+        list: function() {
+            var result = [];
+            angular.forEach(favorites, function(id, obj){
+                result.push(obj);
+            });
+            return result;
+        }
+    };
+});
+
+afm.factory('userFavorites', function($http){
+    return {
+        add: function(station) {
+            $http.post('/api/user/favorites/add', {station_id: station.id});
+        },
+
+        remove: function(station_id) {
+            $http.post('/api/user/favorites/remove', {station_id: station_id});
+        },
+
+        list: function(cb) {
+            $http.get('/api/user/favorites').success(function(response){
+                cb(response['objects']);
+            });
+        }
+    }
+});
+
+afm.controller('FavoritesCtrl', function($scope, $rootScope, currentUser, localFavorites, userFavorites){
+    $scope.favorites = [];
+
     $rootScope.$watch(function() {
         return currentUser.isLogged();
     }, function(logged){
-        console.log(logged);
+        console.log('User ' + (logged ? 'online' : 'offline'));
+
+        if (logged) {
+            localFavorites.clear();
+            userFavorites.list(function(favorites){
+                $scope.favorites = favorites;
+            })
+        } else {
+            $scope.favorites = localFavorites.list();
+        }
     });
 });
 

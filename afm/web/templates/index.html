@@ -196,7 +196,7 @@
                         <td height="281px"><div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
-                                    <li ng-repeat="station in stations">
+                                    <li ng-repeat="station in favorites">
                                         <div class="block" ng-click="selectStation(station)">
                                             {{ station.title }} <i class="remove"></i>
                                         </div>
@@ -236,5 +236,9 @@
     <script src="/static/js/swfobject.js"></script>
     <!--script src="/static/js/modernizr.js"></script-->
     <script src="/static/js/app/radio.js"></script>
+
+    <script>
+        afm.value('bootstrapUser', {{{ user|json|safe }}});
+    </script>
 </body>
 </html>

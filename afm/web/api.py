@@ -78,12 +78,24 @@ def genre_playlist(genre):
     stations = [station.get_public() for station in db.Station.find_public(where, only_online=True)]
     return jsonify({'objects': stations})
 
-@app.route('/api/favorites')
+@app.route('/api/user/tracks')
 @login_required
 def favorites():
-    favorites = db.FavoriteTrack.find({'user_id': current_user.id})
-    favorites = [favorite.get_public() for favorite in favorites]
-    return jsonify({'objects': favorites})
+    tracks = db.FavoriteTrack.find({'user_id': current_user.id})
+    tracks = [track.get_public() for track in tracks]
+    return jsonify({'objects': tracks})
+
+@app.route('/api/user/favorites')
+@login_required
+def user_favorites():
+    favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
+    favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
+    # выборка по списку айдишников
+    query = {'id': {'$in': favorite_stations.keys()}}
+    stations = [station.get_public() for station in db.Station.find(query)]
+    # сортируем по времени добавления
+    stations.sort(key=lambda station: favorite_stations.get(station['id']))
+    return jsonify({'objects': stations})
 
 @app.route('/api/station/random')
 def station_random():

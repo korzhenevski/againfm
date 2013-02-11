@@ -46,3 +46,9 @@ def template_filter_json(data):
 def i18n_template_filter(key):
     return i18n.translate(key)
 
+@web.context_processor
+def app_context():
+    bootstrap = {'user': None}
+    if current_user.is_authenticated():
+        bootstrap['user'] = current_user.get_public()
+    return bootstrap
