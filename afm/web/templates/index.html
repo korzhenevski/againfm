@@ -74,7 +74,8 @@
                     </td>
                 </tr>
             </table>
-            <div class="tracks-box" ng-controller="TracksCtrl" ng-hide="!showTracks">
+
+            <div ng-controller="TracksCtrl" ng-hide="!showTracks" class="tracks-box">
                 <span class="tracks-corner"></span>
                 <!-- TODO: выровнять высоту зоны прокрутки, не обрезать строчки треков. -->
                 <div class="tracks-inner">
@@ -98,7 +99,7 @@
     <table class="roof">
         <tr>
             <td>
-                <img src="/static/i/logo.png" class="logo" />
+                <!--img src="/static/i/logo.png" class="logo" /-->
             </td>
             <td>
 
@@ -125,22 +126,22 @@
             <div class="content">
                 <table class="radio-box" ng-controller="RadioCtrl">
                     <tr valign="top">
-                        <td style="min-width: 310px">
+                        <td ng-controller="DisplayCtrl">
                             <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
-                                <h1 ng-show="currentStation">
-                                    {{ currentStation.title }}
-                                    <button class="fave-button" ng-hide="isStationFaved()" ng-click="faveStation()"></button>
-                                </h1>
-                                <h2 ng-show="currentTrack"><button>like</button> Artist - Trackname</h2>
+                                    <h1 class="station-title">{{ currentStation.title }}</h1>
+                                    <!--div class="track">
+                                        <button class="like"></button>
+                                        <h2>Very Long Artist - Very Long TrackName</h2>
+                                    </div-->
                                 </div>
                             </div>
                             </div>
                         </td>
                         <td rowspan="3">
                             <div class="radio-table">
-                            <div class="table-inner">
+                            <div class="table-inner" ng-controller="PlaylistCtrl">
                                 <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchQuery" />
 
                                 <ul class="filters justified">
@@ -153,7 +154,7 @@
                                     <hr class="radio-line" />
                                     <div id="radio-cursor" class="radio-cursor" ng-hide="getPlaylist().indexOf(currentStation) == -1"></div>
                                     <ul class="playlist justified">
-                                        <li ng-repeat="station in getPlaylist()">
+                                        <li ng-repeat="station in playlist|filter:searchQuery">
                                             <span class="block station-link" ng-class="itemClass(station, currentStation)" ng-click="selectStation(station)">{{ station.title }}</span>
                                         </li>
                                     </ul>
@@ -173,8 +174,8 @@
                                     <button class="back" ng-disabled="!previousStation" ng-click="selectStation(previousStation)"></button>
                                 </td>
                                 <td>
-                                    <button class="pause" ng-hide="!player.playing" ng-click="player.stop()"></button>
-                                    <button class="play" ng-hide="player.playing" ng-click="player.play()"></button>
+                                    <button class="pause" ng-hide="!isPlaying()" ng-click="stop()"></button>
+                                    <button class="play" ng-hide="isPlaying()" ng-click="play()"></button>
                                 </td>
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>

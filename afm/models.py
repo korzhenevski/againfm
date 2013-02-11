@@ -419,6 +419,14 @@ class Track(BaseDocument):
         'created_at': datetime.now,
     }
 
+    def get_public(self):
+        return {
+            'id': self['id'],
+            'title': self['title'],
+            #'artist': self['artist'],
+            #'name': self['name']
+        }
+
 @db.register
 class StationTag(BaseDocument):
     __collection__ = 'stations_tags'

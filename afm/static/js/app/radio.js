@@ -10,6 +10,7 @@
  * + Поиск по треклисту
  * Прокидывание в регистрацию избранного и треклиста
  * Проигрывание через флеш
+ * PIE для IE
  */
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
@@ -19,6 +20,9 @@ afm.config(function($routeProvider, $locationProvider){
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
     $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
+    //$routeProvider.when('/radio/:stationId', {controller: function($routeParams){
+    //    console.log($routeParams);
+    //}});
 
     $routeProvider.otherwise({redirectTo: '/'});
 });
@@ -90,7 +94,7 @@ afm.directive('modal', function($window){
                 $window.history.back();
             });
         }
-    }
+    };
 });
 
 afm.directive('modalBox', function($route){
@@ -253,12 +257,10 @@ afm.factory('currentUser', function($rootScope){
     return {
         update: function(userUpdate) {
             user = userUpdate;
-            $rootScope.$broadcast('userLogged');
         },
 
         clear: function() {
             user = null;
-            $rootScope.$broadcast('userLoggedOff');
         },
 
         isLogged: function() {
@@ -292,20 +294,20 @@ afm.factory('User', function($http){
 });
 
 afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
-    //$scope.login = 'test@testing.com';
-    //$scope.password = 'password';
-
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
     }
 
-    $scope.form = {};
+    $scope.form = {
+        login: 'test@testing.com',
+        password: 'password'
+    };
+
     $scope.auth = function() {
         $scope.error = null;
         User.login($scope.form).success(function(response){
             currentUser.update(response.user);
-            $scope.$broadcast('userLogged');
             $location.path('/');
         }).error(function(){
             $scope.error = 'Error';
@@ -324,7 +326,6 @@ afm.controller('SignupCtrl', function($scope, $location, currentUser, User){
         $scope.error = null;
         User.signup($scope.form).success(function(response){
             currentUser.update(response.user);
-            $scope.$broadcast('userLogged');
             $location.path('/');
         }).error(function(){
             $scope.error = 'Error';
@@ -369,7 +370,23 @@ afm.run(function($rootScope, $http, currentUser, User){
     });
 });
 
-afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, player, $http){
+afm.factory('Station', function($http){
+    return {
+        get: function(stationId) {
+            return $http.get('/api/station/' + stationId);
+        }
+    }
+});
+
+afm.factory('Playlist', function($resource){
+    return $resource('/api/playlist/:filter');
+});
+
+/**
+ * Контролер плейлиста
+ */
+afm.controller('PlaylistCtrl', function($scope, $filter, Playlist){
+    // TODO(outself): rename filter for anything for proper semantics
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
         {id: 'genre/trance', title: 'Транс'},
@@ -380,21 +397,9 @@ afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, play
         {id: 'genre/news', title: 'Новости'},
         {id: 'genre/chillout', title: 'Чилаут'}
     ];
-
-    // TODO(outself): rename filter for anything for proper semantics
-    $scope.player = player;
-    $scope.searchQuery = '';
     $scope.playlist = [];
+    $scope.searchQuery = '';
     $scope.currentFilter = null;
-
-    $scope.currentStation = null;
-    $scope.previousStation = null;
-
-    var Playlist = $resource('/api/playlist/:filter');
-
-    $scope.getPlaylist = function() {
-        return $filter('filter')($scope.playlist, $scope.searchQuery);
-    };
 
     $scope.selectFilter = function(filter) {
         $scope.playlist = [];
@@ -404,12 +409,19 @@ afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, play
         $scope.currentFilter = filter;
     };
 
+    $scope.selectFilter($scope.filters[0]);
+});
+
+afm.controller('RadioCtrl', function($scope, $filter, player, $http){
+    $scope.player = player;
+
+    $scope.currentStation = null;
+    $scope.previousStation = null;
+
     $scope.itemClass = function(filter, current) {
         var selected = current && current.id == filter.id;
         return {selected: selected};
     };
-
-    $scope.selectFilter($scope.filters[0]);
 
     $scope.selectStation = function(station) {
         if (station != $scope.previousStation) {
@@ -433,26 +445,51 @@ afm.controller('RadioCtrl', function($scope, $filter, $location, $resource, play
     };
 });
 
-afm.controller('FavoritesCtrl', function($scope, currentUser, guestFavorites, userFavorites){
-    var favorites = currentUser.isLogged() ? userFavorites : guestFavorites;
-    $scope.stations = [];
+afm.controller('FavoritesCtrl', function($scope, $rootScope, currentUser){
+    $rootScope.$watch(function() {
+        return currentUser.isLogged();
+    }, function(logged){
+        console.log(logged);
+    });
+});
 
-    function loadFavorites() {
-        favorites.query(function(stations){
-            $scope.stations = stations;
-        })
+/**
+ * на сайте отображаем состояние,
+ */
+afm.controller('DisplayCtrl', function($scope, currentUser, Station){
+    $scope.station = null;
+    $scope.track = null;
+
+    $scope.isStationFaved = function() {
+        if (!$scope.station) {
+            return false;
+        }
+
+        if (currentUser.isLogged()) {
+            return $scope.station.faved;
+        }
+
+        return favorites.isFaved($scope.station.id);
+    };
+
+    $scope.isTrackFaved = function() {
+        if (!$scope.track) {
+            return false;
+        }
+
+        if (currentUser.isLogged()) {
+            return $scope.track.faved;
+        }
+
+        return tracks.isFaved($scope.track.id);
+    };
+
+    function update(stationId) {
+        Station.get(stationId).success(function(data){
+            $scope.station = data.station;
+            $scope.track = data.track;
+        });
     }
-
-    $scope.$on('userLogged', function(){
-        favorites = userFavorites;
-        guestFavorites.clear();
-        loadFavorites();
-    });
-
-    $scope.$on('userLoggedOff', function(){
-        favorites = guestFavorites;
-        loadFavorites();
-    });
 });
 
 afm.controller('TracksCtrl', function($scope, $filter){
