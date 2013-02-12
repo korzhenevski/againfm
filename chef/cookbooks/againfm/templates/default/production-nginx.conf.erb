@@ -12,7 +12,7 @@ server {
     # Disable gzip for certain browsers.
     gzip_disable “MSIE [1-6].(?!.*SV1)”;
 
-    <% if node['againfm']['host'] == 'testing.again.fm' %>
+    <% if node['againfm']['host'] == 'v2.again.fm' %>
     auth_basic "Area42";
     auth_basic_user_file /var/www/againfm/againfm.passwd;
     <% end %>

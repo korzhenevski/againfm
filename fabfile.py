@@ -93,7 +93,7 @@ def deploy(rev=None):
         tmp = '/tmp/againfm-deploy'
         with settings(warn_only=True):
             sudo('rm -rf {}'.format(tmp))
-        sudo('GIT_SSH="{}" git clone {} {}'.format(gitssh, env.repo, tmp))
+        sudo('GIT_SSH="{}" git clone -b v2 {} {}'.format(gitssh, env.repo, tmp))
 
         # публикуем релиз
         release = datetime.now().strftime('%Y%m%d%H%M%S')
