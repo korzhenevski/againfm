@@ -384,7 +384,7 @@ class Stream(BaseDocument):
         # то для веб-плееров добавляем ";"
         # иначе показывается страница статистики
         if self.is_shoutcast:
-            return self.url + u';'
+            return u'{};'.format(self.url)
         return self.url
 
     def get_public(self):

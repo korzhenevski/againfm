@@ -540,15 +540,33 @@
     +background(linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.0)))
 
   .search
+    position: relative
+    width: 250px
+
+    .clear
+      background-image: url('/static/i/search-clear.png')
+      background-repeat: no-repeat
+      width: 13px
+      height: 13px
+      padding: 2px
+      position: absolute
+      top: 8px
+      left: 104%
+      cursor: pointer
+      +opacity(0.8)
+      &:hover
+        +opacity(1)
+
+  .search-field
     border: none
-    padding: 6px 10px
     color: #fff
-    min-width: 250px
+    width: 100%
+    padding: 6px 10px
     background-color: #836636
+    padding-right: 20px
     +opacity(0.8)
     +border-radius(3px)
     @include placeholder-color(white)
-
     &:focus
       outline: none
 

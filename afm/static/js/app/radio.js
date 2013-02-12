@@ -459,9 +459,7 @@ afm.controller('RadioCtrl', function($scope, $filter, player, $http){
             $scope.previousStation = $scope.currentStation;
         }
         $scope.currentStation = station;
-        $http.get('/api/station/get/' + station.id).success(function(response){
-            player.play(response.stream.url);
-        });
+        player.play('/api/station/' + station.id + '/tunein');
     };
 
     $scope.selectRandomStation = function() {

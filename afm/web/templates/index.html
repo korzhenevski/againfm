@@ -126,7 +126,7 @@
             <div class="content">
                 <table class="radio-box" ng-controller="RadioCtrl">
                     <tr valign="top">
-                        <td ng-controller="DisplayCtrl">
+                        <td ng-controller="DisplayCtrl" width="312px">
                             <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
@@ -151,7 +151,10 @@
                         <td rowspan="3">
                             <div class="radio-table">
                             <div class="table-inner" ng-controller="PlaylistCtrl">
-                                <input type="search" class="search" placeholder="Поиск по названию радио" ng-model="searchQuery" />
+                                <div class="search">
+                                    <input type="search" class="search-field" placeholder="Поиск по названию радио" ng-model="searchQuery" />
+                                    <i class="clear" ng-click="searchQuery=''"></i>
+                                </div>
 
                                 <ul class="filters justified">
                                     <li ng-repeat="filter in filters">

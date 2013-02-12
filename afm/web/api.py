@@ -4,10 +4,14 @@
 import pymongo
 from itsdangerous import URLSafeSerializer
 from afm import app, db
-from flask import jsonify, request, render_template, url_for
+from flask import jsonify, request, render_template, url_for, Response
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from afm.models import UserFavoritesCache
 from .helpers import *
+
+class TuneinResponse(Response):
+    default_status = 302
+    autocorrect_location_header = False
 
 # bootstrap this on template
 @app.route('/api/user', methods=['POST'])
@@ -102,3 +106,9 @@ def station_random():
     station = db.Station.find_random()
     return jsonify({'station': station.get_public()})
 
+@app.route('/api/station/<int:station_id>/tunein')
+def station_random(station_id):
+    stream = db.Stream.find_one_or_404({'station_id': station_id}, fields={'_id': 0}, sort=[('bitrate', -1)])
+    response = TuneinResponse()
+    response.headers['Location'] = stream.get_web_url().encode('utf8')
+    return response
