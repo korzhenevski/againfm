@@ -292,7 +292,7 @@ afm.factory('favorites', function($rootScope, currentUser, storage, UserFavorite
         },
 
         exists: function(id) {
-            return favorites.hasOwnProperty(id);
+            return !!favorites[id];
         },
 
         get: function() {
@@ -486,14 +486,14 @@ afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
     };
 });
 
-/**
- * на сайте отображаем состояние,
- */
-afm.controller('DisplayCtrl', function($scope, currentUser, Station, favorites){
-    $scope.track = null;
-
+afm.controller('DisplayCtrl', function($scope, currentUser, favorites){
     $scope.faveStation = function() {
-        favorites.add($scope.currentStation.id, $scope.currentStation.title);
+        var station = $scope.currentStation;
+        if (favorites.exists(station.id)) {
+            favorites.remove(station.id);
+        } else {
+            favorites.add(station.id, station.title);
+        }
     };
 
     $scope.isStationFaved = function() {

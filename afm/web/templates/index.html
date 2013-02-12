@@ -130,8 +130,16 @@
                             <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
-                                    <h1 class="station-title">{{ currentStation.title }}</h1>
-                                    <button ng-click="faveStation()" ng-hide="isStationFaved()">fave</button>
+                                    <div class="station" ng-hide="!currentStation">
+                                        <h1 class="station-title">{{ currentStation.title }}</h1>
+                                        <button class="fave" ng-class="{selected: isStationFaved()}" ng-click="faveStation()"></button>
+                                    </div>
+                                    <!--div class="controls">
+                                        <button class="button">История эфира</button>
+                                        <button class="button">О станции</button>
+                                        <button class="button">Ссылка</button>
+                                    </div-->
+
                                     <!--div class="track">
                                         <button class="like"></button>
                                         <h2>Very Long Artist - Very Long TrackName</h2>
@@ -224,7 +232,7 @@
 
     <div class="footer centroid">
         <div class="container">
-        <p>Made in China (更壞)</p>
+        <p>Made in Korea</p>
         </div>
     </div>
 
