@@ -17,7 +17,7 @@ def production():
     env.chef_role = 'production'
 
 def testing():
-    env.hosts = ['testing.again.fm']
+    env.hosts = ['v2.again.fm']
     env.user = 'root'
     env.chef_role = 'testing'
 
