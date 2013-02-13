@@ -25,7 +25,12 @@
                     <input type="submit" class="button" value="Войти в профиль" ng-disabled="loginForm.$invalid" />
                     <a href="/amnesia" class="amnesia">восстановить пароль</a>
                 </div>
-                <hr class="line" />
+                <p class="error" ng-switch on="error.code" ng-show="error">
+                    <span ng-switch-when="404">Нет такого пользователя</span>
+                    <span ng-switch-when="401">Неправильно введен логин или пароль</span>
+                    <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+                </p>
+                <!--hr class="line" /-->
             </form>
         </modal>
     </script>
@@ -37,6 +42,10 @@
                 <input class="field" name="password" ng-model="form.password" type="password" placeholder="Пароль" required="" />
                 <input type="submit" class="button" value="Создать аккаунт" ng-disabled="signupForm.$invalid" />
             </form>
+            <p class="error" ng-switch on="error.code" ng-show="error">
+                <span ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
+                <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+            </p>
         </modal>
     </script>
 
@@ -44,8 +53,12 @@
         <modal id="amnesia" title="Сброс пароля">
             <form name="amnesiaForm" ng-hide="result" ng-submit="amnesia()">
                 <input class="field" name="email" ng-model="form.email" required type="email" placeholder="Электронная почта" />
-                <input type="submit" class="button" value="Выслать на почту" />
+                <input type="submit" class="button" value="Выслать на почту" ng-disabled="amnesiaForm.$invalid" />
             </form>
+            <p class="error" ng-switch on="error.code" ng-show="error">
+                <span ng-switch-when="404">Пользователь не найден</span>
+                <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+            </p>
             <p ng-show="result">
                 Пароль сброшен.
                 <a href="{{ result.email_provider }}" ng-show="result.email_provider" target="_blank">Проверьте почту</a>
@@ -72,17 +85,17 @@
                         <p ng-hide="currentUser.isLogged()">
                             <a href="/login">вход с паролем</a> или <a href="/signup">завести аккаунт</a>
                         </p>
-                        <p ng-hide="!currentUser.isLogged()">
+                        <p ng-show="currentUser.isLogged()">
                             <a ng-click="logout()">выйти</a>
                         </p>
                     </td>
                 </tr>
             </table>
 
-            <div ng-controller="TracksCtrl" ng-hide="!visible" class="tracks-box">
+            <div ng-controller="TracksCtrl" ng-show="visible" class="tracks-box">
                 <span class="tracks-corner"></span>
                 <div class="tracks-inner">
-                    <div class="search" ng-hide="!haveTracks()">
+                    <div class="search" ng-show="haveTracks()">
                         <input type="text" class="input-text search-field" ng-model="searchQuery" placeholder="поиск треков" />
                     </div>
                     <div class="help" ng-hide="haveTracks()">
@@ -93,7 +106,7 @@
                             <td class="title">{{ track.title }}</td>
                             <td class="controls" align="right">
                                 <button ng-click="remove(track)" class="remove" ng-hide="track.removed"></button>
-                                <a ng-click="restore(track)" ng-hide="!track.removed">отмена</a>
+                                <a ng-click="restore(track)" ng-show="track.removed">отмена</a>
                             </td>
                         </tr>
                     </table>
@@ -136,7 +149,7 @@
                             <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
-                                    <div class="station" ng-hide="!currentStation">
+                                    <div class="station" ng-show="currentStation">
                                         <h1 class="station-title">{{ currentStation.title }}</h1>
                                         <button class="fave" ng-class="{selected: isStationFaved()}" ng-click="faveStation()"></button>
                                     </div>
@@ -159,7 +172,7 @@
                             <div class="table-inner" ng-controller="PlaylistCtrl">
                                 <div class="search">
                                     <input type="search" class="search-field" placeholder="Поиск по названию радио" ng-model="searchQuery" />
-                                    <i class="clear" ng-click="searchQuery=''" ng-hide="!searchQuery"></i>
+                                    <i class="clear" ng-click="searchQuery=''" ng-show="searchQuery"></i>
                                 </div>
 
                                 <ul class="filters justified">

@@ -1,9 +1,10 @@
 
 /**
  * + Треклист - авторизованный и не очень
- * Добавление удаление авторизованное Избранное
- * Ошибки в модальных окнах: пользователь уже существует, etc...
- * http-interceptor для json ошибок
+ * + авторизованное Избранное
+ * + Добавление удаление Избранное
+ * + Ошибки в модальных окнах: пользователь уже существует, etc...
+ * / http-interceptor для json ошибок
  * + фильтрация через контроллер - в скопе уже отфильтрованный список (треки, плейлист)
  * Регулятор громкости
  * [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
@@ -385,7 +386,20 @@ afm.factory('UserTrack', function($http){
     }
 });
 
-afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
+afm.factory('passErrorToScope', function(){
+    return function($scope) {
+        return function(response, status_code) {
+            var error = {};
+            if (angular.isObject(response) && response.error) {
+                error.reason = response.error;
+            }
+            error.code = status_code;
+            $scope.error = error;
+        };
+    }
+});
+
+afm.controller('LoginCtrl', function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -396,46 +410,60 @@ afm.controller('LoginCtrl', function($scope, $location, currentUser, User){
         password: 'password'
     };
 
+    $scope.$watch('form', function(){
+        $scope.error = null;
+    }, true);
+
     $scope.auth = function() {
         $scope.error = null;
+
         User.login($scope.form).success(function(response){
             currentUser.update(response.user);
             $location.path('/');
-        }).error(function(){
-                $scope.error = 'Error';
-            });
+        }).error(passErrorToScope($scope));
     };
 });
 
-afm.controller('SignupCtrl', function($scope, $location, currentUser, User){
+afm.controller('SignupCtrl', function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
     }
 
     $scope.form = {};
+
+    $scope.$watch('form', function(){
+        $scope.error = null;
+    }, true);
+
     $scope.signup = function() {
         $scope.error = null;
+
         User.signup($scope.form).success(function(response){
             currentUser.update(response.user);
             $location.path('/');
-        }).error(function(){
-            $scope.error = 'Error';
-        });
+        }).error(passErrorToScope($scope));
     };
 });
 
-afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User){
+afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
     }
 
     $scope.form = {};
+
+    $scope.$watch('form', function(){
+        $scope.error = null;
+    }, true);
+
     $scope.amnesia = function() {
+
+        $scope.error = null;
         User.amnesia($scope.form).success(function(result){
             $scope.result = result;
-        });
+        }).error(passErrorToScope($scope));
     };
 });
 

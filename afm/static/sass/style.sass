@@ -88,12 +88,19 @@
   .button
     padding: 10px 13px
 
+  .error
+    color: #ff6f7d
+
   .controls
     position: relative
     .amnesia
       position: absolute
       right: 0
       top: 0
+
+  form.ng-invalid
+    .error
+      display: none
 
   form.ng-dirty
     input.ng-invalid
@@ -173,7 +180,7 @@
 
   .tracks-corner
     top: -10px
-    left: 20px
+    left: 19px
     width: 19px
     height: 10px
     position: absolute

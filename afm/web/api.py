@@ -4,11 +4,10 @@
 import pymongo
 from itsdangerous import URLSafeSerializer
 from afm import app, db
-from flask import jsonify, request, render_template, url_for, Response
+from flask import jsonify, render_template, url_for, Response
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from afm.models import UserFavoritesCache
-from .helpers import *
-
+from .helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 
 class TuneinResponse(Response):
     default_status = 302
@@ -25,8 +24,8 @@ def login():
             login_user(user, remember=True)
             return jsonify({'user': user.get_public()})
         else:
-            return jsonify({'error': 'auth'})
-    return jsonify({'error': 'no_user'})
+            return jsonify({'error': 'auth'}), 401
+    return jsonify({'error': 'no_user'}), 404
 
 @app.route('/api/user/amnesia', methods=['POST'])
 def amnesia():
@@ -38,14 +37,14 @@ def amnesia():
         body = render_template('mail/amnesia.html', auth_url=auth_url, password=password)
         send_mail(email=user.email, body=body)
         return jsonify({'email_provider': get_email_provider(user.email)})
-    return jsonify({'error': 'no_user'})
+    return jsonify({'error': 'no_user'}), 404
 
 @app.route('/api/user/signup', methods=['POST'])
 def signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
     if db.User.find_one({'email': data['email']}):
-        return jsonify({'error': 'email_exists'})
-        # create
+        return jsonify({'error': 'email_exists'}), 409
+    # create
     user = db.User()
     user.email = unicode(data['email'])
     user.set_password(data['password'])
