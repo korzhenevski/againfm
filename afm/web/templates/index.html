@@ -7,6 +7,10 @@
     <link href="/static/css/style.css" rel="stylesheet"/>
     <!--link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/-->
     <meta name="fragment" content="!" />
+    <style>
+        /* force hide angular markup while js not ready */
+        .ng-cloak { display: none; }
+    </style>
 </head>
 <body class="ng-cloak" ng-init="showTrack=false">
     <!--div class="modal-box ng-cloak" ng-show="template" ng-include="template"></div-->
@@ -77,7 +81,6 @@
 
             <div ng-controller="TracksCtrl" ng-hide="!visible" class="tracks-box">
                 <span class="tracks-corner"></span>
-                <!-- TODO: выровнять высоту зоны прокрутки, не обрезать строчки треков. -->
                 <div class="tracks-inner">
                     <div class="search" ng-hide="!haveTracks()">
                         <input type="text" class="input-text search-field" ng-model="searchQuery" placeholder="поиск треков" />
