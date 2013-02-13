@@ -144,7 +144,10 @@ def revlist():
 
 def restart_service(services):
     for service in services.split(','):
-        sudo('service {} restart'.format('service'))
+        sudo('service {} reload'.format(service))
+
+def reload_uwsgi():
+    sudo('service uwsgi reload')
 
 def revclean():
     releases = sudo('ls -1 {} | sort -n'.format(env.project_releases)).split('\n')

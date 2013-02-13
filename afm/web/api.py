@@ -9,17 +9,10 @@ from flask.ext.login import login_user, login_required, current_user, logout_use
 from afm.models import UserFavoritesCache
 from .helpers import *
 
+
 class TuneinResponse(Response):
     default_status = 302
     autocorrect_location_header = False
-
-# bootstrap this on template
-@app.route('/api/user', methods=['POST'])
-def user():
-    user = None
-    if current_user.is_authenticated():
-        user = current_user.get_public()
-    return jsonify({'user': user})
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -107,7 +100,7 @@ def station_random():
     return jsonify({'station': station.get_public()})
 
 @app.route('/api/station/<int:station_id>/tunein')
-def station_random(station_id):
+def station_tunein(station_id):
     stream = db.Stream.find_one_or_404({'station_id': station_id}, fields={'_id': 0}, sort=[('bitrate', -1)])
     response = TuneinResponse()
     response.headers['Location'] = stream.get_web_url().encode('utf8')

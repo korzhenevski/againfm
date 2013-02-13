@@ -8,7 +8,7 @@
     <!--link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/-->
     <meta name="fragment" content="!" />
 </head>
-<body class="ng-cloak">
+<body class="ng-cloak" ng-init="showTrack=false">
     <!--div class="modal-box ng-cloak" ng-show="template" ng-include="template"></div-->
     <div class="modal-box ng-cloak" ng-view></div>
 
@@ -50,13 +50,13 @@
         </modal>
     </script>
 
-    <div class="topline" ng-init="showTracks=false">
+    <div class="topline">
         <!-- TODO: нахера два центройда? -->
         <div class="topline-inner centroid">
-            <table class="topmenu centroid">
+            <table class="topmenu centroid" ng-controller="MenuCtrl">
                 <tr>
                     <td width="20%">
-                        <a ng-click="showTracks=!showTracks" class="tracks-toggle">
+                        <a ng-click="toggleTracks($event)" class="tracks-toggle">
                             <i class="tracks-icon"></i>
                             Любимые треки и эфиры
                         </a>
@@ -75,15 +75,18 @@
                 </tr>
             </table>
 
-            <div ng-controller="TracksCtrl" ng-hide="!showTracks" class="tracks-box">
+            <div ng-controller="TracksCtrl" ng-hide="!visible" class="tracks-box">
                 <span class="tracks-corner"></span>
                 <!-- TODO: выровнять высоту зоны прокрутки, не обрезать строчки треков. -->
                 <div class="tracks-inner">
-                    <div class="search" ng-hide="!tracks.length">
+                    <div class="search" ng-hide="!haveTracks()">
                         <input type="text" class="input-text search-field" ng-model="searchQuery" placeholder="поиск треков" />
                     </div>
+                    <div class="help" ng-hide="haveTracks()">
+                        <p>А сюда можно добавлять треки. Избранное для треков.</p>
+                    </div>
                     <table class="tracks">
-                        <tr ng-class="{'track-removed': track.removed, track: !track.removed}" ng-repeat="track in getTracks()">
+                        <tr ng-class="trackClass(track)" ng-repeat="track in getTracks()">
                             <td class="title">{{ track.title }}</td>
                             <td class="controls" align="right">
                                 <button ng-click="remove(track)" class="remove" ng-hide="track.removed"></button>
@@ -235,7 +238,7 @@
 
     <div class="footer centroid">
         <div class="container">
-        <p>Made in Korea</p>
+            <p>Made in Korea</p>
         </div>
     </div>
 
@@ -249,6 +252,7 @@
     <!--script src="/static/js/modernizr.js"></script-->
     <script src="/static/js/app/radio.js"></script>
 
+    <!-- делать предполетную подготовку и показывать разбитое радио -->
     <script>
         afm.value('bootstrapUser', {{{ user|json|safe }}});
     </script>

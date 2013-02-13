@@ -72,24 +72,36 @@ afm.directive('tracksBox', function($document){
     return {
         restrict: 'C',
         link: function($scope, element) {
-            /*$document.bind('click', function(e){
-                // если это ссылка в хедере - пропускаем клик
-                if (angular.element(e.target).hasClass('tracks-toggle')) {
-                    return true;
-                }
-
-                $scope.$apply(function(){
-                    $scope.showTracks = false;
-                })
+            $scope.visible = false;
+            $scope.$on('tracks.toggle', function(){
+                $scope.visible = !$scope.visible;
             });
 
             element.bind('click', function(e){
                 e.stopPropagation();
-                return false;
-            });*/
-            //element.bind('mousewheel DOMMouseScroll scroll', function(e){
-            //    e.stopPropagation();
-            //});
+            });
+
+//            element.find('.tracks-inner').bind('mousewheel DOMMouseScroll', function(e){
+//                var delta = e.wheelDelta || -e.detail;
+//                this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+//                e.preventDefault();
+//            });
+
+            // close on body click
+            $document.bind('click', function(e){
+                $scope.$apply(function(){
+                    $scope.visible = false;
+                });
+            });
+
+            // close on escape
+            $document.bind('keyup', function(e){
+                if (e.keyCode == 27) {
+                    $scope.$apply(function(){
+                        $scope.visible = false;
+                    });
+                }
+            });
         }
     }
 });
@@ -321,10 +333,6 @@ afm.factory('User', function($http){
 
         logout: function() {
             return $http.post('/api/user/logout');
-        },
-
-        load: function() {
-            return $http.post('/api/user');
         }
     };
 });
@@ -353,6 +361,24 @@ afm.factory('UserFavorite', function($http){
 
         list: function(cb) {
             $http.get('/api/user/favorites').success(function(response){
+                cb(response['objects']);
+            });
+        }
+    }
+});
+
+afm.factory('UserTrack', function($http){
+    return {
+        add: function(id) {
+            $http.post('/api/user/tracks/add', {track_id: id});
+        },
+
+        remove: function(id) {
+            $http.post('/api/user/tracks/remove', {track_id: id});
+        },
+
+        list: function(cb) {
+            $http.get('/api/user/tracks').success(function(response){
                 cb(response['objects']);
             });
         }
@@ -394,8 +420,8 @@ afm.controller('SignupCtrl', function($scope, $location, currentUser, User){
             currentUser.update(response.user);
             $location.path('/');
         }).error(function(){
-                $scope.error = 'Error';
-            });
+            $scope.error = 'Error';
+        });
     };
 });
 
@@ -502,11 +528,116 @@ afm.controller('DisplayCtrl', function($scope, currentUser, favorites){
     };
 });
 
-afm.controller('TracksCtrl', function($scope, $filter){
+afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
+    var STORAGE_ID = 'tracks';
+    var tracks = storage.get(STORAGE_ID) || {};
+
+    // sync tracks to localstorage
+    $rootScope.$watch(function() { return tracks; }, function(data){
+        if (!currentUser.isLogged()) {
+            storage.put(STORAGE_ID, data);
+        }
+    }, true);
+
+    $rootScope.$watch(function() {
+        return currentUser.isLogged();
+    }, function(logged){
+        if (logged) {
+            storage.put(STORAGE_ID, {});
+            UserTrack.list(function(objects){
+                angular.forEach(objects, function(obj){
+                    tracks[obj.id] = obj;
+                });
+            });
+        } else {
+            tracks = storage.get(STORAGE_ID);
+        }
+    });
+
+    return {
+        add: function(id, title) {
+            var ts = +(new Date());
+            tracks[id] = {id: id, title: title, ts: ts};
+            if (currentUser.isLogged()) {
+                UserTrack.add(id);
+            }
+        },
+
+        restore: function(track) {
+            tracks[track.id] = track;
+            if (currentUser.isLogged()) {
+                UserTrack.restore(track.id);
+            }
+        },
+
+        remove: function(id) {
+            if (tracks.hasOwnProperty(id)) {
+                delete tracks[id];
+            }
+            if (currentUser.isLogged()) {
+                UserTrack.remove(id);
+            }
+        },
+
+        exists: function(id) {
+            return !!tracks[id];
+        },
+
+        get: function() {
+            var result = [];
+            angular.forEach(tracks, function(obj){
+                result.push(obj);
+            });
+            return result;
+        }
+    };
+});
+
+afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
     $scope.tracks = [];
     $scope.searchQuery = '';
 
+    // reload tracks on user login/logout
+    $rootScope.$watch(function() { return currentUser.isLogged(); }, function(){
+        $scope.tracks = angular.copy(tracks.get());
+        $scope.searchQuery = '';
+    });
+
+    $scope.haveTracks = function() {
+        return !!$scope.tracks.length;
+    };
+
+    $scope.trackClass = function(track) {
+        return {
+            track: !track.removed,
+            'track-removed': track.removed
+        };
+    };
+
     $scope.getTracks = function() {
-        return $filter('filter')($scope.tracks, $scope.searchQuery);
+        if (!$scope.tracks.length || $scope.searchQuery) {
+            $scope.tracks = angular.copy(tracks.get());
+        }
+        if ($scope.searchQuery) {
+            return $filter('filter')(tracks.get(), $scope.searchQuery);
+        }
+        return $scope.tracks;
+    };
+
+    $scope.remove = function(track) {
+        track.removed = true;
+        tracks.remove(track.id);
+    };
+
+    $scope.restore = function(track) {
+        delete track.removed;
+        tracks.restore(track);
+    }
+});
+
+afm.controller('MenuCtrl', function($scope, $rootScope){
+    $scope.toggleTracks = function($event) {
+        $rootScope.$broadcast('tracks.toggle');
+        $event.stopPropagation();
     };
 });
