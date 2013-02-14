@@ -64,7 +64,7 @@ Comet._buildUrl = function(params, url) {
         return url + ((url.indexOf('?') == -1) ? '?' : '&') + parts;
     }
     return parts;
-}
+};
 
 // Subscribe a new callback to specified ID.
 // To apply changes and reconnect to the server, call execute()

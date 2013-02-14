@@ -79,7 +79,7 @@
                         </a>
                     </td>
                     <td>
-                        <a href="/radio/1">AH.FM</a>
+                        <a href="/" target="_self">Главная</a>
                         <!--a href="">Добавить радио</a-->
                     </td>
                     <td align="right">
@@ -106,8 +106,9 @@
                         <tr ng-class="trackClass(track)" ng-repeat="track in getTracks()">
                             <td class="title">{{ track.title }}</td>
                             <td class="controls" align="right">
-                                <button ng-click="remove(track)" class="remove" ng-hide="track.removed"></button>
-                                <a ng-click="restore(track)" ng-show="track.removed">отмена</a>
+                                <i ng-click="remove(track)" class="remove" ng-hide="track.removed"></i>
+                                <!-- TODO: fix hover bug -->
+                                <a ng-click="restore(track)" class="restore" ng-show="track.removed">отмена</a>
                             </td>
                         </tr>
                     </table>
@@ -118,22 +119,21 @@
 
     <table class="roof">
         <tr>
-            <td>
-                <!--img src="/static/i/logo.png" class="logo" /-->
+            <td class="logo">
+                <!--a href="/"><img src="/static/i/logo.png" /></a-->
             </td>
             <td>
 
             </td>
             <td align="right">
                 <!--p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p-->
-                <p>Двести тысяч пользователей слушают радио. А мы играем ;)</p>
+                <!--p>Двести тысяч пользователей слушают радио. А мы играем ;)</p-->
             </td>
         </tr>
     </table>
 
     <div class="radio">
-        <player src="/static/swf/player.swf"></player>
-
+        <!--player src="/static/swf/player.swf"></player-->
         <table class="top">
             <tr>
                 <td class="top-left"></td>
@@ -160,10 +160,13 @@
                                         <button class="button">Ссылка</button>
                                     </div-->
 
-                                    <!--div class="track">
-                                        <button class="like"></button>
-                                        <h2>Very Long Artist - Very Long TrackName</h2>
-                                    </div-->
+                                    <div class="track" ng-show="hasTrack()">
+                                        <button class="like" ng-class="{selected: isTrackFaved()}" ng-click="faveTrack()"></button>
+                                        <h2 class="track-title">
+                                            <span ng-show="track.artist"><strong>{{ track.artist }}</strong> &mdash; {{ track.name }}</span>
+                                            <span ng-hide="track.artist">{{ track.title }}</span>
+                                        </h2>
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -206,8 +209,8 @@
                                     <button class="back" ng-disabled="!previousStation()" ng-click="selectStation(previousStation())"></button>
                                 </td>
                                 <td>
-                                    <button class="pause" ng-show="player.isPlaying()" ng-click="player.stop()"></button>
-                                    <button class="play" ng-hide="player.isPlaying()" ng-click="player.play()"></button>
+                                    <button class="pause" ng-show="player.playing" ng-click="player.stop()"></button>
+                                    <button class="play" ng-hide="player.playing" ng-disabled="!currentStation()" ng-click="player.play()"></button>
                                 </td>
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>

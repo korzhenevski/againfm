@@ -4,7 +4,7 @@
 import pymongo
 from itsdangerous import URLSafeSerializer
 from afm import app, db
-from flask import jsonify, render_template, url_for, Response
+from flask import request, jsonify, render_template, url_for, Response
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from afm.models import UserFavoritesCache
 from .helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
@@ -93,14 +93,31 @@ def user_favorites():
     stations.sort(key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
 
+@app.route('/api/station/<int:station_id>')
+def station(station_id):
+    response = {}
+    response['station'] = db.Station.find_one_or_404({'id': station_id}).get_public()
+
+    # TODO: restore 'is_online': True
+    stream = db.Stream.find_one_or_404({'station_id': station_id}, sort=[('bitrate', pymongo.ASCENDING)])
+    safe_serializer = URLSafeSerializer(secret_key=app.config['SECRET_KEY'])
+    safe_channel = safe_serializer.dumps([station_id, stream['id'], request.remote_addr])
+
+    response['station']['stream'] = {
+        'url': stream.get_web_url(),
+        'bitrate': stream['bitrate'],
+        'channel': safe_channel,
+    }
+
+    if current_user.is_authenticated():
+        favorite_cache = UserFavoritesCache(user_id=current_user.id)
+        response['station']['favorite'] = favorite_cache.exists('station', station_id)
+
+    return jsonify(response)
+
 @app.route('/api/station/random')
 def station_random():
     station = db.Station.find_random()
-    return jsonify({'station': station.get_public()})
-
-@app.route('/api/station/<int:station_id>')
-def station_random(station_id):
-    station = db.Station.find_one_or_404({'id': station_id})
     return jsonify({'station': station.get_public()})
 
 @app.route('/api/station/<int:station_id>/tunein')

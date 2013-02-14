@@ -133,7 +133,7 @@
     +border-radius(1px)
     +background(linear-gradient(#68acb9, #3892a3))
 
-.topmenu, .roof
+.topmenu
   a
     border-bottom: 1px dashed #a49ca3
 
@@ -142,7 +142,11 @@
   margin-bottom: 10px
   width: 980px
   .logo
-    margin-left: -2px
+    img
+      margin-left: -2px
+      margin-bottom: -2px
+    a
+      border: none !important
 
 .topline
   border-top: 1px solid #525362
@@ -224,8 +228,12 @@
       width: 50px
       padding: 6px 15px 6px 10px
 
+    .restore
+      display: inline-block
+
     .remove
-      border: none
+      cursor: pointer
+      display: block
       width: 17px
       height: 17px
       background-repeat: no-repeat
@@ -348,8 +356,12 @@
       background-image: url('/static/i/like.png')
       background-repeat: no-repeat
       background-color: transparent
+      border: none
       &:hover, .selected
         background-image: url('/static/i/liked.png')
+
+    .like.selected
+      background-image: url('/static/i/liked.png')
 
     .button
       color: #358c9d
@@ -361,11 +373,6 @@
       &:hover
         +opacity(0.9)
 
-    h2
-      line-height: 1.2em
-      font-size: 16px
-      margin-left: 20px
-
     h1, h2
       margin: 0
       padding: 0
@@ -376,11 +383,21 @@
       white-space: nowrap
       margin-bottom: 0.4em
 
+    .track
+      position: relative
+
+    .track-title
+      margin-left: 22px
+      line-height: 1.2em
+      //font-size: 16px
+      font-size: 14px
+
     .station
       position: relative
 
     .station-title
       line-height: 1.3em
+      // TODO: 19px looking good
       font-size: 22px
       margin-right: 27px
       //&:after

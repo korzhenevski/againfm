@@ -8,7 +8,14 @@
  * + фильтрация через контроллер - в скопе уже отфильтрованный список (треки, плейлист)
  * Регулятор громкости
  * [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
+ * настройки пользователя
+ * отображение имени в хедере, если есть в настройках
+ * логин через вконтакте
  * + Поиск по треклисту
+ * + ссылки на радио
+ * + добавление удаление треков
+ * + подгрузка трека (comet)
+ * баг с ховером отмены удаления трека
  * Прокидывание в регистрацию избранного и треклиста
  * Проигрывание через флеш
  * PIE для IE
@@ -17,7 +24,7 @@ var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
 afm.constant('cometUrl', 'http://comet.againfm.local/');
-afm.service('Comet', Comet);
+afm.service('comet', Comet);
 
 afm.config(function($routeProvider, $locationProvider){
     // TODO: add forEach
@@ -88,7 +95,7 @@ afm.directive('tracksBox', function($document){
     return {
         restrict: 'C',
         link: function($scope, element) {
-            $scope.visible = false;
+            $scope.visible = true;
             $scope.$on('tracks.toggle', function(){
                 $scope.visible = !$scope.visible;
             });
@@ -281,6 +288,10 @@ afm.factory('currentUser', function(){
 
         isLogged: function() {
             return !!user;
+        },
+
+        get: function() {
+            return user;
         }
     };
 });
@@ -538,7 +549,7 @@ afm.controller('PlaylistCtrl', function($scope, $filter, Playlist, radio){
     $scope.selectFilter($scope.filters[0]);
 });
 
-afm.factory('radio', function(player){
+afm.factory('radio', function($rootScope){
     var currentStation = null;
     var previousStation = null;
 
@@ -548,7 +559,7 @@ afm.factory('radio', function(player){
             previousStation = currentStation;
         }
         currentStation = station;
-        player.play('/api/station/' + station.id + '/tunein');
+        $rootScope.$broadcast('stationChanged', currentStation, previousStation);
     }
 
     return {
@@ -565,8 +576,9 @@ afm.factory('radio', function(player){
     };
 });
 
-afm.controller('RadioStationCtrl', function(station, radio){
+afm.controller('RadioStationCtrl', function(station, radio, player){
     radio.selectStation(station);
+    player.play(station.stream.url);
 });
 
 afm.controller('RadioCtrl', function($scope, $http, $location, player, radio){
@@ -606,7 +618,83 @@ afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
     };
 });
 
-afm.controller('DisplayCtrl', function($scope, currentUser, radio, favorites){
+afm.factory('onair', function($rootScope, currentUser, radio, comet){
+    var params = {};
+    var track = null;
+
+    $rootScope.$watch(function() { return currentUser.isLogged(); }, function(logged){
+        if (logged) {
+            params.user_id = currentUser.get().id;
+        } else {
+            delete params.user_id;
+        }
+        subscribe();
+    });
+
+    $rootScope.$watch(function() { return radio.getStation(); }, function(station){
+        if (!angular.isObject(station)) {
+            return;
+        }
+        params.channel = station.stream.channel;
+        subscribe();
+    }, true);
+
+    function update(newTrack) {
+        track = newTrack;
+        // force convert to int, onair maybe return id as string
+        if (angular.isString(track.id)) {
+            track.id = parseInt(track.id, 10);
+        }
+        $rootScope.$apply();
+    }
+
+    function subscribe() {
+        comet.unsubscribe();
+        if (params.channel) {
+            comet.subscribe(params, update);
+        }
+    }
+
+    return {
+        getTrack: function() {
+            return track;
+        }
+    }
+});
+
+afm.controller('DisplayCtrl', function($rootScope, $scope, radio, currentUser, favorites, tracks, onair) {
+    $scope.track = null;
+
+    $rootScope.$watch(function(){ return onair.getTrack(); }, function(track){
+        $scope.track = track;
+    }, true);
+
+    $scope.hasTrack = function() {
+        var track = $scope.track;
+        return track && track.id;
+    };
+
+    $scope.isTrackFaved = function() {
+        if (! ($scope.track && $scope.track.id)) {
+            return false;
+        }
+        if (currentUser.isLogged()) {
+            return $scope.track.favorite;
+        }
+        return tracks.exists($scope.track.id);
+    };
+
+    $scope.faveTrack = function() {
+        var track = $scope.track;
+        if (tracks.exists(track.id)) {
+            tracks.remove(track.id);
+            track.favorite = false;
+        } else {
+            tracks.add(track.id, track.title);
+            track.favorite = true;
+        }
+    };
+
     $scope.faveStation = function() {
         var station = radio.getStation();
         if (favorites.exists(station.id)) {
@@ -711,9 +799,18 @@ afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, 
         };
     };
 
+    $scope.loadTracks = function() {
+        $scope.tracks = angular.copy(tracks.get());
+    };
+
+    // reload tracks when user toggle box
+    $rootScope.$on('tracks.toggle', function(){
+        $scope.loadTracks();
+    });
+
     $scope.getTracks = function() {
         if (!$scope.tracks.length || $scope.searchQuery) {
-            $scope.tracks = angular.copy(tracks.get());
+            $scope.loadTracks();
         }
         if ($scope.searchQuery) {
             return $filter('filter')(tracks.get(), $scope.searchQuery);
