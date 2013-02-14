@@ -19,7 +19,8 @@ def load_user(user_id):
 @web.route('/login')
 @web.route('/signup')
 @web.route('/amnesia')
-def index():
+@web.route('/radio/<station_id>')
+def index(station_id=None):
     return render_template('index.html')
 
 @web.route('/guideline')

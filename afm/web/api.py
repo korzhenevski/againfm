@@ -98,6 +98,11 @@ def station_random():
     station = db.Station.find_random()
     return jsonify({'station': station.get_public()})
 
+@app.route('/api/station/<int:station_id>')
+def station_random(station_id):
+    station = db.Station.find_one_or_404({'id': station_id})
+    return jsonify({'station': station.get_public()})
+
 @app.route('/api/station/<int:station_id>/tunein')
 def station_tunein(station_id):
     stream = db.Stream.find_one_or_404({'station_id': station_id}, fields={'_id': 0}, sort=[('bitrate', -1)])

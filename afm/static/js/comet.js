@@ -20,7 +20,7 @@ function Comet(cometUrl)
 		'<iframe'
 		+ ' id="' + this._iframeId + '"'
 		+ ' onload="' + 'Comet' + '._iframeLoaded(&quot;' + this._iframeId + '&quot;)"'
-		+ ' src="' + fullUrl + '?HOST=' + host + '&amp;version=' + this.version + '"'
+		+ ' src="' + cometUrl + '?HOST=' + host + '&amp;version=' + this.version + '"'
 		+ ' style="position:absolute; visibility:hidden; width:200px; height:200px; left:-1000px; top:-1000px"' +
 		'></iframe>';
 	this._iframeCreated = false;
@@ -47,20 +47,37 @@ Comet._iframeLoaded = function(id)
 			th.execute();
 		}
 	}, 50);
+};
+
+Comet._buildUrl = function(params, url) {
+    if (!params) return url;
+    var parts = [];
+    angular.forEach(params, function(value, key) {
+        if (value == null || value == undefined) return;
+        if (angular.isObject(value)) {
+            value = angular.toJson(value);
+        }
+        parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+    });
+    parts = parts.join('&');
+    if (url) {
+        return url + ((url.indexOf('?') == -1) ? '?' : '&') + parts;
+    }
+    return parts;
 }
 
 // Subscribe a new callback to specified ID.
 // To apply changes and reconnect to the server, call execute()
 // after a sequence of subscribe() calls.
 Comet.prototype.subscribe = function(params, callback) {
-    this.callback = {params: $.param(params), callback: callback};
+    this.callback = {params: Comet._buildUrl(params), callback: callback};
     this.execute();
-}
+};
 
 Comet.prototype.unsubscribe = function() {
     this.callback = null;
     this.execute();
-}
+};
 
 // Reconnect to the server and listen for all specified IDs.
 // You should call this method after a number of calls to subscribe().
@@ -89,7 +106,7 @@ Comet.prototype.execute = function() {
 		this.callback,
 		this.constructor._callAndReturnException
 	);
-}
+};
 
 // This is a work-around for stupid IE. Unfortunately IE cannot
 // catch exceptions which are thrown from the different frame
@@ -102,4 +119,4 @@ Comet._callAndReturnException = function(func, args) {
 	} catch (e) {
 		return "" + e;
 	}
-}
+};

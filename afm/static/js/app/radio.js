@@ -16,19 +16,27 @@
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
+afm.constant('cometUrl', 'http://comet.againfm.local/');
+afm.service('Comet', Comet);
 
-afm.config(function($routeProvider, $locationProvider, $httpProvider){
-    $locationProvider.html5Mode(true);
-
+afm.config(function($routeProvider, $locationProvider){
+    // TODO: add forEach
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
     $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
-    //$routeProvider.when('/radio/:stationId', {controller: function($routeParams){
-    //    console.log($routeParams);
-    //}});
+    // controller don't execute without "template" attr
+    $routeProvider.when('/radio/:stationId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
+        station: function($route, $http) {
+            // use $route instead $routeParams
+            // https://github.com/angular/angular.js/issues/1289
+            var stationId = $route.current.params.stationId;
+            return $http.get('/api/station/' + stationId).then(function(req){
+                return req.data.station;
+            });
+        }
+    }});
     $routeProvider.otherwise({redirectTo: '/'});
-
-    //  $httpProvider.responseInterceptors.push('apiHttpInterceptor');
+    $locationProvider.html5Mode(true);
 });
 
 afm.run(function($rootScope, $http, currentUser, bootstrapUser, User){
@@ -48,22 +56,29 @@ afm.directive('radioCursor', function($rootScope){
         restrict: 'C',
         link: function($scope, element, attrs) {
             $rootScope.$on('playlist.currentElement', function(ev, el){
-                var left = el.prop('offsetLeft') + 25;
+                var centerOffset = Math.round(el.prop('offsetWidth') / 2);
+                // TODO: add random
+                var left = el.prop('offsetLeft') + centerOffset;
                 element.css('left', left + 'px');
             })
         }
     };
 });
 
-afm.directive('stationLink', function($rootScope){
+afm.directive('stationLink', function($rootScope, radio){
     return {
         restrict: 'C',
         link: function($scope, element) {
-            $scope.$watch('currentStation', function(){
+            element.bind('click', function(){
+                $rootScope.$broadcast('playlist.currentElement', element);
+            });
+
+            // TODO: check watch performance
+            $scope.$watch('currentStation()', function(){
                 if (element.hasClass('selected')) {
                     $rootScope.$broadcast('playlist.currentElement', element);
                 }
-            })
+            });
         }
     };
 });
@@ -107,7 +122,7 @@ afm.directive('tracksBox', function($document){
     }
 });
 
-afm.directive('modal', function($window){
+afm.directive('modal', function($rootScope, $window){
     return {
         restrict: 'E',
         replace: true,
@@ -115,8 +130,9 @@ afm.directive('modal', function($window){
         scope: {
             title: '@'
         },
+        require: '^modalBox',
         template: '<div class="modal"><h1 class="header">{{ title }} <i class="close"></i></h1><div ng-transclude></div></div>',
-        link: function(scope, element, attrs) {
+        link: function(scope, element, attrs, controller) {
             element.addClass('modal-' + attrs.role);
             element.find('i').bind('click', function(){
                 $window.history.back();
@@ -125,10 +141,21 @@ afm.directive('modal', function($window){
     };
 });
 
-afm.directive('modalBox', function($route){
+afm.directive('modalBox', function($route, $rootScope, $location){
     return {
         restrict: 'AC',
-        link: function(scope, element, attrs) {
+        controller: function() {
+            /*var that = this;
+            this.location = null;
+
+            $rootScope.$on('$routeChangeSuccess', function(target, current, prev){
+                if ($route.current && !$route.current.modal) {
+
+                }
+                console.log(prev);
+            });*/
+        },
+        link: function(scope, element, attrs, controller) {
             scope.$on('$routeChangeSuccess', update);
             update();
 
@@ -241,7 +268,7 @@ afm.factory('storage', function($window, $cacheFactory, $log){
     return $cacheFactory('storage');
 });
 
-afm.factory('currentUser', function($rootScope){
+afm.factory('currentUser', function(){
     var user = null;
     return {
         update: function(userUpdate) {
@@ -272,7 +299,6 @@ afm.factory('favorites', function($rootScope, currentUser, storage, UserFavorite
     $rootScope.$watch(function() {
         return currentUser.isLogged();
     }, function(logged){
-        console.log('User ' + (logged ? 'online' : 'offline'));
         if (logged) {
             // clean local favorites
             storage.put(STORAGE_ID, {});
@@ -410,6 +436,7 @@ afm.controller('LoginCtrl', function($scope, $location, currentUser, User, passE
         password: 'password'
     };
 
+    // TODO: move to form controller
     $scope.$watch('form', function(){
         $scope.error = null;
     }, true);
@@ -470,7 +497,7 @@ afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, pas
 /**
  * Контролер плейлиста
  */
-afm.controller('PlaylistCtrl', function($scope, $filter, Playlist){
+afm.controller('PlaylistCtrl', function($scope, $filter, Playlist, radio){
     // TODO(outself): rename filter for anything for proper semantics
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
@@ -485,23 +512,68 @@ afm.controller('PlaylistCtrl', function($scope, $filter, Playlist){
     $scope.playlist = [];
     $scope.searchQuery = '';
     $scope.currentFilter = null;
+    // ids list for fast lookup
+    var playlistIds = [];
 
     $scope.selectFilter = function(filter) {
         $scope.playlist = [];
+        $scope.currentFilter = filter;
+
         Playlist.get({filter: filter.id}, function(response){
             $scope.playlist = response.objects;
+            playlistIds = [];
+            angular.forEach(response.objects, function(station){
+                playlistIds.push(station.id);
+            });
         });
-        $scope.currentFilter = filter;
+    };
+
+    $scope.showCursor = function() {
+        if ($scope.searchQuery || !radio.isStationLoaded()) {
+            return false;
+        }
+        return playlistIds.indexOf(radio.getStation().id) >= 0;
     };
 
     $scope.selectFilter($scope.filters[0]);
 });
 
-afm.controller('RadioCtrl', function($scope, $filter, player, $http){
+afm.factory('radio', function(player){
+    var currentStation = null;
+    var previousStation = null;
+
+    function selectStation(station) {
+        // TODO: check this WTF...
+        if (station != previousStation) {
+            previousStation = currentStation;
+        }
+        currentStation = station;
+        player.play('/api/station/' + station.id + '/tunein');
+    }
+
+    return {
+        getStation: function() {
+            return currentStation;
+        },
+        previousStation: function() {
+            return previousStation;
+        },
+        isStationLoaded: function() {
+            return currentStation && currentStation.id;
+        },
+        selectStation: selectStation
+    };
+});
+
+afm.controller('RadioStationCtrl', function(station, radio){
+    radio.selectStation(station);
+});
+
+afm.controller('RadioCtrl', function($scope, $http, $location, player, radio){
     $scope.player = player;
 
-    $scope.currentStation = null;
-    $scope.previousStation = null;
+    $scope.currentStation = radio.getStation;
+    $scope.previousStation = radio.previousStation;
 
     $scope.itemClass = function(filter, current) {
         var selected = current && current.id == filter.id;
@@ -509,11 +581,7 @@ afm.controller('RadioCtrl', function($scope, $filter, player, $http){
     };
 
     $scope.selectStation = function(station) {
-        if (station != $scope.previousStation) {
-            $scope.previousStation = $scope.currentStation;
-        }
-        $scope.currentStation = station;
-        player.play('/api/station/' + station.id + '/tunein');
+        $location.path('/radio/' + station.id);
     };
 
     $scope.selectRandomStation = function() {
@@ -531,16 +599,16 @@ afm.controller('RadioCtrl', function($scope, $filter, player, $http){
 afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
     $scope.getFavorites = function() {
         return favorites.get();
-    }
+    };
 
     $scope.remove = function(id) {
         favorites.remove(id);
     };
 });
 
-afm.controller('DisplayCtrl', function($scope, currentUser, favorites){
+afm.controller('DisplayCtrl', function($scope, currentUser, radio, favorites){
     $scope.faveStation = function() {
-        var station = $scope.currentStation;
+        var station = radio.getStation();
         if (favorites.exists(station.id)) {
             favorites.remove(station.id);
         } else {
@@ -549,10 +617,11 @@ afm.controller('DisplayCtrl', function($scope, currentUser, favorites){
     };
 
     $scope.isStationFaved = function() {
-        if (!$scope.currentStation) {
+        var station = radio.getStation();
+        if (!station) {
             return false;
         }
-        return favorites.exists($scope.currentStation.id);
+        return favorites.exists(station.id);
     };
 });
 
