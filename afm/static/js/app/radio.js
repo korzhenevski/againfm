@@ -577,6 +577,10 @@ afm.factory('radio', function($rootScope){
 });
 
 afm.controller('RadioStationCtrl', function(station, radio, player){
+    // prevent double load station, sound cause flickering
+    if (radio.isStationLoaded() && radio.getStation().id == station.id) {
+        return;
+    }
     radio.selectStation(station);
     player.play(station.stream.url);
 });

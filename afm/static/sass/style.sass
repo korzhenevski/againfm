@@ -8,6 +8,11 @@
 @import "compass/css3/transition"
 @import "compass/css3/filter"
 
+@import "player-controls/*.png"
+@import "display-controls/*.png"
+@import "common-icons/*.png"
+@import "tracks-box/*.png"
+
 @mixin placeholder-color($color)
   &.placeholder
     color: $color
@@ -59,7 +64,7 @@
       right: 0
       width: 17px
       height: 17px
-      background-image: url('/static/i/close.png')
+      @include common-icons-sprite(modal-close)
       +opacity(0.8)
       &:hover
         +opacity(1)
@@ -152,8 +157,7 @@
       width: 19px
       height: 19px
       position: absolute
-      background-image: url('/static/i/tracks-icon.png')
-      background-repeat: no-repeat
+      @include tracks-box-sprite(icon)
 
 .tracks-box
   top: 100%
@@ -173,8 +177,7 @@
     width: 19px
     height: 10px
     position: absolute
-    background-repeat: no-repeat
-    background-image: url('/static/i/tracks-corner.png')
+    @include tracks-box-sprite(corner)
 
   // скролл
   .tracks-inner
@@ -221,9 +224,7 @@
       display: block
       width: 17px
       height: 17px
-      background-repeat: no-repeat
-      background-color: transparent
-      background-image: url('/static/i/tracks-remove.png')
+      @include tracks-box-sprite(remove)
       +border-radius(1px)
 
 .tracks-box.visible
@@ -325,18 +326,18 @@
       top: 0px
       right: -5px
       border: none
-      background-image: url('/static/i/display-star.png')
-      background-repeat: no-repeat
-      background-color: transparent
       width: 27px
       height: 27px
       +opacity(0.7)
+      $disable-magic-sprite-selectors: true
+      @include display-controls-sprite(star)
       &:hover
         +opacity(0.8)
-        background-image: url('/static/i/display-star-hover.png')
+        @include display-controls-sprite(star_hover)
 
     .fave.selected
-      background-image: url('/static/i/display-star-hover.png')
+      $disable-magic-sprite-selectors: true
+      @include display-controls-sprite(star_hover)
       &:hover
         +opacity(1)
 
@@ -347,15 +348,12 @@
       width: 17px
       height: 17px
       cursor: pointer
-      background-image: url('/static/i/like.png')
-      background-repeat: no-repeat
-      background-color: transparent
       border: none
-      &:hover, .selected
-        background-image: url('/static/i/liked.png')
+      @include display-controls-sprite(like)
 
     .like.selected
-      background-image: url('/static/i/liked.png')
+      $disable-magic-sprite-selectors: true
+      @include display-controls-sprite(like_hover)
 
     .button
       color: #358c9d
@@ -449,7 +447,8 @@
       +border-radius(2px)
       +text-shadow(rgba(#314647, 0.2) 0px 1px 1px)
       +box-shadow(#0c0c0c 0px 2px 3px 1px)
-      +background(linear-gradient(#d4d9d7, #c1c8c5))
+      //+background(linear-gradient(#d4d9d7, #c1c8c5))
+      background-color: #ced4d1
       &:active
         border: 1px solid #a3d3dd
         +background(linear-gradient(#54adc0, #88c6d3))
@@ -476,10 +475,9 @@
       right: 5px
       width: 17px
       height: 17px
-      background-color: #cad0ce
-      background-image: url('/static/i/favs-remove.png')
-      background-repeat: no-repeat
       position: absolute
+      background-color: #cad0ce
+      @include common-icons-sprite(remove-favorite)
       +border-radius(2px)
 
   .controls
@@ -503,30 +501,27 @@
       width: 41px
       height: 41px
 
-    .play
-      background-image: url('/static/i/play-button.png')
-
-    .pause
-      background-image: url('/static/i/pause-button.png')
-
-    .random
-      background-image: url('/static/i/random-button.png')
-      &:active
-        background-image: url('/static/i/random-button-active.png')
+    .record
+      @include player-controls-sprite(record)
 
     .back
-      background-image: url('/static/i/back-button.png')
-      &:active
-        background-image: url('/static/i/back-button-active.png')
+      @include player-controls-sprite(back)
+
+    .play
+      @include player-controls-sprite(play)
+
+    .pause
+      @include player-controls-sprite(pause)
+
+    .random
+      @include player-controls-sprite(random)
 
     .volume
-      background-image: url('/static/i/volume-button.png')
+      @include player-controls-sprite(volume)
 
-    .volume-slider
-      -webkit-apperance: slider-vertical
+    .novolume
+      @include player-controls-sprite(novolume)
 
-    .record
-      background-image: url('/static/i/record-button.png')
 
 .radio-table
   height: 100%
