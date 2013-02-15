@@ -28,10 +28,8 @@
   overflow: hidden
   z-index: 1500
   background-color: rgba(#000, 0.8)
-  +filter(blur(10px))
 
 .modal
-  +filter(none)
   +border-radius(7px)
   border: 3px solid rgba(#252523, 0.5)
   background-color: #4b4c5b
@@ -40,30 +38,17 @@
   padding: 19px
 
   h1
-    font-size: 22px
-    font-weight: normal
-    color: #f3f3f4
-    line-height: 1em
     margin: 0
     margin-bottom: 30px
+    color: #f3f3f4
+    font-size: 22px
+    font-weight: normal
+    line-height: 1em
 
-  .field
-    border: 1px solid #505160
-    color: #686975
-    padding: 15px 0
-    // TODO: fix
-    text-indent: 13px
-    outline: none
+  .text
     width: 100%
-    +background(linear-gradient(#3f404f, #454757))
-    +border-radius(2px)
-
-  .button
-    border: 1px solid #6fbccc
-    padding: 4px 9px
-    color: #fff
-    +border-radius(1px)
-    +background(linear-gradient(#59b1c4, #39a2b8))
+    padding: 10px 12px
+    margin-bottom: 12px
 
   .header
     position: relative
@@ -85,12 +70,6 @@
     border-bottom: 1px solid #40414e
     margin: 20px -19px
 
-  .field
-    margin-bottom: 9px
-
-  .button
-    padding: 10px 13px
-
   .error
     color: #ff6f7d
 
@@ -109,6 +88,7 @@
     input.ng-invalid
       color: #ff6f7d
       border: 1px solid #963841
+      @include placeholder-color(#ff6f7d)
 
 .centroid
   width: 980px
@@ -664,20 +644,46 @@ input[disabled], button[disabled]
   cursor: normal
   +opacity(0.4)
 
-.input-text, .page input[type=text]
+input.text
   color: #7b7c87
   outline: none
   border: 1px solid #505160
-  padding: 9px 11px
+  padding: 8px 10px
   outline: none
   background-color: #3f404f
+  +box-sizing(border-box)
   +background(linear-gradient(#3f404f, #454757))
   +border-radius(4px)
   +box-shadow(#505160 0 1px 1px 0px, #3a3b48 0 2px 5px 1px inset)
   @include placeholder-color(#7b7c87)
-
   &:focus
     color: #f2f2f4
+
+.btn
+  color: #fff
+  margin-top: 1px
+  padding: 7px 10px
+  border: 1px solid #6fbccc
+  +border-radius(3px)
+  +box-shadow(#434451 0 1px 1px 0px)
+  +text-shadow(rgba(black, 0.2) 0px 1px 1px)
+  +background(linear-gradient(#59b1c4, #39a2b8))
+  &:hover
+    border-color: #74becd
+    +background(linear-gradient(#5fb4c6, #41a6bc))
+  &:active
+    border-color: #58b1c4
+    +background(linear-gradient(#40a5bb, #5eb3c6))
+
+.btn-green
+  border-color: #61b87e
+  +background(linear-gradient(#49ae6a, #279f4e))
+  &:hover
+    border-color: #6fcc8d
+    +background(linear-gradient(#59c47c, #3ab963))
+  &:active
+    border-color: #52c176
+    +background(linear-gradient(#39b863, #58c37b))
 
 .footer
   clear: both
