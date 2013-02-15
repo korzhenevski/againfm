@@ -464,23 +464,20 @@
         +background(linear-gradient(#54adc0, #88c6d3))
         .remove
           display: none !important
+        &:after
+          display: none
       &:hover
         .remove
           z-index: 900
           display: block
         &:after
+          width: 100%
+          height: 100%
+          position: absolute
+          top: 0
+          right: 0
+          content: ""
           +background(linear-gradient(center left, rgba(white, 0) 60%, #ced4d1 85%))
-
-      &:after
-        width: 100%
-        height: 100%
-        position: absolute
-        top: 0
-        right: 0
-        //-20px
-        content: ""
-        //background-color: red
-        //+box-shadow(#ced4d1 -20px 0px 20px 0px inset)
 
     .remove
       display: none

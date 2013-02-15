@@ -641,29 +641,30 @@
 .radio-box .favorites-list .block:active .remove {
   display: none !important;
 }
-/* line 468, ../sass/style.sass */
+/* line 467, ../sass/style.sass */
+.radio-box .favorites-list .block:active:after {
+  display: none;
+}
+/* line 470, ../sass/style.sass */
 .radio-box .favorites-list .block:hover .remove {
   z-index: 900;
   display: block;
 }
-/* line 471, ../sass/style.sass */
+/* line 473, ../sass/style.sass */
 .radio-box .favorites-list .block:hover:after {
-  background: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(60%, rgba(255, 255, 255, 0)), color-stop(85%, #ced4d1));
-  background: -webkit-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
-  background: -moz-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
-  background: -o-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
-  background: linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
-}
-/* line 474, ../sass/style.sass */
-.radio-box .favorites-list .block:after {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   right: 0;
   content: "";
+  background: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(60%, rgba(255, 255, 255, 0)), color-stop(85%, #ced4d1));
+  background: -webkit-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
+  background: -moz-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
+  background: -o-linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
+  background: linear-gradient(center left, rgba(255, 255, 255, 0) 60%, #ced4d1 85%);
 }
-/* line 485, ../sass/style.sass */
+/* line 482, ../sass/style.sass */
 .radio-box .favorites-list .remove {
   display: none;
   top: 5px;
@@ -680,70 +681,70 @@
   -o-border-radius: 2px;
   border-radius: 2px;
 }
-/* line 497, ../sass/style.sass */
+/* line 494, ../sass/style.sass */
 .radio-box .controls {
   min-height: 100px;
 }
-/* line 500, ../sass/style.sass */
+/* line 497, ../sass/style.sass */
 .radio-box .controls button {
   border: 0;
   background-color: transparent;
   background-repeat: no-repeat;
   margin: 4px;
 }
-/* line 506, ../sass/style.sass */
+/* line 503, ../sass/style.sass */
 .radio-box .controls .play, .radio-box .controls .pause {
   height: 59px;
   width: 59px;
 }
-/* line 510, ../sass/style.sass */
+/* line 507, ../sass/style.sass */
 .radio-box .controls .back, .radio-box .controls .random {
   width: 49px;
   height: 49px;
 }
-/* line 514, ../sass/style.sass */
+/* line 511, ../sass/style.sass */
 .radio-box .controls .record, .radio-box .controls .volume {
   width: 41px;
   height: 41px;
 }
-/* line 518, ../sass/style.sass */
+/* line 515, ../sass/style.sass */
 .radio-box .controls .play {
   background-image: url("/static/i/play-button.png");
 }
-/* line 521, ../sass/style.sass */
+/* line 518, ../sass/style.sass */
 .radio-box .controls .pause {
   background-image: url("/static/i/pause-button.png");
 }
-/* line 524, ../sass/style.sass */
+/* line 521, ../sass/style.sass */
 .radio-box .controls .random {
   background-image: url("/static/i/random-button.png");
 }
-/* line 526, ../sass/style.sass */
+/* line 523, ../sass/style.sass */
 .radio-box .controls .random:active {
   background-image: url("/static/i/random-button-active.png");
 }
-/* line 529, ../sass/style.sass */
+/* line 526, ../sass/style.sass */
 .radio-box .controls .back {
   background-image: url("/static/i/back-button.png");
 }
-/* line 531, ../sass/style.sass */
+/* line 528, ../sass/style.sass */
 .radio-box .controls .back:active {
   background-image: url("/static/i/back-button-active.png");
 }
-/* line 534, ../sass/style.sass */
+/* line 531, ../sass/style.sass */
 .radio-box .controls .volume {
   background-image: url("/static/i/volume-button.png");
 }
-/* line 537, ../sass/style.sass */
+/* line 534, ../sass/style.sass */
 .radio-box .controls .volume-slider {
   -webkit-apperance: slider-vertical;
 }
-/* line 540, ../sass/style.sass */
+/* line 537, ../sass/style.sass */
 .radio-box .controls .record {
   background-image: url("/static/i/record-button.png");
 }
 
-/* line 543, ../sass/style.sass */
+/* line 540, ../sass/style.sass */
 .radio-table {
   height: 100%;
   border: 1px solid #e5e4e0;
@@ -758,7 +759,7 @@
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 553, ../sass/style.sass */
+/* line 550, ../sass/style.sass */
 .radio-table .radio-line {
   height: 5px;
   border: none;
@@ -766,7 +767,7 @@
   background-image: url("/static/i/hr.png");
   background-repeat: repeat-x;
 }
-/* line 560, ../sass/style.sass */
+/* line 557, ../sass/style.sass */
 .radio-table .radio-cursor {
   width: 4px;
   height: 110%;
@@ -785,13 +786,13 @@
   -o-transition: left 0.7s ease 0;
   transition: left 0.7s ease 0;
 }
-/* line 571, ../sass/style.sass */
+/* line 568, ../sass/style.sass */
 .radio-table .table-wrapper {
   position: relative;
   min-height: 380px;
   margin-bottom: 20px;
 }
-/* line 576, ../sass/style.sass */
+/* line 573, ../sass/style.sass */
 .radio-table .table-inner {
   height: 100%;
   min-height: 475px;
@@ -812,12 +813,12 @@
   background: -o-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
   background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
 }
-/* line 586, ../sass/style.sass */
+/* line 583, ../sass/style.sass */
 .radio-table .search {
   position: relative;
   width: 250px;
 }
-/* line 590, ../sass/style.sass */
+/* line 587, ../sass/style.sass */
 .radio-table .search .clear {
   background-image: url("/static/i/search-clear.png");
   background-repeat: no-repeat;
@@ -836,12 +837,12 @@
   -o-border-radius: 2px;
   border-radius: 2px;
 }
-/* line 602, ../sass/style.sass */
+/* line 599, ../sass/style.sass */
 .radio-table .search .clear:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
-/* line 605, ../sass/style.sass */
+/* line 602, ../sass/style.sass */
 .radio-table .search-field {
   border: none;
   color: white;
@@ -876,11 +877,11 @@
 .radio-table .search-field:-ms-input-placeholder {
   color: white;
 }
-/* line 616, ../sass/style.sass */
+/* line 613, ../sass/style.sass */
 .radio-table .search-field:focus {
   outline: none;
 }
-/* line 619, ../sass/style.sass */
+/* line 616, ../sass/style.sass */
 .radio-table .filters {
   margin: 0 -8px;
   margin-top: 15px;
@@ -888,38 +889,38 @@
   min-width: 245px;
   font-size: 0;
 }
-/* line 625, ../sass/style.sass */
+/* line 622, ../sass/style.sass */
 .radio-table .filters:after {
   content: "";
   width: 100%;
   display: inline-block;
 }
-/* line 630, ../sass/style.sass */
+/* line 627, ../sass/style.sass */
 .radio-table .filters li {
   font-size: 14px;
   white-space: nowrap;
 }
-/* line 634, ../sass/style.sass */
+/* line 631, ../sass/style.sass */
 .radio-table .filters .block {
   cursor: pointer;
   padding: 6px 8px;
 }
-/* line 638, ../sass/style.sass */
+/* line 635, ../sass/style.sass */
 .radio-table .playlist {
   margin: 10px -10px;
 }
-/* line 641, ../sass/style.sass */
+/* line 638, ../sass/style.sass */
 .radio-table .playlist .block {
   padding: 5px 10px;
   margin: 5px 0px;
   cursor: pointer;
 }
-/* line 646, ../sass/style.sass */
+/* line 643, ../sass/style.sass */
 .radio-table .filters, .radio-table .playlist {
   color: #3d3017;
   text-shadow: rgba(0, 0, 0, 0.15) 1px 1px 0px;
 }
-/* line 649, ../sass/style.sass */
+/* line 646, ../sass/style.sass */
 .radio-table .filters .selected, .radio-table .playlist .selected {
   color: #3d3017;
   background-color: rgba(197, 171, 101, 0.7);
@@ -930,12 +931,12 @@
   border-radius: 4px;
   text-shadow: #3d3017 0px 0px 1px;
 }
-/* line 656, ../sass/style.sass */
+/* line 653, ../sass/style.sass */
 .radio-table .playlist .selected {
   background-color: rgba(184, 151, 56, 0.4);
 }
 
-/* line 659, ../sass/style.sass */
+/* line 656, ../sass/style.sass */
 .page {
   background-color: #4b4c5b;
   padding: 30px;
@@ -948,14 +949,14 @@
   border-radius: 8px;
 }
 
-/* line 666, ../sass/style.sass */
+/* line 663, ../sass/style.sass */
 input[disabled], button[disabled] {
   cursor: normal;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
   opacity: 0.4;
 }
 
-/* line 670, ../sass/style.sass */
+/* line 667, ../sass/style.sass */
 .input-text, .page input[type=text] {
   color: #7b7c87;
   outline: none;
@@ -993,17 +994,17 @@ input[disabled], button[disabled] {
 .input-text:-ms-input-placeholder, .page input[type=text]:-ms-input-placeholder {
   color: #7b7c87;
 }
-/* line 682, ../sass/style.sass */
+/* line 679, ../sass/style.sass */
 .input-text:focus, .page input[type=text]:focus {
   color: #f2f2f4;
 }
 
-/* line 685, ../sass/style.sass */
+/* line 682, ../sass/style.sass */
 .footer {
   clear: both;
 }
 
-/* line 688, ../sass/style.sass */
+/* line 685, ../sass/style.sass */
 body {
   background-color: #453745;
   font-size: 14px;
@@ -1016,37 +1017,37 @@ body {
   background-size: cover;
 }
 
-/* line 696, ../sass/style.sass */
+/* line 693, ../sass/style.sass */
 a {
   color: white;
   text-decoration: none;
   border-bottom: 1px solid #a49ca3;
 }
 
-/* line 701, ../sass/style.sass */
+/* line 698, ../sass/style.sass */
 ul.inline {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-/* line 705, ../sass/style.sass */
+/* line 702, ../sass/style.sass */
 ul.inline li {
   float: left;
 }
 
-/* line 708, ../sass/style.sass */
+/* line 705, ../sass/style.sass */
 ul.justified {
   margin: 0;
   padding: 0;
   list-style-type: none;
   text-align: justify;
 }
-/* line 713, ../sass/style.sass */
+/* line 710, ../sass/style.sass */
 ul.justified li {
   text-align: left;
   display: inline;
 }
-/* line 716, ../sass/style.sass */
+/* line 713, ../sass/style.sass */
 ul.justified .block {
   display: inline-block;
 }
