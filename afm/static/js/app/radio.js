@@ -95,7 +95,7 @@ afm.directive('tracksBox', function($document){
     return {
         restrict: 'C',
         link: function($scope, element) {
-            $scope.visible = true;
+            $scope.visible = false;
             $scope.$on('tracks.toggle', function(){
                 $scope.visible = !$scope.visible;
             });
