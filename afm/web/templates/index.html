@@ -75,7 +75,7 @@
                     <td width="20%">
                         <a ng-click="toggleTracks($event)" class="tracks-toggle">
                             <i class="tracks-icon"></i>
-                            Любимые треки и эфиры
+                            Любимые треки
                         </a>
                     </td>
                     <td>
@@ -93,7 +93,7 @@
                 </tr>
             </table>
 
-            <div ng-controller="TracksCtrl" ng-show="visible" class="tracks-box">
+            <div ng-controller="TracksCtrl" class="tracks-box" ng-class="{visible: visible}">
                 <span class="tracks-corner"></span>
                 <div class="tracks-inner">
                     <div class="search" ng-show="haveTracks()">
