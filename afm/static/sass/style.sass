@@ -162,6 +162,7 @@
   z-index: 1000
   position: absolute
   border-top: 2px solid #192825
+  left: -2000px
   +opacity(0)
   +background(linear-gradient(#474857, #4b4c5b))
   +border-radius(0px 0px 4px 4px)
@@ -226,6 +227,7 @@
       +border-radius(1px)
 
 .tracks-box.visible
+  left: 0px
   +opacity(1)
   +transition(opacity 0.4s ease 0)
 
@@ -308,7 +310,7 @@
     +background(linear-gradient(#87cedd, #6bd0de, #3aabc3))
 
   .display-inner
-    background-image: url('/static/i/display-pattern2.png')
+    background-image: url('/static/i/display-pattern.png')
     background-color: #3db1c9
 
   .display
