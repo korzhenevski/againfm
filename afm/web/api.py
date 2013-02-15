@@ -99,7 +99,7 @@ def station(station_id):
     response['station'] = db.Station.find_one_or_404({'id': station_id}).get_public()
 
     # TODO: restore 'is_online': True
-    stream = db.Stream.find_one_or_404({'station_id': station_id}, sort=[('bitrate', pymongo.ASCENDING)])
+    stream = db.Stream.find_one_or_404({'station_id': station_id}, sort=[('bitrate', pymongo.DESCENDING)])
     safe_serializer = URLSafeSerializer(secret_key=app.config['SECRET_KEY'])
     safe_channel = safe_serializer.dumps([station_id, stream['id'], request.remote_addr])
 

@@ -323,12 +323,15 @@
       background-color: transparent
       width: 27px
       height: 27px
-      +opacity(0.5)
-      &:hover, .selected
+      +opacity(0.7)
+      &:hover
+        +opacity(0.8)
         background-image: url('/static/i/display-star-hover.png')
 
     .fave.selected
       background-image: url('/static/i/display-star-hover.png')
+      &:hover
+        +opacity(1)
 
     .like
       top: 0px
