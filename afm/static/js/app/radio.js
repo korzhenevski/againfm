@@ -72,6 +72,80 @@ afm.directive('radioCursor', function($rootScope){
     };
 });
 
+// TODO: add touch support
+afm.directive('volumeHandle', function($rootScope, $document){
+    return {
+        restrict: 'CA',
+        scope: {
+            volume: '=',
+            onChange: '&'
+        },
+        link: function($scope, element, attrs) {
+            var startValue;
+            var startPosition;
+            var max = parseFloat(attrs.max);
+            var volumeLine = element.parent();
+            var handlerHeight = element.prop('offsetHeight');
+            var lineHeight = volumeLine.prop('offsetHeight') - handlerHeight;
+
+            updateValue($scope.volume);
+
+            volumeLine.bind('click', function(e){
+                // TODO: offsetY available only on Chrome, support other browsers
+                updateValue(posToValue(e.offsetY - handlerHeight / 2));
+            });
+
+            element.bind('click', function(e){
+                e.stopPropagation();
+            });
+
+            element.bind('mousedown', function(e){
+                startPosition = e.pageY;
+                startValue = $scope.volume;
+            });
+
+            $document.bind('mousemove', function(e){
+                if (!startPosition) {
+                    return;
+                }
+                var delta = e.pageY - startPosition;
+                var value = startValue + ((delta / lineHeight) * max);
+                updateValue(value);
+            });
+
+            $document.bind('mouseup', function(){
+                startPosition = startValue = null;
+            });
+
+            function updateValue(value) {
+                value = parseFloat(value);
+                value = Math.round(clamp(value, 0, max) * 10) / 10;
+                var pos = 0;
+                if (value > 0) {
+                    pos = (value / max) * lineHeight;
+                }
+                element.css('top', Math.round(pos) + 'px');
+                $scope.volume = value;
+                // TODO: investigation - fix apply already in progress
+                // TODO: fix this shit
+                if (!$rootScope.$$phase) { $rootScope.$apply(); }
+                $scope.onChange();
+            }
+
+            function clamp(value, min, max) {
+                if (value <= min) { value = min; }
+                if (value >= max) { value = max; }
+                return value;
+            }
+
+            function posToValue(pos) {
+                var delta = clamp(pos, 0, lineHeight);
+                return delta ? (delta / lineHeight) * (max) : 0;
+            }
+        }
+    };
+});
+
 afm.directive('stationLink', function($rootScope, radio){
     return {
         restrict: 'C',

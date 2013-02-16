@@ -222,7 +222,11 @@
                             </tr>
                             <tr>
                                 <td colspan="5">
-                                    <input class="volume-slider" type="range" min="0" max="1" step="0.1" ng-change="saveVolume()" ng-model="volume" />
+                                    <div class="volume-slider">
+                                        <div class="line">
+                                            <div class="handle" volume-handle volume="volume" on-change="saveVolume()" max="1.0"></div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             </table>

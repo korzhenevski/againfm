@@ -522,6 +522,38 @@
     .novolume
       @include player-controls-sprite(novolume)
 
+    .volume-slider
+      width: 30px
+      height: 85px
+      background-color: #f3f5f4
+      border: 1px solid #bcbab5
+      padding: 10px 0
+      overflow: hidden
+      +opacity(0.9)
+      +border-radius(17px)
+      &:hover
+        +opacity(1)
+
+      .line
+        width: 6px
+        height: 100%
+        margin: 0 auto
+        cursor: pointer
+        position: relative
+        background-color: #384c4c
+        +border-radius(4px)
+
+      .handle
+        width: 14px
+        height: 14px
+        border: 1px solid #6f7e7f
+        top: 0
+        left: -5px
+        cursor: pointer
+        position: absolute
+        +border-radius(15px)
+        +background(linear-gradient(white, #dde1df))
+
 
 .radio-table
   height: 100%

@@ -4,7 +4,7 @@
 Vagrant::Config.run do |config|
     config.vm.box = "base"
     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-    config.vm.network :hostonly, "10.0.0.2"
+    config.vm.network :hostonly, "192.168.2.2"
 
     config.nfs.map_uid = Process.uid
     config.nfs.map_gid = Process.gid
