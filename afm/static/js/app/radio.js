@@ -6,7 +6,7 @@
  * + Ошибки в модальных окнах: пользователь уже существует, etc...
  * / http-interceptor для json ошибок
  * + фильтрация через контроллер - в скопе уже отфильтрованный список (треки, плейлист)
- * Регулятор громкости
+ * + Регулятор громкости
  * + [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
  * настройки пользователя
  * отображение имени в хедере, если есть в настройках
@@ -72,16 +72,16 @@ afm.directive('radioCursor', function($rootScope){
     };
 });
 
-afm.directive('volume', function(){
+afm.directive('volumeWrapper', function(){
     return {
         restrict: 'C',
         link: function(scope, element, attrs) {
-            var wrapper = element.parent();
-            wrapper.bind('mouseenter', function(){
-                wrapper.addClass('hover');
+            element.bind('mouseenter', function(){
+                element.addClass('hover');
+                scope.$broadcast('volumeShow');
             });
-            wrapper.bind('mouseout', function(){
-                wrapper.removeClass('hover');
+            element.bind('mouseout', function(){
+                element.removeClass('hover');
             });
         }
     }
@@ -100,6 +100,10 @@ afm.directive('volumeHandle', function($rootScope, $document){
             var startPosition;
             var max = 1.0;
             var volumeLine = element.parent();
+
+            scope.$on('volumeShow', function(){
+                updateValue(scope.volume);
+            });
 
             scope.$watch('volume', function(volume){
                 updateValue(volume);
@@ -285,7 +289,7 @@ afm.factory('player', function(audio, storage) {
     var player = {
         url: null,
         playing: false,
-        volume: 0,
+        volume: 0.7,
         defaultVolume: 0.7,
         muted: false,
 
