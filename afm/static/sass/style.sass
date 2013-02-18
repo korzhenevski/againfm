@@ -522,17 +522,28 @@
     .novolume
       @include player-controls-sprite(novolume)
 
+    .volume-wrapper
+      position: relative
+      .volume-slider
+        display: none
+
+    .volume-wrapper.hover
+      .volume-slider
+        display: block
+
     .volume-slider
-      width: 30px
-      height: 85px
+      bottom: 8px
+      left: 8px
+      width: 31px
+      height: 67px
       background-color: #f3f5f4
       border: 1px solid #bcbab5
       padding: 10px 0
       overflow: hidden
-      +opacity(0.9)
+      position: relative
+      padding-bottom: 34px
+      position: absolute
       +border-radius(17px)
-      &:hover
-        +opacity(1)
 
       .line
         width: 6px
@@ -554,6 +565,13 @@
         +border-radius(15px)
         +background(linear-gradient(white, #dde1df))
 
+      .indicator
+        @include player-controls-sprite(volume-icon)
+        height: 17px
+        width: 19px
+        margin: 0 auto
+        margin-top: 10px
+        cursor: pointer
 
 .radio-table
   height: 100%

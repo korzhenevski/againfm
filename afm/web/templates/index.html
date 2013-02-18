@@ -80,7 +80,6 @@
                     </td>
                     <td>
                         <a href="/" target="_self">Главная</a>
-                        <!--a href="">Добавить радио</a-->
                     </td>
                     <td align="right">
                         <p ng-hide="currentUser.isLogged()">
@@ -217,14 +216,13 @@
                                     <button class="random" ng-click="selectRandomStation()"></button>
                                 </td>
                                 <td>
-                                    <button class="volume"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="5">
-                                    <div class="volume-slider">
-                                        <div class="line">
-                                            <div class="handle" volume-handle volume="volume" on-change="saveVolume()" max="1.0"></div>
+                                    <div class="volume-wrapper">
+                                        <button class="volume"></button>
+                                        <div class="volume-slider">
+                                            <div class="line">
+                                                <div class="handle" volume="volume" on-change="saveVolume()" max="1.0" volume-handle></div>
+                                            </div>
+                                            <div class="indicator"></div>
                                         </div>
                                     </div>
                                 </td>

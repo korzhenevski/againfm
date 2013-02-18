@@ -72,27 +72,40 @@ afm.directive('radioCursor', function($rootScope){
     };
 });
 
+afm.directive('volume', function(){
+    return {
+        restrict: 'C',
+        link: function(scope, element, attrs) {
+            var wrapper = element.parent();
+            wrapper.bind('mouseenter', function(){
+                wrapper.addClass('hover');
+            });
+            wrapper.bind('mouseout', function(){
+                wrapper.removeClass('hover');
+            });
+        }
+    }
+});
+
 // TODO: add touch support
 afm.directive('volumeHandle', function($rootScope, $document){
     return {
-        restrict: 'CA',
+        restrict: 'A',
         scope: {
             volume: '=',
             onChange: '&'
         },
-        link: function($scope, element, attrs) {
+        link: function(scope, element, attrs) {
             var startValue;
             var startPosition;
             var max = parseFloat(attrs.max);
             var volumeLine = element.parent();
-            var handlerHeight = element.prop('offsetHeight');
-            var lineHeight = volumeLine.prop('offsetHeight') - handlerHeight;
 
-            updateValue($scope.volume);
+            updateValue(0);
 
             volumeLine.bind('click', function(e){
                 // TODO: offsetY available only on Chrome, support other browsers
-                updateValue(posToValue(e.offsetY - handlerHeight / 2));
+                updateValue(posToValue(e.offsetY - element.prop('offsetHeight') / 2));
             });
 
             element.bind('click', function(e){
@@ -101,15 +114,17 @@ afm.directive('volumeHandle', function($rootScope, $document){
 
             element.bind('mousedown', function(e){
                 startPosition = e.pageY;
-                startValue = $scope.volume;
+                startValue = scope.volume;
             });
 
             $document.bind('mousemove', function(e){
                 if (!startPosition) {
                     return;
                 }
-                var delta = e.pageY - startPosition;
-                var value = startValue + ((delta / lineHeight) * max);
+                var pos = startPosition - e.pageY;
+                var direction = (pos < 0) ? -1 : 1;
+                pos = clamp(Math.abs(pos), 0, getLineHeight()) * direction;
+                var value = Math.abs(startValue + (pos / getLineHeight()) * max);
                 updateValue(value);
             });
 
@@ -117,30 +132,35 @@ afm.directive('volumeHandle', function($rootScope, $document){
                 startPosition = startValue = null;
             });
 
+            function posToValue(pos) {
+                pos = Math.abs(getLineHeight() - clamp(pos, 0, getLineHeight()));
+                return pos ? (pos / getLineHeight()) * max : 0;
+            }
+
+            function getLineHeight() {
+                return volumeLine.prop('offsetHeight') - element.prop('offsetHeight');
+            }
+
             function updateValue(value) {
-                value = parseFloat(value);
-                value = Math.round(clamp(value, 0, max) * 10) / 10;
-                var pos = 0;
+                value = clamp(parseFloat(value), 0, max);
+                // decimal round
+                value = Math.round(value * 10) / 10;
+                var pos = getLineHeight();
                 if (value > 0) {
-                    pos = (value / max) * lineHeight;
+                    pos = (Math.abs(max - value) / max) * getLineHeight();
                 }
-                element.css('top', Math.round(pos) + 'px');
-                $scope.volume = value;
                 // TODO: investigation - fix apply already in progress
                 // TODO: fix this shit
+                scope.volume = value;
+                element.css('top', Math.round(pos) + 'px');
                 if (!$rootScope.$$phase) { $rootScope.$apply(); }
-                $scope.onChange();
+                scope.onChange();
             }
 
             function clamp(value, min, max) {
                 if (value <= min) { value = min; }
                 if (value >= max) { value = max; }
                 return value;
-            }
-
-            function posToValue(pos) {
-                var delta = clamp(pos, 0, lineHeight);
-                return delta ? (delta / lineHeight) * (max) : 0;
             }
         }
     };
@@ -211,9 +231,8 @@ afm.directive('modal', function($rootScope, $window){
         scope: {
             title: '@'
         },
-        require: '^modalBox',
         template: '<div class="modal"><h1 class="header">{{ title }} <i class="close"></i></h1><div ng-transclude></div></div>',
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             element.addClass('modal-' + attrs.role);
             element.find('i').bind('click', function(){
                 $window.history.back();
@@ -222,21 +241,10 @@ afm.directive('modal', function($rootScope, $window){
     };
 });
 
-afm.directive('modalBox', function($route, $rootScope, $location){
+afm.directive('modalBox', function($route){
     return {
         restrict: 'AC',
-        controller: function() {
-            /*var that = this;
-            this.location = null;
-
-            $rootScope.$on('$routeChangeSuccess', function(target, current, prev){
-                if ($route.current && !$route.current.modal) {
-
-                }
-                console.log(prev);
-            });*/
-        },
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element) {
             scope.$on('$routeChangeSuccess', update);
             update();
 
@@ -248,18 +256,6 @@ afm.directive('modalBox', function($route, $rootScope, $location){
     }
 });
 
-
-afm.factory('apiHttpInterceptor', function($q){
-    return function(promise) {
-        return promise.then(function(response){
-            console.log('response: ',response);
-            return response;
-        }, function(response){
-            console.log('error response: '+response);
-            return $q.reject(response);
-        });
-    };
-});
 
 afm.factory('audio', function($document) {
     var audio = $document[0].createElement('audio');
