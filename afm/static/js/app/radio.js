@@ -46,7 +46,7 @@ afm.config(function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(true);
 });
 
-afm.run(function($rootScope, $http, currentUser, bootstrapUser, User){
+afm.run(function($rootScope, $http, currentUser, bootstrapUser, routeHistory, User){
     $rootScope.currentUser = currentUser;
     $rootScope.logout = function() {
         if (currentUser.isLogged()) {
@@ -223,7 +223,21 @@ afm.directive('tracksBox', function($document){
     }
 });
 
-afm.directive('modal', function($rootScope, $window){
+afm.factory('routeHistory', function($rootScope, $routeParams, $location){
+    var returnTo = $location.path();
+    $rootScope.$on('$routeChangeSuccess', function(target, current){
+        if (current.$route && !current.$route.modal) {
+            returnTo = $location.path();
+        }
+    });
+    return {
+        backToNotModal: function() {
+            $location.path(returnTo);
+        }
+    }
+});
+
+afm.directive('modal', function($rootScope, $location, routeHistory){
     return {
         restrict: 'E',
         replace: true,
@@ -235,7 +249,7 @@ afm.directive('modal', function($rootScope, $window){
         link: function(scope, element, attrs) {
             element.addClass('modal-' + attrs.role);
             element.find('i').bind('click', function(){
-                $window.history.back();
+                routeHistory.backToNotModal();
             });
         }
     };
