@@ -7,7 +7,7 @@
  * / http-interceptor для json ошибок
  * + фильтрация через контроллер - в скопе уже отфильтрованный список (треки, плейлист)
  * Регулятор громкости
- * [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
+ * + [X] модального окна - проверка предудущего роута, modal == true: возврат на главную
  * настройки пользователя
  * отображение имени в хедере, если есть в настройках
  * логин через вконтакте
@@ -95,13 +95,15 @@ afm.directive('volumeHandle', function($rootScope, $document){
             volume: '=',
             onChange: '&'
         },
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
             var startValue;
             var startPosition;
-            var max = parseFloat(attrs.max);
+            var max = 1.0;
             var volumeLine = element.parent();
 
-            updateValue(0);
+            scope.$watch('volume', function(volume){
+                updateValue(volume);
+            });
 
             volumeLine.bind('click', function(e){
                 // TODO: offsetY available only on Chrome, support other browsers
@@ -114,17 +116,16 @@ afm.directive('volumeHandle', function($rootScope, $document){
 
             element.bind('mousedown', function(e){
                 startPosition = e.pageY;
-                startValue = scope.volume;
+                startValue = parseFloat(scope.volume) || 0;
             });
 
             $document.bind('mousemove', function(e){
                 if (!startPosition) {
                     return;
                 }
-                var pos = startPosition - e.pageY;
-                var direction = (pos < 0) ? -1 : 1;
-                pos = clamp(Math.abs(pos), 0, getLineHeight()) * direction;
-                var value = Math.abs(startValue + (pos / getLineHeight()) * max);
+                var pos = e.pageY - startPosition;
+                var value = startValue - (pos / getLineHeight()) * max;
+                value = clamp(value, 0, max);
                 updateValue(value);
             });
 
@@ -276,11 +277,17 @@ afm.factory('audio', function($document) {
     return audio;
 });
 
-afm.factory('player', function(audio, $cookieStore) {
+afm.factory('player', function(audio, storage) {
+    function setAudioVolume(volume) {
+        audio.volume = volume;
+    }
+
     var player = {
         url: null,
         playing: false,
-        volume: 0.7,
+        volume: 0,
+        defaultVolume: 0.7,
+        muted: false,
 
         play: function(url) {
             if (url) {
@@ -303,17 +310,31 @@ afm.factory('player', function(audio, $cookieStore) {
         },
 
         loadVolume: function() {
-            var volume = $cookieStore.get('volume');
+            var volume = parseFloat(storage.get('volume'));
             // громкость не установлена в куках - берем по умолчанию
-            volume = angular.isUndefined(volume) ? player.volume : volume;
+            if (isNaN(volume)) volume = player.defaultVolume;
             player.setVolume(volume);
         },
 
         setVolume: function(volume) {
             volume = parseFloat(volume);
-            audio.volume = volume;
             player.volume = volume;
-            $cookieStore.put('volume', volume);
+            player.muted = false;
+            setAudioVolume(volume);
+            storage.put('volume', volume);
+        },
+
+        mute: function() {
+            setAudioVolume(0);
+            player.muted = true;
+        },
+
+        unmute: function() {
+            player.setVolume(player.volume || player.defaultVolume);
+        },
+
+        isMuted: function() {
+            return player.muted;
         }
     };
 
@@ -694,6 +715,20 @@ afm.controller('RadioCtrl', function($scope, $http, $location, player, radio){
     $scope.saveVolume = function() {
         player.setVolume($scope.volume);
     };
+
+    $scope.isMuted = function() {
+        return !$scope.volume || player.isMuted();
+    };
+
+    $scope.toggleMute = function() {
+        if ($scope.isMuted()) {
+            player.unmute();
+            $scope.volume = player.volume;
+        } else {
+            player.mute();
+            $scope.volume = 0;
+        }
+    }
 });
 
 afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){

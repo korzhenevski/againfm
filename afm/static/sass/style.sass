@@ -515,20 +515,23 @@
     .random
       @include player-controls-sprite(random)
 
-    .volume
-      @include player-controls-sprite(volume)
-
-    .novolume
-      @include player-controls-sprite(novolume)
-
     .volume-wrapper
       position: relative
       .volume-slider
         display: none
+      .volume
+        @include player-controls-sprite(volume)
 
     .volume-wrapper.hover
       .volume-slider
         display: block
+
+    .volume-wrapper.muted
+      .volume-icon
+        @include player-controls-sprite(novolume-icon)
+
+      .volume
+        @include player-controls-sprite(novolume)
 
     .volume-slider
       bottom: 8px
@@ -564,7 +567,7 @@
         +border-radius(15px)
         +background(linear-gradient(white, #dde1df))
 
-      .indicator
+      .volume-icon
         @include player-controls-sprite(volume-icon)
         height: 17px
         width: 19px
