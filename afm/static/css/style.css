@@ -358,7 +358,7 @@
 }
 /* line 249, ../sass/style.sass */
 .radio .top .top-left {
-  background-image: url("/static/i/table-top-left.png");
+  background-image: url("/static/i/table-corners/top-left.png");
   width: 52px;
   background-repeat: no-repeat;
 }
@@ -369,7 +369,7 @@
 }
 /* line 258, ../sass/style.sass */
 .radio .top .top-right {
-  background-image: url("/static/i/table-top-right.png");
+  background-image: url("/static/i/table-corners/top-right.png");
   width: 52px;
   background-repeat: no-repeat;
 }
@@ -400,7 +400,7 @@
 }
 /* line 280, ../sass/style.sass */
 .radio .bottom .bottom-left {
-  background-image: url("/static/i/table-bottom-left.png");
+  background-image: url("/static/i/table-corners/bottom-left.png");
   width: 95px;
   background-repeat: no-repeat;
   background-position: bottom left;
@@ -413,7 +413,7 @@
 }
 /* line 291, ../sass/style.sass */
 .radio .bottom .bottom-right {
-  background-image: url("/static/i/table-bottom-right.png");
+  background-image: url("/static/i/table-corners/bottom-right.png");
   width: 95px;
   background-repeat: no-repeat;
   background-position: bottom right;
