@@ -27,3 +27,20 @@
   title: {en: Jazz, ru: Джаз}
   tags:
     - jazz
+
+- id: news
+  title: {en: News, ru: Новости}
+  tags:
+    - news
+
+- id: pop
+  title: {en: Pop, ru: Поп}
+  tags:
+    - pop
+
+- id: relax
+  title: {en: Relax, ru: Релакс}
+  tags:
+    - chillout
+    - ambient
+    - relax

@@ -49,7 +49,7 @@ def rebuild_tags():
     tags_stat = defaultdict(int)
     for result in data['result']:
         tags = dict([(tag['tag'], tag['count']) for tag in result['tags']])
-        tags = sorted(tags, key=tags.get, reverse=True)[:5]
+        tags = sorted(tags, key=tags.get, reverse=True)[:3]
         for tag in tags:
             tags_stat[tag] += 1
         tags_count += len(tags)
@@ -256,6 +256,15 @@ def housekeep_stations():
 
     print disable_ids
     db.stations.update({'id': {'$in': list(disable_ids)}}, {'$set': {'status': 0, 'streams': []}}, multi=True)
+
+@manager.command
+@manager.option('-id', '--station_id', dest='station_id')
+def station_history(station_id):
+    where = {'station_id': station_id}
+    history = db.onair_history.find(where, fields=['track_id', 'created_at'], sort=[('created_at', -1)]).limit(200)
+    for item in history:
+        track = db.tracks.find_one({'id': item['track_id']}, fields=['title'])
+        print item['created_at'], track['title']
 
 @manager.command
 def group_itunes():
