@@ -560,7 +560,10 @@ afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'pass
         return;
     }
 
-    $scope.form = {};
+    $scope.form = {
+        login: 'test@testing.com',
+        password: 'password'
+    };
 
     // TODO: move to form controller
     $scope.$watch('form', function(){

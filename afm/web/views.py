@@ -31,13 +31,6 @@ def guideline():
 def unauthorized():
     return jsonify({'error': 'Auth required'}), 401
 
-@web.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
-def token_auth(user_id, token):
-    user = db.User.find_one({'id': user_id})
-    if user and user.confirm_new_password(token):
-        login_user(user, remember=True)
-    return redirect('/')
-
 # быстрый фильтр-сериализатор json
 @web.app_template_filter('json')
 def template_filter_json(data):

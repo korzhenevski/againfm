@@ -4,14 +4,29 @@
 import pymongo
 from itsdangerous import URLSafeSerializer
 from afm import app, db
-from flask import request, jsonify, render_template, url_for, Response
+from flask import request, jsonify, render_template, url_for, Response, session, redirect
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from afm.models import UserFavoritesCache
 from .helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 
+
 class TuneinResponse(Response):
     default_status = 302
     autocorrect_location_header = False
+
+
+def permanent_login_user(user):
+    login_user(user, remember=True)
+    session.permanent = True
+
+
+@app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
+def token_auth(user_id, token):
+    user = db.User.find_one({'id': user_id})
+    if user and user.confirm_new_password(token):
+        permanent_login_user(user)
+    return redirect('/')
+
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -21,11 +36,12 @@ def login():
         direct_auth = user.check_password(data['password'])
         new_password_auth = user.confirm_new_password(data['password'])
         if direct_auth or new_password_auth:
-            login_user(user, remember=True)
+            permanent_login_user(user)
             return jsonify({'user': user.get_public()})
         else:
             return jsonify({'error': 'auth'}), 401
     return jsonify({'error': 'no_user'}), 404
+
 
 @app.route('/api/user/amnesia', methods=['POST'])
 def amnesia():
@@ -33,11 +49,12 @@ def amnesia():
     user = db.User.find_one({'email': email})
     if user:
         password, token = user.generate_new_password()
-        auth_url = url_for('web.token_auth', user_id=user.id, token=token, _external=True)
+        auth_url = url_for('token_auth', user_id=user.id, token=token, _external=True)
         body = render_template('mail/amnesia.html', auth_url=auth_url, password=password)
         send_mail(email=user.email, body=body)
         return jsonify({'email_provider': get_email_provider(user.email)})
     return jsonify({'error': 'no_user'}), 404
+
 
 @app.route('/api/user/signup', methods=['POST'])
 def signup():
@@ -50,11 +67,12 @@ def signup():
     user.set_password(data['password'])
     user.save()
     # login
-    login_user(user, remember=True)
+    permanent_login_user(user)
     # send welcome email
-    #body = render_template('mail/signup.html')
-    #send_mail(email=user.email, body=body)
+    body = render_template('mail/signup.html')
+    send_mail(email=user.email, body=body)
     return jsonify({'user': user.get_public()})
+
 
 @app.route('/api/user/logout', methods=['POST'])
 @login_required
@@ -62,10 +80,12 @@ def logout():
     logout_user()
     return jsonify({'logout': True})
 
+
 @app.route('/api/playlist/featured')
 def featured_playlist():
     stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(35)]
     return jsonify({'objects': stations})
+
 
 @app.route('/api/playlist/genre/<genre>')
 def genre_playlist(genre):
@@ -74,12 +94,14 @@ def genre_playlist(genre):
     stations = [station.get_public() for station in db.Station.find_public(where, only_online=True)]
     return jsonify({'objects': stations})
 
+
 @app.route('/api/user/tracks')
 @login_required
 def favorites():
     tracks = db.FavoriteTrack.find({'user_id': current_user.id})
     tracks = [track.get_public() for track in tracks]
     return jsonify({'objects': tracks})
+
 
 @app.route('/api/user/favorites')
 @login_required
@@ -92,6 +114,7 @@ def user_favorites():
     # сортируем по времени добавления
     stations.sort(key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
+
 
 @app.route('/api/station/<int:station_id>')
 def station(station_id):
@@ -115,10 +138,12 @@ def station(station_id):
 
     return jsonify(response)
 
+
 @app.route('/api/station/random')
 def station_random():
     station = db.Station.find_random()
     return jsonify({'station': station.get_public()})
+
 
 @app.route('/api/station/<int:station_id>/tunein')
 def station_tunein(station_id):
