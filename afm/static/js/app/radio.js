@@ -228,8 +228,8 @@ afm.directive('tracksBox', function($document){
     }
 });
 
-afm.factory('routeHistory', function($rootScope, $routeParams, $location){
-    var returnTo = $location.path();
+afm.factory('routeHistory', function($rootScope, $route, $routeParams, $location){
+    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
     $rootScope.$on('$routeChangeSuccess', function(target, current){
         if (current.$route && !current.$route.modal) {
             returnTo = $location.path();
@@ -242,7 +242,7 @@ afm.factory('routeHistory', function($rootScope, $routeParams, $location){
     }
 });
 
-afm.directive('modal', function($rootScope, $location, routeHistory){
+afm.directive('modal', function($rootScope, $location, $document, routeHistory){
     return {
         restrict: 'E',
         replace: true,
@@ -255,6 +255,12 @@ afm.directive('modal', function($rootScope, $location, routeHistory){
             element.addClass('modal-' + attrs.role);
             element.find('i').bind('click', function(){
                 routeHistory.backToNotModal();
+            });
+            // close on escape
+            $document.bind('keyup', function(e){
+                if (e.keyCode == 27) {
+                    routeHistory.backToNotModal();
+                }
             });
         }
     };

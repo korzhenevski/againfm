@@ -99,7 +99,7 @@
                         <input type="text" class="text search-field" ng-model="searchQuery" placeholder="поиск треков" />
                     </div>
                     <div class="help" ng-hide="haveTracks()">
-                        <p>А сюда можно добавлять треки. Избранное для треков.</p>
+                        <p>Сюда можно записать название любимой композиции из&nbsp;<nobr>радио-эфира</nobr>.</p>
                     </div>
                     <table class="tracks">
                         <tr ng-class="trackClass(track)" ng-repeat="track in getTracks()">
@@ -150,7 +150,7 @@
                             <div class="display-inner">
                                 <div class="display">
                                     <div class="station" ng-show="currentStation()">
-                                        <h1 class="station-title">{{ currentStation().title }}</h1>
+                                        <h1 class="station-title ellipsis">{{ currentStation().title }}</h1>
                                         <button class="fave" ng-class="{selected: isStationFaved()}" ng-click="faveStation()"></button>
                                     </div>
                                     <!--div class="controls">
@@ -161,7 +161,7 @@
 
                                     <div class="track" ng-show="hasTrack()">
                                         <button class="like" ng-class="{selected: isTrackFaved()}" ng-click="faveTrack()"></button>
-                                        <h2 class="track-title">
+                                        <h2 class="track-title ellipsis">
                                             <span ng-show="track.artist"><strong>{{ track.artist }}</strong> &mdash; {{ track.name }}</span>
                                             <span ng-hide="track.artist">{{ track.title }}</span>
                                         </h2>

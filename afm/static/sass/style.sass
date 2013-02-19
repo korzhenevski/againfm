@@ -8,10 +8,16 @@
 @import "compass/css3/transition"
 @import "compass/css3/filter"
 
+$use-mozilla-ellipsis-binding: true
+@import "compass/typography/text/ellipsis"
+
 @import "player-controls/*.png"
 @import "display-controls/*.png"
 @import "common-icons/*.png"
 @import "tracks-box/*.png"
+
+.ellipsis
+  @include ellipsis
 
 @mixin placeholder-color($color)
   &.placeholder
@@ -187,6 +193,7 @@
 
   .help
     margin: 0 25px
+    text-align: center
 
   .search
     margin: 0 13px
