@@ -32,14 +32,14 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
     // controller don't execute without "template" attr
     $routeProvider.when('/radio/:stationId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
-        station: function($route, $http) {
+        station: ['$route', '$http', function($route, $http) {
             // use $route instead $routeParams
             // https://github.com/angular/angular.js/issues/1289
             var stationId = $route.current.params.stationId;
             return $http.get('/api/station/' + stationId).then(function(req){
                 return req.data.station;
             });
-        }
+        }]
     }});
     $routeProvider.otherwise({redirectTo: '/'});
     $locationProvider.html5Mode(true);
@@ -560,10 +560,7 @@ afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'pass
         return;
     }
 
-    $scope.form = {
-        login: 'test@testing.com',
-        password: 'password'
-    };
+    $scope.form = {};
 
     // TODO: move to form controller
     $scope.$watch('form', function(){
@@ -854,7 +851,8 @@ afm.controller('DisplayCtrl', ['$rootScope', '$scope', 'radio', 'currentUser', '
     };
 }]);
 
-afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack', function($rootScope, currentUser, storage, UserTrack) {
+afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack',
+    function($rootScope, currentUser, storage, UserTrack) {
     var STORAGE_ID = 'tracks';
     var tracks = storage.get(STORAGE_ID) || {};
 
