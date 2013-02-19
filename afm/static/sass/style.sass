@@ -127,9 +127,8 @@ $use-mozilla-ellipsis-binding: true
     +border-radius(1px)
     +background(linear-gradient(#68acb9, #3892a3))
 
-.topmenu, .footer
-  a
-    border-bottom: 1px dotted #a49ca3
+.topmenu a
+  border-bottom: 1px dotted #a49ca3
 
 .roof
   margin: 0 auto
@@ -755,17 +754,20 @@ input.text
 
 .footer
   clear: both
+  margin-top: 45px
 
   .credits
     a
       position: relative
       margin-left: 28px
+      border-bottom: 1px dotted #c6c5c8
+      color: #c6c5c8
     i
       position: absolute
       width: 20px
       height: 20px
       left: -28px
-      top: -1px
+      top: -2px
       @include common-icons-sprite(madein)
 
 body

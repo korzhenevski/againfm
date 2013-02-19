@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html ng-app="afm">
 <head>
-    <title>v2</title>
-    <link href="/static/css/normalize.css" rel="stylesheet"/>
-    <link href="/static/css/style.css" rel="stylesheet"/>
+    <title>Радиоплеер Эгейн</title>
+    <meta charset="utf-8"/>
+    <meta name="description" content="Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном." />
+    <meta name="og:title" content="Эгейн" />
+    <meta name="og:description" content="Тёплый ламповый радиоплеер" />
+    <meta name="og:url" content="http://again.fm/" />
+    <!--meta name="og:image" content="http://again.fm/static/i/social-logo.png" /-->
     <style>
         /* force hide angular markup while js not ready */
         .ng-cloak { display: none; }
     </style>
+    {{% assets "styles" %}}
+    <link href="{{{ ASSET_URL }}}" rel="stylesheet"/>
+    {{% endassets %}}
 </head>
 <body class="ng-cloak" ng-init="showTrack=false">
     <div class="modal-box ng-cloak" ng-view></div>
@@ -115,14 +122,13 @@
     <table class="roof">
         <tr>
             <td class="logo">
-                <!--a href="/"><img src="/static/i/logo.png" /></a-->
+                <a href="/"><img src="/static/i/logo.png" width="198" height="46" alt="Радиоплеер Эгейн.ФМ" /></a>
             </td>
             <td>
 
             </td>
             <td align="right">
-                <!--p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p-->
-                <!--p>Двести тысяч пользователей слушают радио. А мы играем ;)</p-->
+                <p>Сейчас на линии всего 10 493 человека. <a href="#">Рассказать в социалочки!</a></p>
             </td>
         </tr>
     </table>
@@ -258,7 +264,9 @@
         </div>
     </div>
 
-    {{% assets "scripts" %}}<script src="{{{ ASSET_URL }}}"></script>{{% endassets %}}
+    {{% assets "scripts" %}}
+    <script src="{{{ ASSET_URL }}}"></script>
+    {{% endassets %}}
 
     {{% if not config.DEBUG %}}
         <script type="text/javascript">
