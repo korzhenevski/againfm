@@ -127,7 +127,7 @@ $use-mozilla-ellipsis-binding: true
     +border-radius(1px)
     +background(linear-gradient(#68acb9, #3892a3))
 
-.topmenu
+.topmenu, .footer
   a
     border-bottom: 1px dotted #a49ca3
 
@@ -408,22 +408,25 @@ $use-mozilla-ellipsis-binding: true
         position: absolute
 
   .favorites
-    +border-radius(4px)
-    max-width: 310px
     height: 100%
-    border: 1px solid #e2e1de
-    background-image: url('/static/i/dynamic.png')
-    background-position: center 20px
-    background-repeat: no-repeat
-    background-color: #222121
     position: relative
+    max-width: 310px
+    border: 1px solid #e2e1de
+    background-color: #222121
+    background-repeat: no-repeat
+    background-position: center 20px
+    background-image: url('/static/i/speaker.png')
+    +border-radius(4px)
 
     .signage
-      position: absolute
       bottom: 0
       display: block
+      position: absolute
       margin-left: 40px
       margin-bottom: 15px
+      width: 232px
+      height: 40px
+      @include common-icons-sprite(favorites-signage)
 
   .favorites-inner
     height: 100%
@@ -752,6 +755,18 @@ input.text
 
 .footer
   clear: both
+
+  .credits
+    a
+      position: relative
+      margin-left: 28px
+    i
+      position: absolute
+      width: 20px
+      height: 20px
+      left: -28px
+      top: -1px
+      @include common-icons-sprite(madein)
 
 body
   background-color: #453745

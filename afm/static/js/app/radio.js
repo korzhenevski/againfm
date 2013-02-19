@@ -294,10 +294,10 @@ afm.factory('player', function(audio, storage) {
 
     var player = {
         url: null,
-        playing: false,
         volume: 0.7,
-        defaultVolume: 0.7,
         muted: false,
+        playing: false,
+        defaultVolume: 0.7,
 
         play: function(url) {
             if (url) {
@@ -329,22 +329,23 @@ afm.factory('player', function(audio, storage) {
         setVolume: function(volume) {
             volume = parseFloat(volume);
             player.volume = volume;
-            player.muted = false;
             setAudioVolume(volume);
             storage.put('volume', volume);
         },
 
         mute: function() {
             setAudioVolume(0);
-            player.muted = true;
+            player.muted = player.volume;
         },
 
         unmute: function() {
-            player.setVolume(player.volume || player.defaultVolume);
+            player.setVolume(player.muted || player.defaultVolume);
+            player.muted = false;
         },
 
         isMuted: function() {
-            return player.muted;
+            // TODO: fix this shit
+            return angular.isNumber(player.muted);
         }
     };
 

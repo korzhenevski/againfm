@@ -64,7 +64,7 @@ def logout():
 
 @app.route('/api/playlist/featured')
 def featured_playlist():
-    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(50)]
+    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(35)]
     return jsonify({'objects': stations})
 
 @app.route('/api/playlist/genre/<genre>')

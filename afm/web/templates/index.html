@@ -3,10 +3,7 @@
 <head>
     <title>v2</title>
     <link href="/static/css/normalize.css" rel="stylesheet"/>
-    <link href="/static/css/common.css" rel="stylesheet"/>
     <link href="/static/css/style.css" rel="stylesheet"/>
-    <!--link href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet"/-->
-    <meta name="fragment" content="!" />
     <style>
         /* force hide angular markup while js not ready */
         .ng-cloak { display: none; }
@@ -150,7 +147,7 @@
                             <div class="display-inner">
                                 <div class="display">
                                     <div class="station" ng-show="currentStation()">
-                                        <h1 class="station-title ellipsis">{{ currentStation().title }}</h1>
+                                        <h1 class="station-title ellipsis" title="{{ currentStation().title }}">{{ currentStation().title }}</h1>
                                         <button class="fave" ng-class="{selected: isStationFaved()}" ng-click="faveStation()"></button>
                                     </div>
                                     <!--div class="controls">
@@ -161,7 +158,7 @@
 
                                     <div class="track" ng-show="hasTrack()">
                                         <button class="like" ng-class="{selected: isTrackFaved()}" ng-click="faveTrack()"></button>
-                                        <h2 class="track-title ellipsis">
+                                        <h2 class="track-title ellipsis" title="{{ track.title }}">
                                             <span ng-show="track.artist"><strong>{{ track.artist }}</strong> &mdash; {{ track.name }}</span>
                                             <span ng-hide="track.artist">{{ track.title }}</span>
                                         </h2>
@@ -238,7 +235,7 @@
                                         </div>
                                     </li>
                                 </ul>
-                                <img src="/static/i/my_favorites.png" class="signage" />
+                                <div class="signage"></div>
                             </div>
                         </div></td>
                     </tr>
@@ -259,7 +256,7 @@
 
     <div class="footer centroid">
         <div class="container">
-            <p>Made in Korea</p>
+            <p class="credits"><a href="/credits"><i></i>Сделано в России</a></p>
         </div>
     </div>
 
