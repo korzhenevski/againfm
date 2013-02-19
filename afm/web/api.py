@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pymongo
+import pymongo.errors
 from itsdangerous import URLSafeSerializer
 from afm import app, db
 from flask import request, jsonify, render_template, url_for, Response, session, redirect
@@ -107,10 +108,15 @@ def user_tracks_add_or_remove(track_id):
     track = db.Track.find_one_or_404({'id': track_id})
 
     favorite_cache = UserFavoritesCache(user_id=current_user.id)
-    info = db.FavoriteTrack.toggle(track, station, current_user.id)
-    state = favorite_cache.toggle('track', track_id, state=info['favorite'])
+    state = False
+    try:
+        info = db.FavoriteTrack.toggle(track, station, current_user.id)
+        state = info['favorite']
+    except pymongo.errors.OperationFailure:
+        pass
+    state = favorite_cache.toggle('track', track_id, state=state)
     #if not state:
-    #    db.FavoriteTrack.remove(track, station['id'], user_id=current_user.id)
+    #    db.FavoriteTrack.remove(track_id, station_id=station['id'], user_id=current_user.id)
     return jsonify({'favorite': state})
 
 
