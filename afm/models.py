@@ -39,6 +39,7 @@ class BaseDocument(Document):
             self['deleted_at'] = get_ts()
             self.save()
 
+
 class UserFavoritesCache(object):
     def __init__(self, user_id, redis=None):
         if redis is None:
@@ -70,6 +71,7 @@ class UserFavoritesCache(object):
 
     def object_key(self, object_type):
         return 'favorite_user_{}:{}'.format(object_type, self.user_id)
+
 
 class AbstractFavorite(BaseDocument):
     @staticmethod
@@ -125,14 +127,6 @@ class FavoriteTrack(AbstractFavorite):
     @classmethod
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
-
-    def get_public_old(self):
-        fields = self.structure.keys()
-        data = dict([(k, v) for k, v in self.iteritems() if k in fields])
-        ts = datetime.utcfromtimestamp(data['created_at'])
-        data['time'] = ts.strftime("%H:%M")
-        data['favorite'] = bool(data['favorite'] % 2)
-        return data
 
     def get_public(self):
         return {
@@ -223,12 +217,12 @@ class User(BaseDocument):
     def get_public(self):
         return {
             'id': self['id'],
-            'email': self['email'],
-            'name': self['name'],
-            'sex': self['sex'],
-            'avatar_url': self['avatar_url'],
-            'gravatar_hash': self.gravatar_hash,
-            'settings': self['settings']
+            #'email': self['email'],
+            #'name': self['name'],
+            #'sex': self['sex'],
+            #'avatar_url': self['avatar_url'],
+            #'gravatar_hash': self.gravatar_hash,
+            #'settings': self['settings']
         }
 
     def generate_new_password(self, length=8):

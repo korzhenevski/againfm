@@ -494,11 +494,11 @@ afm.factory('Playlist', ['$resource', function($resource){
 afm.factory('UserFavorite', ['$http', function($http){
     return {
         add: function(id) {
-            $http.post('/api/user/favorites/add', {station_id: id});
+            $http.post('/api/user/favorites/' + id + '/add');
         },
 
         remove: function(id) {
-            $http.post('/api/user/favorites/remove', {station_id: id});
+            $http.post('/api/user/favorites/' + id + '/remove');
         },
 
         list: function(cb) {
@@ -512,11 +512,15 @@ afm.factory('UserFavorite', ['$http', function($http){
 afm.factory('UserTrack', ['$http', function($http){
     return {
         add: function(id) {
-            $http.post('/api/user/tracks/add', {track_id: id});
+            $http.post('/api/user/tracks/' + id + '/add');
         },
 
         remove: function(id) {
-            $http.post('/api/user/tracks/remove', {track_id: id});
+            $http.post('/api/user/tracks/' + id + '/remove');
+        },
+
+        restore: function(id) {
+            $http.post('/api/user/tracks/' + id + '/restore');
         },
 
         list: function(cb) {

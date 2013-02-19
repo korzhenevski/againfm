@@ -92,10 +92,26 @@ def genre_playlist(genre):
 
 @app.route('/api/user/tracks')
 @login_required
-def favorites():
-    tracks = db.FavoriteTrack.find({'user_id': current_user.id})
+def user_tracks():
+    tracks = db.FavoriteTrack.find({'user_id': current_user.id, 'favorite': {'$not': {'$mod': [2, 0]}}})
     tracks = [track.get_public() for track in tracks]
     return jsonify({'objects': tracks})
+
+@app.route('/api/user/tracks/<int:track_id>/add', methods=['POST'])
+@app.route('/api/user/tracks/<int:track_id>/remove', methods=['POST'])
+@app.route('/api/user/tracks/<int:track_id>/restore', methods=['POST'])
+@login_required
+def user_tracks_add_or_remove(track_id):
+    onair_info = db.OnairHistory.find_one_or_404({'track_id': track_id})
+    station = db.Station.find_one_or_404({'id': onair_info['station_id']})
+    track = db.Track.find_one_or_404({'id': track_id})
+
+    favorite_cache = UserFavoritesCache(user_id=current_user.id)
+    info = db.FavoriteTrack.toggle(track, station, current_user.id)
+    state = favorite_cache.toggle('track', track_id, state=info['favorite'])
+    #if not state:
+    #    db.FavoriteTrack.remove(track, station['id'], user_id=current_user.id)
+    return jsonify({'favorite': state})
 
 
 @app.route('/api/user/favorites')
@@ -109,6 +125,22 @@ def user_favorites():
     # сортируем по времени добавления
     stations.sort(key=lambda station: favorite_stations.get(station['id']))
     return jsonify({'objects': stations})
+
+@app.route('/api/user/favorites/<int:station_id>/add', methods=['POST'])
+@app.route('/api/user/favorites/<int:station_id>/remove', methods=['POST'])
+@login_required
+def user_favorites_add_or_remove(station_id):
+    # проверка на существование станции
+    # можно конечно и без нее, но тогда реально засрать
+    # избранное несуществующими станциями
+    db.Station.find_one_or_404({'id': station_id})
+    favorite_cache = UserFavoritesCache(user_id=current_user.id)
+    info = db.FavoriteStation.toggle(station_id, user_id=current_user.id)
+    state = favorite_cache.toggle('station', station_id, state=info['favorite'])
+    # удаляем станцию из списка
+    if not state:
+        db.FavoriteStation.remove(station_id, user_id=current_user.id)
+    return jsonify({'favorite': state})
 
 
 @app.route('/api/station/<int:station_id>')
