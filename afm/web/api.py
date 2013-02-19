@@ -20,17 +20,10 @@ def permanent_login_user(user):
     session.permanent = True
 
 
-@app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
-def token_auth(user_id, token):
-    user = db.User.find_one({'id': user_id})
-    if user and user.confirm_new_password(token):
-        permanent_login_user(user)
-    return redirect('/')
-
-
 @app.route('/api/user/login', methods=['POST'])
 def login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
+    data['login'] = data['login'].lower()
     user = db.User.find_login(data['login'])
     if user:
         direct_auth = user.check_password(data['password'])
@@ -46,6 +39,7 @@ def login():
 @app.route('/api/user/amnesia', methods=['POST'])
 def amnesia():
     email = safe_input_field('email', 'string')
+    email = email.lower()
     user = db.User.find_one({'email': email})
     if user:
         password, token = user.generate_new_password()
@@ -59,6 +53,7 @@ def amnesia():
 @app.route('/api/user/signup', methods=['POST'])
 def signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
+    data['email'] = data['email'].lower()
     if db.User.find_one({'email': data['email']}):
         return jsonify({'error': 'email_exists'}), 409
     # create
@@ -151,3 +146,11 @@ def station_tunein(station_id):
     response = TuneinResponse()
     response.headers['Location'] = stream.get_web_url().encode('utf8')
     return response
+
+
+@app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
+def token_auth(user_id, token):
+    user = db.User.find_one({'id': user_id})
+    if user and user.confirm_new_password(token):
+        permanent_login_user(user)
+    return redirect('/')
