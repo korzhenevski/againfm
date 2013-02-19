@@ -10,7 +10,6 @@
     </style>
 </head>
 <body class="ng-cloak" ng-init="showTrack=false">
-    <!--div class="modal-box ng-cloak" ng-show="template" ng-include="template"></div-->
     <div class="modal-box ng-cloak" ng-view></div>
 
     <script type="text/ng-template" id="/login.html">
@@ -80,7 +79,7 @@
                     </td>
                     <td align="right">
                         <p ng-hide="currentUser.isLogged()">
-                            <a href="/login">вход с паролем</a> или <a href="/signup">завести аккаунт</a>
+                            <a href="/login">войти с паролем</a> или <a href="/signup">завести аккаунт</a>
                         </p>
                         <p ng-show="currentUser.isLogged()">
                             <a ng-click="logout()">выйти</a>
@@ -129,7 +128,6 @@
     </table>
 
     <div class="radio">
-        <!--player src="/static/swf/player.swf"></player-->
         <table class="top">
             <tr>
                 <td class="top-left"></td>
@@ -256,22 +254,60 @@
 
     <div class="footer centroid">
         <div class="container">
-            <p class="credits"><a href="/credits"><i></i>Сделано в России</a></p>
+            <p class="credits"><a><i></i>Сделано в России</a></p>
         </div>
     </div>
 
-    <!--script src="/static/js/script.js"></script-->
-    <script src="/static/js/angular.js"></script>
-    <script src="/static/js/comet.js"></script>
-    <script src="/static/js/angular-resource.js"></script>
-    <script src="/static/js/angular-cookies.js"></script>
-    <script src="/static/js/swfobject.js"></script>
-    <!--script src="/static/js/modernizr.js"></script-->
-    <script src="/static/js/app/radio.js"></script>
+    {{% assets "scripts" %}}<script src="{{{ ASSET_URL }}}"></script>
+    {{% endassets %}}
 
-    <!-- делать предполетную подготовку и показывать разбитое радио -->
+    {{% if not config.DEBUG %}}
+        <script type="text/javascript">
+            var _gaq = [
+                ['_setAccount', 'UA-21858820-1'],
+                ['_setDomainName', 'again.fm'],
+                ['_setAllowLinker', true],
+                ['_setSiteSpeedSampleRate', 100],
+                ['_trackPageview']
+            ];
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+
+        <script type="text/javascript">
+            (function (d, w, c) {
+                (w[c] = w[c] || []).push(function() {
+                    try {
+                        w.yaCounter18922339 = new Ya.Metrika({id:18922339,
+                            webvisor:true,
+                            clickmap:true,
+                            accurateTrackBounce:true,
+                            trackHash:true});
+                    } catch(e) { }
+                });
+
+                var n = d.getElementsByTagName("script")[0],
+                        s = d.createElement("script"),
+                        f = function () { n.parentNode.insertBefore(s, n); };
+                s.type = "text/javascript";
+                s.async = true;
+                s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+                if (w.opera == "[object Opera]") {
+                    d.addEventListener("DOMContentLoaded", f, false);
+                } else { f(); }
+            })(document, window, "yandex_metrika_callbacks");
+        </script>
+        <noscript><div><img src="//mc.yandex.ru/watch/18922339" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    {{% endif %}}
+
     <script>
         afm.value('bootstrapUser', {{{ user|json|safe }}});
+        afm.constant('cometUrl', {{{ config.COMET_URL|json|safe }}});
     </script>
 </body>
 </html>

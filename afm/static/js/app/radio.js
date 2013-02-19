@@ -23,10 +23,9 @@
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
-afm.constant('cometUrl', 'http://comet.againfm.local/');
-afm.service('comet', Comet);
+afm.service('comet', ['cometUrl', Comet]);
 
-afm.config(function($routeProvider, $locationProvider){
+afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider){
     // TODO: add forEach
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
     $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
@@ -44,9 +43,10 @@ afm.config(function($routeProvider, $locationProvider){
     }});
     $routeProvider.otherwise({redirectTo: '/'});
     $locationProvider.html5Mode(true);
-});
+}]);
 
-afm.run(function($rootScope, $http, currentUser, bootstrapUser, routeHistory, User){
+afm.run(['$rootScope', 'currentUser', 'bootstrapUser', 'routeHistory', 'User',
+    function($rootScope, currentUser, bootstrapUser, routeHistory, User){
     $rootScope.currentUser = currentUser;
     $rootScope.logout = function() {
         if (currentUser.isLogged()) {
@@ -56,9 +56,9 @@ afm.run(function($rootScope, $http, currentUser, bootstrapUser, routeHistory, Us
     };
 
     currentUser.update(bootstrapUser);
-});
+}]);
 
-afm.directive('radioCursor', function($rootScope){
+afm.directive('radioCursor', ['$rootScope', function($rootScope){
     return {
         restrict: 'C',
         link: function($scope, element, attrs) {
@@ -70,12 +70,12 @@ afm.directive('radioCursor', function($rootScope){
             })
         }
     };
-});
+}]);
 
 afm.directive('volumeWrapper', function(){
     return {
         restrict: 'C',
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
             element.bind('mouseenter', function(){
                 element.addClass('hover');
                 scope.$broadcast('volumeShow');
@@ -88,7 +88,7 @@ afm.directive('volumeWrapper', function(){
 });
 
 // TODO: add touch support
-afm.directive('volumeHandle', function($rootScope, $document){
+afm.directive('volumeHandle', ['$rootScope', '$document', function($rootScope, $document){
     return {
         restrict: 'A',
         scope: {
@@ -169,9 +169,9 @@ afm.directive('volumeHandle', function($rootScope, $document){
             }
         }
     };
-});
+}]);
 
-afm.directive('stationLink', function($rootScope, radio){
+afm.directive('stationLink', ['$rootScope', function($rootScope){
     return {
         restrict: 'C',
         link: function($scope, element) {
@@ -187,10 +187,10 @@ afm.directive('stationLink', function($rootScope, radio){
             });
         }
     };
-});
+}]);
 
 // TODO: prevent body scroll
-afm.directive('tracksBox', function($document){
+afm.directive('tracksBox', ['$document', function($document){
     return {
         restrict: 'C',
         link: function($scope, element) {
@@ -226,9 +226,9 @@ afm.directive('tracksBox', function($document){
             });
         }
     }
-});
+}]);
 
-afm.factory('routeHistory', function($rootScope, $route, $routeParams, $location){
+afm.factory('routeHistory', ['$rootScope', '$route', '$location', function($rootScope, $route, $location){
     var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
     $rootScope.$on('$routeChangeSuccess', function(target, current){
         if (current.$route && !current.$route.modal) {
@@ -240,9 +240,9 @@ afm.factory('routeHistory', function($rootScope, $route, $routeParams, $location
             $location.path(returnTo);
         }
     }
-});
+}]);
 
-afm.directive('modal', function($rootScope, $location, $document, routeHistory){
+afm.directive('modal', ['$document', 'routeHistory', function($document, routeHistory){
     return {
         restrict: 'E',
         replace: true,
@@ -264,9 +264,9 @@ afm.directive('modal', function($rootScope, $location, $document, routeHistory){
             });
         }
     };
-});
+}]);
 
-afm.directive('modalBox', function($route){
+afm.directive('modalBox', ['$route', function($route){
     return {
         restrict: 'AC',
         link: function(scope, element) {
@@ -279,15 +279,15 @@ afm.directive('modalBox', function($route){
             }
         }
     }
-});
+}]);
 
 
-afm.factory('audio', function($document) {
+afm.factory('audio', ['$document', function($document) {
     var audio = $document[0].createElement('audio');
     return audio;
-});
+}]);
 
-afm.factory('player', function(audio, storage) {
+afm.factory('player', ['audio', 'storage', function(audio, storage) {
     function setAudioVolume(volume) {
         audio.volume = volume;
     }
@@ -362,9 +362,9 @@ afm.factory('player', function(audio, storage) {
     });
 
     return player;
-});
+}]);
 
-afm.factory('storage', function($window, $cacheFactory, $log){
+afm.factory('storage', ['$window', '$cacheFactory', '$log', function($window, $cacheFactory, $log){
     try {
         // test localStorage
         var storage = $window['localStorage'];
@@ -389,7 +389,7 @@ afm.factory('storage', function($window, $cacheFactory, $log){
     // fallback
     $log.warn('localStorage not available. fallback used.');
     return $cacheFactory('storage');
-});
+}]);
 
 afm.factory('currentUser', function(){
     var user = null;
@@ -412,7 +412,8 @@ afm.factory('currentUser', function(){
     };
 });
 
-afm.factory('favorites', function($rootScope, currentUser, storage, UserFavorite) {
+afm.factory('favorites', ['$rootScope', 'currentUser', 'storage', 'UserFavorite',
+    function($rootScope, currentUser, storage, UserFavorite) {
     var STORAGE_ID = 'favorites';
     var favorites = storage.get(STORAGE_ID) || {};
 
@@ -469,9 +470,9 @@ afm.factory('favorites', function($rootScope, currentUser, storage, UserFavorite
             return result;
         }
     };
-});
+}]);
 
-afm.factory('User', function($http){
+afm.factory('User', ['$http', function($http){
     return {
         login: function(params) {
             return $http.post('/api/user/login', params);
@@ -489,21 +490,21 @@ afm.factory('User', function($http){
             return $http.post('/api/user/logout');
         }
     };
-});
+}]);
 
-afm.factory('Station', function($http){
+afm.factory('Station', ['$http', function($http){
     return {
         get: function(stationId) {
             return $http.get('/api/station/' + stationId);
         }
     }
-});
+}]);
 
-afm.factory('Playlist', function($resource){
+afm.factory('Playlist', ['$resource', function($resource){
     return $resource('/api/playlist/:filter');
-});
+}]);
 
-afm.factory('UserFavorite', function($http){
+afm.factory('UserFavorite', ['$http', function($http){
     return {
         add: function(id) {
             $http.post('/api/user/favorites/add', {station_id: id});
@@ -519,9 +520,9 @@ afm.factory('UserFavorite', function($http){
             });
         }
     }
-});
+}]);
 
-afm.factory('UserTrack', function($http){
+afm.factory('UserTrack', ['$http', function($http){
     return {
         add: function(id) {
             $http.post('/api/user/tracks/add', {track_id: id});
@@ -537,7 +538,7 @@ afm.factory('UserTrack', function($http){
             });
         }
     }
-});
+}]);
 
 afm.factory('passErrorToScope', function(){
     return function($scope) {
@@ -552,7 +553,8 @@ afm.factory('passErrorToScope', function(){
     }
 });
 
-afm.controller('LoginCtrl', function($scope, $location, currentUser, User, passErrorToScope){
+afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
+    function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -576,9 +578,11 @@ afm.controller('LoginCtrl', function($scope, $location, currentUser, User, passE
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
-});
+}]);
 
-afm.controller('SignupCtrl', function($scope, $location, currentUser, User, passErrorToScope){
+afm.controller('SignupCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
+    function($scope, $location, currentUser, User, passErrorToScope){
+
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -598,9 +602,10 @@ afm.controller('SignupCtrl', function($scope, $location, currentUser, User, pass
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
-});
+}]);
 
-afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, passErrorToScope){
+afm.controller('AmnesiaCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
+    function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -619,12 +624,12 @@ afm.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, pas
             $scope.result = result;
         }).error(passErrorToScope($scope));
     };
-});
+}]);
 
 /**
  * Контролер плейлиста
  */
-afm.controller('PlaylistCtrl', function($scope, $filter, Playlist, radio){
+afm.controller('PlaylistCtrl', ['$scope', 'Playlist', 'radio', function($scope, Playlist, radio){
     // TODO(outself): rename filter for anything for proper semantics
     $scope.filters = [
         {id: 'featured', title: 'Подборка'},
@@ -663,9 +668,9 @@ afm.controller('PlaylistCtrl', function($scope, $filter, Playlist, radio){
     };
 
     $scope.selectFilter($scope.filters[0]);
-});
+}]);
 
-afm.factory('radio', function($rootScope){
+afm.factory('radio', ['$rootScope', function($rootScope){
     var currentStation = null;
     var previousStation = null;
 
@@ -690,18 +695,19 @@ afm.factory('radio', function($rootScope){
         },
         selectStation: selectStation
     };
-});
+}]);
 
-afm.controller('RadioStationCtrl', function(station, radio, player){
+afm.controller('RadioStationCtrl', ['station', 'radio', 'player', function(station, radio, player){
     // prevent double load station, sound cause flickering
     if (radio.isStationLoaded() && radio.getStation().id == station.id) {
         return;
     }
     radio.selectStation(station);
     player.play(station.stream.url);
-});
+}]);
 
-afm.controller('RadioCtrl', function($scope, $http, $location, player, radio){
+afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
+    function($scope, $http, $location, player, radio){
     $scope.player = player;
 
     $scope.currentStation = radio.getStation;
@@ -740,9 +746,9 @@ afm.controller('RadioCtrl', function($scope, $http, $location, player, radio){
             $scope.volume = 0;
         }
     }
-});
+}]);
 
-afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
+afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorites){
     $scope.getFavorites = function() {
         return favorites.get();
     };
@@ -750,9 +756,9 @@ afm.controller('FavoritesCtrl', function($scope, $rootScope, favorites){
     $scope.remove = function(id) {
         favorites.remove(id);
     };
-});
+}]);
 
-afm.factory('onair', function($rootScope, currentUser, radio, comet){
+afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($rootScope, currentUser, radio, comet){
     var params = {};
     var track = null;
 
@@ -794,9 +800,10 @@ afm.factory('onair', function($rootScope, currentUser, radio, comet){
             return track;
         }
     }
-});
+}]);
 
-afm.controller('DisplayCtrl', function($rootScope, $scope, radio, currentUser, favorites, tracks, onair) {
+afm.controller('DisplayCtrl', ['$rootScope', '$scope', 'radio', 'currentUser', 'favorites', 'tracks', 'onair',
+    function($rootScope, $scope, radio, currentUser, favorites, tracks, onair) {
     $scope.track = null;
 
     $rootScope.$watch(function(){ return onair.getTrack(); }, function(track){
@@ -845,9 +852,9 @@ afm.controller('DisplayCtrl', function($rootScope, $scope, radio, currentUser, f
         }
         return favorites.exists(station.id);
     };
-});
+}]);
 
-afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
+afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack', function($rootScope, currentUser, storage, UserTrack) {
     var STORAGE_ID = 'tracks';
     var tracks = storage.get(STORAGE_ID) || {};
 
@@ -910,9 +917,10 @@ afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
             return result;
         }
     };
-});
+}]);
 
-afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
+afm.controller('TracksCtrl', ['$scope', '$rootScope', '$filter', 'currentUser', 'tracks',
+    function($scope, $rootScope, $filter, currentUser, tracks){
     $scope.tracks = [];
     $scope.searchQuery = '';
 
@@ -961,11 +969,11 @@ afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, 
         delete track.removed;
         tracks.restore(track);
     }
-});
+}]);
 
-afm.controller('MenuCtrl', function($scope, $rootScope){
+afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope){
     $scope.toggleTracks = function($event) {
         $rootScope.$broadcast('tracks.toggle');
         $event.stopPropagation();
     };
-});
+}]);
