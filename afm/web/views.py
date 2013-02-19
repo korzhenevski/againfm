@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
-import logging
 import ujson as json
 from afm import db, login_manager, i18n, app
 from . import web
-from .connect.vkontakte import VKApi
-from flask import jsonify, render_template, redirect, url_for, request, current_app
-from flask.ext.login import login_user, current_user
-from urllib import urlencode
+from flask import jsonify, render_template
+from flask.ext.login import current_user
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -23,9 +19,10 @@ def load_user(user_id):
 def index(station_id=None):
     return render_template('index.html')
 
-@web.route('/guideline')
-def guideline():
-    return render_template('guideline.html')
+if app.debug:
+    @web.route('/guideline')
+    def guideline():
+        return render_template('guideline.html')
 
 @login_manager.unauthorized_handler
 def unauthorized():
