@@ -263,9 +263,28 @@
 
     <div class="footer centroid">
         <div class="container">
-            <p class="credits"><span><i></i>Сделано в России</span></p>
+            <table width="100%">
+                <tr>
+                    <td>
+                        <p class="credits"><span><i></i>Сделано в России</span></p>
+                    </td>
+                    <td align="right">
+                        <a href="https://twitter.com/share" class="twitter-share-button"
+                           data-url="http://again.fm/" data-via="againfm" data-lang="en"
+                           data-text="Радиоплеер Эгейн.ФМ"></a>
+                        <div id="vk-like"></div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
+
+    <script>
+        /* script.js */
+        (function(j,g,b){"undefined"!=typeof b.module&&b.module.exports?b.module.exports=g():"undefined"!=typeof b.define&&"function"==b.define&&b.define.amd?define(j,g):b[j]=g()})("$script",function(){function j(b,a){for(var c=0,f=b.length;c<f;++c)if(!a(b[c]))return k;return 1}function g(b,a){j(b,function(c){return!a(c)})}function b(h,a,c){function f(a){return a.call?a():m[a]}function d(){if(!--k){m[e]=1;s&&s();for(var a in l)j(a.split("|"),f)&&!g(l[a],f)&&(l[a]=[])}}h=h[n]?h:[h];var p=a&&a.call,s=p?a:c,
+                e=p?h.join(""):a,k=h.length;setTimeout(function(){g(h,function(a){if(q[a])return 2==q[a]&&d();q[a]=1;t(!w.test(a)&&r?r+a+".js":a,d)})},0);return b}function t(b,a){var c=d.createElement("script"),f=k;c.onload=c.onerror=c[u]=function(){c[e]&&!/^c|loade/.test(c[e])||f||(c.onload=c[u]=null,f=1,q[b]=2,a())};c.async=1;c.src=b;v.insertBefore(c,v.firstChild)}var d=document,v=d.getElementsByTagName("head")[0],w=/^https?:\/\//,m={},l={},r,q={},k=!1,n="push",e="readyState",u="onreadystatechange";!d[e]&&d.addEventListener&&
+        (d.addEventListener("DOMContentLoaded",function a(){d.removeEventListener("DOMContentLoaded",a,k);d[e]="complete"},k),d[e]="loading");b.get=t;b.order=function(a,c,f){(function p(d){d=a.shift();a.length?b(d,p):b(d,c,f)})()};b.path=function(a){r=a};b.ready=function(a,c,d){a=a[n]?a:[a];var e=[];!g(a,function(a){m[a]||e[n](a)})&&j(a,function(a){return m[a]})?c():(a=a.join("|"),l[a]=l[a]||[],l[a][n](c),d&&d(e),!0);return b};return b},this);
+    </script>
 
     {{% assets "scripts" %}}
     <script src="{{{ ASSET_URL }}}"></script>
@@ -280,12 +299,12 @@
                 ['_setSiteSpeedSampleRate', 100],
                 ['_trackPageview']
             ];
-
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
+            $script(('https:'==location.protocol?'//ssl':'http://www')+'.google-analytics.com/ga.js');
+            $script("//platform.twitter.com/widgets.js");
+            $script("//vk.com/js/api/openapi.js?79", function(){
+                VK.init({apiId: 3183069, onlyWidgets: true});
+                VK.Widgets.Like('vk-like', {type: 'mini'});
+            });
         </script>
 
         <script type="text/javascript">
