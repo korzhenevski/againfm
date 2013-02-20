@@ -78,7 +78,7 @@
         <modal id="feedback" title="Обратная связь">
             <form name="feedbackForm" ng-submit="feedback()" ng-hide="result">
                 <input class="text" name="email" ng-model="form.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
-                <textarea class="text" name="text" ng-model="form.text" placeholder="Текст" required=""></textarea>
+                <textarea rows="4" class="text" name="text" ng-model="form.text" placeholder="Текст" required=""></textarea>
                 <input type="submit" class="btn" value="Отправить" ng-disabled="feedbackForm.$invalid" />
             </form>
             <p ng-show="result">Сообщение отправлено, спасибо :)</p>
@@ -279,7 +279,7 @@
         <div class="container">
             <table width="100%">
                 <tr>
-                    <td>
+                    <td width="180px">
                         <p class="credits"><span><i></i>Сделано в России</span></p>
                     </td>
                     <td>
