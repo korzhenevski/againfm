@@ -274,7 +274,7 @@ afm.factory('audio', ['$document', function($document) {
     return audio;
 }]);
 
-afm.directive('flashEngine', ['$window', 'player', '$timeout', function($window, player, $timeout){
+afm.directive('flashEngine', ['$window', 'player', function($window, player){
     window.flashPlayerCallback = player.flashCallback;
     return {
         restrict: 'C',
@@ -287,7 +287,7 @@ afm.directive('flashEngine', ['$window', 'player', '$timeout', function($window,
     }
 }]);
 
-afm.factory('player', ['$rootScope', 'storage', '$timeout', function($rootScope, storage, $timeout) {
+afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
     var player = {
         url: null,
         volume: 0.6,
