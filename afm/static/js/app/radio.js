@@ -806,8 +806,9 @@ afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter)
         // used to update the UI
         function updateTime() {
             var date = new Date();
-            var format = (date.getSeconds() % 2) ? 'HH:mm' : 'HH mm';
-            element.html(dateFilter(date, format).replace(':', '<span class="dots">:</span>'));
+            var delimiter = (date.getSeconds() % 2) ? '&nbsp;' : ':';
+            var text = dateFilter(date, 'HH mm').replace(' ', '<span class="dots">'+delimiter+'</span>');
+            element.html(text);
         }
 
         scope.$watch(attrs.clock, function(value) {
