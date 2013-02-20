@@ -1,12 +1,4 @@
 server {
-	server_name again.fm;
-
-	location / {
-	    rewrite ^ http://launch.again.fm? permanent;
-	}
-}
-
-server {
 	server_name <%= node['againfm']['host'] %>;
 
     # output compression saves bandwidth
