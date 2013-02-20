@@ -269,42 +269,56 @@ afm.directive('modalBox', ['$route', function($route){
     }
 }]);
 
-
 afm.factory('audio', ['$document', function($document) {
     var audio = $document[0].createElement('audio');
     return audio;
 }]);
 
-afm.factory('player', ['audio', 'storage', function(audio, storage) {
-    function setAudioVolume(volume) {
-        audio.volume = volume;
+afm.directive('flashEngine', ['$window', 'player', '$timeout', function($window, player, $timeout){
+    window.flashPlayerCallback = player.flashCallback;
+    return {
+        restrict: 'C',
+        link: function(scope, element, attrs) {
+            swfobject.embedSWF(attrs.src, attrs.id, 1, 1, '10', false, {}, {
+                allowScriptAccess: 'always',
+                wmode: 'transparent'
+            }, {});
+        }
     }
+}]);
 
+afm.factory('player', ['$rootScope', 'storage', '$timeout', function($rootScope, storage, $timeout) {
     var player = {
         url: null,
         volume: 0.7,
         muted: false,
         playing: false,
         defaultVolume: 0.7,
+        flashAudio: null,
 
         play: function(url) {
             if (url) {
                 player.url = url;
             }
 
-            if (player.url) {
-                audio.src = player.url;
-                audio.play();
+            if (player.url && player.flashAudio) {
+                player.flashAudio.playStream(player.url);
             }
+
             player.playing = true;
         },
 
         stop: function() {
-            if (audio.src) {
-                audio.src = null;
-                audio.load();
+            if (player.url && player.flashAudio) {
+                player.flashAudio.stopStream();
             }
             player.playing = false;
+        },
+
+        setAudioVolume: function(volume) {
+            if (player.flashAudio) {
+                player.flashAudio.setVolume(volume);
+            }
         },
 
         loadVolume: function() {
@@ -317,12 +331,12 @@ afm.factory('player', ['audio', 'storage', function(audio, storage) {
         setVolume: function(volume) {
             volume = parseFloat(volume);
             player.volume = volume;
-            setAudioVolume(volume);
+            player.setAudioVolume(volume);
             storage.put('volume', volume);
         },
 
         mute: function() {
-            setAudioVolume(0);
+            player.setAudioVolume(0);
             player.muted = player.volume;
         },
 
@@ -334,21 +348,25 @@ afm.factory('player', ['audio', 'storage', function(audio, storage) {
         isMuted: function() {
             // TODO: fix this shit
             return angular.isNumber(player.muted);
+        },
+
+        flashCallback: function(event) {
+            if (event == 'stopped') {
+                player.playing = false;
+            }
+            if (event == 'playing') {
+                player.playing = true;
+            }
+            if (event == 'ready') {
+                player.flashAudio = document.getElementById('flash-player-engine');
+                player.setAudioVolume(player.volume);
+                player.play();
+            }
+            $rootScope.$apply();
         }
     };
 
     player.loadVolume();
-
-    audio.addEventListener('play', function(){
-        player.playing = true;
-    });
-
-    angular.forEach(['ended', 'pause'], function(event){
-        audio.addEventListener(event, function(){
-            player.playing = false;
-        });
-    });
-
     return player;
 }]);
 
@@ -552,10 +570,7 @@ afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'pass
         return;
     }
 
-    $scope.form = {
-        login: 'test@testing.com',
-        password: 'password'
-    };
+    $scope.form = {};
 
     // TODO: move to form controller
     $scope.$watch('form', function(){
@@ -723,8 +738,6 @@ afm.controller('RadioStationCtrl', ['station', 'radio', 'player', function(stati
 
 afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
     function($scope, $http, $location, player, radio){
-    $scope.player = player;
-
     $scope.currentStation = radio.getStation;
     $scope.previousStation = radio.previousStation;
 
@@ -752,6 +765,18 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
         return !$scope.volume || player.isMuted();
     };
 
+    $scope.play = function() {
+        player.play();
+    };
+
+    $scope.stop = function() {
+        player.stop();
+    };
+
+    $scope.isPlaying = function() {
+        return player.playing;
+    };
+
     $scope.toggleMute = function() {
         if ($scope.isMuted()) {
             player.unmute();
@@ -765,7 +790,6 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
 
 afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorites){
     $scope.getFavorites = function() {
-        console.log(favorites.get());
         return favorites.get();
     };
 
@@ -1034,3 +1058,4 @@ afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope)
         $event.stopPropagation();
     };
 }]);
+

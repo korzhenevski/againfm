@@ -194,11 +194,11 @@ package {
 
        // вызов колбеков без отдельного потока (setTimeout(..., 0)) блокирует HTML UI
        public function callback(eventName:String) {
-           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'")', 0);
+           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'")', 1);
        }
 
        public function callbackWithData(eventName:String, data:Object) {
-           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'", "'+data+'")', 0);
+           ExternalInterface.call('setTimeout', 'flashPlayerCallback("'+eventName+'", "'+data+'")', 1);
        }
 
       public function isPlaying():Boolean {

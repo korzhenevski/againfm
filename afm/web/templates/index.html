@@ -16,9 +16,11 @@
     {{% assets "styles" %}}
     <link href="{{{ ASSET_URL }}}" rel="stylesheet"/>
     {{% endassets %}}
+    {{% if not config.DEBUG %}}
     <script type="text/javascript">
         (function(a,c){a.__qbaka_eh=a.onerror;a.__qbaka_reports=[];a.onerror=function(){a.__qbaka_reports.push(arguments);if(a.__qbaka_eh)try{a.__qbaka_eh.apply(a,arguments)}catch(b){}};a.onerror.qbaka=1;a.qbaka={report:function(){},customParams:{},set:function(a,b){qbaka.customParams[a]=b},exec:function(a){try{a()}catch(b){qbaka.reportException(b)}},reportException:function(){}};var b=c.createElement("script"),e=c.getElementsByTagName("script")[0],d=function(){e.parentNode.insertBefore(b,e)};b.id="qbaka";b.type="text/javascript";b.async=!0;b.src="//cdn.qbaka.net/reporting.js";"[object Opera]"==a.opera?c.addEventListener("DOMContentLoaded",d):d();qbaka.key="73b99461c5bf44245c159c11d57146b3"})(window,document);qbaka.options={autoStacktrace:1,trackEvents:1};
     </script>
+    {{% endif %}}
 </head>
 <body class="ng-cloak" ng-init="showTrack=false">
     <div class="modal-box ng-cloak" ng-view></div>
@@ -225,8 +227,8 @@
                                     <button class="back" ng-disabled="!previousStation()" ng-click="selectStation(previousStation())"></button>
                                 </td>
                                 <td>
-                                    <button class="pause" ng-show="player.playing" ng-click="player.stop()"></button>
-                                    <button class="play" ng-hide="player.playing" ng-disabled="!currentStation()" ng-click="player.play()"></button>
+                                    <button class="pause" ng-show="isPlaying()" ng-click="stop()"></button>
+                                    <button class="play" ng-hide="isPlaying()" ng-disabled="!currentStation()" ng-click="play()"></button>
                                 </td>
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>
@@ -356,5 +358,7 @@
         afm.value('bootstrapUser', {{{ user|json|safe }}});
         afm.constant('cometUrl', {{{ config.COMET_URL|json|safe }}});
     </script>
+    <div class="flash-engine" id="flash-player-engine" src="/static/swf/player.swf"></div>
+
 </body>
 </html>
