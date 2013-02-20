@@ -253,7 +253,7 @@
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="station in getFavorites()">
-                                        <div class="block" ng-click="selectStation(station)">
+                                        <div class="block" ng-class="itemClass(station, currentStation())" ng-click="selectStation(station)">
                                             {{ station.title }} <i class="remove" ng-click="remove(station.id)"></i>
                                         </div>
                                     </li>
