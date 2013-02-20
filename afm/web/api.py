@@ -108,15 +108,8 @@ def user_tracks_add_or_remove(track_id):
     track = db.Track.find_one_or_404({'id': track_id})
 
     favorite_cache = UserFavoritesCache(user_id=current_user.id)
-    state = False
-    try:
-        info = db.FavoriteTrack.toggle(track, station, current_user.id)
-        state = info['favorite']
-    except pymongo.errors.OperationFailure:
-        pass
-    state = favorite_cache.toggle('track', track_id, state=state)
-    #if not state:
-    #    db.FavoriteTrack.remove(track_id, station_id=station['id'], user_id=current_user.id)
+    info = db.FavoriteTrack.toggle(track, station, current_user.id)
+    state = favorite_cache.toggle('track', track_id, state=info['favorite'])
     return jsonify({'favorite': state})
 
 
@@ -129,7 +122,7 @@ def user_favorites():
     query = {'id': {'$in': favorite_stations.keys()}}
     stations = [station.get_public() for station in db.Station.find(query)]
     # сортируем по времени добавления
-    stations.sort(key=lambda station: favorite_stations.get(station['id']))
+    stations.sort(key=lambda station: favorite_stations.get(station['id']), reverse=True)
     return jsonify({'objects': stations})
 
 @app.route('/api/user/favorites/<int:station_id>/add', methods=['POST'])

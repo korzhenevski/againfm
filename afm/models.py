@@ -105,10 +105,10 @@ class FavoriteTrack(AbstractFavorite):
             'artist': unicode,
             'name': unicode
         },
-        'station': {
-            'id': int,
-            'title': unicode,
-        },
+        #'station': {
+        #    'id': int,
+        #   'title': unicode,
+        #},
         'favorite': bool,
         'created_at': int
     }
@@ -120,7 +120,7 @@ class FavoriteTrack(AbstractFavorite):
         filter_keys = lambda source, keys: dict((k, v) for k, v in source.iteritems() if k in keys)
         return cls.toggle_favorite({
             'track': filter_keys(track, cls.structure['track']),
-            'station': filter_keys(station, cls.structure['station']),
+            #'station': filter_keys(station, cls.structure['station']),
             'user_id': user_id,
         })
 

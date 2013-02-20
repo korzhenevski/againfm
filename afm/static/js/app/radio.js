@@ -452,7 +452,7 @@ afm.factory('favorites', ['$rootScope', 'currentUser', 'storage', 'UserFavorite'
         get: function() {
             var result = [];
             angular.forEach(favorites, function(obj){
-                result.push(obj);
+                result.unshift(obj);
             });
             return result;
         }
@@ -741,6 +741,7 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
 
 afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorites){
     $scope.getFavorites = function() {
+        console.log(favorites.get());
         return favorites.get();
     };
 
@@ -748,6 +749,46 @@ afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorit
         favorites.remove(id);
     };
 }]);
+
+afm.directive('clock', function($timeout, dateFilter) {
+    // return the directive link function. (compile function not needed)
+    return function(scope, element, attrs) {
+        var format,  // date format
+            timeoutId; // timeoutId, so that we can cancel the time updates
+
+        // used to update the UI
+        function updateTime() {
+            var date = new Date();
+            var format = (date.getSeconds() % 2) ? 'HH:mm' : 'HH mm';
+            element.html(dateFilter(date, format).replace(':', '<span class="dots">:</span>'));
+        }
+
+        scope.$watch(attrs.clock, function(value) {
+            if (value) {
+                $timeout.cancel(timeoutId);
+                element.css('display', 'none');
+            } else {
+                updateLater();
+                element.css('display', 'block');
+            }
+        });
+
+        // schedule update in one second
+        function updateLater() {
+            // save the timeoutId for canceling
+            timeoutId = $timeout(function() {
+                updateTime(); // update DOM
+                updateLater(); // schedule another update
+            }, 1000);
+        }
+
+        // listen on DOM destroy (removal) event, and cancel the next UI update
+        // to prevent updating time ofter the DOM element was removed.
+        element.bind('$destroy', function() {
+            $timeout.cancel(timeoutId);
+        });
+    }
+});
 
 afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($rootScope, currentUser, radio, comet){
     var params = {};
@@ -904,7 +945,7 @@ afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack',
         get: function() {
             var result = [];
             angular.forEach(tracks, function(obj){
-                result.push(obj);
+                result.unshift(obj);
             });
             return result;
         }

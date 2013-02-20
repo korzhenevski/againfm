@@ -149,6 +149,7 @@
                             <div class="display-ground">
                             <div class="display-inner">
                                 <div class="display">
+                                    <h1 class="clock" clock="currentStation()"></h1>
                                     <div class="station" ng-show="currentStation()">
                                         <h1 class="station-title ellipsis" title="{{ currentStation().title }}">{{ currentStation().title }}</h1>
                                         <button class="fave" ng-class="{selected: isStationFaved()}" ng-click="faveStation()"></button>
