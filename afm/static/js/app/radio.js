@@ -750,7 +750,7 @@ afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorit
     };
 }]);
 
-afm.directive('clock', function($timeout, dateFilter) {
+afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
     // return the directive link function. (compile function not needed)
     return function(scope, element, attrs) {
         var format,  // date format
@@ -788,7 +788,7 @@ afm.directive('clock', function($timeout, dateFilter) {
             $timeout.cancel(timeoutId);
         });
     }
-});
+}]);
 
 afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($rootScope, currentUser, radio, comet){
     var params = {};
