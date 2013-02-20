@@ -1,10 +1,10 @@
-{% extends 'mail/layout.html' %}
-{% block content %}
+{{% extends 'mail/layout.html' %}}
+{{% block content %}}
 
-<p>{{ email }} (айпи {{ remote_addr }}) написал на сайте.</p>
+<p>{{{ email }}} (айпи {{{ remote_addr }}}) написал на сайте.</p>
 
 <blockquote>
-{{ text }}
+{{{ text }}}
 </blockquote>
 
-{% endblock %}
+{{% endblock %}}

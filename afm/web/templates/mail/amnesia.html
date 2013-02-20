@@ -1,6 +1,6 @@
-{% extends 'mail/layout.html' %}
-{% block content %}
-<p><a href="{{ auth_url }}">Войти на сайт</a> с новым паролем: {{ password }}</p>
+{{% extends 'mail/layout.html' %}}
+{{% block content %}}
+<p><a href="{{{ auth_url }}}">Войти на сайт</a> с новым паролем: {{{ password }}}</p>
 <p> Если вы не хотите менять старый пароль, ничего страшного, мы поменяем его только после входа с новым.
     Вот так.</p>
-{% endblock %}
+{{% endblock %}}
