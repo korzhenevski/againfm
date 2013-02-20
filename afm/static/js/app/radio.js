@@ -665,10 +665,9 @@ afm.controller('PlaylistCtrl', ['$scope', 'Playlist', 'radio', function($scope, 
         {id: 'genre/trance', title: 'Транс'},
         {id: 'genre/house', title: 'Хауз'},
         {id: 'genre/dnb', title: 'Драм-н-бейс'},
+        {id: 'genre/ambient', title: 'Эмбиент'}
         {id: 'genre/pop', title: 'Поп'},
-        {id: 'genre/metal', title: 'Метал'},
-        {id: 'genre/news', title: 'Новости'},
-        {id: 'genre/chillout', title: 'Чилаут'}
+        {id: 'genre/news', title: 'Новости'}
     ];
     $scope.playlist = [];
     $scope.searchQuery = '';
