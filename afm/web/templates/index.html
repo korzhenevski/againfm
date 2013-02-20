@@ -221,14 +221,14 @@
                             <table class="controls" width="80%">
                             <tr align="center">
                                 <td>
-                                    <button class="record" disabled="disabled"></button>
+                                    <button class="record"></button>
                                 </td>
                                 <td>
                                     <button class="back" ng-disabled="!previousStation()" ng-click="selectStation(previousStation())"></button>
                                 </td>
                                 <td>
-                                    <button class="pause" ng-show="isPlaying()" ng-click="stop()"></button>
-                                    <button class="play" ng-hide="isPlaying()" ng-disabled="!currentStation()" ng-click="play()"></button>
+                                    <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
+                                    <button class="play" ng-click="play()" ng-hide="isPlaying()" ng-disabled="!currentStation()"></button>
                                 </td>
                                 <td>
                                     <button class="random" ng-click="selectRandomStation()"></button>

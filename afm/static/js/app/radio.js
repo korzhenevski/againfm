@@ -290,10 +290,10 @@ afm.directive('flashEngine', ['$window', 'player', '$timeout', function($window,
 afm.factory('player', ['$rootScope', 'storage', '$timeout', function($rootScope, storage, $timeout) {
     var player = {
         url: null,
-        volume: 0.7,
+        volume: 0.6,
         muted: false,
         playing: false,
-        defaultVolume: 0.7,
+        defaultVolume: 0.6,
         flashAudio: null,
 
         play: function(url) {
@@ -303,9 +303,8 @@ afm.factory('player', ['$rootScope', 'storage', '$timeout', function($rootScope,
 
             if (player.url && player.flashAudio) {
                 player.flashAudio.playStream(player.url);
+                player.playing = true;
             }
-
-            player.playing = true;
         },
 
         stop: function() {
