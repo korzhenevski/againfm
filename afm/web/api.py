@@ -185,3 +185,24 @@ def token_auth(user_id, token):
     if user and user.confirm_new_password(token):
         permanent_login_user(user)
     return redirect('/')
+
+@app.route('/api/feedback', methods=['POST'])
+def feedback():
+    form = safe_input_object({
+        'text': {'type': 'string', 'maxLength': 2048},
+        'email': {'type': 'string', 'maxLength': 255}
+    })
+
+    # TODO: fix this shit
+    form['text'] = unicode(form['text'])
+    form['email'] = unicode(form['email'])
+
+    message = db.FeedbackMessage()
+    message.update(form)
+    message.remote_addr = unicode(request.remote_addr)
+    message.save()
+
+    body = render_template('mail/feedback.html', **message)
+    send_mail(email=app.config['ADMIN_EMAIL'], body=body, subject=u'Обратная связь')
+
+    return jsonify({'success': True})

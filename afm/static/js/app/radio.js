@@ -17,6 +17,7 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
     $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
+    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
     // controller don't execute without "template" attr
     $routeProvider.when('/radio/:stationId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
         station: ['$route', '$http', function($route, $http) {
@@ -603,18 +604,41 @@ afm.controller('AmnesiaCtrl', ['$scope', '$location', 'currentUser', 'User', 'pa
     }
 
     $scope.form = {};
-
     $scope.$watch('form', function(){
         $scope.error = null;
     }, true);
 
     $scope.amnesia = function() {
-
         $scope.error = null;
         User.amnesia($scope.form).success(function(result){
             $scope.result = result;
         }).error(passErrorToScope($scope));
     };
+}]);
+
+afm.factory('Feedback', ['$http', function($http) {
+    return {
+        send: function(params) {
+            return $http.post('/api/feedback', params);
+        }
+    }
+}]);
+
+afm.controller('FeedbackCtrl', ['$scope', 'Feedback', 'passErrorToScope',
+    function($scope, Feedback, passErrorToScope){
+        $scope.form = {};
+
+        $scope.$watch('form', function(){
+            $scope.error = null;
+        }, true);
+
+        $scope.feedback = function() {
+            $scope.error = null;
+            $scope.result = null;
+            Feedback.send($scope.form).success(function(result){
+                $scope.result = result;
+            }).error(passErrorToScope($scope));
+        };
 }]);
 
 /**
