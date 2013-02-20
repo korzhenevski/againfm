@@ -665,7 +665,7 @@ afm.controller('PlaylistCtrl', ['$scope', 'Playlist', 'radio', function($scope, 
         {id: 'genre/trance', title: 'Транс'},
         {id: 'genre/house', title: 'Хауз'},
         {id: 'genre/dnb', title: 'Драм-н-бейс'},
-        {id: 'genre/ambient', title: 'Эмбиент'},
+        {id: 'genre/relax', title: 'Релакс'},
         {id: 'genre/pop', title: 'Поп'},
         {id: 'genre/news', title: 'Новости'}
     ];
