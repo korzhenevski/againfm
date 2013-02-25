@@ -335,6 +335,7 @@ class Station(BaseDocument):
     def public_list(models):
         return [(model['id'], model['title']) for model in models]
 
+
 @db.register
 class Stream(BaseDocument):
     __collection__ = 'streams'

@@ -50,13 +50,13 @@ def amnesia():
         return jsonify({'email_provider': get_email_provider(user.email)})
     return jsonify({'error': 'no_user'}), 404
 
-
 @app.route('/api/user/signup', methods=['POST'])
 def signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
     data['email'] = data['email'].lower()
     if db.User.find_one({'email': data['email']}):
         return jsonify({'error': 'email_exists'}), 409
+
     # create
     user = db.User()
     user.email = unicode(data['email'])
