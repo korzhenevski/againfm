@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Admin{% endblock %}</title>
+    <title>{{% block title %}}Admin{{% endblock %}}</title>
     <link href="/admin/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/admin/static/css/admin.css" rel="stylesheet">
 </head>
@@ -16,16 +16,9 @@
     </div>
     </div>
     <div class="container">
-        {% block content %}{% endblock %}
+        {{% block content %}}{{% endblock %}}
     </div>
 
-    <script src="/static/js/libs/jquery.min.js"></script>
-    <script src="/static/js/libs/underscore.js"></script>
-    <script src="/static/js/libs/backbone.js"></script>
-    <script src="/static/js/libs/handlebars.js"></script>
-    <script src="/admin/static/js/bootstrap.js"></script>
-    <script src="/admin/static/js/admin.js"></script>
-
-    {% block js %}{% endblock %}
+    {{% block js %}}{{% endblock %}}
 </body>
 </html>

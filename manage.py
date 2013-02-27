@@ -5,9 +5,13 @@ import string
 from pprint import pprint
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
-from afm import app, db, assets
+from afm import app, db, assets, models
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
+
+@manager.shell
+def make_shell_context():
+    return dict(app=app, db=db, models=models)
 
 @manager.command
 @manager.option('-f', '--file', dest='file')
@@ -246,7 +250,7 @@ def convert_stations():
 @manager.command
 def housekeep_stations():
     ids = set()
-    for stream in db.streams.find({}, fields=['id','station_id']):
+    for stream in db.streams.find({}, fields=['id', 'station_id']):
         ids.add(stream['station_id'])
 
     disable_ids = set()
@@ -268,24 +272,45 @@ def station_history(station_id):
 
 @manager.command
 def group_itunes():
+    import re
+    from os.path import commonprefix
+    from collections import defaultdict
     from pprint import pprint
-    from collections import Counter, defaultdict
-    counter = Counter()
-    agg = defaultdict(set)
-    import nltk
-    from nltk.tokenize.punkt import PunktWordTokenizer
-    tokenizer = PunktWordTokenizer()
-    for station in db.itunes.find({}, fields=['title',]):
-        title = station['title']
-        tokens = tokenizer.tokenize(title)
-        tokens = [token for token in tokens if len(token) > 1]
-        if tokens:
-            token = tokens[0]
-            agg[token].add(station['title'])
-            counter[token] += 1
+    from nltk.tokenize.simple import SpaceTokenizer
+    tokenizer = SpaceTokenizer()
 
-    #print agg
-    pprint(counter.most_common(50))
+    db.rawradio.drop()
+    tree = defaultdict(list)
+    for station in db.itunes.find():
+        try:
+            title = station['title'].decode('utf8').strip()
+        except UnicodeEncodeError:
+            title = None
+
+        if not title:
+            continue
+
+        if 'itunes' in station['playlist'].lower():
+            continue
+
+        title = re.sub(r'\s[\-\^]+\s', u' ', title)
+        title = title.replace('.fm/', '.fm ').strip()
+        #print title
+        title_tokenized = tokenizer.tokenize(title)
+        tree[title_tokenized[0]].append(station)
+
+
+    for root_token, stations in tree.iteritems():
+        if len(stations) > 2:
+            radio_title = commonprefix([station['title'] for station in stations]).strip()
+            if radio_title:
+                print db.rawradio.insert({
+                    'title': radio_title,
+                    'stations': stations
+                })
+
+    print db.rawradio.count()
+
 
 if __name__ == "__main__":
     manager.run()
