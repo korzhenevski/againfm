@@ -6,6 +6,8 @@ from pprint import pprint
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 from afm import app, db, assets, models
+from bson.objectid import ObjectId
+
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
 
@@ -271,6 +273,100 @@ def station_history(station_id):
         print item['created_at'], track['title']
 
 @manager.command
+def convert_radio():
+    from pprint import pprint
+    groups = db.radio.aggregate({'$group': {'_id': '$tag.group', 'count': {'$sum': 1}}})['result']
+    for group in groups:
+        if group['_id'] is None:
+            continue
+        title = group['_id'].strip(':/')
+        g = db.RadioGroup()
+        g['title'] = title
+        g.save()
+        print g
+        print db.radio.update({'tag.group': group['_id']}, {'$set': {'group': {'id': g['id'], 'title': g['title']}}}, multi=True)
+
+@manager.command
+def convert_radio2():
+    from pprint import pprint
+    genres = {}
+    for data in db.radio2.find():
+        genres[data['genre_id']] = data['genre']
+"""
+        playlist_url = data['playlist'].lower()
+        playlist_streams = data.get('playlist_content', {}).get('urls')
+        if not playlist_streams:
+            continue
+
+        radio = db.Radio()
+        radio['title'] = data['title'].strip()
+        radio['description'] = data['description']
+        if data['genre_id']:
+            radio['genres'] = [int(data['genre_id'])]
+
+        radio['tag'] = {'itunes_esid': data['esid']}
+
+        group = data.get('group')
+        if group:
+            radio['tag']['group'] = group
+            radio['is_channel'] = True
+
+        radio.save()
+        pprint(radio)
+
+        playlist = db.Playlist()
+        playlist['radio_id'] = radio['id']
+        playlist['url'] = playlist_url
+        playlist['streams'] = playlist_streams
+        playlist.save()
+        pprint(playlist)
+
+    pprint(genres)
+
+    for genre_id, genre_title in genres.iteritems():
+        genre = db.RadioGenre()
+        genre['id'] = int(genre_id)
+        genre['title'] = genre_title
+        pprint(genre.save())
+"""
+
+@manager.command
+def download_playlist():
+    from afm.web.tasks import fetch_playlist
+    from afm.web.tasks import fetch_radio_stream
+
+@manager.command
+def regroup_itunes():
+    db.radio.drop()
+    for rawradio in db.rawradio.find():
+        for station in rawradio['stations']:
+            radio = station
+            try:
+                s = ''.join(filter(None, [radio['title'], radio['description'], radio['playlist']])).lower()
+                if 'itunes' in s or 'radionomy' in s:
+                    continue
+            except UnicodeEncodeError:
+                continue
+
+            if rawradio.get('group'):
+                radio['group'] = rawradio['title']
+
+            radio['_id'] = ObjectId(radio['_id'])
+            print db.radio.insert(radio)
+    print db.radio.count()
+
+@manager.command
+@manager.option('-key', '--key', dest='key')
+def mongo_group(key):
+    collection, field = key.split('/')
+    result = db[collection].aggregate([
+        {'$group': {'_id': '$' + field, 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}},
+    ])
+    for item in result['result']:
+        print '{count} {_id}'.format(**item)
+
+@manager.command
 def group_itunes():
     import re
     from os.path import commonprefix
@@ -297,17 +393,17 @@ def group_itunes():
         title = title.replace('.fm/', '.fm ').strip()
         #print title
         title_tokenized = tokenizer.tokenize(title)
+        station['_id'] = unicode(station['_id'])
         tree[title_tokenized[0]].append(station)
 
 
     for root_token, stations in tree.iteritems():
-        if len(stations) > 2:
-            radio_title = commonprefix([station['title'] for station in stations]).strip()
-            if radio_title:
-                print db.rawradio.insert({
-                    'title': radio_title,
-                    'stations': stations
-                })
+        radio_title = commonprefix([station['title'] for station in stations]).strip()
+        if radio_title:
+            print db.rawradio.insert({
+                'title': radio_title,
+                'stations': stations
+            })
 
     print db.rawradio.count()
 

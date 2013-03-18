@@ -19,17 +19,17 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
     $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
     // controller don't execute without "template" attr
-    $routeProvider.when('/radio/:stationId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
+    $routeProvider.when('/listen/:radioId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
         station: ['$route', '$http', function($route, $http) {
             // use $route instead $routeParams
             // https://github.com/angular/angular.js/issues/1289
-            var stationId = $route.current.params.stationId;
-            return $http.get('/api/station/' + stationId).then(function(req){
-                return req.data.station;
+            var radioId = $route.current.params.radioId;
+            return $http.get('/api/radio/' + radioId).then(function(req){
+                return req.data;
             });
         }]
     }});
-    $routeProvider.otherwise({redirectTo: '/'});
+    //$routeProvider.otherwise({redirectTo: '/'});
     $locationProvider.html5Mode(true).hashPrefix('!');
 }]);
 
@@ -745,7 +745,7 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
     };
 
     $scope.selectStation = function(station) {
-        $location.path('/radio/' + station.id);
+        $location.path('/listen/' + station.id);
     };
 
     $scope.selectRandomStation = function() {

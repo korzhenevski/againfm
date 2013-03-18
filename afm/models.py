@@ -23,16 +23,22 @@ def get_ts():
 
 class BaseDocument(Document):
     use_dot_notation = True
+    use_autoinc_id = False
 
     def save(self, *args, **kwargs):
         # автоинкремент числового идентификатора
+        if self.use_autoinc_id:
+            self['_id'] = self.get_next_id(self.collection.name)
+
         spec = self.structure.get('id')
         if spec is int and not self['id']:
-            self['id'] = self.db.object_ids.find_and_modify(
-                query={'_id': self.collection.name},
-                update={'$inc': {'next': 1}},
-                new=True, upsert=True)['next']
+            self['id'] = self.get_next_id(self.collection.name)
+
         return super(BaseDocument, self).save(*args, **kwargs)
+
+    def get_next_id(self, ns):
+        ret = self.db.object_ids.find_and_modify(query={'_id': ns}, update={'$inc': {'next': 1}}, new=True, upsert=True)
+        return ret['next']
 
     def soft_delete(self):
         if 'deleted_at' in self.structure:
@@ -491,3 +497,148 @@ class FeedbackMessage(BaseDocument):
     default_values = {
         'created_at': datetime.now
     }
+
+@db.register
+class RadioGenre(BaseDocument):
+    __collection__ = 'radio_genre'
+    structure = {
+        'id': int,
+        'title': unicode,
+        'is_public': bool
+    }
+
+    default_values = {
+        'is_public': False,
+    }
+
+@db.register
+class RadioGroup(BaseDocument):
+    __collection__ = 'radio_group'
+
+    structure = {
+        'id': int,
+        'title': unicode,
+        'slug': unicode,
+        'owners': [int],
+        'created_at': int,
+        'deleted_at': int,
+    }
+
+    default_values = {
+        'slug': u'',
+        'owners': [],
+        'created_at': get_ts,
+        'deleted_at': 0,
+    }
+
+    def update_channels(self):
+        pass
+
+@db.register
+class Radio(BaseDocument):
+    __collection__ = 'radio'
+
+    structure = {
+        'id': int,
+        'title': unicode,
+        # короткое URL-имя
+        'slug': unicode,
+        'description': unicode,
+        # страна, город
+        'location': unicode,
+        'website': unicode,
+        'genres': [int],
+        'group': dict,
+        'owner_id': int,
+        'is_channel': bool,
+        'is_public': bool,
+        'air': {
+            'track': bool,
+            'record': bool,
+        },
+        'stat': dict,
+        'tag': dict,
+        'created_at': int,
+        'deleted_at': int,
+    }
+
+    default_values = {
+        'slug': u'',
+        'description': u'',
+        'location': u'',
+        'website': u'',
+        'genres': [],
+        'is_channel': False,
+        'is_public': False,
+        'created_at': get_ts,
+        'deleted_at': 0,
+        'air': {
+            'track': False,
+            'record': False,
+        }
+    }
+
+    def get_public(self):
+        radio = {
+            'id': self['id'],
+            'title': self['title'],
+            'description': self['description'],
+            'website': self['website'],
+        }
+        #if self['channel'] and self['group'].get('title'):
+        #    radio['title'] = u' - '.join([self['group']['title'], self['title']])
+        return radio
+
+    def get_related(self, limit=5):
+        from random import shuffle
+        if not self['genres']:
+            return []
+        where = {'id': {'$ne': self['id']}, 'genres': self['genres']}
+        results = list(db.Radio.find(where, sort=[('title', 1)], limit=limit * 3))
+        shuffle(results)
+        return results[:limit]
+
+    def get_genres(self):
+        if not self['genres']:
+            return []
+        genres = list(db.RadioGenre.find({'id': self['genres']}))
+        return genres
+
+@db.register
+class Playlist(BaseDocument):
+    __collection__ = 'playlist'
+
+    structure = {
+        'id': int,
+        'url': unicode,
+        'streams': [unicode],
+        'radio_id': int,
+        'created_at': int,
+        'deleted_at': int,
+    }
+
+    default_values = {
+        'streams': [],
+        'created_at': get_ts,
+        'deleted_at': 0,
+    }
+
+@db.register
+class Air(BaseDocument):
+    __collection__ = 'air'
+
+    structure = {
+        'id': int,
+        'rid': int,
+        'sid': int,
+        'title': unicode,
+        'ts': int,
+    }
+
+
+if __name__ == '__main__':
+    import unittest
+    from random import randint
+    class RadioTest(unittest.TestCase):
+        pass
+    unittest.main()

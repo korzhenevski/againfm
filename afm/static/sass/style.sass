@@ -131,9 +131,8 @@ $use-mozilla-ellipsis-binding: true
   border-bottom: 1px dotted #a49ca3
 
 .roof
-  margin: 0 auto
-  margin-bottom: 10px
   width: 980px
+  margin: 25px auto 10px auto
   .logo
     img
       margin-left: -2px
@@ -144,7 +143,6 @@ $use-mozilla-ellipsis-binding: true
 .topline
   border-top: 1px solid #525362
   border-bottom: 1px solid #24252a
-  margin-bottom: 25px
   +background(linear-gradient(rgba(#4e4d5c, 0.5), rgba(#393944, 0.5)))
   +box-shadow(#4b4c5b 0px -4px 3px -2px inset, #26242c 0px 0px 3px 1px)
 
@@ -477,14 +475,6 @@ $use-mozilla-ellipsis-binding: true
         .remove
           z-index: 900
           display: block
-        /*&:after
-          width: 100%
-          height: 100%
-          position: absolute
-          top: 0
-          right: 0
-          content: ""
-          +background(linear-gradient(center left, rgba(white, 0) 60%, #ced4d1 85%))
 
     .block.selected
       border: 1px solid #a3d3dd
@@ -719,7 +709,50 @@ $use-mozilla-ellipsis-binding: true
   padding: 30px
   min-height: 500px
   border: 3px solid #2b2b2b
+  overflow: hidden
   +border-radius(8px)
+
+  a.link
+    color: #42d5f4
+    border-bottom: 1px solid #42d5f4
+    &:hover
+      text-decoration: none
+
+  .text-muted
+    color: #cccccf
+
+  h1
+    margin: 0
+    font-size: 28px
+    font-weight: normal
+
+  h2
+    margin: 0
+    font-size: 22px
+    font-weight: normal
+
+  p + h2
+    margin-top: 1em
+
+  p
+    line-height: 1.3em
+
+.radio-page
+  .listen
+    line-height: 1em
+    margin-top: 0.7em
+    margin-bottom: 4.4em
+
+  .content,
+  .sidebar
+    float: left
+
+  .content
+    padding-right: 4%
+    width: 66%
+
+  .sidebar
+    width: 30%
 
 input[disabled], button[disabled]
   cursor: normal
@@ -776,7 +809,6 @@ input.text, textarea.text
     span
       position: relative
       margin-left: 28px
-      /*border-bottom: 1px dotted #c6c5c8
       color: #c6c5c8
     i
       position: absolute
@@ -792,6 +824,7 @@ body
   font-family: Helvetica, Arial, sans-serif !important
   color: #fff
   background: url('/static/i/background.jpg')
+  text-rendering: optimizeLegibility
   +background-size(cover)
 
 a
@@ -820,3 +853,4 @@ ul.justified
 #vk-like
   display: inline-block
   margin-right: -20px
+
