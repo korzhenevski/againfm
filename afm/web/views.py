@@ -75,5 +75,6 @@ def app_context():
     bootstrap = {'user': None}
     if current_user.is_authenticated():
         bootstrap['user'] = current_user.get_public()
+    bootstrap['genres'] = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})]
     return bootstrap
 

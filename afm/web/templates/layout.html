@@ -124,7 +124,9 @@
 
 <script>
     afm.value('bootstrapUser', {{{ user|json|safe }}});
-    afm.constant('cometUrl', {{{ config.COMET_URL|json|safe }}});
+    afm.value('bootstrapGenres', {{{ genres|json|safe }}});
+    // configure comet over $provide.configuration
+    afm.value('cometUrl', {{{ config.COMET_URL|json|safe }}});
 </script>
 
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>

@@ -7,6 +7,10 @@
  * Проигрывание через флеш
  * PIE для IE
  */
+
+(function(window, angular, Comet, undefined) {
+'use strict';
+
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
@@ -49,13 +53,13 @@ afm.run(['$rootScope', 'currentUser', 'bootstrapUser', 'routeHistory', 'User',
 afm.directive('radioCursor', ['$rootScope', function($rootScope){
     return {
         restrict: 'C',
-        link: function($scope, element, attrs) {
+        link: function($scope, element) {
             $rootScope.$on('playlist.currentElement', function(ev, el){
                 var centerOffset = Math.round(el.prop('offsetWidth') / 2);
                 // TODO: add random
                 var left = el.prop('offsetLeft') + centerOffset;
                 element.css('left', left + 'px');
-            })
+            });
         }
     };
 }]);
@@ -72,7 +76,7 @@ afm.directive('volumeWrapper', function(){
                 element.removeClass('hover');
             });
         }
-    }
+    };
 });
 
 // TODO: add touch support
@@ -198,7 +202,7 @@ afm.directive('tracksBox', ['$document', function($document){
 //            });
 
             // close on body click
-            $document.bind('click', function(e){
+            $document.bind('click', function(){
                 $scope.$apply(function(){
                     $scope.visible = false;
                 });
@@ -213,7 +217,7 @@ afm.directive('tracksBox', ['$document', function($document){
                 }
             });
         }
-    }
+    };
 }]);
 
 afm.factory('routeHistory', ['$rootScope', '$route', '$location', function($rootScope, $route, $location){
@@ -227,7 +231,7 @@ afm.factory('routeHistory', ['$rootScope', '$route', '$location', function($root
         backToNotModal: function() {
             $location.path(returnTo);
         }
-    }
+    };
 }]);
 
 afm.directive('modal', ['$document', 'routeHistory', function($document, routeHistory){
@@ -266,7 +270,7 @@ afm.directive('modalBox', ['$route', function($route){
                 element.css('display', modal ? 'block' : 'none');
             }
         }
-    }
+    };
 }]);
 
 afm.factory('audio', ['$document', function($document) {
@@ -274,17 +278,19 @@ afm.factory('audio', ['$document', function($document) {
     return audio;
 }]);
 
+
 afm.directive('flashEngine', ['$window', 'player', function($window, player){
     window.flashPlayerCallback = player.flashCallback;
     return {
         restrict: 'C',
         link: function(scope, element, attrs) {
+            // TODO: move swfobject to provider
             swfobject.embedSWF(attrs.src, attrs.id, 1, 1, '10', false, {}, {
                 allowScriptAccess: 'always',
                 wmode: 'transparent'
             }, {});
         }
-    }
+    };
 }]);
 
 afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
@@ -323,7 +329,9 @@ afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
         loadVolume: function() {
             var volume = parseFloat(storage.get('volume'));
             // громкость не установлена в куках - берем по умолчанию
-            if (isNaN(volume)) volume = player.defaultVolume;
+            if (isNaN(volume)) {
+                volume = player.defaultVolume;
+            }
             player.setVolume(volume);
         },
 
@@ -372,7 +380,7 @@ afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
 afm.factory('storage', ['$window', '$cacheFactory', '$log', function($window, $cacheFactory, $log){
     try {
         // test localStorage
-        var storage = $window['localStorage'];
+        var storage = $window.localStorage;
         if (storage) {
             storage.setItem('key', 'value');
             storage.removeItem('key');
@@ -388,7 +396,7 @@ afm.factory('storage', ['$window', '$cacheFactory', '$log', function($window, $c
                 remove: function(key) {
                     storage.removeItem(key);
                 }
-            }
+            };
         }
     } catch(e) {}
     // fallback
@@ -502,11 +510,7 @@ afm.factory('Station', ['$http', function($http){
         get: function(stationId) {
             return $http.get('/api/station/' + stationId);
         }
-    }
-}]);
-
-afm.factory('Playlist', ['$resource', function($resource){
-    return $resource('/api/playlist/:filter');
+    };
 }]);
 
 afm.factory('UserFavorite', ['$http', function($http){
@@ -521,10 +525,10 @@ afm.factory('UserFavorite', ['$http', function($http){
 
         list: function(cb) {
             $http.get('/api/user/favorites').success(function(response){
-                cb(response['objects']);
+                cb(response.objects);
             });
         }
-    }
+    };
 }]);
 
 afm.factory('UserTrack', ['$http', function($http){
@@ -543,23 +547,23 @@ afm.factory('UserTrack', ['$http', function($http){
 
         list: function(cb) {
             $http.get('/api/user/tracks').success(function(response){
-                cb(response['objects']);
+                cb(response.objects);
             });
         }
-    }
+    };
 }]);
 
 afm.factory('passErrorToScope', function(){
     return function($scope) {
-        return function(response, status_code) {
+        return function(response, statusCode) {
             var error = {};
             if (angular.isObject(response) && response.error) {
                 error.reason = response.error;
             }
-            error.code = status_code;
+            error.code = statusCode;
             $scope.error = error;
         };
-    }
+    };
 });
 
 afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
@@ -635,7 +639,7 @@ afm.factory('Feedback', ['$http', function($http) {
         send: function(params) {
             return $http.post('/api/feedback', params);
         }
-    }
+    };
 }]);
 
 afm.controller('FeedbackCtrl', ['$scope', 'Feedback', 'passErrorToScope',
@@ -655,37 +659,48 @@ afm.controller('FeedbackCtrl', ['$scope', 'Feedback', 'passErrorToScope',
         };
 }]);
 
+afm.factory('Playlist', ['$http', function($http){
+    return {
+        get: function(playlist) {
+            return $http.get('/api/radio/' + playlist);
+        }
+    };
+}]);
+
 /**
  * Контролер плейлиста
  */
-afm.controller('PlaylistCtrl', ['$scope', 'Playlist', 'radio', function($scope, Playlist, radio){
-    // TODO(outself): rename filter for anything for proper semantics
-    $scope.filters = [
-        {id: 'featured', title: 'Подборка'},
-        {id: 'genre/trance', title: 'Транс'},
-        {id: 'genre/house', title: 'Хауз'},
-        {id: 'genre/dnb', title: 'Драм-н-бейс'},
-        {id: 'genre/relax', title: 'Релакс'},
-        {id: 'genre/pop', title: 'Поп'},
-        {id: 'genre/news', title: 'Новости'}
-    ];
+afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', function($scope, $http, radio, bootstrapGenres){
+    $scope.tabs = [];
+    angular.forEach(bootstrapGenres, function(genre){
+        $scope.tabs.push({
+            id: 'genre/' + genre.id,
+            title: genre.title
+        });
+    });
+
     $scope.playlist = [];
     $scope.searchQuery = '';
-    $scope.currentFilter = null;
+    $scope.currentTab = null;
     // ids list for fast lookup
     var playlistIds = [];
 
-    $scope.selectFilter = function(filter) {
+    $scope.selectTab = function(tabId) {
         $scope.playlist = [];
-        $scope.currentFilter = filter;
+        $scope.currentTab = tabId;
 
-        Playlist.get({filter: filter.id}, function(response){
-            $scope.playlist = response.objects;
+        $http.get('/api/radio/' + tabId).success(function(response){
             playlistIds = [];
+            $scope.playlist = response.objects;
             angular.forEach(response.objects, function(station){
                 playlistIds.push(station.id);
             });
         });
+    };
+
+    $scope.tabClass = function(tabId) {
+        var selected = (tabId == $scope.currentTab) && !$scope.searchQuery;
+        return {selected: selected};
     };
 
     $scope.showCursor = function() {
@@ -694,8 +709,6 @@ afm.controller('PlaylistCtrl', ['$scope', 'Playlist', 'radio', function($scope, 
         }
         return playlistIds.indexOf(radio.getStation().id) >= 0;
     };
-
-    $scope.selectFilter($scope.filters[0]);
 }]);
 
 afm.factory('radio', ['$rootScope', function($rootScope){
@@ -739,8 +752,8 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
     $scope.currentStation = radio.getStation;
     $scope.previousStation = radio.previousStation;
 
-    $scope.itemClass = function(filter, current) {
-        var selected = current && current.id == filter.id;
+    $scope.itemClass = function(item, current) {
+        var selected = current && current.id == item.id;
         return {selected: selected};
     };
 
@@ -783,7 +796,7 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
             player.mute();
             $scope.volume = 0;
         }
-    }
+    };
 }]);
 
 afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorites){
@@ -799,8 +812,7 @@ afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorit
 afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
     // return the directive link function. (compile function not needed)
     return function(scope, element, attrs) {
-        var format,  // date format
-            timeoutId; // timeoutId, so that we can cancel the time updates
+        var timeoutId; // timeoutId, so that we can cancel the time updates
 
         // used to update the UI
         function updateTime() {
@@ -834,7 +846,7 @@ afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter)
         element.bind('$destroy', function() {
             $timeout.cancel(timeoutId);
         });
-    }
+    };
 }]);
 
 afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($rootScope, currentUser, radio, comet){
@@ -842,6 +854,7 @@ afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($r
     var track = null;
 
     $rootScope.$watch(function() { return currentUser.isLogged(); }, function(logged){
+        // TODO: rename user_id => uid
         if (logged) {
             params.user_id = currentUser.get().id;
         } else {
@@ -878,7 +891,7 @@ afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($r
         getTrack: function() {
             return track;
         }
-    }
+    };
 }]);
 
 afm.controller('DisplayCtrl', ['$rootScope', '$scope', 'radio', 'currentUser', 'favorites', 'tracks', 'onair',
@@ -1048,7 +1061,7 @@ afm.controller('TracksCtrl', ['$scope', '$rootScope', '$filter', 'currentUser', 
     $scope.restore = function(track) {
         delete track.removed;
         tracks.restore(track);
-    }
+    };
 }]);
 
 afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope){
@@ -1058,3 +1071,5 @@ afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope)
     };
 }]);
 
+window.afm = afm;
+})(window, angular, Comet);

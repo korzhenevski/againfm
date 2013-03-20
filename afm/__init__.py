@@ -14,6 +14,10 @@ app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
 app.config.from_envvar('AGAINFM_CONFIG', silent=True)
 
+if app.debug:
+    # show immediately template changes during debug
+    app.jinja_env.cache.clear()
+
 app.jinja_env.variable_start_string = '{{{'
 app.jinja_env.variable_end_string = '}}}'
 app.jinja_env.block_start_string = '{{%'
@@ -40,6 +44,6 @@ app.register_blueprint(admin, url_prefix='/admin')
 from afm.web.assets import assets
 assets.init_app(app)
 
-if not app.config['DEBUG']:
-    from raven.contrib.flask import Sentry
-    sentry = Sentry(app)
+#if not app.config['DEBUG']:
+#    from raven.contrib.flask import Sentry
+#    sentry = Sentry(app)

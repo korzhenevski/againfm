@@ -95,10 +95,12 @@
                                     <div class="search">
                                         <input type="search" class="search-field" placeholder="Быстрый поиск" data-ng-model="searchQuery" />
                                     </div>
-
-                                    <ul class="filters justified">
-                                        <li data-ng-repeat="filter in filters">
-                                            <span class="block" data-ng-class="itemClass(filter, currentFilter)" data-ng-click="selectFilter(filter)">{{ filter.title }}</span>
+                                    <ul class="tabs justified" data-ng-init="selectTab('featured')">
+                                        <li>
+                                            <span class="block" data-ng-class="tabClass('featured')" data-ng-click="selectTab('featured')">Подборка</span>
+                                        </li>
+                                        <li data-ng-repeat="tab in tabs">
+                                            <span class="block" data-ng-class="tabClass(tab.id)" data-ng-click="selectTab(tab.id)">{{ tab.title }}</span>
                                         </li>
                                     </ul>
 
@@ -107,7 +109,9 @@
                                         <div id="radio-cursor" class="radio-cursor" data-ng-show="showCursor()"></div>
                                         <ul class="playlist justified">
                                             <li data-ng-repeat="station in playlist|filter:searchQuery">
-                                                <span class="block station-link" data-ng-class="itemClass(station, currentStation())" data-ng-click="selectStation(station)">{{ station.title }}</span>
+                                                <div class="block station-link" data-ng-class="itemClass(station, currentStation())" data-ng-click="selectStation(station)">
+                                                    <span class="link">{{ station.title }}</span>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>

@@ -69,19 +69,15 @@ def logout():
     return jsonify({'logout': True})
 
 
-@app.route('/api/playlist/featured')
-def featured_playlist():
-    stations = [station.get_public() for station in db.Station.find_public(only_online=True).limit(35)]
-    return jsonify({'objects': stations})
+@app.route('/api/radio/featured')
+def radio_featured():
+    objects = [radio.get_public() for radio in db.Radio.find().limit(30)]
+    return jsonify({'objects': objects})
 
-
-@app.route('/api/playlist/genre/<genre>')
-def genre_playlist(genre):
-    genre = db.Genre.find_one_or_404({'id': genre})
-    where = {'tags': {'$in': genre['tags']}}
-    stations = [station.get_public() for station in db.Station.find_public(where, only_online=True)]
-    return jsonify({'objects': stations})
-
+@app.route('/api/radio/genre/<int:genre_id>')
+def radio_by_genre(genre_id):
+    objects = [radio.get_public() for radio in db.Radio.find({'genres': genre_id}).limit(30)]
+    return jsonify({'objects': objects})
 
 @app.route('/api/user/tracks')
 @login_required

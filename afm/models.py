@@ -341,60 +341,6 @@ class Station(BaseDocument):
     def public_list(models):
         return [(model['id'], model['title']) for model in models]
 
-
-@db.register
-class Stream(BaseDocument):
-    __collection__ = 'streams'
-
-    structure = {
-        'id': int,
-        'url': unicode,
-        'station_id': int,
-        'bitrate': int,
-        'content_type': unicode,
-        'is_shoutcast': bool,
-        'is_online': bool,
-        'check_retries': int,
-        'check_time': float,
-        'error': unicode,
-        'error_at': int,
-        'checked_at': int,
-        'created_at': int,
-        'deleted_at': int,
-    }
-
-    indexes = [
-        {'fields': 'id', 'unique': True},
-        {'fields': 'url', 'unique': True},
-        #{'fields': ['checked_at', 'perform_check']},
-        #{'fields': ['station_id', 'is_online']}
-    ]
-
-    default_values = {
-        'bitrate': 0,
-        'is_online': False,
-        'is_shoutcast': False,
-        'error_at': 0,
-        'deleted_at': 0,
-        'checked_at': 0,
-        'created_at': get_ts,
-    }
-
-    def get_web_url(self):
-        # если поток вешается через шауткаст,
-        # то для веб-плееров добавляем ";"
-        # иначе показывается страница статистики
-        if self.is_shoutcast:
-            return u'{};'.format(self.url)
-        return self.url
-
-    def get_public(self):
-        return {
-            'id': self['id'],
-            'url': self.get_web_url(),
-            'bitrate': self['bitrate'],
-        }
-
 @db.register
 class Track(BaseDocument):
     __collection__ = 'tracks'
@@ -511,6 +457,9 @@ class RadioGenre(BaseDocument):
         'is_public': False,
     }
 
+    def get_public(self):
+        return {'id': self['id'], 'title': self['title']}
+
 @db.register
 class RadioGroup(BaseDocument):
     __collection__ = 'radio_group'
@@ -610,18 +559,76 @@ class Playlist(BaseDocument):
 
     structure = {
         'id': int,
+        'radio_id': int,
         'url': unicode,
         'streams': [unicode],
-        'radio_id': int,
         'created_at': int,
+        'updated_at': int,
         'deleted_at': int,
     }
 
     default_values = {
         'streams': [],
         'created_at': get_ts,
+        'updated_at': 0,
         'deleted_at': 0,
     }
+
+@db.register
+class Stream(BaseDocument):
+    __collection__ = 'streams'
+
+    structure = {
+        'id': int,
+        'url': unicode,
+        'radio_id': int,
+        'playlist_id': int,
+        # основные свойства
+        'bitrate': int,
+        'content_type': unicode,
+        'is_shoutcast': bool,
+        'is_online': bool,
+        'check': dict,
+        'meta': dict,
+        'created_at': int,
+        'checked_at': int,
+        'deleted_at': int,
+    }
+
+    indexes = [
+        {'fields': ['radio_id', 'url'], 'unique': True}
+    ]
+
+    default_values = {
+        'playlist_id': 0,
+        'bitrate': 0,
+        'content_type': u'',
+        'is_shoutcast': False,
+        'is_online': True,
+        'check': {},
+        'meta': {},
+        'created_at': get_ts,
+        'checked_at': 0,
+        'deleted_at': 0,
+    }
+
+    @property
+    def listen_url(self):
+        # если поток вешается через шауткаст,
+        # то для веб-плееров добавляем ";"
+        # иначе показывается страница статистики
+        if self.is_shoutcast:
+            return u'{};'.format(self.url)
+        return self.url
+
+    def get_public(self):
+        return {
+            'id': self['id'],
+            'bitrate': self['bitrate'],
+            'listen_url': self.listen_url,
+            'content_type': self['content_type']
+        }
+
 
 @db.register
 class Air(BaseDocument):

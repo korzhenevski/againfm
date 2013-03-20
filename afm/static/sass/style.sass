@@ -600,10 +600,9 @@ $use-mozilla-ellipsis-binding: true
 
   .radio-line
     margin: 15px -20px 0 -20px
-    height: 5px
+    height: 3px
     border: none
-    background-image: url('/static/i/hr.png')
-    background-repeat: repeat-x
+    +background(linear-gradient(#644f24, #91753a))
 
   .radio-cursor
     width: 4px
@@ -664,7 +663,7 @@ $use-mozilla-ellipsis-binding: true
     &:focus
       outline: none
 
-  .filters
+  .tabs
     margin: 0 -8px
     margin-top: 15px
     overflow: hidden
@@ -676,12 +675,17 @@ $use-mozilla-ellipsis-binding: true
       display: inline-block
 
     li
-      font-size: 14px
+      font-size: 12px
+      text-transform: uppercase
       white-space: nowrap
 
     .block
       cursor: pointer
-      padding: 6px 8px
+      padding: 5px 8px
+      &:hover
+        background-color: rgba(#c5ab65, 0.4)
+        +border-radius(4px)
+
 
   .playlist
     margin: 10px -10px
@@ -690,15 +694,20 @@ $use-mozilla-ellipsis-binding: true
       padding: 5px 10px
       margin: 5px 0px
       cursor: pointer
+      &:hover
+        .link
+          border-bottom: 1px solid rgba(#3d3017, 1)
+      .link
+        border-bottom: 1px solid rgba(#3d3017, 0.2)
 
-  .filters, .playlist
+
+  .tabs, .playlist
     color: #3d3017
-    +text-shadow(rgba(#000, 0.15) 1px 1px 0px)
     .selected
       color: #3d3017
-      background-color: rgba(#c5ab65, 0.7)
-      +border-radius(4px)
+      background-color: rgba(#c5ab65, 0.7) !important
       +text-shadow(#3d3017 0px 0px 1px)
+      +border-radius(4px)
 
   .playlist
     .selected
