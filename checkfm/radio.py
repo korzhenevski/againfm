@@ -2,10 +2,161 @@ import re
 import urllib2
 import httplib
 import socket
+import urlnorm
+import requests
 from time import time
-from urlparse import urlparse
-
+from urlparse import urlparse, urljoin
 from httplib import LineAndFileWrapper, BadStatusLine
+
+USER_AGENT = 'Mozilla/5.0 (compatible; checkfm/1.0)'
+PLAYLIST_ALLOWED_TYPES = (
+    'audio/x-mpegurl', 'audio/x-scpls', 'application/pls+xml', 'audio/scpls',
+    'text/html', 'text/plain', 'audio/scpls', 'audio/mpegurl',)
+
+class FetchStreamResult(object):
+    def __init__(self):
+        self.error = None
+        self.time = time()
+        self.meta = {}
+        self.bitrate = None
+        self.metaint = None
+        self.content_type = None
+        self.is_shoutcast = False
+        self._headers = {}
+
+    @property
+    def headers(self):
+        return self._headers
+
+    @headers.setter
+    def headers(self, value):
+        self._headers = value
+        self.meta = dict([(re.sub(r'(ic[ye]|x-audiocast)-', '', k), v) for k, v in self._headers.iteritems()])
+
+    def __repr__(self):
+        fmt = u'<RadioResponse: {content_type}, bitrate: {bitrate}, metaint: {metaint}, time: {time}, ' \
+              u'shoutcast: {is_shoutcast}>'
+        return fmt.format(**self.__dict__)
+
+def normalize_url(url, path=None):
+    try:
+        if path:
+            url = urljoin(url, path)
+        return urlnorm.norm(url)
+    except urlnorm.InvalidUrl:
+        pass
+
+def normalize_content_type(content_type):
+    return content_type.split(';')[0].lower().strip()
+
+def safe_int(value, default=0):
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def fetch_stream(url, timeout=5, user_agent=None):
+    client = None
+    result = FetchStreamResult()
+
+    if user_agent is None:
+        user_agent = USER_AGENT
+
+    try:
+        req = urllib2.Request(url, None, {'User-Agent': user_agent, 'Icy-Metadata': '1'})
+        client = urllib2.urlopen(req, timeout=timeout)
+    except urllib2.HTTPError as exc:
+        result.error = 'HTTP Error: %s' % exc.code
+    except urllib2.URLError as exc:
+        if isinstance(exc.reason, socket.timeout):
+            result.error = 'Request timeout (%d secs.)' % timeout
+        else:
+            result.error = 'URL Error: %s' % exc.reason
+    except Exception as exc:
+        result.error = 'Error: %s' % exc
+
+    result.time = float('%.4f' % (time() - result.time))
+
+    if not result.error:
+        headers = dict([(name.lower(), val) for name, val in client.info().items()])
+        content_type = normalize_content_type(headers.get('content-type', ''))
+        result.headers = headers
+        result.content_type = content_type
+
+        if content_type.startswith('audio/') or content_type == 'application/octet-stream':
+            result.metaint = safe_int(headers.get('icy-metaint'))
+            # guess bitrate
+            bitrate = 0
+            for name in ('bitrate', 'br'):
+                if name in result.meta:
+                    bitrate = result.meta.get(name)
+            result.bitrate = safe_int(bitrate)
+        elif content_type == 'text/html':
+            page_content = client.read(8096)
+            if 'SHOUTcast Administrator' in page_content:
+                # Bitrate is important for stream selection,
+                # extract value from Shoutcast Info HTML.
+                bitrate_match = re.search(r"at (\d+) kbps", page_content, re.IGNORECASE)
+                if bitrate_match:
+                    result.bitrate = safe_int(bitrate_match.group(1))
+                result.is_shoutcast = True
+            else:
+                result.error = 'Invalid content type: text/html'
+        else:
+            result.error = 'Invalid content type: %s' % content_type
+
+    if client:
+        client.close()
+
+    return result
+
+class FetchPlaylistResult(object):
+    def __init__(self):
+        self.error = None
+        self.content_type = None
+        self.urls = []
+        self.time = time()
+
+    def __repr__(self):
+        if self.error:
+            fmt = u'<FetchPlaylistResult: error: "{error}", time: {time}>'
+        else:
+            fmt = u'<FetchPlaylistResult: content_type: {content_type}, time: {time}>'
+        return fmt.format(**self.__dict__)
+
+def fetch_playlist(url, timeout=5):
+    result = FetchPlaylistResult()
+    response = None
+
+    headers = {'User-Agent': USER_AGENT}
+    try:
+        response = requests.get(url, timeout=timeout, headers=headers, stream=True)
+    except requests.exceptions.RequestException as exc:
+        result.error = exc.message
+
+    if result.error:
+        result.time = time() - result.time
+        return result
+
+    content_type = normalize_content_type(response.headers.get('content-type', ''))
+    allowed_types = ('audio/x-mpegurl', 'audio/x-scpls', 'application/pls+xml', 'audio/scpls',
+                     'text/html', 'text/plain', 'audio/scpls', 'audio/mpegurl',)
+
+    result.content_type = content_type
+
+    if content_type in allowed_types:
+        result.urls = parse_playlist(response.text)
+    else:
+        result.error = u'Invalid content type: {}'.format(content_type)
+
+    result.time = time() - result.time
+    return result
+
+def parse_playlist(text):
+    regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
+    urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
+    return filter(None, urls)
 
 class ShoutcastHTTPResponse(httplib.HTTPResponse):
     def _read_status(self):
@@ -54,96 +205,7 @@ class ShoutcastHTTPResponse(httplib.HTTPResponse):
 
 httplib.HTTPConnection.response_class = ShoutcastHTTPResponse
 
-
-class RadioResponse(object):
-    def __init__(self):
-        self.error = None
-        self.time = time()
-        self.meta = {}
-        self.bitrate = None
-        self.metaint = None
-        self.content_type = None
-        self.is_shoutcast = False
-        self._headers = {}
-
-    @property
-    def headers(self):
-        return self._headers
-
-    @headers.setter
-    def headers(self, value):
-        self._headers = value
-        self.meta = dict([(re.sub(r'(ic[ye]|x-audiocast)-', '', k), v) for k, v in self._headers.iteritems()])
-
-    def __repr__(self):
-        fmt = u'<RadioResponse: {content_type}, bitrate: {bitrate}, metaint: {metaint}, time: {time}, ' \
-              u'shoutcast: {is_shoutcast}>'
-        return fmt.format(**self.__dict__)
-
-
-def safe_int(value, default=0):
-    try:
-        return int(value)
-    except ValueError:
-        return default
-
-
-def fetch_radio_stream(url, timeout=5, user_agent=None):
-    client = None
-    url = urlparse(url)
-    response = RadioResponse()
-
-    if user_agent is None:
-        user_agent = 'WinampMPEG/5.0'
-
-    try:
-        req = urllib2.Request(url.geturl(), None, {'User-Agent': user_agent, 'Icy-Metadata': '1'})
-        client = urllib2.urlopen(req, timeout=timeout)
-    except urllib2.HTTPError as exc:
-        response.error = 'HTTP Error: %s' % exc.code
-    except urllib2.URLError as exc:
-        if isinstance(exc.reason, socket.timeout):
-            response.error = 'Request timeout (%d secs.)' % timeout
-        else:
-            response.error = 'URL Error: %s' % exc.reason
-    except Exception as exc:
-        response.error = 'Error: %s' % exc
-
-    response.time = float('%.4f' % (time() - response.time))
-
-    if not response.error:
-        headers = dict([(name.lower(), val) for name, val in client.info().items()])
-        content_type = headers.get('content-type', '').split(';')[0].lower().strip()
-        response.headers = headers
-        response.content_type = content_type
-
-        if content_type.startswith('audio/') or content_type == 'application/octet-stream':
-            response.metaint = safe_int(headers.get('icy-metaint'))
-            # guess bitrate
-            bitrate = 0
-            for name in ('ice-bitrate', 'icy-br', 'x-audiocast-bitrate'):
-                if name in headers:
-                    bitrate = headers.get(name)
-            response.bitrate = safe_int(bitrate)
-        elif content_type == 'text/html':
-            page_content = client.read(8096)
-            if 'SHOUTcast Administrator' in page_content:
-                # Bitrate is important for stream selection,
-                # extract value from Shoutcast Info HTML.
-                bitrate_match = re.search(r"at (\d+) kbps", page_content, re.IGNORECASE)
-                if bitrate_match:
-                    response.bitrate = safe_int(bitrate_match.group(1))
-                response.is_shoutcast = True
-            else:
-                response.error = 'Invalid content type: text/html'
-        else:
-            response.error = 'Invalid content type: %s' % content_type
-
-    if client:
-        client.close()
-
-    return response
-
 if __name__ == '__main__':
-    from pprint import pprint
-    pprint(fetch_radio_stream('http://pub3.di.fm:80/di_bigroomhouse', user_agent='Winamp'))
+    pass
+    #print fetch_playlist('http://nullwave.ru/general.pls', timeout=1).urls
+    #print fetch_stream('http://nl2.ah.fm:9000/', user_agent='Winamp')

@@ -273,69 +273,6 @@ def station_history(station_id):
         print item['created_at'], track['title']
 
 @manager.command
-def convert_radio():
-    from pprint import pprint
-    groups = db.radio.aggregate({'$group': {'_id': '$tag.group', 'count': {'$sum': 1}}})['result']
-    for group in groups:
-        if group['_id'] is None:
-            continue
-        title = group['_id'].strip(':/')
-        g = db.RadioGroup()
-        g['title'] = title
-        g.save()
-        print g
-        print db.radio.update({'tag.group': group['_id']}, {'$set': {'group': {'id': g['id'], 'title': g['title']}}}, multi=True)
-
-@manager.command
-def convert_radio2():
-    from pprint import pprint
-    genres = {}
-    for data in db.radio2.find():
-        genres[data['genre_id']] = data['genre']
-"""
-        playlist_url = data['playlist'].lower()
-        playlist_streams = data.get('playlist_content', {}).get('urls')
-        if not playlist_streams:
-            continue
-
-        radio = db.Radio()
-        radio['title'] = data['title'].strip()
-        radio['description'] = data['description']
-        if data['genre_id']:
-            radio['genres'] = [int(data['genre_id'])]
-
-        radio['tag'] = {'itunes_esid': data['esid']}
-
-        group = data.get('group')
-        if group:
-            radio['tag']['group'] = group
-            radio['is_channel'] = True
-
-        radio.save()
-        pprint(radio)
-
-        playlist = db.Playlist()
-        playlist['radio_id'] = radio['id']
-        playlist['url'] = playlist_url
-        playlist['streams'] = playlist_streams
-        playlist.save()
-        pprint(playlist)
-
-    pprint(genres)
-
-    for genre_id, genre_title in genres.iteritems():
-        genre = db.RadioGenre()
-        genre['id'] = int(genre_id)
-        genre['title'] = genre_title
-        pprint(genre.save())
-"""
-
-@manager.command
-def download_playlist():
-    from afm.web.tasks import fetch_playlist
-    from afm.web.tasks import fetch_radio_stream
-
-@manager.command
 def regroup_itunes():
     db.radio.drop()
     for rawradio in db.rawradio.find():
