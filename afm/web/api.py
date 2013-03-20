@@ -71,12 +71,14 @@ def logout():
 
 @app.route('/api/radio/featured')
 def radio_featured():
-    objects = [radio.get_public() for radio in db.Radio.find().limit(30)]
+    where = {'is_public': True, 'deleted_at': 0}
+    objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
 
 @app.route('/api/radio/genre/<int:genre_id>')
 def radio_by_genre(genre_id):
-    objects = [radio.get_public() for radio in db.Radio.find({'genres': genre_id}).limit(30)]
+    where = {'is_public': True, 'deleted_at': 0, 'genres': genre_id}
+    objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
 
 @app.route('/api/user/tracks')
@@ -132,10 +134,17 @@ def user_favorites_add_or_remove(station_id):
 
 @app.route('/api/radio/<int:radio_id>')
 def api_radio(radio_id):
-    response = db.Radio.find_one_or_404({'id': radio_id}).get_public()
+    radio = db.Radio.find_one_or_404({'id': radio_id}).get_public()
     if current_user.is_authenticated():
-        response['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
-    return jsonify(response)
+        radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
+    stream = db.Stream.find_one({
+        'radio_id': radio_id,
+        'content_type': 'audio/mpeg',
+        'deleted_at': 0,
+    })
+    if stream:
+        radio['stream'] = stream.get_public()
+    return jsonify(radio)
 
 
 @app.route('/api/station/random')

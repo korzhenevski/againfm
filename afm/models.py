@@ -576,6 +576,7 @@ class Playlist(BaseDocument):
 
 @db.register
 class Stream(BaseDocument):
+    # TODO: maybe rename streams -> stream ??
     __collection__ = 'streams'
 
     structure = {

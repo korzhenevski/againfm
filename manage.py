@@ -70,5 +70,11 @@ def check_stream():
     for stream in streams:
         print check_stream.delay(stream_id=stream['id'])
 
+@manager.command
+def pub_radio():
+    for stream in db.streams.find({'content_type': 'audio/mpeg', 'is_online': True}, fields=['radio_id']):
+        db.radio.update({'id': stream['radio_id']}, {'$set': {'is_public': True}})
+        print 'pub', stream['radio_id']
+
 if __name__ == "__main__":
     manager.run()

@@ -23,12 +23,12 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
     $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
     // controller don't execute without "template" attr
-    $routeProvider.when('/listen/:radioId', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
+    $routeProvider.when('/listen/:id', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
         station: ['$route', '$http', function($route, $http) {
             // use $route instead $routeParams
             // https://github.com/angular/angular.js/issues/1289
-            var radioId = $route.current.params.radioId;
-            return $http.get('/api/radio/' + radioId).then(function(req){
+            var id = $route.current.params.id;
+            return $http.get('/api/radio/' + id).then(function(req){
                 return req.data;
             });
         }]
@@ -280,7 +280,7 @@ afm.factory('audio', ['$document', function($document) {
 
 
 afm.directive('flashEngine', ['$window', 'player', function($window, player){
-    window.flashPlayerCallback = player.flashCallback;
+    $window.flashPlayerCallback = player.flashCallback;
     return {
         restrict: 'C',
         link: function(scope, element, attrs) {
@@ -744,7 +744,7 @@ afm.controller('RadioStationCtrl', ['station', 'radio', 'player', function(stati
         return;
     }
     radio.selectStation(station);
-    player.play(station.stream.url);
+    player.play(station.stream.listen_url);
 }]);
 
 afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
