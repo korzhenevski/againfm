@@ -1,0 +1,24 @@
+{{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
+{{% block content %}}
+    <div class="page centroid">
+        <h1>Мое радио</h1>
+        <div class="">
+            <form data-ng-submit="">
+                <p>Название радио</p>
+                <input type="text" class="text" placeholder="РадиоРекорд" ng-model="title" />
+                <p>Название радио</p>
+                <input type="text" class="text" placeholder="РадиоРекорд" ng-model="title" />
+
+            </form>
+        </div>
+        <p><a href="/my/radio/add" class="link">добавить радио</a></p>
+        <table data-ng-controller="MyRadioCtrl">
+            <tr data-ng-repeat="radio in radioList">
+                <td>
+                    <h3>{{ radio.title }}</h3>
+                    <p>{{ radio.description }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+{{% endblock %}}

@@ -4,6 +4,7 @@
 
 function Comet(cometUrl)
 {
+    return;
 	// Current JS library version.
 	var VERSION = "1.32";
 

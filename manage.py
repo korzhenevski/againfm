@@ -71,6 +71,25 @@ def check_stream():
         print check_stream.delay(stream_id=stream['id'])
 
 @manager.command
+def convert_radio():
+    import pymongo
+    from pprint import pprint as pp
+    db2 = pymongo.Connection()['againfm2']
+    for station in db2.stations.find({'deleted_at': 0}):
+        radio = db.Radio()
+        radio['title'] = station['title']
+        radio['website'] = station['website']
+        radio['tag'] = {'old_id': station['id']}
+        radio.save()
+        for st in db2.streams.find({'station_id': station['id'], 'deleted_at': 0}):
+            stream = db.Stream()
+            stream['radio_id'] = radio['id']
+            stream['url'] = st['url']
+            stream.save()
+            pp(stream)
+        pp(radio)
+
+@manager.command
 def pub_radio():
     for stream in db.streams.find({'content_type': 'audio/mpeg', 'is_online': True}, fields=['radio_id']):
         db.radio.update({'id': stream['radio_id']}, {'$set': {'is_public': True}})

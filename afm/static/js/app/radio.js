@@ -1071,5 +1071,12 @@ afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope)
     };
 }]);
 
+afm.controller('MyRadioCtrl', function($scope, $http){
+    $scope.radioList = [];
+    $http.get('/api/my/radio').success(function(response){
+        $scope.radioList = response.objects;
+    });
+});
+
 window.afm = afm;
 })(window, angular, Comet);

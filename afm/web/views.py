@@ -41,14 +41,13 @@ def radio(radio_id):
 @web.route('/amnesia')
 @web.route('/feedback')
 def index():
-    return render_template('index.html')
+    return render_template('player.html')
 
 @web.route('/listen/<int:radio_id>')
 def listen(radio_id):
     return render_template('index.html')
 
 # TODO: add error pages templates
-
 @login_manager.unauthorized_handler
 def unauthorized():
     if request.is_xhr:
@@ -72,9 +71,9 @@ def i18n_template_filter(key):
 
 @web.context_processor
 def app_context():
-    bootstrap = {'user': None}
+    ctx = {'user': None}
     if current_user.is_authenticated():
-        bootstrap['user'] = current_user.get_public()
-    bootstrap['genres'] = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})]
-    return bootstrap
+        ctx['user'] = current_user.get_public()
+    ctx['genres'] = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})]
+    return ctx
 

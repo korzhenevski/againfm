@@ -36,6 +36,10 @@
                     </div>
                     <table class="tracks">
                         <tr data-ng-class="trackClass(track)" data-ng-repeat="track in getTracks()">
+                            <!--
+                            artist - track          (today, yesterday, ..., 21 марта, 21.08.09)
+                            station | time
+                            -->
                             <td class="title">{{ track.title }}</td>
                             <td class="controls" align="right">
                                 <i data-ng-click="remove(track)" class="remove" data-ng-hide="track.removed"></i>
@@ -93,7 +97,7 @@
                             <div class="radio-table">
                                 <div class="table-inner" data-ng-controller="PlaylistCtrl">
                                     <div class="search">
-                                        <input type="search" class="search-field" placeholder="Быстрый поиск" data-ng-model="searchQuery" />
+                                        <input placeholder="поиск радио" type="search" class="search-field" data-ng-model="searchQuery" />
                                     </div>
                                     <ul class="tabs justified" data-ng-init="selectTab('featured')">
                                         <li>
