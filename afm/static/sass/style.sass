@@ -132,7 +132,7 @@ $use-mozilla-ellipsis-binding: true
 
 .roof
   width: 980px
-  margin: 25px auto 10px auto
+  margin: 20px auto 5px auto
   .logo
     img
       margin-left: -2px
@@ -413,6 +413,9 @@ $use-mozilla-ellipsis-binding: true
         content: ""
         position: absolute
 
+  .favorites-cell
+    height: 235px
+
   .favorites
     height: 100%
     position: relative
@@ -492,7 +495,7 @@ $use-mozilla-ellipsis-binding: true
       +border-radius(2px)
 
   .controls
-    min-height: 100px
+    min-height: 90px
 
     button
       border: 0
@@ -617,12 +620,12 @@ $use-mozilla-ellipsis-binding: true
 
   .table-wrapper
     position: relative
-    min-height: 380px
+    min-height: 310px
     margin-bottom: 20px
 
   .table-inner
     height: 100%
-    min-height: 475px
+    min-height: 435px
     overflow: hidden
     padding: 20px
     padding-bottom: 0px
@@ -814,6 +817,8 @@ input.text, textarea.text
   margin-top: 45px
   a
     color: #c6c5c8
+    &:hover
+      color: #f3f3f3
 
   .credits
     span
@@ -836,11 +841,15 @@ body
   background: url('/static/i/background.jpg')
   text-rendering: optimizeLegibility
   +background-size(cover)
+  min-width: 1200px
+  min-height: 800px
 
 a
-  color: #fff
+  color: #f3f3f3
   text-decoration: none
   border-bottom: 1px solid #a49ca3
+  &:hover
+    color: #f3f3f3
 
 ul.inline
   list-style-type: none

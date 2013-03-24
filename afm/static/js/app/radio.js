@@ -33,6 +33,7 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
             });
         }]
     }});
+    $routeProvider.when('/my/radio', {templateUrl: '/my/radio', controller: 'MyRadioCtrl'});
     //$routeProvider.otherwise({redirectTo: '/'});
     $locationProvider.html5Mode(true).hashPrefix('!');
 }]);
@@ -48,20 +49,6 @@ afm.run(['$rootScope', 'currentUser', 'bootstrapUser', 'routeHistory', 'User',
     };
 
     currentUser.update(bootstrapUser);
-}]);
-
-afm.directive('radioCursor', ['$rootScope', function($rootScope){
-    return {
-        restrict: 'C',
-        link: function($scope, element) {
-            $rootScope.$on('playlist.currentElement', function(ev, el){
-                var centerOffset = Math.round(el.prop('offsetWidth') / 2);
-                // TODO: add random
-                var left = el.prop('offsetLeft') + centerOffset;
-                element.css('left', left + 'px');
-            });
-        }
-    };
 }]);
 
 afm.directive('volumeWrapper', function(){
@@ -159,24 +146,6 @@ afm.directive('volumeHandle', ['$rootScope', '$document', function($rootScope, $
                 if (value >= max) { value = max; }
                 return value;
             }
-        }
-    };
-}]);
-
-afm.directive('stationLink', ['$rootScope', function($rootScope){
-    return {
-        restrict: 'C',
-        link: function($scope, element) {
-            element.bind('click', function(){
-                $rootScope.$broadcast('playlist.currentElement', element);
-            });
-
-            // TODO: check watch performance
-            $scope.$watch('currentStation()', function(){
-                if (element.hasClass('selected')) {
-                    $rootScope.$broadcast('playlist.currentElement', element);
-                }
-            });
         }
     };
 }]);

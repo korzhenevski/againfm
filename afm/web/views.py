@@ -7,6 +7,7 @@ from afm import db, login_manager, i18n, app
 from . import web
 from flask import jsonify, render_template, g, request, url_for, redirect
 from flask.ext.login import current_user
+from datetime import datetime
 
 if app.debug:
     @web.route('/guideline')
@@ -75,5 +76,6 @@ def app_context():
     if current_user.is_authenticated():
         ctx['user'] = current_user.get_public()
     ctx['genres'] = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})]
+    ctx['year'] = datetime.now().year
     return ctx
 

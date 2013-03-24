@@ -8,9 +8,11 @@ from afm import app, db, assets, models
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
 
+
 @manager.shell
 def make_shell_context():
     return dict(app=app, db=db, models=models)
+
 
 @manager.command
 def ensure_indexes():
@@ -29,6 +31,7 @@ def ensure_indexes():
             print '- %s (unique: %s)' % (print_fields, index.get('unique', False))
             collection.ensure_index(fields, unique=index.get('unique'), dropDups=True)
         print ''
+
 
 @manager.command
 @manager.option('-u', '--user', dest='login')
@@ -54,12 +57,14 @@ def agg(key):
     for item in result['result']:
         print '{count} {_id}'.format(**item)
 
+
 @manager.command
 def update_playlist():
     from afm.web.tasks import update_playlist
     for playlist in db.playlist.find(fields=['id']):
         print playlist['id']
         print update_playlist.delay(playlist_id=playlist['id'])
+
 
 @manager.command
 def check_stream():
@@ -71,29 +76,9 @@ def check_stream():
         print check_stream.delay(stream_id=stream['id'])
 
 @manager.command
-def convert_radio():
-    import pymongo
-    from pprint import pprint as pp
-    db2 = pymongo.Connection()['againfm2']
-    for station in db2.stations.find({'deleted_at': 0}):
-        radio = db.Radio()
-        radio['title'] = station['title']
-        radio['website'] = station['website']
-        radio['tag'] = {'old_id': station['id']}
-        radio.save()
-        for st in db2.streams.find({'station_id': station['id'], 'deleted_at': 0}):
-            stream = db.Stream()
-            stream['radio_id'] = radio['id']
-            stream['url'] = st['url']
-            stream.save()
-            pp(stream)
-        pp(radio)
-
-@manager.command
-def pub_radio():
-    for stream in db.streams.find({'content_type': 'audio/mpeg', 'is_online': True}, fields=['radio_id']):
-        db.radio.update({'id': stream['radio_id']}, {'$set': {'is_public': True}})
-        print 'pub', stream['radio_id']
+def pr():
+    for radio in db.radio.find().limit(30):
+        print radio['title']
 
 if __name__ == "__main__":
     manager.run()

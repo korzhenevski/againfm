@@ -14,7 +14,12 @@ def permanent_login_user(user):
 @app.route('/my/radio')
 @login_required
 def my_radio():
-    return render_template('my_radio.html', partial=True)
+    return render_template('my_radio.html')
+
+@app.route('/my/radio/add')
+@login_required
+def my_radio_add():
+    return render_template('my_radio_add.html')
 
 @app.context_processor
 def app_context():

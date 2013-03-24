@@ -110,7 +110,6 @@
 
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
-                                        <!--div id="radio-cursor" class="radio-cursor" data-ng-show="showCursor()"></div-->
                                         <ul class="playlist justified">
                                             <li data-ng-repeat="station in playlist|filter:searchQuery">
                                                 <div class="block station-link" data-ng-class="itemClass(station, currentStation())" data-ng-click="selectStation(station)">
@@ -156,7 +155,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td height="274px"><div class="favorites" data-ng-controller="FavoritesCtrl">
+                        <td class="favorites-cell"><div class="favorites" data-ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li data-ng-repeat="station in getFavorites()">
