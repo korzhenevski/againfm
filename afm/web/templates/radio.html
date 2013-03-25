@@ -1,33 +1,7 @@
 {{% extends "layout.html" %}}
 
-{{% block title %}}Радио {{{ radio.title }}}{{% endblock %}}
-
-{{% block description %}}{{{ radio.description }}}{{% endblock %}}
-
 {{% block content %}}
-<div class="page centroid radio-page">
-    <div class="content">
-        <h1>Радио &laquo;{{{ radio.title }}}&raquo;</h1>
-        <p>{{% for genre in radio.get_genres() %}}<a href="">{{{ genre.title }}}</a>{{% endfor %}}</p>
-        <p><span class="text-muted">Описание: </span>{{{ radio.description }}}</p>
-        <h2>История эфира</h2>
+    <div class="page centroid">
+        <h1>Каталог радио</h1>
     </div>
-    <div class="sidebar">
-        <p class="listen">
-            <a class="btn" target="_self" href="{{{ url_for('web.listen', radio_id=radio.id) }}}">
-                Слушать в плеере
-            </a>
-        </p>
-        <h2>Еще радио</h2>
-        {{% for related_radio in radio.get_related(limit=5) %}}
-        <p>
-            <a target="_self" class="link" href="{{{ url_for('web.radio', radio_id=related_radio.id) }}}">
-                {{{ related_radio.title }}}
-            </a>
-            <br>
-            <span class="text-muted">{{{ related_radio.description }}}</span>
-        </p>
-        {{% endfor %}}
-    </div>
-</div>
 {{% endblock %}}

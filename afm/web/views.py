@@ -31,10 +31,14 @@ def x_headers(response):
 def load_user(user_id):
     return db.User.find_one({'id': user_id})
 
+@web.route('/radio/')
+def radio():
+    return render_template('radio.html')
+
 @web.route('/radio/<int:radio_id>')
-def radio(radio_id):
+def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
-    return render_template('radio.html', radio=radio)
+    return render_template('radio_page.html', radio=radio)
 
 @web.route('/')
 @web.route('/login')

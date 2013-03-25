@@ -46,10 +46,10 @@
             <table width="100%">
                 <tr>
                     <td width="180px">
-                        <p class="credits"><span><i></i>&copy {{{ year }}}, Again.FM </span></p>
+                        <p class="credits"><span><i></i> &copy {{{ year }}}</span></p>
                     </td>
                     <td>
-                        <p>пишите: <a href="mailto:feedback@again.fm?subject=Обратная+связь">feedback@again.fm</a></p>
+                        <p><a href="/feedback">обратная связь</a></p>
                     </td>
                     <td align="right">
                         <a href="https://twitter.com/share" class="twitter-share-button"
@@ -151,6 +151,7 @@
             <input class="text" name="email" data-ng-model="form.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
             <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required="" />
             <input type="submit" class="btn" value="Зарегистрироваться" data-ng-disabled="signupForm.$invalid" />
+            или <a href="/login">войти с паролем</a>
         </form>
         <p class="error" data-ng-switch data-on="error.code" data-ng-show="error">
             <span data-ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
@@ -183,6 +184,10 @@
             <input class="text" name="email" data-ng-model="form.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
             <textarea rows="4" class="text" name="text" data-ng-model="form.text" placeholder="Текст" required=""></textarea>
             <input type="submit" class="btn" value="Отправить" data-ng-disabled="feedbackForm.$invalid" />
+            <p class="mail">
+                Будет нечестно не сказать, <br> что мы еще читаем письма с
+                <a href="mailto:feedback@again.fm?subject=Обратная+связь" target="_blank">feedback@again.fm</a>
+            </p>
         </form>
         <p data-ng-show="result">Сообщение отправлено, спасибо :)</p>
         <p class="error" data-ng-switch on="error.code" data-ng-show="error">
