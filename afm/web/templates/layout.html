@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html data-ng-app="afm" xmlns:og="http://ogp.me/ns#">
 <head>
-    <title>{{% block title %}}Радиоплеер Эгейн.ФМ (Again.FM){{% endblock %}}</title>
+    <title>{{% block title %}}Эгейн - радиоплеер{{% endblock %}}</title>
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном.{{% endblock %}}" />
     <meta name="og:title" content="{{% block share_title %}}Радиоплеер Эгейн{{% endblock %}}" />
@@ -32,7 +32,7 @@
     <table class="roof">
         <tr>
             <td class="logo">
-                <a href="/" target="_self"><img src="/static/i/logo.png" width="198" height="46" alt="Радиоплеер Эгейн.ФМ" /></a>
+                <a href="/" target="_self"><img src="/static/i/logo.png" width="198" height="46" alt="Радиоплеер Эгейн" /></a>
             </td>
             <td>
             </td>
@@ -46,7 +46,7 @@
             <table width="100%">
                 <tr>
                     <td width="180px">
-                        <p class="credits"><span><i></i> &copy {{{ year }}}</span></p>
+                        <p>&copy; 2011&mdash;{{{ year }}}</p>
                     </td>
                     <td>
                         <p><a href="/feedback">обратная связь</a></p>
@@ -54,7 +54,7 @@
                     <td align="right">
                         <a href="https://twitter.com/share" class="twitter-share-button"
                            data-url="http://again.fm/" data-via="againfm" data-lang="en"
-                           data-text="Радиоплеер Эгейн.ФМ"></a>
+                           data-text="Радиоплеер Эгейн"></a>
                         <div id="vk-like"></div>
                     </td>
                 </tr>
@@ -185,7 +185,7 @@
             <textarea rows="4" class="text" name="text" data-ng-model="form.text" placeholder="Текст" required=""></textarea>
             <input type="submit" class="btn" value="Отправить" data-ng-disabled="feedbackForm.$invalid" />
             <p class="mail">
-                Будет нечестно не сказать, <br> что мы еще читаем письма с
+                Будет нечестно не сказать, что мы еще <br>читаем письма с
                 <a href="mailto:feedback@again.fm?subject=Обратная+связь" target="_blank">feedback@again.fm</a>
             </p>
         </form>
