@@ -5,8 +5,6 @@
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном.{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
-    <meta name="fragment" content="!" />
-    <!--meta name="og:image" content="http://again.fm/static/i/social-logo.png" /-->
     <style>
         /* force hide angular markup while js not ready */
         .ng-cloak { display: none; }
@@ -58,15 +56,11 @@
         </div>
     </div>
 
-{{% include 'extras/scriptjs.html' %}}
-
-{{% assets "scripts" %}}
+{{% assets 'common' %}}
 <script src="{{{ ASSET_URL }}}"></script>
 {{% endassets %}}
 
-{{% if not config.DEBUG %}}
-{{% include 'extras/counters.html' %}}
-{{% endif %}}
+{{% block scripts %}}{{% endblock %}}
 
 <script>
 afm.value('bootstrapUser', {{{ user|json|safe }}});
@@ -74,6 +68,12 @@ afm.value('bootstrapGenres', {{{ genres|json|safe }}});
 // configure comet over $provide.configuration
 afm.value('cometUrl', {{{ config.COMET_URL|json|safe }}});
 </script>
+
+{{% include 'extras/scriptjs.html' %}}
+
+{{% if not config.DEBUG %}}
+{{% include 'extras/counters.html' %}}
+{{% endif %}}
 
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 <script type="text/ng-template" id="/login.html">

@@ -282,66 +282,6 @@ class User(BaseDocument):
 
 
 @db.register
-class Station(BaseDocument):
-    __collection__ = 'stations'
-    # Константы статуса
-    # потоки не отвечают более шести часов
-    OFFLINE = 0
-    # есть хоть один живой поток
-    ACTIVE = 1
-    # потоки не отвечают менее шести часов
-    # радио отмечено, есть возможность добавить в избранное
-    DOWN = 2
-
-    structure = {
-        'id': int,
-        'tags': [unicode],
-        'title': unicode,
-        'status': int,
-        'website': unicode,
-        'screen_name': unicode,
-        'streams': [int],
-        'online_at': int,
-        'created_at': int,
-        'deleted_at': int,
-    }
-
-    indexes = [
-        {'fields': 'id', 'unique': True},
-        {'fields': 'screen_name', 'unique': True},
-        {'fields': 'tags'},
-        {'fields': 'status'},
-        {'fields': 'deleted_at'},
-    ]
-
-    default_values = {
-        'status': 0,
-        'online_at': 0,
-        'deleted_at': 0,
-        'created_at': get_ts(),
-    }
-
-    def get_public(self):
-        return {
-            'id': self['id'],
-            'title': self['title'],
-            # статус показывает живое упавшее радио
-            # мертвые станции (status==0) исключены из любых списков
-            #'is_online': self['status'] == 1
-        }
-
-    def find_public(self, query=None, only_online=False, **kwargs):
-        if query is None:
-            query = {}
-        query['status'] = self.ACTIVE if only_online else {'$ne': self.OFFLINE}
-        query['deleted_at'] = 0
-        return self.find(query, sort=[('status', 1), ('id', -1)], **kwargs)
-
-    @staticmethod
-    def public_list(models):
-        return [(model['id'], model['title']) for model in models]
-
-@db.register
 class Track(BaseDocument):
     __collection__ = 'tracks'
 
@@ -373,60 +313,6 @@ class Track(BaseDocument):
             #'artist': self['artist'],
             #'name': self['name']
         }
-
-@db.register
-class StationTag(BaseDocument):
-    __collection__ = 'stations_tags'
-
-    structure = {
-        'id': int,
-        'title': unicode,
-        'tags': [unicode],
-        'is_visible': bool
-    }
-    i18n = ['title']
-    default_values = {
-        'is_visible': True,
-    }
-
-    indexes = [{'fields': 'id', 'unique': True}]
-
-    def get_public(self):
-        return {
-            'id': self['id'],
-            'title': self['tag'],
-        }
-
-@db.register
-class Genre(BaseDocument):
-    __collection__ = 'genres'
-    structure = {
-        'id': unicode,
-        'title': unicode,
-        'tags': [unicode]
-    }
-
-    def get_public(self):
-        return {
-            'id': self.id,
-            'title': self.get_i18n('title')
-        }
-
-    def get_i18n(self, name):
-        val = getattr(self, name)
-        return val.get(self._current_lang, val.get(self._fallback_lang))
-
-    @staticmethod
-    def public_list(lang):
-        genres = []
-        for genre in db.Genre.find():
-            genre.set_lang(lang)
-            genres.append(genre.get_public())
-        return genres
-
-@db.register
-class OnairHistory(BaseDocument):
-    __collection__ = 'onair_history'
 
 @db.register
 class FeedbackMessage(BaseDocument):

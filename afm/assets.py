@@ -1,14 +1,13 @@
 from flask.ext.assets import Bundle, Environment
 
 assets = Environment()
-assets.register('scripts', Bundle(
+assets.register('common', Bundle(
     'js/angular.js',
     'js/comet.js',
     'js/angular-cookies.js',
     'js/angular-resource.js',
     'js/swfobject.js',
-    'js/app/radio.js',
-    filters='uglifyjs', output='js/deploy/app.%(version)s.js'))
+    filters='uglifyjs', output='js/deploy/common-%(version)s.js'))
 
 assets.register('styles', Bundle(
     'css/normalize.css',

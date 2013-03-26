@@ -6,7 +6,6 @@ from celery import Celery
 from flask.ext.login import LoginManager
 from flask.ext.mongokit import MongoKit
 from redis import Redis
-#from .i18n import I18n
 from .mailer import AmazonMailer
 from afm.assets import assets
 
@@ -24,7 +23,6 @@ app.jinja_env.variable_end_string = '}}}'
 app.jinja_env.block_start_string = '{{%'
 app.jinja_env.block_end_string = '%}}'
 
-#i18n = I18n(app)
 db = MongoKit(app)
 redis = Redis(**app.config['REDIS'])
 

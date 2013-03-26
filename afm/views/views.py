@@ -2,27 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import time
-import ujson as json
 from flask import jsonify, render_template, g, request
 from flask.ext.login import current_user
 from datetime import datetime
 
 from afm import db, app
-
-
-if app.debug:
-    @app.route('/guideline')
-    def guideline():
-        return render_template('guideline.html')
-
-@app.before_request
-def save_start_time():
-    g.start = time.time()
-
-@app.after_request
-def x_headers(response):
-    response.headers['X-Request-Time'] = round(time.time() - g.start, 4)
-    return response
 
 @app.route('/radio/')
 def radio():
@@ -56,10 +40,6 @@ def radio_page(radio_id):
 # /radio/add
 
 @app.route('/')
-@app.route('/login')
-@app.route('/signup')
-@app.route('/amnesia')
-@app.route('/feedback')
 def index():
     return render_template('player.html')
 
@@ -67,16 +47,7 @@ def index():
 def listen(radio_id):
     return render_template('player.html')
 
-@app.errorhandler(404)
-def page_not_found(e):
-    if request.is_xhr:
-        return jsonify({'error': 'Not Found'}), 404
-    return '<h1>Not Found</h1>', 404
 
-# быстрый фильтр-сериализатор json
-@app.template_filter('json')
-def template_filter_json(data):
-    return json.dumps(data)
 
 @app.context_processor
 def app_context():
