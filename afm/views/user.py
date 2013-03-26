@@ -29,7 +29,7 @@ def unauthorized():
 def app_context():
     return dict(standalone=request.is_xhr)
 
-@app.route('/user/login', methods=['POST'])
+@app.route('/api/user/login', methods=['POST'])
 def login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
     data['login'] = data['login'].lower()
