@@ -11,15 +11,15 @@ def permanent_login_user(user):
     login_user(user, remember=True)
     session.permanent = True
 
-@app.route('/my/radio')
+@app.route('/radio/my/')
 @login_required
 def my_radio():
-    return render_template('my_radio.html')
+    return render_template('user/my_radio.html')
 
-@app.route('/my/radio/add')
+@app.route('/radio/radio/add')
 @login_required
 def my_radio_add():
-    return render_template('my_radio_add.html')
+    return render_template('user/my_radio_add.html')
 
 @app.context_processor
 def app_context():

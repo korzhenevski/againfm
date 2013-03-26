@@ -753,13 +753,7 @@ $use-mozilla-ellipsis-binding: true
     margin-top: 1em
 
   p
-    line-height: 1.3em
-
-.radio-page
-  .listen
-    line-height: 1em
-    margin-top: 0.7em
-    margin-bottom: 4.4em
+    line-height: 1.4em
 
   .content,
   .sidebar
@@ -771,6 +765,21 @@ $use-mozilla-ellipsis-binding: true
 
   .sidebar
     width: 30%
+
+.radio-page
+  .listen
+    line-height: 1em
+    margin-top: 0.7em
+    margin-bottom: 4.4em
+
+.radio-list
+  margin-top: 2em
+  h2
+    font-size: 18px
+  p
+    color: #aaa
+    margin: 0.5em 0
+    font-size: 13px
 
 input[disabled], button[disabled]
   cursor: normal
@@ -819,7 +828,12 @@ input.text, textarea.text
 
 .footer
   clear: both
-  margin-top: 45px
+  font-size: 13px
+  margin-top: 10px
+  .copyright
+    margin-right: 1em
+  p
+    color: #c6c5c8
   a
     color: #c6c5c8
     &:hover
@@ -827,8 +841,8 @@ input.text, textarea.text
 
 body
   background-color: #453745
-  font-size: 14px
-  font-family: Helvetica, Arial, sans-serif !important
+  font-size: 13px
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important
   color: #efefef
   background: url('/static/i/background.jpg')
   text-rendering: optimizeLegibility
@@ -865,3 +879,12 @@ ul.justified
   display: inline-block
   margin-right: -20px
 
+
+ul.tabs
+  li
+    padding: 7px 9px
+    +border-radius(3px)
+    margin-right: 4px
+  .active
+    +text-shadow(0px 1px 3px #000)
+    background-color: #3f404f

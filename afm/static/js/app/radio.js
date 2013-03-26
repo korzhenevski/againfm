@@ -680,7 +680,7 @@ afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', f
     };
 }]);
 
-afm.factory('radio', ['$rootScope', function($rootScope){
+afm.factory('radio', ['$rootScope', '$window', function($rootScope, $window){
     var currentStation = null;
     var previousStation = null;
 
@@ -691,6 +691,7 @@ afm.factory('radio', ['$rootScope', function($rootScope){
         }
         currentStation = station;
         $rootScope.$broadcast('stationChanged', currentStation, previousStation);
+        $window.document.title = currentStation.title;
     }
 
     return {

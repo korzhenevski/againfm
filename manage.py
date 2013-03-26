@@ -4,10 +4,10 @@
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 from afm import app, db, assets, models
+from pprint import pprint as pp
 
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
-
 
 @manager.shell
 def make_shell_context():
@@ -74,6 +74,48 @@ def check_stream():
     streams = db.streams.find({'checked_at': {'$lte': check_deadline}, 'deleted_at': 0}, fields=['id'])
     for stream in streams:
         print check_stream.delay(stream_id=stream['id'])
+
+
+@manager.command
+def update_places():
+    access_token = '56fd22cacbc4b5d67d429d3030cb913df2000f9c7f7d8be1459c80515884b7624db30424a926820c04d44'
+    import requests
+    db.countries.drop()
+    db.regions.drop()
+    db.cities.drop()
+    from time import sleep
+
+    def call_method(name, **params):
+        params['access_token'] = access_token
+        tries = 10
+        resp = None
+        while tries:
+            tries -= 1
+            resp = requests.get('https://api.vk.com/method/' + name, params=params)
+            data = resp.json()
+            if 'error' in data and data.get('error').get('error_code') == 6:
+                print 'sleep...'
+                sleep(2)
+                continue
+            break
+        if resp is None:
+            raise RuntimeError('too many tries')
+        return resp.json().get('response', [])
+
+    countries = call_method('places.getCountries', need_full=1)
+    for country in countries:
+        print country['cid']
+        print db.countries.insert({'_id': country['cid'], 'title': country['title']})
+        regions = call_method('places.getRegions', country=country['cid'])
+        for region in regions:
+            print('- region', region['region_id'])
+            print db.regions.insert({'_id': region['region_id'], 'country_id': country['cid'], 'title': region['title']})
+        cities = call_method('places.getCities', country=country['cid'])
+        for city in cities:
+            city['country_id'] = country['cid']
+            print('- city', city['cid'])
+            db.cities.insert(city)
+
 
 @manager.command
 def pr():

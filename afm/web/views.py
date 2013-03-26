@@ -33,12 +33,34 @@ def load_user(user_id):
 
 @web.route('/radio/')
 def radio():
-    return render_template('radio.html')
+    radio_list = db.Radio.find({'deleted_at': 0})
+    return render_template('radio.html', radio_list=radio_list)
 
 @web.route('/radio/<int:radio_id>')
 def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     return render_template('radio_page.html', radio=radio)
+
+# ссылка на радио
+# /radio/<int>
+# юзер может ссылатся на эту страницу. в каталоге выделять отдельно верифицированне, наши и юзерские станции
+
+# ссылка на жанр (фильтр)
+# жанров не настолько много, что-бы делать резолв на каждый запрос
+# можно тупо перечислить шортнеймы в коде
+# /radio/<string>
+#
+# позже будем регистрировать кастомные имена
+# http://again.fm/<shortname>
+#
+# список радиостанций
+# /radio/
+#
+# пользовательское радио
+# /radio/my/
+#
+# добавление радио
+# /radio/add
 
 @web.route('/')
 @web.route('/login')
@@ -50,14 +72,14 @@ def index():
 
 @web.route('/listen/<int:radio_id>')
 def listen(radio_id):
-    return render_template('index.html')
+    return render_template('player.html')
 
 # TODO: add error pages templates
 @login_manager.unauthorized_handler
 def unauthorized():
     if request.is_xhr:
         return jsonify({'error': 'Auth required'}), 401
-    return '<h1>Auth required</h1>', 401
+    return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def page_not_found(e):

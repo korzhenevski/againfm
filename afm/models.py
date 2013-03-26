@@ -553,6 +553,7 @@ class Radio(BaseDocument):
         genres = list(db.RadioGenre.find({'id': self['genres']}))
         return genres
 
+
 @db.register
 class Playlist(BaseDocument):
     __collection__ = 'playlist'

@@ -2,6 +2,30 @@
 
 {{% block content %}}
     <div class="page centroid">
-        <h1>Каталог радио</h1>
+        <div class="content">
+            <h1>Радиостанции</h1>
+            <p><a href="/radio/my/">мое радио</a></p>
+            <!--ul class="inline tabs">
+                <li class="active">каталог</li>
+                <li><a href="/radio/my/">мое</a></li>
+            </ul-->
+            <table class="radio-list">
+                {{% for radio in radio_list.limit(10) %}}
+                <tr>
+                    <td>
+                        <h2>
+                            <a href="{{{ url_for('web.radio_page', radio_id=radio.id) }}}" target="_self" class="link">{{{ radio.title }}}</a>
+                        </h2>
+                        <p>{{{ radio.description }}}</p>
+                        <!--p>15 000 слушателей</p-->
+                    </td>
+                </tr>
+                {{% endfor %}}
+            </table>
+        </div>
+        <div class="sidebar">
+            <ul>
+            </ul>
+        </div>
     </div>
 {{% endblock %}}

@@ -4,13 +4,11 @@
     <title>{{% block title %}}Эгейн - радиоплеер{{% endblock %}}</title>
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном.{{% endblock %}}" />
-    <meta name="og:title" content="{{% block share_title %}}Радиоплеер Эгейн{{% endblock %}}" />
-    <meta name="og:description" content="{{% block share_description %}}Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном.{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
     <meta name="fragment" content="!" />
     <!--meta name="og:image" content="http://again.fm/static/i/social-logo.png" /-->
     <style>
-            /* force hide angular markup while js not ready */
+        /* force hide angular markup while js not ready */
         .ng-cloak { display: none; }
     </style>
 
@@ -19,14 +17,12 @@
     {{% endassets %}}
 
     {{% if not config.DEBUG %}}
-    <script type="text/javascript">
-        (function(a,c){a.__qbaka_eh=a.onerror;a.__qbaka_reports=[];a.onerror=function(){a.__qbaka_reports.push(arguments);if(a.__qbaka_eh)try{a.__qbaka_eh.apply(a,arguments)}catch(b){}};a.onerror.qbaka=1;a.qbaka={report:function(){},customParams:{},set:function(a,b){qbaka.customParams[a]=b},exec:function(a){try{a()}catch(b){qbaka.reportException(b)}},reportException:function(){}};var b=c.createElement("script"),e=c.getElementsByTagName("script")[0],d=function(){e.parentNode.insertBefore(b,e)};b.id="qbaka";b.type="text/javascript";b.async=!0;b.src="//cdn.qbaka.net/reporting.js";"[object Opera]"==a.opera?c.addEventListener("DOMContentLoaded",d):d();qbaka.key="73b99461c5bf44245c159c11d57146b3"})(window,document);qbaka.options={autoStacktrace:1,trackEvents:1};
-    </script>
+    {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
 
     {{% block head %}}{{% endblock %}}
 </head>
-<body class="ng-cloak">
+<body>
     {{% block top_content %}}{{% endblock %}}
 
     <table class="roof">
@@ -45,11 +41,11 @@
         <div class="container">
             <table width="100%">
                 <tr>
-                    <td width="180px">
-                        <p>&copy; 2011&mdash;{{{ year }}}</p>
-                    </td>
                     <td>
-                        <p><a href="/feedback">обратная связь</a></p>
+                        <p>
+                            <span class="copyright">&copy; 2011&mdash;{{{ year }}}</span>
+                            <a href="/feedback">обратная связь</a>
+                        </p>
                     </td>
                     <td align="right">
                         <a href="https://twitter.com/share" class="twitter-share-button"
@@ -62,67 +58,21 @@
         </div>
     </div>
 
-<script>
-    /* script.js */
-    (function(j,g,b){"undefined"!=typeof b.module&&b.module.exports?b.module.exports=g():"undefined"!=typeof b.define&&"function"==b.define&&b.define.amd?define(j,g):b[j]=g()})("$script",function(){function j(b,a){for(var c=0,f=b.length;c<f;++c)if(!a(b[c]))return k;return 1}function g(b,a){j(b,function(c){return!a(c)})}function b(h,a,c){function f(a){return a.call?a():m[a]}function d(){if(!--k){m[e]=1;s&&s();for(var a in l)j(a.split("|"),f)&&!g(l[a],f)&&(l[a]=[])}}h=h[n]?h:[h];var p=a&&a.call,s=p?a:c,
-            e=p?h.join(""):a,k=h.length;setTimeout(function(){g(h,function(a){if(q[a])return 2==q[a]&&d();q[a]=1;t(!w.test(a)&&r?r+a+".js":a,d)})},0);return b}function t(b,a){var c=d.createElement("script"),f=k;c.onload=c.onerror=c[u]=function(){c[e]&&!/^c|loade/.test(c[e])||f||(c.onload=c[u]=null,f=1,q[b]=2,a())};c.async=1;c.src=b;v.insertBefore(c,v.firstChild)}var d=document,v=d.getElementsByTagName("head")[0],w=/^https?:\/\//,m={},l={},r,q={},k=!1,n="push",e="readyState",u="onreadystatechange";!d[e]&&d.addEventListener&&
-    (d.addEventListener("DOMContentLoaded",function a(){d.removeEventListener("DOMContentLoaded",a,k);d[e]="complete"},k),d[e]="loading");b.get=t;b.order=function(a,c,f){(function p(d){d=a.shift();a.length?b(d,p):b(d,c,f)})()};b.path=function(a){r=a};b.ready=function(a,c,d){a=a[n]?a:[a];var e=[];!g(a,function(a){m[a]||e[n](a)})&&j(a,function(a){return m[a]})?c():(a=a.join("|"),l[a]=l[a]||[],l[a][n](c),d&&d(e),!0);return b};return b},this);
-</script>
+{{% include 'extras/scriptjs.html' %}}
 
 {{% assets "scripts" %}}
-    <script src="{{{ ASSET_URL }}}"></script>
+<script src="{{{ ASSET_URL }}}"></script>
 {{% endassets %}}
 
 {{% if not config.DEBUG %}}
-    <script type="text/javascript">
-        var _gaq = [
-            ['_setAccount', 'UA-21858820-1'],
-            ['_setDomainName', 'again.fm'],
-            ['_setAllowLinker', true],
-            ['_setSiteSpeedSampleRate', 100],
-            ['_trackPageview']
-        ];
-        $script(('https:'==location.protocol?'//ssl':'http://www')+'.google-analytics.com/ga.js');
-        $script("//platform.twitter.com/widgets.js");
-        $script("//vk.com/js/api/openapi.js?79", function(){
-            VK.init({apiId: 3183069, onlyWidgets: true});
-            VK.Widgets.Like('vk-like', {type: 'mini'});
-        });
-    </script>
-
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter18922339 = new Ya.Metrika({id:18922339,
-                        webvisor:true,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true,
-                        trackHash:true});
-                } catch(e) { }
-            });
-
-            var n = d.getElementsByTagName("script")[0],
-                    s = d.createElement("script"),
-                    f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
-
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="//mc.yandex.ru/watch/18922339" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    {{% endif %}}
+{{% include 'extras/counters.html' %}}
+{{% endif %}}
 
 <script>
-    afm.value('bootstrapUser', {{{ user|json|safe }}});
-    afm.value('bootstrapGenres', {{{ genres|json|safe }}});
-    // configure comet over $provide.configuration
-    afm.value('cometUrl', {{{ config.COMET_URL|json|safe }}});
+afm.value('bootstrapUser', {{{ user|json|safe }}});
+afm.value('bootstrapGenres', {{{ genres|json|safe }}});
+// configure comet over $provide.configuration
+afm.value('cometUrl', {{{ config.COMET_URL|json|safe }}});
 </script>
 
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>

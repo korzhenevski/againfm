@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 DEBUG = True
-TESTING = False
 ASSETS_DEBUG = False
 SECRET_KEY = '8b7707cbf3ac84b95361319960654c77'
 SEND_MAIL = True
