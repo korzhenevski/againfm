@@ -4,39 +4,30 @@
 import time 
 import ujson as json
 from afm import db, login_manager, i18n, app
-from . import web
 from flask import jsonify, render_template, g, request, url_for, redirect
 from flask.ext.login import current_user
 from datetime import datetime
 
 if app.debug:
-    @web.route('/guideline')
+    @app.route('/guideline')
     def guideline():
         return render_template('guideline.html')
 
-@app.route('/favicon.ico')
-def favicon():
-    return redirect(url_for('static', filename='i/favicon.ico'))
-
-@web.before_request
+@app.before_request
 def save_start_time():
     g.start = time.time()
 
-@web.after_request
+@app.after_request
 def x_headers(response):
     response.headers['X-Request-Time'] = round(time.time() - g.start, 4)
     return response
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.User.find_one({'id': user_id})
-
-@web.route('/radio/')
+@app.route('/radio/')
 def radio():
     radio_list = db.Radio.find({'deleted_at': 0})
     return render_template('radio.html', radio_list=radio_list)
 
-@web.route('/radio/<int:radio_id>')
+@app.route('/radio/<int:radio_id>')
 def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     return render_template('radio_page.html', radio=radio)
@@ -62,24 +53,17 @@ def radio_page(radio_id):
 # добавление радио
 # /radio/add
 
-@web.route('/')
-@web.route('/login')
-@web.route('/signup')
-@web.route('/amnesia')
-@web.route('/feedback')
+@app.route('/')
+@app.route('/login')
+@app.route('/signup')
+@app.route('/amnesia')
+@app.route('/feedback')
 def index():
     return render_template('player.html')
 
-@web.route('/listen/<int:radio_id>')
+@app.route('/listen/<int:radio_id>')
 def listen(radio_id):
     return render_template('player.html')
-
-# TODO: add error pages templates
-@login_manager.unauthorized_handler
-def unauthorized():
-    if request.is_xhr:
-        return jsonify({'error': 'Auth required'}), 401
-    return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -88,15 +72,11 @@ def page_not_found(e):
     return '<h1>Not Found</h1>', 404
 
 # быстрый фильтр-сериализатор json
-@web.app_template_filter('json')
+@app.template_filter('json')
 def template_filter_json(data):
     return json.dumps(data)
 
-@web.app_template_filter('i18n')
-def i18n_template_filter(key):
-    return i18n.translate(key)
-
-@web.context_processor
+@app.context_processor
 def app_context():
     ctx = {'user': None}
     if current_user.is_authenticated():

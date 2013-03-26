@@ -5,8 +5,10 @@ import logging
 import validictory
 from flask import request, abort, current_app
 from datetime import date
-from afm.web import tasks
+from afm import tasks
 from time import time
+from urlparse import urlparse, urljoin
+from flask import request, url_for, redirect
 
 def naturalday(ts, ts_format=None):
     delta = ts.date() - date.today()
@@ -59,9 +61,6 @@ def get_email_provider(email):
 
 def get_ts():
     return int(time())
-
-from urlparse import urlparse, urljoin
-from flask import request, url_for, redirect
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)

@@ -6,7 +6,7 @@ from flask.ext.login import login_required, current_user
 
 from afm import app, db
 from afm.models import UserFavoritesCache
-from .helpers import safe_input_object, send_mail
+from afm.helpers import safe_input_object, send_mail
 
 
 @app.route('/api/radio/featured')

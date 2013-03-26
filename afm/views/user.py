@@ -4,12 +4,22 @@
 from flask import jsonify, render_template, url_for, session, redirect, request
 from flask.ext.login import login_user, login_required, logout_user, current_user
 
-from afm import app, db
-from .helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
+from afm import app, db, login_manager
+from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 
 def permanent_login_user(user):
     login_user(user, remember=True)
     session.permanent = True
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.User.find_one({'id': user_id})
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    if request.is_xhr:
+        return jsonify({'error': 'Auth required'}), 401
+    return redirect(url_for('login'))
 
 @app.route('/radio/my/')
 @login_required
