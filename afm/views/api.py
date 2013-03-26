@@ -8,6 +8,12 @@ from afm import app, db
 from afm.models import UserFavoritesCache
 from afm.helpers import safe_input_object, send_mail
 
+@app.route('/api/parse_playlist_source', methods=['POST'])
+def parse_playlist_source():
+    import requests
+    from afm.radio import parse_playlist_source
+    resp = requests.get(request.json['url'])
+    return jsonify({'urls': parse_playlist_source(resp.text, resp.request.url)})
 
 @app.route('/api/radio/featured')
 def radio_featured():

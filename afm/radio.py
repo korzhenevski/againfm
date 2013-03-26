@@ -165,6 +165,11 @@ def parse_playlist(text):
     urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
     return filter(None, urls)
 
+def parse_playlist_source(source, baseurl):
+    rex = r'(?i)href="?((.*?)\.(pls|m3u))"?'
+    urls = set([match.group(1).strip() for match in re.finditer(rex, source, flags=re.IGNORECASE)])
+    return filter(None, [normalize_url(baseurl, url) for url in urls])
+
 class ShoutcastHTTPResponse(httplib.HTTPResponse):
     def _read_status(self):
         # Initialize with Simple-Response defaults

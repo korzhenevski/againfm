@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request
+from flask import render_template, request, jsonify, url_for
 from flask.ext.login import current_user
 from datetime import datetime
 
@@ -39,12 +39,53 @@ def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('radio_page.html', radio=radio)
 
+@app.route('/radio/<int:radio_id>/edit')
+def radio_action(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
+    return render_template('radio_edit.html', radio=radio)
+
 @app.route('/radio/admin/')
 def radio_admin():
     return render_template('radio_admin.html')
 
-@app.route('/radio/add')
+@app.route('/radio/add', methods=['POST','GET'])
 def radio_add():
+    if request.method == 'POST':
+        import pymongo.errors
+        data = request.json
+        radio = db.Radio()
+        print data
+        radio['title'] = unicode(data['title'])
+        radio['website'] = unicode(data.get('website', u''))
+        radio['location'] = unicode(data.get('location', u''))
+        radio['owner_id'] = current_user.id
+        radio.save()
+
+        for playlist_url in data.get('playlistUrl', []):
+            playlist = db.Playlist()
+            playlist['url'] = unicode(playlist_url)
+            playlist['radio_id'] = radio['id']
+            try:
+                playlist.save()
+            except pymongo.errors.DuplicateKeyError:
+                pass
+
+        for stream_url in data.get('streamUrl', []):
+            stream = db.Stream()
+            stream.update({
+                'url': unicode(stream_url),
+                'playlist_id': 0,
+                'radio_id': radio['id'],
+            })
+
+            try:
+                stream.save()
+            except pymongo.errors.DuplicateKeyError:
+                # игнорируем, если поток уде был добавлен из другого плейлиста
+                pass
+
+        return jsonify({'radio': radio.get_public(), 'location': url_for('radio_page', radio_id=radio['id'])})
+
     return render_template('radio_add.html')
 
 @app.route('/')

@@ -1,0 +1,47 @@
+{{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
+{{% block content %}}
+    <div class="page centroid">
+        <h2>{{{ radio.title }}}</h2>
+        <div data-ng-controller="RadioAddCtrl" class="radio-add">
+            <form data-ng-submit="">
+                <dl class="control-group">
+                    <dt>Название:</dt>
+                    <dd><input type="text" class="text" ng-model="radio.title" required="" /></dd>
+                </dl>
+                <dl class="control-group">
+                    <dt>Ссылка на плейлист:</dt>
+                    <dd>
+                        <textarea type="text" class="text" ng-model="radio.playlistUrl" ng-list="/\n/" rows="5"></textarea>
+                        <div class="help">
+                            в формате pls, m3u и xspf или
+                        </div>
+                    </dd>
+                </dl>
+                <dl class="control-group">
+                    <dt>Адрес потока:</dt>
+                    <dd>
+                        <textarea type="text" class="text" ng-model="radio.streamUrl" ng-list="/\n/" rows="5"></textarea>
+                    </dd>
+                </dl>
+                <dl class="control-group">
+                    <dt>Веб-сайт:</dt>
+                    <dd><input type="url" class="text" ng-model="radio.website" /></dd>
+                </dl>
+                <dl class="control-group">
+                    <dt>Адрес вещания:</dt>
+                    <dd>
+                        <input type="url" class="text" ng-model="radio.location" />
+                        <div class="help">например: Россия, Москва</div>
+                    </dd>
+                </dl>
+                <div class="controls">
+                    <input type="submit" class="btn" value="Добавить радио" />
+                </div>
+            </form>
+            <pre>{{ radio|json }}</pre>
+        </div>
+    </div>
+    {{% endblock %}}
+{{% block scripts %}}
+    <script src="/static/js/radio_admin.js"></script>
+{{% endblock %}}

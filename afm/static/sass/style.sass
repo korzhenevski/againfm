@@ -796,7 +796,7 @@ input.text, textarea.text
   +background(linear-gradient(#3f404f, #454757))
   +border-radius(4px)
   +box-shadow(#505160 0 1px 1px 0px, #3a3b48 0 2px 5px 1px inset)
-  @include placeholder-color(#7b7c87)
+  @include placeholder-color(#64656e)
   &:focus
     color: #f2f2f4
 
@@ -888,3 +888,35 @@ ul.tabs
   .active
     +text-shadow(0px 1px 3px #000)
     background-color: #3f404f
+
+
+$control-group-width: 130px
+.control-group
+  dt
+    width: $control-group-width
+    float: left
+    clear: left
+    overflow: hidden
+    text-align: right
+    padding-top: 8px
+    color: #aaa
+  dd
+    margin-left: $control-group-width + 10
+  .help
+    color: #7b7c87
+    padding-left: 10px
+    margin-top: 1em
+
+.radio-add
+  width: 400px
+
+  .text
+    width: 100%
+
+  .source-url
+    margin-right: 7px
+    width: 65%
+    float: left
+
+  .controls
+    margin-left: $control-group-width + 10

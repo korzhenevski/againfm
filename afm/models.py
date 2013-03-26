@@ -410,6 +410,7 @@ class Radio(BaseDocument):
             'title': self['title'],
             'description': self['description'],
             'website': self['website'],
+            'owner_id': self['owner_id'],
         }
         #if self['channel'] and self['group'].get('title'):
         #    radio['title'] = u' - '.join([self['group']['title'], self['title']])
