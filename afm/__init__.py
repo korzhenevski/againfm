@@ -25,7 +25,6 @@ app.jinja_env.block_end_string = '%}}'
 
 db = MongoKit(app)
 redis = Redis(**app.config['REDIS'])
-
 mailer = AmazonMailer(app)
 
 celery = Celery(__name__)

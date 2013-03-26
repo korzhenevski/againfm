@@ -8,11 +8,15 @@ from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 
 def permanent_login_user(user):
+    """
+    Логин пользователя с фиксацией сессии
+    """
     login_user(user, remember=True)
     session.permanent = True
 
 @login_manager.user_loader
 def load_user(user_id):
+    # проверка на активность в login_user
     return db.User.find_one({'id': user_id})
 
 @login_manager.unauthorized_handler
@@ -21,27 +25,11 @@ def unauthorized():
         return jsonify({'error': 'Auth required'}), 401
     return redirect(url_for('login'))
 
-@app.route('/radio/my/')
-@login_required
-def my_radio():
-    return render_template('user/my_radio.html')
-
-@app.route('/radio/radio/add')
-@login_required
-def my_radio_add():
-    return render_template('user/my_radio_add.html')
-
 @app.context_processor
 def app_context():
     return dict(standalone=request.is_xhr)
 
-@app.route('/api/my/radio')
-def api_my_radio():
-    objects = db.Radio.find({'owner_id': current_user['id']}).limit(100)
-    objects = [obj.get_public() for obj in objects]
-    return jsonify({'objects': objects})
-
-@app.route('/api/user/login', methods=['POST'])
+@app.route('/user/login', methods=['POST'])
 def login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
     data['login'] = data['login'].lower()

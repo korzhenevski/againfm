@@ -4,8 +4,8 @@
     <div class="page centroid">
         <div class="content">
             <h1>Радиостанции</h1>
-            <p><a href="/radio/admin/">Управление</a></p>
-            <p><a href="/radio/new">Предложить Радио</a></p>
+            <p><a href="{{{ url_for('radio_admin') }}}">Управление</a></p>
+            <p><a href="{{{ url_for('radio_add') }}}">Предложить Радио</a></p>
             <!--ul class="inline tabs">
                 <li class="active">каталог</li>
                 <li><a href="/radio/my/">мое</a></li>
@@ -15,7 +15,7 @@
                 <tr>
                     <td>
                         <h2>
-                            <a href="{{{ url_for('web.radio_page', radio_id=radio.id) }}}" target="_self" class="link">{{{ radio.title }}}</a>
+                            <a href="{{{ url_for('radio_page', radio_id=radio.id) }}}" target="_self" class="link">{{{ radio.title }}}</a>
                         </h2>
                         <p>{{{ radio.description }}}</p>
                         <!--p>15 000 слушателей</p-->

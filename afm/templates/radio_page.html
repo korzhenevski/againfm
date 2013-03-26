@@ -14,14 +14,14 @@
     </div>
     <div class="sidebar">
         <p class="listen">
-            <a class="btn" target="_self" href="{{{ url_for('web.listen', radio_id=radio.id) }}}">
+            <a class="btn" target="_self" href="{{{ url_for('listen', radio_id=radio.id) }}}">
                 Слушать в плеере
             </a>
         </p>
         <h2>Еще радио</h2>
         {{% for related_radio in radio.get_related(limit=5) %}}
         <p>
-            <a target="_self" class="link" href="{{{ url_for('web.radio', radio_id=related_radio.id) }}}">
+            <a target="_self" class="link" href="{{{ url_for('radio_page', radio_id=related_radio.id) }}}">
                 {{{ related_radio.title }}}
             </a>
             <br>
