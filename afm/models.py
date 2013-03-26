@@ -647,7 +647,7 @@ class Air(BaseDocument):
 
 if __name__ == '__main__':
     import unittest
-    from random import randint
+
     class RadioTest(unittest.TestCase):
         pass
     unittest.main()

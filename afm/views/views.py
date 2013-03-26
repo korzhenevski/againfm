@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time 
+import time
 import ujson as json
-from afm import db, login_manager, i18n, app
-from flask import jsonify, render_template, g, request, url_for, redirect
+from flask import jsonify, render_template, g, request
 from flask.ext.login import current_user
 from datetime import datetime
+
+from afm import db, app
+
 
 if app.debug:
     @app.route('/guideline')

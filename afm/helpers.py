@@ -5,10 +5,12 @@ import logging
 import validictory
 from flask import request, abort, current_app
 from datetime import date
-from afm import tasks
 from time import time
 from urlparse import urlparse, urljoin
-from flask import request, url_for, redirect
+from flask import url_for, redirect
+
+from afm import tasks
+
 
 def naturalday(ts, ts_format=None):
     delta = ts.date() - date.today()

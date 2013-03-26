@@ -5,7 +5,7 @@ import socket
 import urlnorm
 import requests
 from time import time
-from urlparse import urlparse, urljoin
+from urlparse import urljoin
 from httplib import LineAndFileWrapper, BadStatusLine
 
 USER_AGENT = 'Mozilla/5.0 (compatible; checkfm/1.0)'
