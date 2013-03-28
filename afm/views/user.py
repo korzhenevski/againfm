@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, render_template, url_for, session, redirect, request
-from flask.ext.login import login_user, login_required, logout_user, current_user
+from flask.ext.login import login_user, login_required, logout_user
 
 from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider

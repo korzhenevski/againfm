@@ -60,7 +60,7 @@ def agg(key):
 
 @manager.command
 def update_playlist():
-    from afm.web.tasks import update_playlist
+    from afm.tasks import update_playlist
     for playlist in db.playlist.find(fields=['id']):
         print playlist['id']
         print update_playlist.delay(playlist_id=playlist['id'])
@@ -68,8 +68,8 @@ def update_playlist():
 
 @manager.command
 def check_stream():
-    from afm.web.tasks import check_stream
-    from afm.web.helpers import get_ts
+    from afm.tasks import check_stream
+    from afm.helpers import get_ts
     check_deadline = get_ts() - 3600
     streams = db.streams.find({'checked_at': {'$lte': check_deadline}, 'deleted_at': 0}, fields=['id'])
     for stream in streams:
@@ -119,8 +119,49 @@ def update_places():
 
 @manager.command
 def pr():
-    for radio in db.radio.find().limit(30):
-        print radio['title']
+    for item in db.streams.find({'meta.name': {'$exists': True}}, fields=['meta.name']):
+        print item['meta']['name']
+
+@manager.command
+def research():
+    for item in db.streams.find({'meta.name': {'$exists': True}}):
+        print len(item['meta']['name'])
+
+@manager.command
+def feed_search():
+    import requests
+    import ujson as json
+    #feed_url = 'http://localhost:9200/afm/radio/{}'
+    #for radio in db.Radio.find():
+    #    print requests.post(feed_url.format(radio['id']), data=json.dumps(radio.get_public()))
+    """
+    analyzer = {'autocomplete': {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["standard", "lowercase", "stop", "kstem", "ngram"]
+    }}
+    resp = requests.put('http://localhost:9200/afm/radio/_settings', data=json.dumps({'analysis': {'analyzer': analyzer}}))
+    """
+    mapping = {
+        "title": {
+            "type": "multi_field",
+            "fields": {
+                "title": {
+                    "type": "string"
+                },
+                "autocomplete": {
+                    "analyzer": "autocomplete",
+                    "type": "string"
+                }
+            }
+        },
+    }
+    resp = requests.put('http://localhost:9200/afm/radio/_mapping', data=json.dumps({
+        'radio': {'properties': mapping}
+    }))
+
+    print resp
+    print resp.json()
 
 if __name__ == "__main__":
     manager.run()

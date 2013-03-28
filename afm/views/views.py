@@ -54,7 +54,6 @@ def radio_add():
         import pymongo.errors
         data = request.json
         radio = db.Radio()
-        print data
         radio['title'] = unicode(data['title'])
         radio['website'] = unicode(data.get('website', u''))
         radio['location'] = unicode(data.get('location', u''))

@@ -1,12 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from flask import request, jsonify, render_template
 from flask.ext.login import login_required, current_user
 
 from afm import app, db
 from afm.models import UserFavoritesCache
 from afm.helpers import safe_input_object, send_mail
+
+
+@app.route('/api/radio/search/<q>')
+def radio_search(q):
+    import requests
+    resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': q + '*'})
+    hits = [hit['_source'] for hit in resp.json()['hits'].get('hits', [])]
+    return jsonify({'objects': hits, 'q': q})
+
+@app.route('/api/radio_source')
+def parse_radio_source():
+    from afm.radio import fetch_stream
+    url = request.args.get('url')
+    stream = fetch_stream(url, timeout=2, as_player=True)
+    return jsonify({'source': stream.__dict__})
 
 @app.route('/api/parse_playlist_source', methods=['POST'])
 def parse_playlist_source():

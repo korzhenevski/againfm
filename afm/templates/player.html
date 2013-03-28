@@ -13,7 +13,9 @@
                             Любимые песни из эфира
                         </a>
                     </td>
-                    <td></td>
+                    <td style="padding-left: 30px">
+                        <a href="/radio/" target="_self">Радио</a>
+                    </td>
                     <td align="right">
                         <p data-ng-hide="currentUser.isLogged()">
                             <a href="/signup">Стать постоянным слушателем</a> или <a href="/login">войти с паролем</a>
@@ -111,7 +113,7 @@
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
-                                            <li data-ng-repeat="station in playlist|filter:searchQuery">
+                                            <li data-ng-repeat="station in getList()">
                                                 <div class="block station-link" data-ng-class="itemClass(station, currentStation())" data-ng-click="selectStation(station)">
                                                     <span class="link">{{ station.title }}</span>
                                                 </div>

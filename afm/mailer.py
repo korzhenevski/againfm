@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from boto.ses.connection import SESConnection
 
 class AmazonMailer(SESConnection):

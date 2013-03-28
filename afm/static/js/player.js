@@ -640,7 +640,11 @@ afm.factory('Playlist', ['$http', function($http){
  * Контролер плейлиста
  */
 afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', function($scope, $http, radio, bootstrapGenres){
+    $scope.searchQuery = '';
     $scope.tabs = [];
+    $scope.currentTab = null;
+    $scope.playlist = [];
+
     angular.forEach(bootstrapGenres, function(genre){
         $scope.tabs.push({
             id: 'genre/' + genre.id,
@@ -648,35 +652,31 @@ afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', f
         });
     });
 
-    $scope.playlist = [];
-    $scope.searchQuery = '';
-    $scope.currentTab = null;
-    // ids list for fast lookup
-    var playlistIds = [];
+    $scope.$watch('searchQuery', function(searchQuery) {
+        if (!searchQuery) {
+            return;
+        }
+        $http.get('/api/radio/search/' + searchQuery).success(function(resp){
+            $scope.playlist = resp.objects;
+        });
+    });
+
+    $scope.getList = function() {
+        return $scope.playlist;
+    };
 
     $scope.selectTab = function(tabId) {
         $scope.playlist = [];
         $scope.currentTab = tabId;
 
         $http.get('/api/radio/' + tabId).success(function(response){
-            playlistIds = [];
             $scope.playlist = response.objects;
-            angular.forEach(response.objects, function(station){
-                playlistIds.push(station.id);
-            });
         });
     };
 
     $scope.tabClass = function(tabId) {
         var selected = (tabId == $scope.currentTab) && !$scope.searchQuery;
         return {selected: selected};
-    };
-
-    $scope.showCursor = function() {
-        if ($scope.searchQuery || !radio.isStationLoaded()) {
-            return false;
-        }
-        return playlistIds.indexOf(radio.getStation().id) >= 0;
     };
 }]);
 
