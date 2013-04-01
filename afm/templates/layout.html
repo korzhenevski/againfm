@@ -63,10 +63,10 @@
 {{% block scripts %}}{{% endblock %}}
 
 <script>
-afm.value('bootstrapUser', {{{ user|json|safe }}});
-afm.value('bootstrapGenres', {{{ genres|json|safe }}});
+afm.value('bootstrapUser', {{{ user|json }}});
+afm.value('bootstrapGenres', {{{ genres|json }}});
 // configure comet over $provide.configuration
-afm.value('cometUrl', {{{ config.COMET_URL|json|safe }}});
+afm.value('cometUrl', {{{ config.COMET_URL|json }}});
 </script>
 
 {{% include 'extras/scriptjs.html' %}}

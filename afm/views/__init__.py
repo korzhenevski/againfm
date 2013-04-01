@@ -5,6 +5,7 @@ import time
 import ujson as json
 from flask import g, request, jsonify
 from afm import app
+from jinja2 import Markup
 
 @app.before_request
 def save_start_time():
@@ -24,6 +25,6 @@ def page_not_found(e):
 # быстрый фильтр-сериализатор json
 @app.template_filter('json')
 def template_filter_json(data):
-    return json.dumps(data)
+    return Markup(json.dumps(data))
 
 from . import views, user, api

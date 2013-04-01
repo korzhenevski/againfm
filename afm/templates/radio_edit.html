@@ -1,47 +1,59 @@
 {{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
+{{% block title %}}
+    Редактирование радио
+{{% endblock %}}
 {{% block content %}}
-    <div class="page centroid">
-        <h2>{{{ radio.title }}}</h2>
-        <div data-ng-controller="RadioAddCtrl" class="radio-add">
-            <form data-ng-submit="">
-                <dl class="control-group">
-                    <dt>Название:</dt>
-                    <dd><input type="text" class="text" ng-model="radio.title" required="" /></dd>
-                </dl>
-                <dl class="control-group">
-                    <dt>Ссылка на плейлист:</dt>
-                    <dd>
-                        <textarea type="text" class="text" ng-model="radio.playlistUrl" ng-list="/\n/" rows="5"></textarea>
-                        <div class="help">
-                            в формате pls, m3u и xspf или
-                        </div>
-                    </dd>
-                </dl>
-                <dl class="control-group">
-                    <dt>Адрес потока:</dt>
-                    <dd>
-                        <textarea type="text" class="text" ng-model="radio.streamUrl" ng-list="/\n/" rows="5"></textarea>
-                    </dd>
-                </dl>
-                <dl class="control-group">
-                    <dt>Веб-сайт:</dt>
-                    <dd><input type="url" class="text" ng-model="radio.website" /></dd>
-                </dl>
-                <dl class="control-group">
-                    <dt>Адрес вещания:</dt>
-                    <dd>
-                        <input type="url" class="text" ng-model="radio.location" />
-                        <div class="help">например: Россия, Москва</div>
-                    </dd>
-                </dl>
-                <div class="controls">
-                    <input type="submit" class="btn" value="Добавить радио" />
-                </div>
-            </form>
-            <pre>{{ radio|json }}</pre>
-        </div>
+<div class="page centroid">
+    <h2>Радио &laquo;{{{ radio.title }}}&raquo;</h2>
+    <a class="link" href="{{{ url_for('radio_admin') }}}">мое радио</a>
+    <div data-ng-controller="EditCtrl" class="radio-edit" ng-init='form={{{ radio.get_public()|json }}}'>
+        <form name="editForm" ng-submit="add()">
+            <dl class="control-group">
+                <dt>Название</dt>
+                <dd>
+                    <input class="text" ng-model="form.title" required="" maxlength="" />
+                </dd>
+            </dl>
+            <dl class="control-group">
+                <dt>Описание</dt>
+                <dd>
+                    <textarea class="text" ng-model="form.description" rows="4"></textarea>
+                </dd>
+            </dl>
+            <dl class="control-group">
+                <dt>Веб-сайт</dt>
+                <dd><input type="url" class="text" ng-model="form.website" /></dd>
+            </dl>
+            <div class="controls">
+                <input type="submit" ng-disabled="editForm.$invalid" class="btn" value="Сохранить" />
+                <p class="error" data-ng-switch on="error.code" data-ng-show="error">
+                    <span data-ng-switch-default>Ошибка при обработке запроса.</span>
+                </p>
+            </div>
+        </form>
     </div>
-    {{% endblock %}}
+
+    <h2>Потоки</h2>
+    <table class="radio-streams" ng-controller="EditStreamsCtrl" ng-init='streams={{{ radio.get_streams()|json }}}'>
+        <tr ng-hide="streams">
+            <td colspan="10">нет потоков</td>
+        </tr>
+        <tr ng-repeat="stream in streams">
+            <td>{{ stream.listen_url }}</td>
+        </tr>
+    </table>
+
+    <h2>Плейлисты</h2>
+    <table class="radio-playlists" ng-controller="EditPlaylistsCtrl" ng-init='playlists={{{ radio.get_playlists()|json }}}'>
+        <tr ng-hide="playlists">
+            <td colspan="10">нет плейлистов</td>
+        </tr>
+        <tr ng-repeat="playlist in playlists">
+            <td>{{ playlist.url }}</td>
+        </tr>
+    </table>
+</div>
+{{% endblock %}}
 {{% block scripts %}}
-    <script src="/static/js/radio_admin.js"></script>
+    <script src="/static/js/radio.js"></script>
 {{% endblock %}}

@@ -23,14 +23,14 @@ def load_user(user_id):
 def unauthorized():
     if request.is_xhr:
         return jsonify({'error': 'Auth required'}), 401
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.context_processor
 def app_context():
     return dict(standalone=request.is_xhr)
 
 @app.route('/api/user/login', methods=['POST'])
-def login():
+def api_user_login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
     data['login'] = data['login'].lower()
     user = db.User.find_login(data['login'])
@@ -46,7 +46,7 @@ def login():
 
 
 @app.route('/api/user/amnesia', methods=['POST'])
-def amnesia():
+def api_user_amnesia():
     email = safe_input_field('email', 'string')
     email = email.lower()
     user = db.User.find_one({'email': email})
@@ -59,7 +59,7 @@ def amnesia():
     return jsonify({'error': 'no_user'}), 404
 
 @app.route('/api/user/signup', methods=['POST'])
-def signup():
+def api_user_signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
     data['email'] = data['email'].lower()
     if db.User.find_one({'email': data['email']}):
@@ -79,7 +79,7 @@ def signup():
 
 @app.route('/api/user/logout', methods=['POST'])
 @login_required
-def logout():
+def api_user_logout():
     logout_user()
     return jsonify({'logout': True})
 

@@ -21,6 +21,11 @@ def md5hash(data):
 def get_ts():
     return int(time.time())
 
+def comma_fields(fields_str):
+    fields = fields_str.split(',')
+    fields = map(string.strip, fields)
+    return fields
+
 class BaseDocument(Document):
     use_dot_notation = True
     use_autoinc_id = False
@@ -40,10 +45,25 @@ class BaseDocument(Document):
         ret = self.db.object_ids.find_and_modify(query={'_id': ns}, update={'$inc': {'next': 1}}, new=True, upsert=True)
         return ret['next']
 
-    def soft_delete(self):
-        if 'deleted_at' in self.structure:
-            self['deleted_at'] = get_ts()
-            self.save()
+    @classmethod
+    def soft_delete(cls, **where):
+        if not cls.__collection__ or where:
+            return
+        db[cls.__collection__].update(where, {'$set': {'deleted_at': get_ts()}})
+
+    @classmethod
+    def restore(cls, **where):
+        if not cls.__collection__ or where:
+            return
+        db[cls.__collection__].update(where, {'$set': {'deleted_at': 0}})
+
+    def get_public(self, fields=None):
+        if fields is None:
+            fields = self.public
+        else:
+            fields = fields.split(',')
+        fields = set(fields) & set(self.structure.keys())
+        return dict((field, self.get(field)) for field in fields)
 
 
 class UserFavoritesCache(object):
@@ -180,7 +200,7 @@ class User(BaseDocument):
         'connect': dict,
         'is_active': bool,
         'is_admin': bool,
-        'settings': {}
+        'settings': dict
     }
 
     indexes = [{'fields': 'id', 'unique': True}]
@@ -214,12 +234,6 @@ class User(BaseDocument):
     def get_public(self):
         return {
             'id': self['id'],
-            #'email': self['email'],
-            #'name': self['name'],
-            #'sex': self['sex'],
-            #'avatar_url': self['avatar_url'],
-            #'gravatar_hash': self.gravatar_hash,
-            #'settings': self['settings']
         }
 
     def generate_new_password(self, length=8):
@@ -251,9 +265,11 @@ class User(BaseDocument):
     def find_login(self, login):
         login = login.lower()
         key = 'email' if '@' in login else 'login'
-        where = {}
-        where[key] = login
-        return self.find_one(where)
+        return self.find_one({key: login})
+
+    @property
+    def gravatar_hash(self):
+        return md5hash(self['email'].lower())
 
     def is_authenticated(self):
         return True
@@ -266,10 +282,6 @@ class User(BaseDocument):
 
     def get_id(self):
         return self['id']
-
-    @property
-    def gravatar_hash(self):
-        return md5hash(self['email'].lower())
 
 
 @db.register
@@ -334,8 +346,7 @@ class RadioGenre(BaseDocument):
         'is_public': False,
     }
 
-    def get_public(self):
-        return {'id': self['id'], 'title': self['title']}
+    public = ['id', 'title']
 
 @db.register
 class RadioGroup(BaseDocument):
@@ -357,8 +368,8 @@ class RadioGroup(BaseDocument):
         'deleted_at': 0,
     }
 
-    def update_channels(self):
-        pass
+    public = ['id', 'title']
+
 
 @db.register
 class Radio(BaseDocument):
@@ -369,6 +380,7 @@ class Radio(BaseDocument):
         'title': unicode,
         # короткое URL-имя
         'slug': unicode,
+        'source_url': unicode,
         'description': unicode,
         # страна, город
         'location': unicode,
@@ -390,6 +402,7 @@ class Radio(BaseDocument):
 
     default_values = {
         'slug': u'',
+        'source_url': u'',
         'description': u'',
         'location': u'',
         'website': u'',
@@ -404,17 +417,7 @@ class Radio(BaseDocument):
         }
     }
 
-    def get_public(self):
-        radio = {
-            'id': self['id'],
-            'title': self['title'],
-            'description': self['description'],
-            'website': self['website'],
-            'owner_id': self['owner_id'],
-        }
-        #if self['channel'] and self['group'].get('title'):
-        #    radio['title'] = u' - '.join([self['group']['title'], self['title']])
-        return radio
+    public = ['id', 'title', 'description']
 
     def get_related(self, limit=5):
         from random import shuffle
@@ -428,8 +431,13 @@ class Radio(BaseDocument):
     def get_genres(self):
         if not self['genres']:
             return []
-        genres = list(db.RadioGenre.find({'id': self['genres']}))
-        return genres
+        return list(db.RadioGenre.find({'id': self['genres']}))
+
+    def get_streams(self):
+        return list(stream.get_public() for stream in db.Stream.find({'radio_id': self['id'], 'deleted_at': 0}))
+
+    def get_playlists(self):
+        return list(playlist.get_public() for playlist in db.Playlist.find({'radio_id': self['id'], 'deleted_at': 0}))
 
 
 @db.register
@@ -452,6 +460,8 @@ class Playlist(BaseDocument):
         'updated_at': 0,
         'deleted_at': 0,
     }
+
+    public = ['id', 'url', 'streams']
 
 @db.register
 class Stream(BaseDocument):

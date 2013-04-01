@@ -739,6 +739,9 @@ $use-mozilla-ellipsis-binding: true
   .text-muted
     color: #cccccf
 
+  label
+    cursor: pointer
+
   h1
     margin: 0
     font-size: 28px
@@ -774,9 +777,9 @@ $use-mozilla-ellipsis-binding: true
 
 .radio-list
   margin-top: 2em
-  h2
+  .title
     font-size: 18px
-  p
+  .description
     color: #aaa
     margin: 0.5em 0
     font-size: 13px
@@ -890,7 +893,7 @@ ul.tabs
     background-color: #3f404f
 
 
-$control-group-width: 130px
+$control-group-width: 150px
 .control-group
   dt
     width: $control-group-width
@@ -903,15 +906,18 @@ $control-group-width: 130px
   dd
     margin-left: $control-group-width + 10
   .help
-    color: #7b7c87
+    color: #90919e
     padding-left: 10px
-    margin-top: 1em
+    margin-top: 0.3em
 
-.radio-add
-  width: 400px
+.radio-edit
+  width: 430px
 
   .text
     width: 100%
+
+  .title
+    width: 80%
 
   .source-url
     margin-right: 7px
@@ -920,3 +926,21 @@ $control-group-width: 130px
 
   .controls
     margin-left: $control-group-width + 10
+
+.radio-admin-table
+  width: 60%
+  td
+    padding-bottom: 1em
+  .controls
+    text-align: right
+    width: 100px
+
+.genres-edit
+  margin: 10px 0
+  font-size: 12px
+  td
+    padding: 5px 0
+    padding-left: 10px
+  .private
+    color: #90919e
+    text-decoration: line-through

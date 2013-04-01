@@ -1,50 +1,48 @@
 {{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
+{{% block title %}}
+    Добавить радио
+{{% endblock %}}
 {{% block content %}}
 <div class="page centroid">
-    <h2>Добавление нового радио</h2>
-    <div ng-controller="RadioAddCtrl" class="radio-add">
+    <h2>Добавление радио</h2>
+    <div data-ng-controller="AddCtrl" class="radio-edit">
         <form name="addForm" ng-submit="add()">
             <dl class="control-group">
-                <dt>Название:</dt>
-                <dd><input type="text" class="text" ng-model="radio.title" required="" /></dd>
+                <dt>Название</dt>
+                <dd>
+                    <input class="text" ng-model="form.title" required="" maxlength="" />
+                </dd>
             </dl>
             <dl class="control-group">
-                <dt>Ссылка на плейлист:</dt>
+                <dt>Ссылка для плеера</dt>
                 <dd>
-                    <textarea type="text" class="text" ng-model="radio.playlistUrl" ng-list="/\n/" rows="5"></textarea>
-                    <input type="url" class="text source-url" ng-model="sourceUrl" placeholder="сайт источник" />
-                    <input type="button" class="btn" value="загрузить"
-                           ng-disabled="!sourceUrl || parsingSource" ng-click="parsePlaylistSource()" />
+                    <input type="url" class="text" ng-model="form.source_url" required="" />
                     <div class="help">
-                        в формате pls, m3u и xspf или
+                        плейлист в формате: pls, m3u, txt<br>
+                        или аудиопоток: mp3, aac, aac+
                     </div>
                 </dd>
             </dl>
             <dl class="control-group">
-                <dt>Адрес потока:</dt>
+                <dt>Описание радио</dt>
                 <dd>
-                    <textarea type="text" class="text" ng-model="radio.streamUrl" ng-list="/\n/" rows="5"></textarea>
+                    <textarea class="text" ng-model="form.description" rows="4"></textarea>
                 </dd>
             </dl>
             <dl class="control-group">
-                <dt>Веб-сайт:</dt>
-                <dd><input type="url" class="text" ng-model="radio.website" /></dd>
-            </dl>
-            <dl class="control-group">
-                <dt>Адрес вещания:</dt>
-                <dd>
-                    <input type="text" class="text" ng-model="radio.location" />
-                    <div class="help">например: Россия, Москва</div>
-                </dd>
+                <dt>Веб-сайт</dt>
+                <dd><input type="url" class="text" ng-model="form.website" /></dd>
             </dl>
             <div class="controls">
                 <input type="submit" ng-disabled="addForm.$invalid" class="btn" value="Добавить радио" />
+                <p class="error" data-ng-switch on="error.code" data-ng-show="error">
+                    <span data-ng-switch-default>Ошибка при обработке запроса.</span>
+                </p>
             </div>
         </form>
-        <pre>{{ radio|json }}</pre>
     </div>
 </div>
 {{% endblock %}}
 {{% block scripts %}}
-    <script src="/static/js/radio_admin.js"></script>
+    <script src="/static/js/radio.js"></script>
 {{% endblock %}}

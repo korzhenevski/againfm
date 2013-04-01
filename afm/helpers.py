@@ -40,8 +40,13 @@ def safe_input_object(schema, **kwargs):
         else:
             props[k] = v
     obj = safe_input({'type': 'object', 'properties': props}, **kwargs)
-    # фильтруем все поля не описанные в схеме
-    return dict([(k, v) for k, v in obj.iteritems() if k in props])
+    res = {}
+    for name, val in obj.iteritems():
+        # оставлем только описанные в схеме
+        if name in props:
+            # строки принудительно приводим в юникод
+            res[name] = unicode(val) if props[name]['type'] == 'string' else val
+    return res
 
 def safe_input(schema, data=None, **kwargs):
     data = data or request.json or request.form.to_dict()
