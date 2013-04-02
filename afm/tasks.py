@@ -35,19 +35,7 @@ def update_playlist(playlist_id):
         }})
 
         # добавление потоков
-        for stream_url in result.urls:
-            stream = db.Stream()
-            stream.update({
-                'url': stream_url,
-                'playlist_id': playlist['id'],
-                'radio_id': playlist['radio_id'],
-            })
-
-            try:
-                stream.save()
-            except pymongo.errors.DuplicateKeyError:
-                # игнорируем, если поток уде был добавлен из другого плейлиста
-                pass
+        db.Stream.bulk_add(playlist['radio_id'], result.urls, playlist_id=playlist['id'])
 
 @celery.task(ignore_result=True)
 def check_stream(stream_id):

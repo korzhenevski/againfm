@@ -48,7 +48,10 @@ def normalize_url(url, path=None):
     try:
         if path:
             url = urljoin(url, path)
-        return urlnorm.norm(url)
+        url = urlnorm.norm(url)
+        # force HTTP protocol
+        if url.startswith('http'):
+            return url
     except urlnorm.InvalidUrl:
         pass
 

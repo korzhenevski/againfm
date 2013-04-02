@@ -13,15 +13,40 @@ afm.factory('passErrorToScope', function(){
     };
 });
 
+afm.controller('AddCheckCtrl', function($scope){
+    $scope.form = {};
+    $scope.anySource = function() {
+        var form = $scope.form;
+        return form.file || form.url || form.text;
+    };
+});
+
 afm.controller('AddCtrl', function($scope, $http, $window, passErrorToScope){
+    $scope.canSave = function() {
+        var hasStreams = false;
+        angular.forEach($scope.form.streams, function(stream){
+            if (stream.use) {
+                hasStreams = true;
+            }
+        });
+        return hasStreams && $scope.addForm.$valid && !$scope.error;
+    };
+
     $scope.$watch('form', function(){
         $scope.error = null;
-    }, true);
+    });
 
-    $scope.add = function() {
-        $http.post('/radio/add', $scope.form).success(function(res){
-            if (res.location) {
-                $window.location = res.location;
+    $scope.save = function() {
+        var data = angular.copy($scope.form);
+        var streams = [];
+        angular.forEach(data.streams, function(stream){
+            streams.push(stream.url);
+        });
+        data.streams = streams;
+        console.log(data);
+        $http.post('/radio/add/save', data).success(function(resp){
+            if (resp.location) {
+                $window.location = resp.location;
             }
         }).error(passErrorToScope($scope));
     };
@@ -76,4 +101,73 @@ afm.controller('EditStreamsCtrl', function($scope, $http){
 
 afm.controller('EditPlaylistsCtrl', function($scope, $http){
 
+});
+
+afm.directive('tabs', function() {
+    return {
+        restrict: 'C',
+        transclude: true,
+        scope: {},
+        controller: function($scope) {
+            var panes = $scope.panes = [];
+
+            $scope.select = function(pane) {
+                angular.forEach(panes, function(pane) {
+                    pane.selected = false;
+                });
+                pane.selected = true;
+            };
+
+            this.addPane = function(pane) {
+                if (panes.length == 0) {
+                    $scope.select(pane);
+                }
+                panes.push(pane);
+            };
+        },
+        template:
+            '<div class="tabbable">' +
+                '<ul class="inline nav">' +
+                '<li ng-repeat="pane in panes" ng-class="{active:pane.selected}">'+
+                '<a href="" ng-click="select(pane)">{{pane.title}}</a>' +
+                '</li>' +
+                '</ul>' +
+                '<div class="tab-content" ng-transclude></div>' +
+                '</div>',
+        replace: true
+    };
+});
+
+afm.directive('pane', function() {
+    return {
+        require: '^tabs',
+        restrict: 'C',
+        transclude: true,
+        scope: {
+            title: '@'
+        },
+        link: function(scope, element, attrs, tabsCtrl) {
+            tabsCtrl.addPane(scope);
+        },
+        template:
+            '<div class="tab-pane" ng-class="{active: selected}" ng-transclude></div>',
+        replace: true
+    };
+});
+
+
+afm.directive('file', function(){
+    return {
+        scope: {
+            file: '='
+        },
+        link: function(scope, el){
+            el.bind('change', function(event){
+                var files = event.target.files;
+                var file = files[0];
+                scope.file = file ? file.name : undefined;
+                scope.$apply();
+            });
+        }
+    };
 });

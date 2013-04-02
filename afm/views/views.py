@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import requests
 from flask import render_template, request, jsonify, url_for, redirect
 from flask.ext.login import current_user, login_required
 from datetime import datetime
@@ -81,29 +82,86 @@ def radio_admin():
     radio_list = db.Radio.find({'owner_id': current_user['id'], 'deleted_at': 0}).sort([('created_at', -1)])
     return render_template('radio_admin.html', radio_list=radio_list)
 
+def radio_add_check():
+    from afm.radio import parse_playlist, fetch_stream
+    result = dict(playlistUrl='', streams=[])
+    playlist = None
+
+    f = request.files.get('file')
+    url = request.form.get('url', '').strip()
+    text = request.form.get('text', '').strip()
+
+    if f:
+        playlist = f.stream.read()
+    elif url:
+        result['playlistUrl'] = url
+        try:
+            response = requests.get(url, timeout=2)
+            playlist = response.text
+        except:
+            # TODO: add error handling
+            pass
+    elif text:
+        playlist = text
+
+    streams = parse_playlist(playlist)
+    result['streams'] = [dict(url=stream, id=stream_id, use=True) for stream_id, stream in enumerate(streams, start=1)]
+
+    if streams:
+        meta = fetch_stream(streams[0], timeout=2, as_player=True).meta
+        result.update({
+            'title': meta.get('name', ''),
+            'website': meta.get('url', ''),
+            'description': meta.get('description', '')
+        })
+
+    return result
+
 @app.route('/radio/add', methods=['POST', 'GET'])
 @login_required
 def radio_add():
-    if request.method == 'POST':
-        form = safe_input_object({
-            'title': {'type': 'string', 'maxLength': 64},
-            'description': {'type': 'string', 'maxLength': 1024},
-            'source_url': {'type': 'string', 'maxLength': 1024},
-            'website': {'type': 'string'},
-        })
+    if request.method == 'POST' and request.form.get('action') == 'check':
+        result = radio_add_check()
+        if not result['streams']:
+            return render_template('radio_add_check.html', error='no_streams')
+        return render_template('radio_add.html', check_result=result)
 
-        radio = db.Radio()
-        radio.update(form)
-        radio['owner_id'] = current_user['id']
-        radio.save()
+    return render_template('radio_add_check.html')
 
-        return jsonify({
-            'radio': radio.get_public(),
-            'location': url_for('radio_admin')
-        })
+@app.route('/radio/add/save', methods=['POST'])
+@login_required
+def radio_add_save():
+    from afm.radio import normalize_url
+    form = safe_input_object({
+        'title': dict(type='string', minLength=1, maxLength=512),
+        'description': {'type': 'string', 'blank': True, 'maxLength': 512},
+        'website': {'type': 'string', 'blank': True, 'maxLength': 512},
+        'playlistUrl': {'type': 'string', 'blank': True, 'required': False},
+        'streams': {'type': 'array', 'items': {'type': 'string'}, 'minLength': 1},
+    })
 
-    return render_template('radio_add.html')
+    streams = form.pop('streams', [])
+    streams = filter(None, map(normalize_url, streams))
 
+    playlist_url = normalize_url(form.pop('playlistUrl', ''))
+
+    radio = db.Radio()
+    radio.update(form)
+    radio['owner_id'] = current_user.id
+    radio.save()
+
+    playlist_id = 0
+    if playlist_url:
+        playlist = db.Playlist()
+        playlist['url'] = playlist_url
+        playlist['radio_id'] = radio.id
+        playlist['streams'] = streams
+        playlist.save()
+        playlist_id = playlist['id']
+
+    db.Stream.bulk_add(radio['id'], streams, playlist_id=playlist_id)
+
+    return jsonify({'location': url_for('radio_page', radio_id=radio.id)})
 
 @app.route('/')
 def index():

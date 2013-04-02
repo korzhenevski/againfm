@@ -12,6 +12,7 @@ except ImportError:
 from hashlib import md5
 from random import choice
 from datetime import datetime
+import pymongo.errors
 
 def md5hash(data):
     hashed = md5()
@@ -518,6 +519,23 @@ class Stream(BaseDocument):
             'listen_url': self.listen_url,
             'content_type': self['content_type']
         }
+
+    @classmethod
+    def bulk_add(cls, radio_id, urls, playlist_id=0):
+        # добавление потоков
+        for stream_url in urls:
+            stream = db.Stream()
+            stream.update({
+                'url': stream_url,
+                'playlist_id': playlist_id,
+                'radio_id': radio_id,
+            })
+
+            try:
+                stream.save()
+            except pymongo.errors.DuplicateKeyError:
+                # игнорируем, если поток уде был добавлен из другого плейлиста
+                pass
 
 
 @db.register

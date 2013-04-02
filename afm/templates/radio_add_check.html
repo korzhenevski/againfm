@@ -1,0 +1,47 @@
+{{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
+{{% block title %}}
+    Добавление радиостанции
+{{% endblock %}}
+{{% block content %}}
+<div class="page centroid">
+    <h2>Добавление радиостанции</h2>
+    <!--p><strong>Проверка адреса</strong> &rarr; <span class="text-muted">Заполнение информации</span></p-->
+    <div data-ng-controller="AddCheckCtrl" class="radio-edit">
+        <form name="addForm" method="POST" action="{{{ url_for('radio_add') }}}" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="check" />
+            <dl class="control-group">
+                <dt class="valign-top">Поток для плеера</dt>
+                <dd>
+                    <div class="tabs">
+                        <div class="pane" title="из файла">
+                            {# TODO: AJAX загрузка файла #}
+                            <input type="file" name="file" tabindex="11" data-file="form.file"
+                                   accept="audio/x-scpls,audio/x-mpegurl,application/pls+xml" />
+                            <div class="help">плейлист .pls, .m3u</div>
+                        </div>
+                        <div class="pane" title="по ссылке">
+                            <input class="text" name="url" tabindex="11" ng-model="form.url"
+                                   placeholder="http://example.com/playlist.pls" />
+                            <div class="help">плейлист .pls, .m3u</div>
+                        </div>
+                        <div class="pane" title="по тексту">
+                            <textarea class="text" name="text" tabindex="11" rows="5" ng-model="form.text"
+                                      placeholder="http://example.com:9000/stream1"></textarea>
+                            <div class="help">можно несколько. по одному на новой строке</div>
+                        </div>
+                    </div>
+                    {{% if error == 'no_streams' %}}
+                    <p class="text-error">Плейлист не поддерживается или нет доступных потоков.</p>
+                    {{% endif %}}
+                </dd>
+            </dl>
+            <div class="controls">
+                <input type="submit" ng-disabled="!anySource()" class="btn btn-green" value="Добавить" />
+            </div>
+        </form>
+    </div>
+</div>
+{{% endblock %}}
+{{% block scripts %}}
+    <script src="/static/js/radio.js"></script>
+{{% endblock %}}

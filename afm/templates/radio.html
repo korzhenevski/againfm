@@ -4,12 +4,11 @@
     <div class="page centroid">
         <div class="content">
             <h1>Радиостанции</h1>
-            <p><a href="{{{ url_for('radio_admin') }}}">Мое Радио</a></p>
-            <p><a href="{{{ url_for('radio_add') }}}">Предложить Радио</a></p>
-            <!--ul class="inline tabs">
-                <li class="active">каталог</li>
-                <li><a href="/radio/my/">мое</a></li>
-            </ul-->
+            {{% if current_user.is_authenticated() %}}
+            <p><a href="{{{ url_for('radio_admin') }}}">Управление</a></p>
+            <p><a href="{{{ url_for('radio_add') }}}">Добавить Радио</a></p>
+            {{% endif %}}
+
             <table class="radio-list">
                 {{% for radio in radio_list.limit(10) %}}
                 <tr>
@@ -22,6 +21,7 @@
                 </tr>
                 {{% endfor %}}
             </table>
+
         </div>
         <div class="sidebar">
             <ul>

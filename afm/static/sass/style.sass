@@ -19,6 +19,48 @@ $use-mozilla-ellipsis-binding: true
 .ellipsis
   @include ellipsis
 
+body
+  font-family: Arial, sans-serif
+  font-size: 14px
+  line-height: 20px
+  color: #efefef
+  background-color: #453745
+  background: url('/static/i/background.jpg')
+  min-width: 1200px
+  min-height: 800px
+  +background-size(cover)
+
+a
+  color: #f3f3f3
+  text-decoration: none
+  border-bottom: 1px solid #a49ca3
+  &:hover
+    color: #f3f3f3
+
+ul.simple
+  list-style-type: none
+  margin: 0
+  padding: 0
+
+ul.inline
+  list-style-type: none
+  margin: 0
+  padding: 0
+  li
+    float: left
+
+ul.justified
+  margin: 0
+  padding: 0
+  list-style-type: none
+  text-align: justify
+  li
+    text-align: left
+    display: inline
+  .block
+    display: inline-block
+
+
 @mixin placeholder-color($color)
   &.placeholder
     color: $color
@@ -739,6 +781,9 @@ $use-mozilla-ellipsis-binding: true
   .text-muted
     color: #cccccf
 
+  .text-error
+    color: #ff6f7d
+
   label
     cursor: pointer
 
@@ -786,7 +831,7 @@ $use-mozilla-ellipsis-binding: true
 
 input[disabled], button[disabled]
   cursor: normal
-  +opacity(0.5)
+  +opacity(0.4)
 
 input.text, textarea.text
   color: #7b7c87
@@ -842,58 +887,13 @@ input.text, textarea.text
     &:hover
       color: #f3f3f3
 
-body
-  background-color: #453745
-  font-size: 14px
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important
-  color: #efefef
-  background: url('/static/i/background.jpg')
-  text-rendering: optimizeLegibility
-  +background-size(cover)
-  min-width: 1200px
-  min-height: 800px
 
-a
-  color: #f3f3f3
-  text-decoration: none
-  border-bottom: 1px solid #a49ca3
-  &:hover
-    color: #f3f3f3
-
-ul.inline
-  list-style-type: none
-  margin: 0
-  padding: 0
-  li
-    float: left
-
-ul.justified
-  margin: 0
-  padding: 0
-  list-style-type: none
-  text-align: justify
-  li
-    text-align: left
-    display: inline
-  .block
-    display: inline-block
 
 #vk-like
   display: inline-block
   margin-right: -20px
 
-
-ul.tabs
-  li
-    padding: 7px 9px
-    +border-radius(3px)
-    margin-right: 4px
-  .active
-    +text-shadow(0px 1px 3px #000)
-    background-color: #3f404f
-
-
-$control-group-width: 150px
+$control-group-width: 120px
 .control-group
   dt
     width: $control-group-width
@@ -901,31 +901,52 @@ $control-group-width: 150px
     clear: left
     overflow: hidden
     text-align: right
-    padding-top: 8px
+    padding-top: 7px
     color: #aaa
   dd
     margin-left: $control-group-width + 10
   .help
-    color: #90919e
-    padding-left: 10px
+    color: #aaa
     margin-top: 0.3em
 
+
+.tabbable
+  overflow: hidden
+  .pane
+    display: none
+    float: left
+    overflow: hidden
+
+  .nav
+    li
+      margin-right: 1em
+    a
+      border-bottom: 1px dotted #a49ca3
+    .active a
+      border: none
+
+  .pane.active
+    display: block
+
 .radio-edit
-  width: 430px
+  width: 550px
+  margin-top: 2em
 
   .text
+    width: 70%
+
+  .pane
     width: 100%
+    margin: 1em 0
 
-  .title
-    width: 80%
-
-  .source-url
-    margin-right: 7px
-    width: 65%
-    float: left
+  .valign-top
+    padding: 0
 
   .controls
     margin-left: $control-group-width + 10
+
+  .text-error
+    margin-top: 0
 
 .radio-admin-table
   width: 60%
@@ -934,6 +955,7 @@ $control-group-width: 150px
   .controls
     text-align: right
     width: 100px
+
 
 .genres-edit
   margin: 10px 0

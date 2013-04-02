@@ -45,7 +45,7 @@ def safe_input_object(schema, **kwargs):
         # оставлем только описанные в схеме
         if name in props:
             # строки принудительно приводим в юникод
-            res[name] = unicode(val) if props[name]['type'] == 'string' else val
+            res[name] = unicode(val) if props[name].get('type') == 'string' else val
     return res
 
 def safe_input(schema, data=None, **kwargs):

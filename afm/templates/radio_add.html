@@ -1,43 +1,53 @@
 {{% if not standalone %}} {{% extends "layout.html" %}} {{% endif %}}
 {{% block title %}}
-    Добавить радио
+    Добавление радиостанции
 {{% endblock %}}
 {{% block content %}}
 <div class="page centroid">
-    <h2>Добавление радио</h2>
-    <div data-ng-controller="AddCtrl" class="radio-edit">
-        <form name="addForm" ng-submit="add()">
+    <h2>Добавление радиостанции</h2>
+    <div ng-controller="AddCtrl" class="radio-edit radio-edit-review">
+        <form name="addForm" ng-init='form={{{ check_result|json }}}' ng-submit="save()">
             <dl class="control-group">
                 <dt>Название</dt>
                 <dd>
-                    <input class="text" ng-model="form.title" required="" maxlength="" />
+                    <input class="text" ng-model="form.title" required="" />
                 </dd>
             </dl>
             <dl class="control-group">
-                <dt>Ссылка для плеера</dt>
+                <dt>Описание</dt>
                 <dd>
-                    <input type="url" class="text" ng-model="form.source_url" required="" />
-                    <div class="help">
-                        плейлист в формате: pls, m3u, txt<br>
-                        или аудиопоток: mp3, aac, aac+
-                    </div>
-                </dd>
-            </dl>
-            <dl class="control-group">
-                <dt>Описание радио</dt>
-                <dd>
-                    <textarea class="text" ng-model="form.description" rows="4"></textarea>
+                    <input class="text" ng-model="form.description" rows="5" />
                 </dd>
             </dl>
             <dl class="control-group">
                 <dt>Веб-сайт</dt>
-                <dd><input type="url" class="text" ng-model="form.website" /></dd>
+                <dd>
+                    <input class="text" ng-model="form.website" />
+                </dd>
+            </dl>
+            <dl class="control-group" ng-show="form.playlistUrl">
+                <dt class="valign-top">Плейлист</dt>
+                <dd>
+                    {{ form.playlistUrl }}
+                </dd>
+            </dl>
+            <dl class="control-group">
+                <dt class="valign-top">Поток</dt>
+                <dd>
+                    <ul class="simple">
+                        <li ng-repeat="stream in form.streams">
+                            <input type="checkbox" id="stream_{{ stream.id }}" ng-model="stream.use" />
+                            <label for="stream_{{ stream.id }}">{{ stream.url }}</label>
+                        </li>
+                    </ul>
+                </dd>
             </dl>
             <div class="controls">
-                <input type="submit" ng-disabled="addForm.$invalid" class="btn" value="Добавить радио" />
-                <p class="error" data-ng-switch on="error.code" data-ng-show="error">
-                    <span data-ng-switch-default>Ошибка при обработке запроса.</span>
+                <p class="error" ng-switch on="error.code" ng-show="error">
+                    <span ng-switch-when="400">Некорректные данные.</span>
+                    <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
                 </p>
+                <input type="submit" class="btn btn-green" ng-disabled="!canSave()" value="Сохранить" />
             </div>
         </form>
     </div>
