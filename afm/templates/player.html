@@ -70,6 +70,8 @@
             <div class="content">
                 <table class="radio-box" data-ng-controller="RadioCtrl">
                     <tr valign="top">
+
+                        <!-- Минидисплей -->
                         <td data-ng-controller="DisplayCtrl" width="312px">
                             <div class="display-ground">
                                 <div class="display-inner">
@@ -95,13 +97,18 @@
                                 </div>
                             </div>
                         </td>
+
+                        <!-- Шкала -->
                         <td rowspan="3">
                             <div class="radio-table">
-                                <div class="table-inner" data-ng-controller="PlaylistCtrl">
-                                    <div class="search">
-                                        <input placeholder="поиск радио" type="search" class="search-field" data-ng-model="searchQuery" />
+                                <div class="table-inner" data-ng-controller="PlaylistCtrl" ng-init="selectTab('featured')">
+                                    <div class="group">
+                                        <div class="search">
+                                            <input type="search" placeholder="поиск радио" class="search-field" data-ng-model="searchQuery" />
+                                        </div>
+                                        <div class="loader"></div>
                                     </div>
-                                    <ul class="tabs justified" data-ng-init="selectTab('featured')">
+                                    <ul class="tabs justified">
                                         <li>
                                             <span class="block" data-ng-class="tabClass('featured')" data-ng-click="selectTab('featured')">Подборка</span>
                                         </li>
@@ -113,11 +120,12 @@
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
-                                            <li data-ng-repeat="station in getList()">
+                                            <li data-ng-repeat="station in playlist">
                                                 <div class="block station-link" data-ng-class="itemClass(station, currentStation())" data-ng-click="selectStation(station)">
                                                     <span class="link">{{ station.title }}</span>
                                                 </div>
                                             </li>
+                                            <li ng-hide="hasList()" class="ng-cloak not-found">Ничего не найдено</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -125,6 +133,8 @@
                         </td>
                     </tr>
                     <tr>
+
+                        <!-- Контролы управления -->
                         <td align="center">
                             <table class="controls" width="80%">
                                 <tr align="center">
@@ -157,6 +167,8 @@
                         </td>
                     </tr>
                     <tr>
+
+                        <!-- Мое избранное -->
                         <td class="favorites-cell"><div class="favorites" data-ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">

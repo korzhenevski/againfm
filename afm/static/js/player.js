@@ -4,7 +4,6 @@
  * логин через вконтакте
  * баг с ховером отмены удаления трека
  * Прокидывание в регистрацию избранного и треклиста
- * Проигрывание через флеш
  * PIE для IE
  */
 
@@ -636,13 +635,28 @@ afm.factory('Playlist', ['$http', function($http){
     };
 }]);
 
+// ajax loader
+afm.directive('loader', function(){
+    return {
+        restrict: 'C',
+        templateUrl: '/loader.html',
+        link: function($scope, element) {
+            $scope.$on('loading', function(){
+                element.css('display', 'block');
+            });
+            $scope.$on('loaded', function(){
+                element.css('display', 'none');
+            });
+        }
+    };
+});
+
 /**
  * Контролер плейлиста
  */
-afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', function($scope, $http, radio, bootstrapGenres){
+afm.controller('PlaylistCtrl', function($scope, $http, radio, bootstrapGenres, $timeout){
     $scope.searchQuery = '';
     $scope.tabs = [];
-    $scope.currentTab = null;
     $scope.playlist = [];
 
     angular.forEach(bootstrapGenres, function(genre){
@@ -652,33 +666,57 @@ afm.controller('PlaylistCtrl', ['$scope', '$http', 'radio', 'bootstrapGenres', f
         });
     });
 
-    $scope.$watch('searchQuery', function(searchQuery) {
-        if (!searchQuery) {
-            return;
-        }
-        $http.get('/api/radio/search/' + searchQuery).success(function(resp){
-            $scope.playlist = resp.objects;
-        });
-    });
-
-    $scope.getList = function() {
+    $scope.hasList = function() {
         return $scope.playlist;
     };
 
+    $scope.search = function(searchQuery) {
+        if (searchQuery) {
+            if (!$scope.prevTab) {
+                $scope.prevTab = $scope.currentTab;
+            }
+            $scope.selectTab('search/' + searchQuery);
+        } else if ($scope.prevTab) {
+            $scope.selectTab($scope.prevTab);
+        }
+    };
+
+    // throttle search on 0.2 sec
+    var searchThrottle;
+    $scope.$watch('searchQuery', function(searchQuery) {
+        if (searchThrottle) {
+            $timeout.cancel(searchThrottle);
+        }
+
+        searchThrottle = $timeout(function(){
+            $scope.search(searchQuery);
+        }, 200);
+    });
+
     $scope.selectTab = function(tabId) {
-        $scope.playlist = [];
+        // если при поиске выбираем категорию, поиск сбрасывается
+        if (tabId.indexOf('search/') == -1 && $scope.searchQuery) {
+            $scope.searchQuery = '';
+            $scope.prevTab = null;
+        }
+
         $scope.currentTab = tabId;
 
+        $scope.$broadcast('loading');
         $http.get('/api/radio/' + tabId).success(function(response){
             $scope.playlist = response.objects;
+            $scope.$broadcast('loaded');
+        }).error(function(){
+            $scope.playlist = [];
+            $scope.$broadcast('loaded');
         });
     };
 
     $scope.tabClass = function(tabId) {
-        var selected = (tabId == $scope.currentTab) && !$scope.searchQuery;
+        var selected = (tabId == $scope.currentTab);
         return {selected: selected};
     };
-}]);
+});
 
 afm.factory('radio', ['$rootScope', '$window', function($rootScope, $window){
     var currentStation = null;
@@ -916,8 +954,7 @@ afm.controller('DisplayCtrl', ['$rootScope', '$scope', 'radio', 'currentUser', '
     };
 }]);
 
-afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack',
-    function($rootScope, currentUser, storage, UserTrack) {
+afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
     var STORAGE_ID = 'tracks';
     var tracks = storage.get(STORAGE_ID) || {};
 
@@ -980,10 +1017,9 @@ afm.factory('tracks', ['$rootScope', 'currentUser', 'storage', 'UserTrack',
             return result;
         }
     };
-}]);
+});
 
-afm.controller('TracksCtrl', ['$scope', '$rootScope', '$filter', 'currentUser', 'tracks',
-    function($scope, $rootScope, $filter, currentUser, tracks){
+afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
     $scope.tracks = [];
     $scope.searchQuery = '';
 
@@ -1032,14 +1068,14 @@ afm.controller('TracksCtrl', ['$scope', '$rootScope', '$filter', 'currentUser', 
         delete track.removed;
         tracks.restore(track);
     };
-}]);
+});
 
-afm.controller('MenuCtrl', ['$scope', '$rootScope', function($scope, $rootScope){
+afm.controller('MenuCtrl', function($scope, $rootScope){
     $scope.toggleTracks = function($event) {
         $rootScope.$broadcast('tracks.toggle');
         $event.stopPropagation();
     };
-}]);
+});
 
 afm.controller('MyRadioCtrl', function($scope, $http){
     $scope.radioList = [];

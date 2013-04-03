@@ -13,6 +13,8 @@
     {{% assets "styles" %}}
     <link href="{{{ ASSET_URL }}}" rel="stylesheet"/>
     {{% endassets %}}
+    <link href="/static/css/loader.css" rel="stylesheet"/>
+
 
     {{% if not config.DEBUG %}}
     {{% include 'extras/qbaka.html' %}}
@@ -21,6 +23,18 @@
     {{% block head %}}{{% endblock %}}
 </head>
 <body>
+<script type="text/ng-template" id="/loader.html">
+    <div id="floatingBarsG">
+        <div class="blockG" id="rotateG_01"></div>
+        <div class="blockG" id="rotateG_02"></div>
+        <div class="blockG" id="rotateG_03"></div>
+        <div class="blockG" id="rotateG_04"></div>
+        <div class="blockG" id="rotateG_05"></div>
+        <div class="blockG" id="rotateG_06"></div>
+        <div class="blockG" id="rotateG_07"></div>
+        <div class="blockG" id="rotateG_08"></div>
+    </div>
+</script>
     {{% block top_content %}}{{% endblock %}}
 
     <table class="roof">
@@ -145,5 +159,6 @@ afm.value('cometUrl', {{{ config.COMET_URL|json }}});
         </p>
     </modal>
 </script>
+
 </body>
 </html>
