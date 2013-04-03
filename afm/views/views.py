@@ -79,7 +79,7 @@ def api_radio_genres_edit():
 @app.route('/radio/admin/')
 @login_required
 def radio_admin():
-    radio_list = db.Radio.find({'owner_id': current_user['id'], 'deleted_at': 0}).sort([('created_at', -1)])
+    radio_list = db.Radio.find_public({'owner_id': current_user['id']}).sort([('created_at', -1)])
     return render_template('radio_admin.html', radio_list=radio_list)
 
 def radio_add_check():

@@ -3,7 +3,7 @@
 
 import time
 import string
-from . import app, db
+from . import app, db, search
 
 try:
     from flask.ext.mongokit import Document
@@ -26,6 +26,7 @@ def comma_fields(fields_str):
     fields = fields_str.split(',')
     fields = map(string.strip, fields)
     return fields
+
 
 class BaseDocument(Document):
     use_dot_notation = True
@@ -66,6 +67,14 @@ class BaseDocument(Document):
         fields = set(fields) & set(self.structure.keys())
         return dict((field, self.get(field)) for field in fields)
 
+    def find_public(self, where=None, **kwargs):
+        if where is None:
+            where = {}
+        where['deleted_at'] = 0
+        return self.find(where, **kwargs)
+
+    def as_dict(self):
+        return dict((name, self.get(name)) for name, val in self.structure.iteritems())
 
 class UserFavoritesCache(object):
     def __init__(self, user_id, redis=None):
@@ -440,6 +449,8 @@ class Radio(BaseDocument):
     def get_playlists(self):
         return list(playlist.get_public() for playlist in db.Playlist.find({'radio_id': self['id'], 'deleted_at': 0}))
 
+    def push_to_search(self):
+        return search.index(self.as_dict(), 'radio', self.id)
 
 @db.register
 class Playlist(BaseDocument):

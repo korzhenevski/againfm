@@ -132,40 +132,11 @@ def sitemap():
 
 
 @manager.command
-def feed_search():
-    import requests
-    import ujson as json
-    #feed_url = 'http://localhost:9200/afm/radio/{}'
-    #for radio in db.Radio.find():
-    #    print requests.post(feed_url.format(radio['id']), data=json.dumps(radio.get_public()))
-    """
-    analyzer = {'autocomplete': {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": ["standard", "lowercase", "stop", "kstem", "ngram"]
-    }}
-    resp = requests.put('http://localhost:9200/afm/radio/_settings', data=json.dumps({'analysis': {'analyzer': analyzer}}))
-    """
-    mapping = {
-        "title": {
-            "type": "multi_field",
-            "fields": {
-                "title": {
-                    "type": "string"
-                },
-                "autocomplete": {
-                    "analyzer": "autocomplete",
-                    "type": "string"
-                }
-            }
-        },
-    }
-    resp = requests.put('http://localhost:9200/afm/radio/_mapping', data=json.dumps({
-        'radio': {'properties': mapping}
-    }))
-
-    print resp
-    print resp.json()
+def update_search():
+    from afm import search
+    #for radio in db.Radio.find_public():
+    #    print radio.push_to_search()
+    print search.refresh()
 
 if __name__ == "__main__":
     manager.run()

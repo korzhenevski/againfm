@@ -7,6 +7,7 @@ from flask.ext.login import LoginManager
 from flask.ext.mongokit import MongoKit
 from redis import Redis
 from .mailer import AmazonMailer
+from .search import Search
 from afm.assets import assets
 
 app = Flask(__name__)
@@ -24,6 +25,7 @@ app.jinja_env.block_start_string = '{{%'
 app.jinja_env.block_end_string = '%}}'
 
 db = MongoKit(app)
+search = Search()
 redis = Redis(**app.config['REDIS'])
 mailer = AmazonMailer(app)
 

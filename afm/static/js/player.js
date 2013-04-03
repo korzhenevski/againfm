@@ -675,7 +675,7 @@ afm.controller('PlaylistCtrl', function($scope, $http, radio, bootstrapGenres, $
             if (!$scope.prevTab) {
                 $scope.prevTab = $scope.currentTab;
             }
-            $scope.selectTab('search/' + searchQuery);
+            $scope.selectTab('search?q=' + searchQuery);
         } else if ($scope.prevTab) {
             $scope.selectTab($scope.prevTab);
         }
@@ -695,7 +695,7 @@ afm.controller('PlaylistCtrl', function($scope, $http, radio, bootstrapGenres, $
 
     $scope.selectTab = function(tabId) {
         // если при поиске выбираем категорию, поиск сбрасывается
-        if (tabId.indexOf('search/') == -1 && $scope.searchQuery) {
+        if (tabId.indexOf('search') == -1 && $scope.searchQuery) {
             $scope.searchQuery = '';
             $scope.prevTab = null;
         }

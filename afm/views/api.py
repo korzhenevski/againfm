@@ -18,13 +18,12 @@ def radio_search():
 
 @app.route('/api/radio/featured')
 def radio_featured():
-    where = {'is_public': True, 'deleted_at': 0}
-    objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
+    objects = [radio.get_public() for radio in db.Radio.find_public({'is_public': True}).limit(30)]
     return jsonify({'objects': objects})
 
 @app.route('/api/radio/genre/<int:genre_id>')
 def radio_by_genre(genre_id):
-    where = {'is_public': True, 'deleted_at': 0, 'genres': genre_id}
+    where = {'is_public': True, 'genres': genre_id}
     objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
 
