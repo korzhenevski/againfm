@@ -44,13 +44,19 @@ def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('radio_page.html', radio=radio)
 
-@app.route('/radio/<int:radio_id>/edit')
+@app.route('/radio/<int:radio_id>/edit', methods=['GET','POST'])
 @login_required
 def radio_edit(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
-    # проверка прав редактирования
+    # проверка права редактирования
     if not (radio['owner_id'] == current_user['id'] or current_user.is_admin()):
         return redirect(url_for('radio_page', radio_id=radio_id))
+    if request.method == 'POST':
+        data = safe_input_object(db.Radio.get_json_schema())
+        print data
+        radio.update(data)
+        radio.save()
+        return jsonify({'ok': True})
     return render_template('radio_edit.html', radio=radio)
 
 @app.route('/radio/genres/')
@@ -132,13 +138,23 @@ def radio_add():
 @login_required
 def radio_add_save():
     from afm.radio import normalize_url
-    form = safe_input_object({
-        'title': dict(type='string', minLength=1, maxLength=512),
-        'description': {'type': 'string', 'blank': True, 'maxLength': 512},
-        'website': {'type': 'string', 'blank': True, 'maxLength': 512},
-        'playlistUrl': {'type': 'string', 'blank': True, 'required': False},
-        'streams': {'type': 'array', 'items': {'type': 'string'}, 'minLength': 1},
-    })
+    schema = {
+        'playlistUrl': {
+            'type': 'string',
+            'blank': True,
+            'required': False
+        },
+        'streams': {
+            'type': 'array',
+            'items': {'type': 'string'},
+            'minLength': 1
+        },
+    }
+    schema.update(db.Radio.get_json_schema())
+
+    from pprint import pprint
+    pprint(schema)
+    form = safe_input_object(schema)
 
     streams = form.pop('streams', [])
     streams = filter(None, map(normalize_url, streams))
@@ -161,7 +177,7 @@ def radio_add_save():
 
     db.Stream.bulk_add(radio['id'], streams, playlist_id=playlist_id)
 
-    return jsonify({'location': url_for('radio_page', radio_id=radio.id)})
+    return jsonify({'location': url_for('radio_admin')})
 
 @app.route('/')
 def index():

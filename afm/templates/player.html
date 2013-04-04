@@ -72,27 +72,16 @@
                     <tr valign="top">
 
                         <!-- Минидисплей -->
-                        <td data-ng-controller="DisplayCtrl" width="312px">
+                        <td width="312px">
                             <div class="display-ground">
                                 <div class="display-inner">
-                                    <div class="display">
-                                        <h1 class="clock" clock="currentStation()"></h1>
-                                        <div class="station" data-ng-show="currentStation()">
-                                            <h1 class="station-title ellipsis" title="{{ currentStation().title }}">{{ currentStation().title }}</h1>
-                                            <button class="fave" data-ng-class="{selected: isStationFaved()}" data-ng-click="faveStation()"></button>
-                                        </div>
-                                        <!--div class="controls">
-                                            <button class="button">История эфира</button>
-                                            <button class="button">О станции</button>
-                                            <button class="button">Ссылка</button>
-                                        </div-->
-                                        <div class="track" data-ng-show="hasTrack()">
-                                            <button class="like" data-ng-class="{selected: isTrackFaved()}" data-ng-click="faveTrack()"></button>
-                                            <h2 class="track-title ellipsis" title="{{ track.title }}">
-                                                <span data-ng-show="track.artist"><strong>{{ track.artist }}</strong> &mdash; {{ track.name }}</span>
-                                                <span data-ng-hide="track.artist">{{ track.title }}</span>
-                                            </h2>
-                                        </div>
+                                    <div class="display" data-ng-controller="DisplayCtrl">
+                                        <p class="title" ng-class="{starred: starred()}" ng-click="star()">
+                                            <span class="marquee marquee-text-overflow">
+                                                <span class="marquee-scroll">{{ title }}</span>
+                                            </span>
+                                            <span class="star"></span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -108,6 +97,8 @@
                                         </div>
                                         <div class="loader"></div>
                                     </div>
+
+                                    <!-- навигация -->
                                     <ul class="tabs justified">
                                         <li>
                                             <span class="block" data-ng-class="tabClass('featured')" data-ng-click="selectTab('featured')">Подборка</span>
@@ -117,6 +108,7 @@
                                         </li>
                                     </ul>
 
+                                    <!-- список радиостанций -->
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
@@ -200,4 +192,5 @@
 
 {{% block scripts %}}
     <script src="/static/js/player.js"></script>
+    <script src="/static/js/common/ui-transition.js"></script>
 {{% endblock %}}

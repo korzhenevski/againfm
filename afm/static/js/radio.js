@@ -91,8 +91,16 @@ afm.directive('inlineEdit', function() {
     };
 });
 
-afm.controller('EditCtrl', function($scope){
+afm.controller('EditCtrl', function($scope, $http){
+    $scope.$watch('form', function(){
+        $scope.saved = false;
+    });
 
+    $scope.save = function() {
+        $http.post('/radio/' + $scope.form.id + '/edit', $scope.form).success(function(){
+            $scope.saved = true;
+        });
+    };
 });
 
 afm.controller('EditStreamsCtrl', function($scope, $http){

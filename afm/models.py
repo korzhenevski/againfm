@@ -31,6 +31,7 @@ def comma_fields(fields_str):
 class BaseDocument(Document):
     use_dot_notation = True
     use_autoinc_id = False
+    json_schema = {}
 
     def save(self, *args, **kwargs):
         # автоинкремент числового идентификатора
@@ -75,6 +76,11 @@ class BaseDocument(Document):
 
     def as_dict(self):
         return dict((name, self.get(name)) for name, val in self.structure.iteritems())
+
+    def get_json_schema(self, keys=None):
+        if keys is None:
+            return self.json_schema
+        return dict((key, self.json_schema.get(key)) for key in keys if key in self.json_schema)
 
 class UserFavoritesCache(object):
     def __init__(self, user_id, redis=None):
@@ -390,7 +396,6 @@ class Radio(BaseDocument):
         'title': unicode,
         # короткое URL-имя
         'slug': unicode,
-        'source_url': unicode,
         'description': unicode,
         # страна, город
         'location': unicode,
@@ -412,7 +417,6 @@ class Radio(BaseDocument):
 
     default_values = {
         'slug': u'',
-        'source_url': u'',
         'description': u'',
         'location': u'',
         'website': u'',
@@ -427,7 +431,32 @@ class Radio(BaseDocument):
         }
     }
 
-    public = ['id', 'title', 'description']
+    json_schema = {
+        'title': {
+            'type': 'string',
+            'maxLength': 256,
+        },
+        'description': {
+            'type': 'string',
+            'blank': True,
+            'required': False,
+            'maxLength': 512,
+        },
+        'website': {
+            'type': 'string',
+            'blank': True,
+            'required': False,
+            'maxLength': 512,
+        },
+        'location': {
+            'type': 'string',
+            'blank': True,
+            'required': False,
+            'maxLength': 64,
+        },
+    }
+
+    public = ['id', 'title', 'description', 'location']
 
     def get_related(self, limit=5):
         from random import shuffle

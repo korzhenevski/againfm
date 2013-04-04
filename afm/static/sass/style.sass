@@ -20,7 +20,7 @@ $use-mozilla-ellipsis-binding: true
   @include ellipsis
 
 body
-  font-family: Arial, sans-serif
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
   font-size: 14px
   line-height: 20px
   color: #efefef
@@ -351,6 +351,17 @@ ul.justified
     margin: 0 -30px
     padding: 0 30px
 
+.marquee
+  overflow: hidden
+  display: block
+
+  .marquee-scroll
+    white-space: nowrap
+    +transition(margin-left, 1s, linear)
+
+.marquee-text-overflow
+  text-overflow: ellipsis
+
 .radio-box
   width: 100%
 
@@ -367,99 +378,35 @@ ul.justified
 
   .display
     padding: 20px
+    color: #2e403f
     min-height: 88px
     position: relative
     +box-shadow(#526464 0 0 3px 2px inset)
-    +background(linear-gradient(rgba(#fff, 0.6), rgba(white, 0)))
+    +background(linear-gradient(rgba(#fff, 0.6), rgba(#fff, 0)))
 
-    .fave
+    .title
+      margin: 0
+      font-size: 19px
+      line-height: 26px
+      position: relative
+      cursor: pointer
+      &:hover .star
+        @include display-controls-sprite(star_hover)
+
+      .marquee
+        width: 245px
+
+    .title.starred
+      .star
+        @include display-controls-sprite(star_hover)
+
+    .star
       position: absolute
       top: 0px
       right: -5px
-      border: none
       width: 27px
       height: 27px
-      +opacity(0.7)
-      $disable-magic-sprite-selectors: true
       @include display-controls-sprite(star)
-      &:hover
-        +opacity(0.8)
-        @include display-controls-sprite(star_hover)
-
-    .fave.selected
-      $disable-magic-sprite-selectors: true
-      @include display-controls-sprite(star_hover)
-      &:hover
-        +opacity(1)
-
-    .like
-      top: 0px
-      left: 0px
-      position: absolute
-      width: 17px
-      height: 17px
-      cursor: pointer
-      border: none
-      @include display-controls-sprite(like)
-
-    .like.selected
-      $disable-magic-sprite-selectors: true
-      @include display-controls-sprite(like_hover)
-
-    .button
-      color: #358c9d
-      border: 2px solid #39a1b7
-      font-size: 12px
-      padding: 4px 5px
-      +opacity(0.6)
-      +border-radius(2px)
-      &:hover
-        +opacity(0.9)
-
-    h1, h2
-      margin: 0
-      padding: 0
-      color: #2e403f
-      overflow: hidden
-      position: relative
-      font-weight: normal
-      white-space: nowrap
-      margin-bottom: 0.4em
-
-    .track
-      position: relative
-
-    .track-title
-      margin-left: 22px
-      line-height: 1.2em
-      //font-size: 16px
-      font-size: 14px
-
-    .station
-      position: relative
-
-    .clock
-      text-align: center
-      margin: 7% auto
-      font-size: 40px
-      line-height: 1em
-      +opacity(0.4)
-      .dots
-        position: relative
-        top: -0.1em
-
-    .station-title
-      line-height: 1.3em
-      // TODO: 19px looking good
-      font-size: 22px
-      margin-right: 27px
-      //&:after
-        top: 0px
-        right: 0px
-        width: 100px
-        height: 100%
-        content: ""
-        position: absolute
 
   .favorites-cell
     height: 235px
@@ -735,15 +682,10 @@ ul.justified
     overflow: hidden
     min-width: 245px
     font-size: 0
-    &:after
-      content: ''
-      width: 100%
-      display: inline-block
 
     li
       font-size: 12px
       text-transform: uppercase
-      white-space: nowrap
 
     .block
       cursor: pointer

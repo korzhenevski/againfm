@@ -6,12 +6,14 @@
 <div class="page centroid">
     <h2>Радио &laquo;{{{ radio.title }}}&raquo;</h2>
     <a class="link" href="{{{ url_for('radio_admin') }}}">мое радио</a>
-    <div data-ng-controller="EditCtrl" class="radio-edit" ng-init='form={{{ radio.get_public()|json }}}'>
-        <form name="editForm" ng-submit="add()">
+    <div data-ng-controller="EditCtrl" class="radio-edit"
+         ng-init='form={{{ radio.get_public()|json }}}'>
+        <p ng-show="saved">Информация сохранена</p>
+        <form name="editForm" ng-submit="save()">
             <dl class="control-group">
                 <dt>Название</dt>
                 <dd>
-                    <input class="text" ng-model="form.title" required="" maxlength="" />
+                    <input class="text" ng-model="form.title" required="" />
                 </dd>
             </dl>
             <dl class="control-group">
@@ -23,6 +25,10 @@
             <dl class="control-group">
                 <dt>Веб-сайт</dt>
                 <dd><input type="url" class="text" ng-model="form.website" /></dd>
+            </dl>
+            <dl class="control-group">
+                <dt>Город</dt>
+                <dd><input class="text" ng-model="form.location" /></dd>
             </dl>
             <div class="controls">
                 <input type="submit" ng-disabled="editForm.$invalid" class="btn" value="Сохранить" />
