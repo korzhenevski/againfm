@@ -76,12 +76,23 @@
                             <div class="display-ground">
                                 <div class="display-inner">
                                     <div class="display" data-ng-controller="DisplayCtrl">
-                                        <p class="title" ng-class="{starred: starred()}" ng-click="star()">
-                                            <span class="marquee marquee-text-overflow">
-                                                <span class="marquee-scroll">{{ title }}</span>
-                                            </span>
-                                            <span class="star"></span>
-                                        </p>
+                                        <div ng-show="title">
+                                            <p class="title" ng-class="{starred: starred()}" ng-click="star()">
+                                                <span class="marquee">
+                                                    {{ title }}
+                                                </span>
+                                                <span class="star"></span>
+                                            </p>
+                                            <p class="track" ng-class="{liked: track.favorite}"
+                                               ng-click="like()" ng-show="track">
+                                                <span class="marquee" ng-hide="track.artist">{{ track.title }}</span>
+                                                <span class="marquee" ng-show="track.artist">
+                                                    <strong>{{ track.artist }}</strong> &mdash; {{ track.name }}
+                                                </span>
+                                                <span class="like"></span>
+                                            </p>
+                                        </div>
+                                        <div class="clock" clock="title"></div>
                                     </div>
                                 </div>
                             </div>
@@ -130,9 +141,9 @@
                         <td align="center">
                             <table class="controls" width="80%">
                                 <tr align="center">
-                                    <td>
+                                    <!--td>
                                         <button class="record"></button>
-                                    </td>
+                                    </td-->
                                     <td>
                                         <button class="back" data-ng-disabled="!previousStation()" data-ng-click="selectStation(previousStation())"></button>
                                     </td>
@@ -143,7 +154,7 @@
                                     <td>
                                         <button class="random" data-ng-click="selectRandomStation()"></button>
                                     </td>
-                                    <td>
+                                    <!--td>
                                         <div class="volume-wrapper" data-ng-class="{muted: isMuted()}">
                                             <button class="volume" data-ng-click="toggleMute()"></button>
                                             <div class="volume-slider">
@@ -153,7 +164,7 @@
                                                 <div class="volume-icon" data-ng-click="toggleMute()"></div>
                                             </div>
                                         </div>
-                                    </td>
+                                    </td-->
                                 </tr>
                             </table>
                         </td>
@@ -193,4 +204,5 @@
 {{% block scripts %}}
     <script src="/static/js/player.js"></script>
     <script src="/static/js/common/ui-transition.js"></script>
+    <script src="/static/js/common/ui-animate.js"></script>
 {{% endblock %}}

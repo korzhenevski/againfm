@@ -902,27 +902,31 @@ afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($r
     };
 }]);
 
-afm.directive('marquee', function($transition, $timeout){
+afm.directive('marquee', function($transition){
     return {
         restrict: 'C',
+        transclude: true,
+        template: '<span class="marquee-scroll" ng-transclude></span>',
         link: function($scope, element) {
             var scroll = element.children('.marquee-scroll');
             var delta = 0;
-            $scope.$watch('title', function(){
-                var scrollWidth = scroll[0].offsetWidth;
-                var elementWidth = element[0].offsetWidth;
-                delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
-            });
-
             var transition;
+
+            element.addClass('marquee-text-overflow');
+
             function animate() {
                 if (transition) {
                     transition.cancel();
                 }
+
+                var duration = Math.round(delta * 40 / 1000);
+                if (duration < 1) {
+                    return;
+                }
+
                 element.removeClass('marquee-text-overflow');
-                scroll.css({
-                    transitionDuration: Math.round(delta * 40 / 1000) + 's'
-                });
+                scroll.css({transitionDuration: duration + 's'});
+
                 transition = $transition(scroll, {marginLeft: -delta + 'px'});
                 transition.then(function(){
                     transition.cancel();
@@ -935,7 +939,12 @@ afm.directive('marquee', function($transition, $timeout){
             }
 
             element.bind('mouseover', function(){
-                animate();
+                var scrollWidth = scroll[0].offsetWidth;
+                var elementWidth = element[0].offsetWidth;
+                delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
+                if (delta) {
+                    animate();
+                }
             });
 
             element.bind('mouseout', function(){
@@ -944,7 +953,7 @@ afm.directive('marquee', function($transition, $timeout){
                 }
                 element.addClass('marquee-text-overflow');
                 scroll.css({
-                    transitionDuration: 0,
+                    transitionDuration: '100ms',
                     transitionDelay: 0,
                     marginLeft: 0
                 });
@@ -956,16 +965,13 @@ afm.directive('marquee', function($transition, $timeout){
 /**
  * Дисплей радиостанции
  */
-afm.controller('DisplayCtrl', function($scope, radio, favorites, tracks) {
-    $scope.title = 'Very very long title fdafasd fsdaf daf d3edfsad fsdf asfd';
-    $scope.track = {
-        id: 1000
-    };
+afm.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tracks, onair) {
+    $rootScope.$watch(function(){ return onair.getTrack(); }, function(track){
+        $scope.track = track;
+    }, true);
 
     $scope.$watch(function(){ return radio.getStation(); }, function(station){
-        if (station) {
-            $scope.title = station.title;
-        }
+        $scope.title = station ? station.title : '';
     });
 
     $scope.starred = function() {
@@ -989,7 +995,7 @@ afm.controller('DisplayCtrl', function($scope, radio, favorites, tracks) {
         }
     };
 
-    $scope.bookmarkTrack = function() {
+    $scope.like = function() {
         var track = $scope.track;
         if (tracks.exists(track.id)) {
             tracks.remove(track.id);
@@ -1000,59 +1006,6 @@ afm.controller('DisplayCtrl', function($scope, radio, favorites, tracks) {
         }
     };
 });
-
-
-afm.controller('DisplayCtrl_old', ['$rootScope', '$scope', 'radio', 'currentUser', 'favorites', 'tracks', 'onair',
-    function($rootScope, $scope, radio, currentUser, favorites, tracks, onair) {
-    $scope.track = null;
-
-    $rootScope.$watch(function(){ return onair.getTrack(); }, function(track){
-        $scope.track = track;
-    }, true);
-
-    $scope.hasTrack = function() {
-        var track = $scope.track;
-        return track && track.id;
-    };
-
-    $scope.isTrackFaved = function() {
-        if (! ($scope.track && $scope.track.id)) {
-            return false;
-        }
-        if (currentUser.isLogged()) {
-            return $scope.track.favorite;
-        }
-        return tracks.exists($scope.track.id);
-    };
-
-    $scope.faveTrack = function() {
-        var track = $scope.track;
-        if (tracks.exists(track.id)) {
-            tracks.remove(track.id);
-            track.favorite = false;
-        } else {
-            tracks.add(track.id, track.title);
-            track.favorite = true;
-        }
-    };
-
-    $scope.faveStation = function() {
-        var station = radio.getStation();
-        if (favorites.exists(station.id)) {
-            favorites.remove(station.id);
-        } else {
-            favorites.add(station.id, station.title);
-        }
-    };
-
-    $scope.isStationFaved = function() {
-        var station = radio.getStation();
-        if (!station) {
-            return false;
-        }
-        return favorites.exists(station.id);
-    };
-}]);
 
 afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
     var STORAGE_ID = 'tracks';

@@ -383,6 +383,7 @@ ul.justified
     position: relative
     +box-shadow(#526464 0 0 3px 2px inset)
     +background(linear-gradient(rgba(#fff, 0.6), rgba(#fff, 0)))
+    $disable-magic-sprite-selectors: true
 
     .title
       margin: 0
@@ -394,11 +395,7 @@ ul.justified
         @include display-controls-sprite(star_hover)
 
       .marquee
-        width: 245px
-
-    .title.starred
-      .star
-        @include display-controls-sprite(star_hover)
+        width: 242px
 
     .star
       position: absolute
@@ -407,6 +404,40 @@ ul.justified
       width: 27px
       height: 27px
       @include display-controls-sprite(star)
+
+    .title.starred
+      .star
+        @include display-controls-sprite(star_hover)
+
+    .track
+      line-height: 16px
+      cursor: pointer
+      position: relative
+      padding-left: 25px
+      &:hover .like
+        @include display-controls-sprite(like_hover)
+
+    .track.liked
+      .like
+        @include display-controls-sprite(like_hover)
+
+    .like
+      top: 0px
+      left: 0px
+      position: absolute
+      width: 17px
+      height: 17px
+      @include display-controls-sprite(like)
+      &:hover
+        @include display-controls-sprite(like_hover)
+
+    .clock
+      text-align: center
+      font-size: 28px
+      margin-top: 25px
+      .dots
+        font-size: 35px
+        margin: 0 1px
 
   .favorites-cell
     height: 235px
@@ -691,6 +722,7 @@ ul.justified
       cursor: pointer
       padding: 5px 8px
       margin: 3px 0
+      +transition(all, 150ms)
       &:hover
         background-color: rgba(#c5ab65, 0.4)
         +border-radius(4px)
@@ -700,14 +732,15 @@ ul.justified
     margin: 10px -10px
 
     .block
-      padding: 5px 10px
-      margin: 5px 0px
+      padding: 5px
+      margin: 5px 3px
       cursor: pointer
+      .link
+        margin: 0 5px
+        border-bottom: 1px solid rgba(#3d3017, 0.2)
       &:hover
         .link
           border-bottom: 1px solid rgba(#3d3017, 1)
-      .link
-        border-bottom: 1px solid rgba(#3d3017, 0.2)
 
 
   .tabs, .playlist
