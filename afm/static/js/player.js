@@ -210,7 +210,8 @@ afm.directive('modal', ['$document', 'routeHistory', function($document, routeHi
         scope: {
             title: '@'
         },
-        template: '<div class="modal"><h1 class="header">{{ title }} <i class="close"></i></h1><div ng-transclude></div></div>',
+        template: '<div class="modal" ui-animate><h1 class="header">{{ title }} <i class="close"></i></h1>' +
+                  '<div ng-transclude></div></div>',
         link: function(scope, element, attrs) {
             element.addClass('modal-' + attrs.id);
             element.find('i').bind('click', function(){

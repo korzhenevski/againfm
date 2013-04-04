@@ -89,6 +89,7 @@ ul.justified
   width: 320px
   margin: 8% auto
   padding: 19px
+  +transition(all, 400ms)
 
   h1
     margin: 0
@@ -142,6 +143,10 @@ ul.justified
       color: #ff6f7d
       border: 1px solid #963841
       @include placeholder-color(#ff6f7d)
+
+.modal.ui-animate
+  margin-top: -250px
+  opacity: 0
 
 .modal-feedback
   .mail
