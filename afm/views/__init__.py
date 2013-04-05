@@ -27,4 +27,4 @@ def page_not_found(e):
 def template_filter_json(data):
     return Markup(json.dumps(data))
 
-from . import views, user, api
+from . import views, user, api, auth

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from flask.ext.assets import Bundle, Environment
 
 scripts = ['angular', 'comet', 'angular-cookies', 'angular-resource', 'swfobject']
