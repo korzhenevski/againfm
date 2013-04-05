@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
-from flask import render_template, request, jsonify, url_for, redirect
-from flask.ext.login import current_user, login_required
-from datetime import datetime
+from flask import request, jsonify, url_for, redirect
 from flask import session
 
-from afm import db, app
-from afm.helpers import safe_input_object
+from afm import app
 from afm.oauth import vk
-from flask import redirect
+
 
 @vk.tokengetter
 def get_vk_token(token=None):

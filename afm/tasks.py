@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import pymongo.errors
 from afm import app, celery, mailer, db
 from .radio import fetch_playlist, fetch_stream
 

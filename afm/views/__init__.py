@@ -4,8 +4,10 @@
 import time
 import ujson as json
 from flask import g, request, jsonify
-from afm import app
 from jinja2 import Markup
+
+from afm import app
+
 
 @app.before_request
 def save_start_time():
