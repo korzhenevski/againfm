@@ -1,42 +1,43 @@
 <!DOCTYPE html>
-<html data-ng-app="afm" xmlns:og="http://ogp.me/ns#">
+<html xmlns:og="http://ogp.me/ns#">
 <head>
     <title>{{% block title %}}Эгейн - радиоплеер{{% endblock %}}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю эфира. Хранит любимые треки в личном избранном.{{% endblock %}}" />
+    <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю прямого эфира{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
-    <style>
-        /* force hide angular markup while js not ready */
-        .ng-cloak { display: none; }
-    </style>
 
+    {# скрываем шаблоны до отработки ангулар парсера #}
+    <style>.ng-cloak { display: none; }</style>
+
+    {# базовые стили #}
     {{% assets "styles" %}}
     <link href="{{{ ASSET_URL }}}" rel="stylesheet"/>
     {{% endassets %}}
-    <link href="/static/css/loader.css" rel="stylesheet"/>
 
+    {# подключаемые стили #}
+    {{% block styles %}}{{% endblock %}}
 
+    {# трекинг js-ошибок в qbaka.net #}
     {{% if not config.DEBUG %}}
-    {{% include 'extras/qbaka.html' %}}
+        {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
-
-    {{% block head %}}{{% endblock %}}
 </head>
 <body>
-<script type="text/ng-template" id="/loader.html">
-    <div id="floatingBarsG">
-        <div class="blockG" id="rotateG_01"></div>
-        <div class="blockG" id="rotateG_02"></div>
-        <div class="blockG" id="rotateG_03"></div>
-        <div class="blockG" id="rotateG_04"></div>
-        <div class="blockG" id="rotateG_05"></div>
-        <div class="blockG" id="rotateG_06"></div>
-        <div class="blockG" id="rotateG_07"></div>
-        <div class="blockG" id="rotateG_08"></div>
-    </div>
-</script>
-    {{% block top_content %}}{{% endblock %}}
+    {# шаблон индикатора загрузки на CSS3 #}
+    <script type="text/ng-template" id="/loader.html">
+        <div id="floatingBarsG">
+            <div class="blockG" id="rotateG_01"></div>
+            <div class="blockG" id="rotateG_02"></div>
+            <div class="blockG" id="rotateG_03"></div>
+            <div class="blockG" id="rotateG_04"></div>
+            <div class="blockG" id="rotateG_05"></div>
+            <div class="blockG" id="rotateG_06"></div>
+            <div class="blockG" id="rotateG_07"></div>
+            <div class="blockG" id="rotateG_08"></div>
+        </div>
+    </script>
 
+    {{% block top_content %}}{{% endblock %}}
     <table class="roof">
         <tr>
             <td class="logo">
@@ -49,6 +50,7 @@
 
     {{% block content %}}{{% endblock %}}
 
+    {# подвал #}
     <div class="footer centroid">
         <div class="container">
             <table width="100%">
@@ -70,30 +72,28 @@
         </div>
     </div>
 
-{{% assets 'common' %}}
+{# базовые скрипты #}
+{{% assets 'scripts' %}}
 <script src="{{{ ASSET_URL }}}"></script>
 {{% endassets %}}
 
+{# подключаемые скрипты #}
 {{% block scripts %}}{{% endblock %}}
-
-<script>
-afm.value('bootstrapUser', {{{ user|json }}});
-afm.value('bootstrapGenres', {{{ genres|json }}});
-// configure comet over $provide.configuration
-afm.value('cometUrl', {{{ config.COMET_URL|json }}});
-</script>
 
 {{% include 'extras/scriptjs.html' %}}
 
+{# счетчики: yandex, google analytics, ... #}
 {{% if not config.DEBUG %}}
 {{% include 'extras/counters.html' %}}
 {{% endif %}}
 
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
+
 <script type="text/ng-template" id="/login.html">
     <modal id="login" title="Вход с паролем">
         <form name="loginForm" data-ng-submit="auth()">
-            <input class="text" name="login" data-ng-model="form.login" type="email" placeholder="Электронная почта" required="" autofocus="" />
+            <input class="text" name="login" data-ng-model="form.login" autofocus="autofocus"
+                   type="email" placeholder="Электронная почта" required="" autofocus="" />
             <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required />
             <div class="controls">
                 <input type="submit" class="btn" value="Войти" data-ng-disabled="loginForm.$invalid" />
@@ -112,7 +112,8 @@ afm.value('cometUrl', {{{ config.COMET_URL|json }}});
 <script type="text/ng-template" id="/signup.html">
     <modal id="signup" title="Регистрация">
         <form name="signupForm" data-ng-submit="signup()">
-            <input class="text" name="email" data-ng-model="form.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
+            <input class="text" name="email" data-ng-model="form.email" autofocus="autofocus"
+                   type="email" placeholder="Электронная почта" required="" autofocus="" />
             <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required="" />
             <input type="submit" class="btn" value="Зарегистрироваться" data-ng-disabled="signupForm.$invalid" />
             или <a href="/login">войти с паролем</a>
@@ -127,7 +128,8 @@ afm.value('cometUrl', {{{ config.COMET_URL|json }}});
 <script type="text/ng-template" id="/amnesia.html">
     <modal id="amnesia" title="Сброс пароля">
         <form name="amnesiaForm" data-ng-hide="result" data-ng-submit="amnesia()">
-            <input class="text" name="email" data-ng-model="form.email" required type="email" placeholder="Электронная почта" />
+            <input class="text" name="email" data-ng-model="form.email" required=""
+                   type="email" placeholder="Электронная почта" autofocus="autofocus" />
             <input type="submit" class="btn" value="Выслать на почту" data-ng-disabled="amnesiaForm.$invalid" />
         </form>
         <p class="error" data-ng-switch on="error.code" data-ng-show="error">
@@ -145,7 +147,8 @@ afm.value('cometUrl', {{{ config.COMET_URL|json }}});
 <script type="text/ng-template" id="/feedback.html">
     <modal id="feedback" title="Обратная связь">
         <form name="feedbackForm" data-ng-submit="feedback()" data-ng-hide="result">
-            <input class="text" name="email" data-ng-model="form.email" type="email" placeholder="Электронная почта" required="" autofocus="" />
+            <input type="email" class="text" name="email" autofocus="autofocus"
+                   data-ng-model="form.email" placeholder="Электронная почта" required="" autofocus="" />
             <textarea rows="4" class="text" name="text" data-ng-model="form.text" placeholder="Текст" required=""></textarea>
             <input type="submit" class="btn" value="Отправить" data-ng-disabled="feedbackForm.$invalid" />
             <!--p class="mail">

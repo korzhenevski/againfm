@@ -9,6 +9,7 @@ venv
 .DS_Store
 local_config.py
 src/
+ui-bootstrap
 
 jasmine
 script.js/

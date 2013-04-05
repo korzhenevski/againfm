@@ -7,9 +7,6 @@
  * PIE для IE
  */
 
-(function(window, angular, Comet, undefined) {
-'use strict';
-
 var afm = angular.module('afm', ['ngResource', 'ngCookies']);
 
 afm.value('bootstrapUser', null);
@@ -37,8 +34,7 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $locationProvider.html5Mode(true).hashPrefix('!');
 }]);
 
-afm.run(['$rootScope', 'currentUser', 'bootstrapUser', 'routeHistory', 'User',
-    function($rootScope, currentUser, bootstrapUser, routeHistory, User){
+afm.run(function($rootScope, currentUser, bootstrapUser, routeHistory, User){
     $rootScope.currentUser = currentUser;
     $rootScope.logout = function() {
         if (currentUser.isLogged()) {
@@ -48,7 +44,7 @@ afm.run(['$rootScope', 'currentUser', 'bootstrapUser', 'routeHistory', 'User',
     };
 
     currentUser.update(bootstrapUser);
-}]);
+});
 
 afm.directive('volumeWrapper', function(){
     return {
@@ -66,7 +62,7 @@ afm.directive('volumeWrapper', function(){
 });
 
 // TODO: add touch support
-afm.directive('volumeHandle', ['$rootScope', '$document', function($rootScope, $document){
+afm.directive('volumeHandle', function($rootScope, $document){
     return {
         restrict: 'A',
         scope: {
@@ -147,7 +143,7 @@ afm.directive('volumeHandle', ['$rootScope', '$document', function($rootScope, $
             }
         }
     };
-}]);
+});
 
 // TODO: prevent body scroll
 afm.directive('tracksBox', ['$document', function($document){
@@ -1137,6 +1133,3 @@ afm.controller('MyRadioCtrl', function($scope, $http){
         $scope.radioList = response.objects;
     });
 });
-
-window.afm = afm;
-})(window, angular, Comet);

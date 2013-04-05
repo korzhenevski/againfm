@@ -172,7 +172,8 @@
                     <tr>
 
                         <!-- Мое избранное -->
-                        <td class="favorites-cell"><div class="favorites" data-ng-controller="FavoritesCtrl">
+                        <td class="favorites-cell">
+                            <div class="favorites" data-ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li data-ng-repeat="station in getFavorites()">
@@ -183,7 +184,8 @@
                                 </ul>
                                 <div class="signage"></div>
                             </div>
-                        </div></td>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -201,8 +203,25 @@
 </div>
 {{% endblock %}}
 
+{{% block styles %}}
+    <link href="/static/css/loader.css" rel="stylesheet"/>
+{{% endblock %}}
+
 {{% block scripts %}}
+    <script src="/static/js/common/swfobject.js"></script>
+    <script src="/static/js/common/comet.js"></script>
     <script src="/static/js/player.js"></script>
     <script src="/static/js/common/ui-transition.js"></script>
     <script src="/static/js/common/ui-animate.js"></script>
+    <script>
+        {# TODO: разобратся с этой хуйней #}
+        afm.value('bootstrapUser', {{{ user|json }}});
+        afm.value('bootstrapGenres', {{{ genres|json }}});
+        // configure comet over $provide.configuration
+        afm.value('cometUrl', {{{ config.COMET_URL|json }}});
+
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm']);
+        });
+    </script>
 {{% endblock %}}

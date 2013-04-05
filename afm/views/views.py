@@ -180,9 +180,9 @@ def radio_add_save():
     return jsonify({'location': url_for('radio_admin')})
 
 @app.route('/')
-@app.route('/login')
 @app.route('/signup')
 @app.route('/amnesia')
+@app.route('/login')
 def index():
     return render_template('player.html')
 

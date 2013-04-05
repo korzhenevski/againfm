@@ -138,5 +138,18 @@ def update_search():
     #    print radio.push_to_search()
     print search.refresh()
 
+@manager.command
+def get_icy_genre():
+    import string
+    from collections import Counter
+    c = Counter()
+    for stream in db.streams.find({'meta.genre': {'$exists': True}}):
+        genre = stream['meta']['genre']
+        for token in map(string.lower, genre.split(',')):
+            c[token.strip()] += 1
+
+    for k,v in c.most_common(100):
+        print k
+
 if __name__ == "__main__":
     manager.run()
