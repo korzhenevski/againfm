@@ -916,7 +916,7 @@ afm.directive('marquee', function($transition){
                     transition.cancel();
                 }
 
-                var duration = Math.round(delta * 40 / 1000);
+                var duration = Math.round(delta * 42 / 1000);
                 if (duration < 1) {
                     return;
                 }
