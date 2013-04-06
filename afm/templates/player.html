@@ -128,7 +128,11 @@
                                                     <span class="link">{{ station.title }}</span>
                                                 </div>
                                             </li>
-                                            <li ng-hide="hasList()" class="ng-cloak not-found">Ничего не найдено</li>
+                                            <li ng-hide="hasList()" class="ng-cloak not-found">
+                                                <div class="block">
+                                                    Ничего не найдено
+                                                </div>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -141,9 +145,9 @@
                         <td align="center">
                             <table class="controls" width="80%">
                                 <tr align="center">
-                                    <!--td>
+                                    <td>
                                         <button class="record"></button>
-                                    </td-->
+                                    </td>
                                     <td>
                                         <button class="back" data-ng-disabled="!previousStation()" data-ng-click="selectStation(previousStation())"></button>
                                     </td>
@@ -154,23 +158,23 @@
                                     <td>
                                         <button class="random" data-ng-click="selectRandomStation()"></button>
                                     </td>
-                                    <!--td>
+                                    <td>
                                         <div class="volume-wrapper" data-ng-class="{muted: isMuted()}">
                                             <button class="volume" data-ng-click="toggleMute()"></button>
-                                            <div class="volume-slider">
+                                            <div class="volume-slider hidden">
                                                 <div class="line">
                                                     <div class="handle" volume="volume" on-change="saveVolume()" volume-handle></div>
                                                 </div>
                                                 <div class="volume-icon" data-ng-click="toggleMute()"></div>
                                             </div>
                                         </div>
-                                    </td-->
+                                    </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <tr>
 
+                    <tr>
                         <!-- Мое избранное -->
                         <td class="favorites-cell">
                             <div class="favorites" data-ng-controller="FavoritesCtrl">

@@ -51,11 +51,11 @@ afm.directive('volumeWrapper', function(){
         restrict: 'C',
         link: function(scope, element) {
             element.bind('mouseenter', function(){
-                element.addClass('hover');
+                element.find('div').removeClass('hidden');
                 scope.$broadcast('volumeShow');
             });
             element.bind('mouseout', function(){
-                element.removeClass('hover');
+                element.find('div').addClass('hidden');
             });
         }
     };
@@ -950,7 +950,7 @@ afm.directive('marquee', function($transition){
                 }
                 element.addClass('marquee-text-overflow');
                 scroll.css({
-                    transitionDuration: '100ms',
+                    transitionDuration: 0,
                     transitionDelay: 0,
                     marginLeft: 0
                 });

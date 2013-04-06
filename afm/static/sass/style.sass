@@ -564,14 +564,8 @@ ul.justified
 
     .volume-wrapper
       position: relative
-      .volume-slider
-        display: none
       .volume
         @include player-controls-sprite(volume)
-
-    .volume-wrapper.hover
-      .volume-slider
-        display: block
 
     .volume-wrapper.muted
       .volume-icon
@@ -593,6 +587,7 @@ ul.justified
       padding-bottom: 34px
       position: absolute
       +border-radius(17px)
+      +transition(all, 100ms)
 
       .line
         width: 6px
@@ -621,6 +616,9 @@ ul.justified
         margin: 0 auto
         margin-top: 10px
         cursor: pointer
+
+    .volume-slider.hidden
+      +opacity(0)
 
 .radio-table
   height: 100%

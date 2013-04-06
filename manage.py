@@ -134,8 +134,8 @@ def sitemap():
 @manager.command
 def update_search():
     from afm import search
-    #for radio in db.Radio.find_public():
-    #    print radio.push_to_search()
+    for radio in db.Radio.find_public():
+        print radio.push_to_search()
     print search.refresh()
 
 @manager.command
@@ -150,6 +150,45 @@ def get_icy_genre():
 
     for k,v in c.most_common(100):
         print k
+
+@manager.command
+def ctrl_search():
+    settings = {
+        "analysis": {
+            "filter": {
+                "ngram_filter": {
+                    "min_gram": 3,
+                    "max_gram": 8,
+                    "type": "nGram"
+                }
+            },
+            "analyzer": {
+                "ngram_analyzer": {
+                    "tokenizer": "lowercase",
+                    "filter": ["ngram_filter"],
+                    "type": "custom",
+                }
+            }
+        }
+    }
+
+    import requests
+    import json
+    print requests.delete('http://192.168.2.2:9200/againfm').json()
+    pp(requests.post('http://192.168.2.2:9200/againfm', data=json.dumps({'settings': settings})).json())
+    maping = {
+        'properties': {
+            'title': {
+                'type': 'string',
+                'analyzer': 'ngram_analyzer'
+            }
+        }
+    }
+    pp(requests.put('http://192.168.2.2:9200/againfm/radio/_mapping', data=json.dumps({'radio': maping})).json())
+
+    print requests.get('http://192.168.2.2:9200/againfm/_settings').json()
+    print requests.get('http://192.168.2.2:9200/againfm/_mapping').json()
+    #print requests.post('http://192.168.2.2:9200/test/_refresh').json()
 
 if __name__ == "__main__":
     manager.run()

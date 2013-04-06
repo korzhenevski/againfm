@@ -12,7 +12,7 @@ from afm.helpers import safe_input_object, send_mail
 @app.route('/api/radio/search')
 def radio_search():
     q = request.args.get('q', type=unicode)
-    resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': q + '*'})
+    resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': u'title:{}*'.format(q)})
     hits = [hit['_source'] for hit in resp.json()['hits'].get('hits', [])]
     return jsonify({'objects': hits, 'q': q})
 
