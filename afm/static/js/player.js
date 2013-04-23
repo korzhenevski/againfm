@@ -13,120 +13,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             User.logout();
         }
     };
+
     user.update($rootScope.bootstrapUser);
-})
-
-.directive('volumeWrapper', function(){
-    return {
-        restrict: 'C',
-        link: function(scope, element) {
-            element.bind('mouseenter', function(){
-                element.find('div').removeClass('hidden');
-                scope.$broadcast('volumeShow');
-            });
-            element.bind('mouseout', function(){
-                element.find('div').addClass('hidden');
-            });
-        }
-    };
-})
-
-// TODO: add touch support
-.directive('volumeHandle', function($rootScope, $document){
-    return {
-        restrict: 'A',
-        scope: {
-            volume: '=',
-            onChange: '&'
-        },
-        link: function(scope, element) {
-            var startValue;
-            var startPosition;
-            var max = 1.0;
-            var volumeLine = element.parent();
-
-            scope.$on('volumeShow', function(){
-                updateValue(scope.volume);
-            });
-
-            scope.$watch('volume', function(volume){
-                updateValue(volume);
-            });
-
-            volumeLine.bind('click', function(e){
-                // TODO: offsetY available only on Chrome, support other browsers
-                updateValue(posToValue(e.offsetY - element.prop('offsetHeight') / 2));
-            });
-
-            element.bind('click', function(e){
-                e.stopPropagation();
-            });
-
-            element.bind('mousedown', function(e){
-                startPosition = e.pageY;
-                startValue = parseFloat(scope.volume) || 0;
-            });
-
-            $document.bind('mousemove', function(e){
-                if (!startPosition) {
-                    return;
-                }
-                var pos = e.pageY - startPosition;
-                var value = startValue - (pos / getLineHeight()) * max;
-                value = clamp(value, 0, max);
-                updateValue(value);
-            });
-
-            $document.bind('mouseup', function(){
-                startPosition = startValue = null;
-            });
-
-            function posToValue(pos) {
-                pos = Math.abs(getLineHeight() - clamp(pos, 0, getLineHeight()));
-                return pos ? (pos / getLineHeight()) * max : 0;
-            }
-
-            function getLineHeight() {
-                return volumeLine.prop('offsetHeight') - element.prop('offsetHeight');
-            }
-
-            function updateValue(value) {
-                value = clamp(parseFloat(value), 0, max);
-                // decimal round
-                value = Math.round(value * 10) / 10;
-                var pos = getLineHeight();
-                if (value > 0) {
-                    pos = (Math.abs(max - value) / max) * getLineHeight();
-                }
-                // TODO: investigation - fix apply already in progress
-                // TODO: fix this shit
-                scope.volume = value;
-                element.css('top', Math.round(pos) + 'px');
-                if (!$rootScope.$$phase) { $rootScope.$apply(); }
-                scope.onChange();
-            }
-
-            function clamp(value, min, max) {
-                if (value <= min) { value = min; }
-                if (value >= max) { value = max; }
-                return value;
-            }
-        }
-    };
-})
-
-.factory('routeHistory', function($rootScope, $route, $location){
-    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
-    $rootScope.$on('$routeChangeSuccess', function(target, current){
-        if (current && current.$route && !current.$route.modal) {
-            returnTo = $location.path();
-        }
-    });
-    return {
-        backToNotModal: function() {
-            $location.path(returnTo);
-        }
-    };
 })
 
 .directive('modal', function($document, routeHistory){
@@ -173,9 +61,9 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 .factory('player', function($rootScope, storage) {
     var player = {
         url: null,
-        volume: 0.6,
         muted: false,
         playing: false,
+        volume: 0.6,
         defaultVolume: 0.6,
         flashAudio: null,
 
@@ -555,6 +443,119 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         }
     };
     return self;
+})
+
+.directive('volumeWrapper', function(){
+    return {
+        restrict: 'C',
+        link: function(scope, element) {
+            element.bind('mouseenter', function(){
+                element.find('div').removeClass('hidden');
+                scope.$broadcast('volumeShow');
+            });
+            element.bind('mouseout', function(){
+                element.find('div').addClass('hidden');
+            });
+        }
+    };
+})
+
+// TODO: add touch support
+.directive('volumeHandle', function($rootScope, $document){
+    return {
+        restrict: 'A',
+        scope: {
+            volume: '=',
+            onChange: '&'
+        },
+        link: function(scope, element) {
+            var startValue;
+            var startPosition;
+            var max = 1.0;
+            var volumeLine = element.parent();
+
+            scope.$on('volumeShow', function(){
+                updateValue(scope.volume);
+            });
+
+            scope.$watch('volume', function(volume){
+                updateValue(volume);
+            });
+
+            volumeLine.bind('click', function(e){
+                // TODO: offsetY available only on Chrome, support other browsers
+                updateValue(posToValue(e.offsetY - element.prop('offsetHeight') / 2));
+            });
+
+            element.bind('click', function(e){
+                e.stopPropagation();
+            });
+
+            element.bind('mousedown', function(e){
+                startPosition = e.pageY;
+                startValue = parseFloat(scope.volume) || 0;
+            });
+
+            $document.bind('mousemove', function(e){
+                if (!startPosition) {
+                    return;
+                }
+                var pos = e.pageY - startPosition;
+                var value = startValue - (pos / getLineHeight()) * max;
+                value = clamp(value, 0, max);
+                updateValue(value);
+            });
+
+            $document.bind('mouseup', function(){
+                startPosition = startValue = null;
+            });
+
+            function posToValue(pos) {
+                pos = Math.abs(getLineHeight() - clamp(pos, 0, getLineHeight()));
+                return pos ? (pos / getLineHeight()) * max : 0;
+            }
+
+            function getLineHeight() {
+                return volumeLine.prop('offsetHeight') - element.prop('offsetHeight');
+            }
+
+            function updateValue(value) {
+                value = clamp(parseFloat(value), 0, max);
+                // decimal round
+                value = Math.round(value * 10) / 10;
+                var pos = getLineHeight();
+                if (value > 0) {
+                    pos = (Math.abs(max - value) / max) * getLineHeight();
+                }
+                // TODO: investigation - fix apply already in progress
+                // TODO: fix this shit
+                scope.volume = value;
+                element.css('top', Math.round(pos) + 'px');
+                if (!$rootScope.$$phase) { $rootScope.$apply(); }
+                scope.onChange();
+            }
+
+            function clamp(value, min, max) {
+                if (value <= min) { value = min; }
+                if (value >= max) { value = max; }
+                return value;
+            }
+        }
+    };
+})
+
+.factory('routeHistory', function($rootScope, $route, $location){
+    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
+    $rootScope.$on('$routeChangeSuccess', function(target, current){
+        if (current && current.$route && !current.$route.modal) {
+            returnTo = $location.path();
+        }
+    });
+    return {
+        backToNotModal: function() {
+            $location.path(returnTo);
+        }
+    };
 })
 
 .controller('PlayerCtrl', function($scope, $http, $location, player, radio){
