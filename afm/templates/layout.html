@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:og="http://ogp.me/ns#">
 <head>
-    <title>{{% block title %}}Эгейн - радиоплеер{{% endblock %}}</title>
+    <title>{{% block title %}}Again.FM{{% endblock %}}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="{{% block description %}}Играет радио и сохраняет историю прямого эфира{{% endblock %}}" />
+    <meta name="description" content="{{% block description %}}Радиоплеер. Играет радио и сохраняет историю прямого эфира.{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
 
     {# скрываем шаблоны до отработки ангулар парсера #}
@@ -22,7 +22,7 @@
         {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
 </head>
-<body>
+<body ng-init='bootstrapUser={{{ current_user.get_public()|json }}}; bootstrapGenres={{{ genres|json }}}'>
     {{% block top_content %}}{{% endblock %}}
     <table class="roof">
         <tr>
@@ -35,7 +35,6 @@
     </table>
 
     {{% block content %}}{{% endblock %}}
-
     {# подвал #}
     <div class="footer centroid">
         <div class="container">
@@ -102,7 +101,6 @@
                    type="email" placeholder="Электронная почта" required="" autofocus="" />
             <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required="" />
             <input type="submit" class="btn" value="Зарегистрироваться" data-ng-disabled="signupForm.$invalid" />
-            или <a href="/login">войти с паролем</a>
         </form>
         <p class="error" data-ng-switch data-on="error.code" data-ng-show="error">
             <span data-ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
@@ -136,11 +134,11 @@
             <input type="email" class="text" name="email" autofocus="autofocus"
                    data-ng-model="form.email" placeholder="Электронная почта" required="" autofocus="" />
             <textarea rows="4" class="text" name="text" data-ng-model="form.text" placeholder="Текст" required=""></textarea>
-            <input type="submit" class="btn" value="Отправить" data-ng-disabled="feedbackForm.$invalid" />
-            <!--p class="mail">
+            <input type="submit" class="btn" value="Отправить сообщение" data-ng-disabled="feedbackForm.$invalid" />
+            {# <p class="mail">
                 Будет нечестно не сказать, что мы еще <br>читаем письма с
                 <a href="mailto:feedback@again.fm?subject=Обратная+связь" target="_blank">feedback@again.fm</a>
-            </p-->
+            </p> #}
         </form>
         <p data-ng-show="result">Сообщение отправлено, спасибо :)</p>
         <p class="error" data-ng-switch on="error.code" data-ng-show="error">

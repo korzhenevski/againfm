@@ -7,7 +7,7 @@
  *   - As a function, it represents a function to be called that will cause the transition to occur.
  * @return {Promise}  A promise that is resolved when the transition finishes.
  */
-afm.factory('$transition', ['$q', '$timeout', '$rootScope', function($q, $timeout, $rootScope) {
+angular.module('afm.base').factory('$transition', ['$q', '$timeout', '$rootScope', function($q, $timeout, $rootScope) {
   var $transition = function(element, trigger, options) {
     options = options || {};
     var deferred = $q.defer();

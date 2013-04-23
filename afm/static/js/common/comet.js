@@ -4,29 +4,27 @@
 
 function Comet(cometUrl)
 {
-    return;
-	// Current JS library version.
-	var VERSION = "1.32";
-
 	// Detect current page hostname.
 	var host = document.location.host;
 	
 	// Assign initial properties.
-	if (!this.constructor._registry) this.constructor._registry = {}; // all objects registry
-	this.version = VERSION;
-	this.callback = {};
-	this._realplexor = null;
-	this._iframeId = "mpl" + (new Date().getTime());
+	if (!this.constructor._registry) {
+        this.constructor._registry = {};
+    }
+
+	this._comet = null;
+	this._iframeId = 'mpl' + (new Date().getTime());
 	this._iframeTag = 
 		'<iframe'
 		+ ' id="' + this._iframeId + '"'
 		+ ' onload="' + 'Comet' + '._iframeLoaded(&quot;' + this._iframeId + '&quot;)"'
-		+ ' src="' + cometUrl + '?HOST=' + host + '&amp;version=' + this.version + '"'
-		+ ' style="position:absolute; visibility:hidden; width:200px; height:200px; left:-1000px; top:-1000px"' +
+		+ ' src="' + cometUrl + '?host=' + host + '"'
+		+ ' style="position:absolute; visibility:hidden; width:1px; height:1px; left:-1000px; top:-1000px"' +
 		'></iframe>';
 	this._iframeCreated = false;
-	this._needExecute = false;
 	this._executeTimer = null;
+    this._url = false;
+    this._callback = false;
 	
 	// Register this object in the registry (for IFRAME onload callback).
 	this.constructor._registry[this._iframeId] = this;
@@ -43,10 +41,7 @@ Comet._iframeLoaded = function(id)
 	// use setTimeout to let IFRAME JavaScript code some time to execute.
 	setTimeout(function() {
 		var iframe = document.getElementById(id);
-		th._realplexor = iframe.contentWindow.Comet_Loader;
-		if (th.needExecute) {
-			th.execute();
-		}
+		th._comet = iframe.contentWindow.Comet;
 	}, 50);
 };
 
@@ -67,16 +62,24 @@ Comet._buildUrl = function(params, url) {
     return parts;
 };
 
-// Subscribe a new callback to specified ID.
-// To apply changes and reconnect to the server, call execute()
-// after a sequence of subscribe() calls.
-Comet.prototype.subscribe = function(params, callback) {
-    this.callback = {params: Comet._buildUrl(params), callback: callback};
+Comet.prototype.subscribe = function(url, params, callback) {
+    if (angular.isFunction(params) && !callback) {
+        callback = params;
+        params = null;
+    }
+
+    if (params) {
+        url = Comet._buildUrl(params, url);
+    }
+
+    this._url = url;
+    this._callback = callback;
     this.execute();
 };
 
 Comet.prototype.unsubscribe = function() {
-    this.callback = null;
+    this._url = false;
+    this._callback = false;
     this.execute();
 };
 
@@ -96,28 +99,40 @@ Comet.prototype.execute = function() {
 		clearTimeout(this._executeTimer);
 		this._executeTimer = null;
 	}
-	var th = this;
-	if (!this._realplexor) {
-		this._executeTimer = setTimeout(function() { th.execute() }, 30);
+
+	var self = this;
+	if (!this._comet) {
+		this._executeTimer = setTimeout(function() {
+            self.execute();
+        }, 30);
 		return;
 	}
 	
 	// Realplexor loader is ready, run it.
-	this._realplexor.execute(
-		this.callback,
-		this.constructor._callAndReturnException
-	);
+	this._comet.execute(this._url, this._callback);
 };
 
-// This is a work-around for stupid IE. Unfortunately IE cannot
-// catch exceptions which are thrown from the different frame
-// (in most cases). Please see
-// http://blogs.msdn.com/jaiprakash/archive/2007/01/22/jscript-exceptions-not-handled-thrown-across-frames-if-thrown-from-a-expando-method.aspx
-Comet._callAndReturnException = function(func, args) {
-	try {
-		func.apply(null, args);
-		return null;
-	} catch (e) {
-		return "" + e;
-	}
-};
+
+/**
+ * Wrapper for angular DI
+ */
+angular.module('afm.comet', []).provider('comet', function(){
+    this.url = '';
+
+    /*
+    this.$get = function() {
+        return {
+            subscribe: function() {},
+            unsubscribe: function() {}
+        }
+    };
+    */
+
+    this.$get = function() {
+        return new Comet(this.url);
+    };
+
+    this.setUrl = function(url) {
+        this.url = url;
+    };
+});

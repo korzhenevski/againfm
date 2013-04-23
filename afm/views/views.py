@@ -9,30 +9,6 @@ from datetime import datetime
 from afm import db, app
 from afm.helpers import safe_input_object
 
-# ссылка на радио
-# /radio/<int>
-# юзер может ссылатся на эту страницу. в каталоге выделять отдельно верифицированне, наши и юзерские станции
-
-# ссылка на жанр (фильтр)
-# жанров не настолько много, что-бы делать резолв на каждый запрос
-# можно тупо перечислить шортнеймы в коде
-# /radio/<string>
-#
-# позже будем регистрировать кастомные имена
-# http://again.fm/<shortname>
-#
-# список радиостанций
-# /radio/
-#
-# пользовательское радио
-# /radio/my/
-#
-# добавление радио
-# /radio/add
-#
-# по жанрам
-# /radio/genres
-
 @app.route('/radio/')
 def radio():
     # TODO: add pagination
@@ -44,7 +20,7 @@ def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('radio_page.html', radio=radio)
 
-@app.route('/radio/<int:radio_id>/edit', methods=['GET','POST'])
+@app.route('/radio/<int:radio_id>/edit', methods=['GET', 'POST'])
 @login_required
 def radio_edit(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
@@ -152,8 +128,6 @@ def radio_add_save():
     }
     schema.update(db.Radio.get_json_schema())
 
-    from pprint import pprint
-    pprint(schema)
     form = safe_input_object(schema)
 
     streams = form.pop('streams', [])
@@ -176,7 +150,6 @@ def radio_add_save():
         playlist_id = playlist['id']
 
     db.Stream.bulk_add(radio['id'], streams, playlist_id=playlist_id)
-
     return jsonify({'location': url_for('radio_admin')})
 
 @app.route('/')
@@ -193,12 +166,9 @@ def listen(radio_id):
 
 @app.context_processor
 def app_context():
-    ctx = {'user': None}
-    if current_user.is_authenticated():
-        ctx['user'] = current_user.get_public()
-    ctx['genres'] = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})]
-    ctx['year'] = datetime.now().year
-    # подгрузка страниц аяксом - возвращаем контент без лейаута
-    ctx['standalone'] = request.is_xhr
-    return ctx
+    return {
+        'standalone': request.is_xhr,
+        'genres': [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})],
+        'year': datetime.now().year,
+    }
 

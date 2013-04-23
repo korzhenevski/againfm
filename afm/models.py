@@ -3,7 +3,7 @@
 
 import time
 import string
-from . import app, db, search
+from . import app, db, search, login_manager
 
 try:
     from flask.ext.mongokit import Document
@@ -13,6 +13,7 @@ from hashlib import md5
 from random import choice
 from datetime import datetime
 import pymongo.errors
+from flask_login import AnonymousUser
 
 def md5hash(data):
     hashed = md5()
@@ -199,6 +200,11 @@ class FavoriteStation(AbstractFavorite):
     @classmethod
     def remove(cls, station_id, user_id):
         db[cls.__collection__].remove({'user_id': user_id, 'station_id': station_id})
+
+
+class AnonUser(AnonymousUser):
+    def get_public(self):
+        return None
 
 @db.register
 class User(BaseDocument):
@@ -577,7 +583,6 @@ class Stream(BaseDocument):
                 # игнорируем, если поток уде был добавлен из другого плейлиста
                 pass
 
-
 @db.register
 class Air(BaseDocument):
     __collection__ = 'air'
@@ -590,6 +595,7 @@ class Air(BaseDocument):
         'ts': int,
     }
 
+login_manager.anonymous_user = AnonUser
 
 if __name__ == '__main__':
     import unittest

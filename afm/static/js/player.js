@@ -1,23 +1,13 @@
-/**
- * настройки пользователя
- * отображение имени в хедере, если есть в настройках
- * логин через вконтакте
- * баг с ховером отмены удаления трека
- * Прокидывание в регистрацию избранного и треклиста
- * PIE для IE
- */
+angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 
-var afm = angular.module('afm', ['ngResource', 'ngCookies']);
+.config(function($routeProvider, $locationProvider, cometProvider){
+    cometProvider.setUrl('http://comet.' + document.location.host);
 
-afm.value('bootstrapUser', null);
-afm.service('comet', ['cometUrl', Comet]);
-
-afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider){
-    // TODO: add forEach
     $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
     $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
     $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
     $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
+
     // controller don't execute without "template" attr
     $routeProvider.when('/listen/:id', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
         station: ['$route', '$http', function($route, $http) {
@@ -29,12 +19,11 @@ afm.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
             });
         }]
     }});
-    $routeProvider.when('/my/radio', {templateUrl: '/my/radio', controller: 'MyRadioCtrl'});
-    //$routeProvider.otherwise({redirectTo: '/'});
-    $locationProvider.html5Mode(true).hashPrefix('!');
-}]);
 
-afm.run(function($rootScope, currentUser, bootstrapUser, routeHistory, User){
+    $locationProvider.html5Mode(true).hashPrefix('!');
+})
+
+.run(function($rootScope, currentUser, User){
     $rootScope.currentUser = currentUser;
     $rootScope.logout = function() {
         if (currentUser.isLogged()) {
@@ -42,11 +31,10 @@ afm.run(function($rootScope, currentUser, bootstrapUser, routeHistory, User){
             User.logout();
         }
     };
+    currentUser.update($rootScope.bootstrapUser);
+})
 
-    currentUser.update(bootstrapUser);
-});
-
-afm.directive('volumeWrapper', function(){
+.directive('volumeWrapper', function(){
     return {
         restrict: 'C',
         link: function(scope, element) {
@@ -59,10 +47,10 @@ afm.directive('volumeWrapper', function(){
             });
         }
     };
-});
+})
 
 // TODO: add touch support
-afm.directive('volumeHandle', function($rootScope, $document){
+.directive('volumeHandle', function($rootScope, $document){
     return {
         restrict: 'A',
         scope: {
@@ -143,10 +131,10 @@ afm.directive('volumeHandle', function($rootScope, $document){
             }
         }
     };
-});
+})
 
 // TODO: prevent body scroll
-afm.directive('tracksBox', ['$document', function($document){
+.directive('tracksBox', function($document){
     return {
         restrict: 'C',
         link: function($scope, element) {
@@ -182,12 +170,12 @@ afm.directive('tracksBox', ['$document', function($document){
             });
         }
     };
-}]);
+})
 
-afm.factory('routeHistory', ['$rootScope', '$route', '$location', function($rootScope, $route, $location){
+.factory('routeHistory', function($rootScope, $route, $location){
     var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
     $rootScope.$on('$routeChangeSuccess', function(target, current){
-        if (current.$route && !current.$route.modal) {
+        if (current && current.$route && !current.$route.modal) {
             returnTo = $location.path();
         }
     });
@@ -196,9 +184,9 @@ afm.factory('routeHistory', ['$rootScope', '$route', '$location', function($root
             $location.path(returnTo);
         }
     };
-}]);
+})
 
-afm.directive('modal', ['$document', 'routeHistory', function($document, routeHistory){
+.directive('modal', ['$document', 'routeHistory', function($document, routeHistory){
     return {
         restrict: 'E',
         replace: true,
@@ -213,6 +201,7 @@ afm.directive('modal', ['$document', 'routeHistory', function($document, routeHi
             element.find('i').bind('click', function(){
                 routeHistory.backToNotModal();
             });
+
             // close on escape
             $document.bind('keyup', function(e){
                 if (e.keyCode == 27) {
@@ -221,9 +210,9 @@ afm.directive('modal', ['$document', 'routeHistory', function($document, routeHi
             });
         }
     };
-}]);
+}])
 
-afm.directive('modalBox', ['$route', function($route){
+.directive('modalBox', function($route){
     return {
         restrict: 'AC',
         link: function(scope, element) {
@@ -236,29 +225,9 @@ afm.directive('modalBox', ['$route', function($route){
             }
         }
     };
-}]);
+})
 
-afm.factory('audio', ['$document', function($document) {
-    var audio = $document[0].createElement('audio');
-    return audio;
-}]);
-
-
-afm.directive('flashEngine', ['$window', 'player', function($window, player){
-    $window.flashPlayerCallback = player.flashCallback;
-    return {
-        restrict: 'C',
-        link: function(scope, element, attrs) {
-            // TODO: move swfobject to provider
-            swfobject.embedSWF(attrs.src, attrs.id, 1, 1, '10', false, {}, {
-                allowScriptAccess: 'always',
-                wmode: 'transparent'
-            }, {});
-        }
-    };
-}]);
-
-afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
+.factory('player', function($rootScope, storage) {
     var player = {
         url: null,
         volume: 0.6,
@@ -340,58 +309,9 @@ afm.factory('player', ['$rootScope', 'storage', function($rootScope, storage) {
 
     player.loadVolume();
     return player;
-}]);
+})
 
-afm.factory('storage', ['$window', '$cacheFactory', '$log', function($window, $cacheFactory, $log){
-    try {
-        // test localStorage
-        var storage = $window.localStorage;
-        if (storage) {
-            storage.setItem('key', 'value');
-            storage.removeItem('key');
-            return {
-                put: function(key, value) {
-                    storage.setItem(key, angular.toJson(value));
-                },
-
-                get: function(key) {
-                    return angular.fromJson(storage.getItem(key));
-                },
-
-                remove: function(key) {
-                    storage.removeItem(key);
-                }
-            };
-        }
-    } catch(e) {}
-    // fallback
-    $log.warn('localStorage not available. fallback used.');
-    return $cacheFactory('storage');
-}]);
-
-afm.factory('currentUser', function(){
-    var user = null;
-    return {
-        update: function(userUpdate) {
-            user = userUpdate;
-        },
-
-        clear: function() {
-            user = null;
-        },
-
-        isLogged: function() {
-            return !!user;
-        },
-
-        get: function() {
-            return user;
-        }
-    };
-});
-
-afm.factory('favorites', ['$rootScope', 'currentUser', 'storage', 'UserFavorite',
-    function($rootScope, currentUser, storage, UserFavorite) {
+.factory('favorites', function($rootScope, currentUser, storage, UserFavorite) {
     var STORAGE_ID = 'favorites';
     var favorites = storage.get(STORAGE_ID) || {};
 
@@ -448,37 +368,17 @@ afm.factory('favorites', ['$rootScope', 'currentUser', 'storage', 'UserFavorite'
             return result;
         }
     };
-}]);
+})
 
-afm.factory('User', ['$http', function($http){
-    return {
-        login: function(params) {
-            return $http.post('/api/user/login', params);
-        },
-
-        signup: function(params) {
-            return $http.post('/api/user/signup', params);
-        },
-
-        amnesia: function(params) {
-            return $http.post('/api/user/amnesia', params);
-        },
-
-        logout: function() {
-            return $http.post('/api/user/logout');
-        }
-    };
-}]);
-
-afm.factory('Station', ['$http', function($http){
+.factory('Station', function($http){
     return {
         get: function(stationId) {
             return $http.get('/api/station/' + stationId);
         }
     };
-}]);
+})
 
-afm.factory('UserFavorite', ['$http', function($http){
+.factory('UserFavorite', function($http){
     return {
         add: function(id) {
             $http.post('/api/user/favorites/' + id + '/add');
@@ -494,9 +394,9 @@ afm.factory('UserFavorite', ['$http', function($http){
             });
         }
     };
-}]);
+})
 
-afm.factory('UserTrack', ['$http', function($http){
+.factory('UserTrack', function($http){
     return {
         add: function(id) {
             $http.post('/api/user/tracks/' + id + '/add');
@@ -516,23 +416,9 @@ afm.factory('UserTrack', ['$http', function($http){
             });
         }
     };
-}]);
+})
 
-afm.factory('passErrorToScope', function(){
-    return function($scope) {
-        return function(response, statusCode) {
-            var error = {};
-            if (angular.isObject(response) && response.error) {
-                error.reason = response.error;
-            }
-            error.code = statusCode;
-            $scope.error = error;
-        };
-    };
-});
-
-afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
-    function($scope, $location, currentUser, User, passErrorToScope){
+.controller('LoginCtrl', function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -553,10 +439,9 @@ afm.controller('LoginCtrl', ['$scope', '$location', 'currentUser', 'User', 'pass
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
-}]);
+})
 
-afm.controller('SignupCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
-    function($scope, $location, currentUser, User, passErrorToScope){
+.controller('SignupCtrl', function($scope, $location, currentUser, User, passErrorToScope){
 
     if (currentUser.isLogged()) {
         $location.path('/');
@@ -577,10 +462,9 @@ afm.controller('SignupCtrl', ['$scope', '$location', 'currentUser', 'User', 'pas
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
-}]);
+})
 
-afm.controller('AmnesiaCtrl', ['$scope', '$location', 'currentUser', 'User', 'passErrorToScope',
-    function($scope, $location, currentUser, User, passErrorToScope){
+.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, passErrorToScope){
     if (currentUser.isLogged()) {
         $location.path('/');
         return;
@@ -597,43 +481,33 @@ afm.controller('AmnesiaCtrl', ['$scope', '$location', 'currentUser', 'User', 'pa
             $scope.result = result;
         }).error(passErrorToScope($scope));
     };
-}]);
+})
 
-afm.factory('Feedback', ['$http', function($http) {
+.factory('Feedback', function($http) {
     return {
         send: function(params) {
             return $http.post('/api/feedback', params);
         }
     };
-}]);
+})
 
-afm.controller('FeedbackCtrl', ['$scope', 'Feedback', 'passErrorToScope',
-    function($scope, Feedback, passErrorToScope){
-        $scope.form = {};
+.controller('FeedbackCtrl', function($scope, Feedback, passErrorToScope){
+    $scope.form = {};
 
-        $scope.$watch('form', function(){
-            $scope.error = null;
-        }, true);
+    $scope.$watch('form', function(){
+        $scope.error = null;
+    }, true);
 
-        $scope.feedback = function() {
-            $scope.error = null;
-            $scope.result = null;
-            Feedback.send($scope.form).success(function(result){
-                $scope.result = result;
-            }).error(passErrorToScope($scope));
-        };
-}]);
-
-afm.factory('Playlist', ['$http', function($http){
-    return {
-        get: function(playlist) {
-            return $http.get('/api/radio/' + playlist);
-        }
+    $scope.feedback = function() {
+        $scope.error = null;
+        $scope.result = null;
+        Feedback.send($scope.form).success(function(result){
+            $scope.result = result;
+        }).error(passErrorToScope($scope));
     };
-}]);
+})
 
-// ajax loader
-afm.directive('loader', function(){
+.directive('loader', function(){
     return {
         restrict: 'C',
         templateUrl: '/loader.html',
@@ -646,17 +520,23 @@ afm.directive('loader', function(){
             });
         }
     };
-});
+})
 
 /**
  * Контролер плейлиста
  */
-afm.controller('PlaylistCtrl', function($scope, $http, radio, bootstrapGenres, $timeout){
+.controller('PlaylistCtrl', function($scope, $http, radio, $timeout){
     $scope.searchQuery = '';
     $scope.tabs = [];
     $scope.playlist = [];
 
-    angular.forEach(bootstrapGenres, function(genre){
+    $scope.$on('freePlay', function(){
+        if ($scope.playlist) {
+            $scope.selectStation($scope.playlist[0]);
+        }
+    });
+
+    angular.forEach($scope.bootstrapGenres, function(genre){
         $scope.tabs.push({
             id: 'genre/' + genre.id,
             title: genre.title
@@ -713,11 +593,10 @@ afm.controller('PlaylistCtrl', function($scope, $http, radio, bootstrapGenres, $
         var selected = (tabId == $scope.currentTab);
         return {selected: selected};
     };
-});
+})
 
-afm.factory('radio', ['$rootScope', '$window', function($rootScope, $window){
-    var currentStation = null;
-    var previousStation = null;
+.factory('radio', function($rootScope){
+    var currentStation, previousStation;
 
     function selectStation(station) {
         // TODO: check this WTF...
@@ -726,7 +605,6 @@ afm.factory('radio', ['$rootScope', '$window', function($rootScope, $window){
         }
         currentStation = station;
         $rootScope.$broadcast('stationChanged', currentStation, previousStation);
-        $window.document.title = currentStation.title;
     }
 
     return {
@@ -736,24 +614,24 @@ afm.factory('radio', ['$rootScope', '$window', function($rootScope, $window){
         previousStation: function() {
             return previousStation;
         },
-        isStationLoaded: function() {
+        loaded: function() {
             return currentStation && currentStation.id;
         },
         selectStation: selectStation
     };
-}]);
+})
 
-afm.controller('RadioStationCtrl', ['station', 'radio', 'player', function(station, radio, player){
+.controller('RadioStationCtrl', function(station, radio, player){
     // prevent double load station, sound cause flickering
-    if (radio.isStationLoaded() && radio.getStation().id == station.id) {
+    if (radio.loaded() && radio.getStation().id == station.id) {
         return;
     }
     radio.selectStation(station);
+    player.stop();
     player.play(station.stream.listen_url);
-}]);
+})
 
-afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
-    function($scope, $http, $location, player, radio){
+.controller('PlayerCtrl', function($rootScope, $scope, $http, $location, player, radio){
     $scope.currentStation = radio.getStation;
     $scope.previousStation = radio.previousStation;
 
@@ -782,6 +660,10 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
     };
 
     $scope.play = function() {
+        if (!radio.loaded()) {
+            $rootScope.$broadcast('freePlay');
+            return;
+        }
         player.play();
     };
 
@@ -802,9 +684,9 @@ afm.controller('RadioCtrl', ['$scope', '$http', '$location', 'player', 'radio',
             $scope.volume = 0;
         }
     };
-}]);
+})
 
-afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorites){
+.controller('FavoritesCtrl', function($scope, favorites){
     $scope.getFavorites = function() {
         return favorites.get();
     };
@@ -812,9 +694,9 @@ afm.controller('FavoritesCtrl', ['$scope', 'favorites', function($scope, favorit
     $scope.remove = function(id) {
         favorites.remove(id);
     };
-}]);
+})
 
-afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
+.directive('clock', function($timeout, dateFilter) {
     // return the directive link function. (compile function not needed)
     return function(scope, element, attrs) {
         var timeoutId; // timeoutId, so that we can cancel the time updates
@@ -852,18 +734,18 @@ afm.directive('clock', ['$timeout', 'dateFilter', function($timeout, dateFilter)
             $timeout.cancel(timeoutId);
         });
     };
-}]);
+})
 
-afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($rootScope, currentUser, radio, comet){
-    var params = {};
-    var track = null;
+.factory('onair', function($rootScope, currentUser, radio, comet){
+    var params = {wait: 30};
+    var air = null;
 
     $rootScope.$watch(function() { return currentUser.isLogged(); }, function(logged){
         // TODO: rename user_id => uid
         if (logged) {
-            params.user_id = currentUser.get().id;
+            params.uid = currentUser.get().id;
         } else {
-            delete params.user_id;
+            delete params.uid;
         }
         subscribe();
     });
@@ -877,94 +759,35 @@ afm.factory('onair', ['$rootScope', 'currentUser', 'radio', 'comet', function($r
     }, true);
 
     function update(newTrack) {
-        track = newTrack;
+        air = newTrack;
         // force convert to int, onair maybe return id as string
-        if (angular.isString(track.id)) {
-            track.id = parseInt(track.id, 10);
+        if (angular.isString(air.id)) {
+            air.id = parseInt(air.id, 10);
         }
         $rootScope.$apply();
     }
 
     function subscribe() {
-        comet.unsubscribe();
-        if (params.channel) {
-            comet.subscribe(params, update);
+        if (!radio.getStation()) {
+            return;
         }
+        comet.unsubscribe();
+        comet.subscribe('/onair/' + radio.getStation().id, params, update);
     }
 
     return {
-        getTrack: function() {
-            return track;
+        getAir: function() {
+            return air;
         }
     };
-}]);
-
-afm.directive('marquee', function($transition){
-    return {
-        restrict: 'C',
-        transclude: true,
-        template: '<span class="marquee-scroll" ng-transclude></span>',
-        link: function($scope, element) {
-            var scroll = element.children('.marquee-scroll');
-            var delta = 0;
-            var transition;
-
-            element.addClass('marquee-text-overflow');
-
-            function animate() {
-                if (transition) {
-                    transition.cancel();
-                }
-
-                var duration = Math.round(delta * 42 / 1000);
-                if (duration < 1) {
-                    return;
-                }
-
-                element.removeClass('marquee-text-overflow');
-                scroll.css({transitionDuration: duration + 's'});
-
-                transition = $transition(scroll, {marginLeft: -delta + 'px'});
-                transition.then(function(){
-                    transition.cancel();
-                    transition = $transition(scroll, {
-                        marginLeft: 0,
-                        transitionDelay: '1s'
-                    });
-                    transition.then(animate);
-                });
-            }
-
-            element.bind('mouseover', function(){
-                var scrollWidth = scroll[0].offsetWidth;
-                var elementWidth = element[0].offsetWidth;
-                delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
-                if (delta) {
-                    animate();
-                }
-            });
-
-            element.bind('mouseout', function(){
-                if (transition) {
-                    transition.cancel();
-                }
-                element.addClass('marquee-text-overflow');
-                scroll.css({
-                    transitionDuration: 0,
-                    transitionDelay: 0,
-                    marginLeft: 0
-                });
-            });
-        }
-    };
-});
+})
 
 /**
  * Дисплей радиостанции
  */
-afm.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tracks, onair) {
-    $rootScope.$watch(function(){ return onair.getTrack(); }, function(track){
-        $scope.track = track;
+.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tracks, onair) {
+    $rootScope.$watch(function(){ return onair.getAir(); }, function(air){
+        $scope.air = air;
     }, true);
 
     $scope.$watch(function(){ return radio.getStation(); }, function(station){
@@ -993,18 +816,18 @@ afm.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tra
     };
 
     $scope.like = function() {
-        var track = $scope.track;
-        if (tracks.exists(track.id)) {
-            tracks.remove(track.id);
-            track.favorite = false;
+        var air = $scope.air;
+        if (tracks.exists(air.id)) {
+            tracks.remove(air.id);
+            air.favorite = false;
         } else {
-            tracks.add(track.id, track.title);
-            track.favorite = true;
+            tracks.add(air.id, air.title);
+            air.favorite = true;
         }
     };
-});
+})
 
-afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
+.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
     var STORAGE_ID = 'tracks';
     var tracks = storage.get(STORAGE_ID) || {};
 
@@ -1067,9 +890,9 @@ afm.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
             return result;
         }
     };
-});
+})
 
-afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
+.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
     $scope.tracks = [];
     $scope.searchQuery = '';
 
@@ -1118,18 +941,11 @@ afm.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, 
         delete track.removed;
         tracks.restore(track);
     };
-});
+})
 
-afm.controller('MenuCtrl', function($scope, $rootScope){
+.controller('MenuCtrl', function($scope, $rootScope){
     $scope.toggleTracks = function($event) {
         $rootScope.$broadcast('tracks.toggle');
         $event.stopPropagation();
     };
-});
-
-afm.controller('MyRadioCtrl', function($scope, $http){
-    $scope.radioList = [];
-    $http.get('/api/my/radio').success(function(response){
-        $scope.radioList = response.objects;
-    });
 });

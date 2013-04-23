@@ -1,4 +1,4 @@
-afm.directive('uiAnimate', ['$timeout', function ($timeout) {
+angular.module('afm.base').directive('uiAnimate', ['$timeout', function ($timeout) {
     return {
         restrict: 'A', // supports using directive as element, attribute and class
         link: function ($scope, element, attrs) {

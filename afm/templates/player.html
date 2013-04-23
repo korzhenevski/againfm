@@ -17,29 +17,27 @@
     </script>
 
     <div class="topline">
-        <!-- TODO: нахера два центройда? -->
+        {# TODO: нахера два центройда? #}
         <div class="topline-inner centroid">
-            <table class="topmenu centroid" data-ng-controller="MenuCtrl">
-                <tr>
-                    <td width="20%">
+
+            <div class="topmenu" data-ng-controller="MenuCtrl">
+                <div class="menu-item">
+                    <p>
                         <a data-ng-click="toggleTracks($event)" class="tracks-toggle">
-                            <i class="tracks-icon"></i>
-                            Любимые песни из эфира
+                            <i class="tracks-icon"></i>Любимые песни из эфира
                         </a>
-                    </td>
-                    <td style="padding-left: 30px">
-                        <a href="/radio/" target="_self">Радио</a>
-                    </td>
-                    <td align="right">
-                        <p data-ng-hide="currentUser.isLogged()">
-                            <a href="/signup">Стать постоянным слушателем</a> или <a href="/login">войти с паролем</a>
-                        </p>
-                        <p data-ng-show="currentUser.isLogged()">
-                            <a data-ng-click="logout()">выйти</a>
-                        </p>
-                    </td>
-                </tr>
-            </table>
+                    </p>
+                </div>
+                <div class="menu-item side-item">
+                    <p data-ng-hide="currentUser.isLogged()">
+                        <a href="/signup">Стать постоянным слушателем</a>
+                        <a href="/login">Войти с паролем</a>
+                    </p>
+                    <p data-ng-show="currentUser.isLogged()">
+                        <a data-ng-click="logout()">выйти</a>
+                    </p>
+                </div>
+            </div>
 
             <div data-ng-controller="TracksCtrl" class="tracks-box" data-ng-class="{visible: visible}">
                 <span class="tracks-corner"></span>
@@ -52,14 +50,14 @@
                     </div>
                     <table class="tracks">
                         <tr data-ng-class="trackClass(track)" data-ng-repeat="track in getTracks()">
-                            <!--
+                            {#
                             artist - track          (today, yesterday, ..., 21 марта, 21.08.09)
                             station | time
-                            -->
+                            #}
                             <td class="title">{{ track.title }}</td>
                             <td class="controls" align="right">
                                 <i data-ng-click="remove(track)" class="remove" data-ng-hide="track.removed"></i>
-                                <!-- TODO: fix hover bug -->
+                                {#  TODO: fix hover bug #}
                                 <a data-ng-click="restore(track)" class="restore" data-ng-show="track.removed">отмена</a>
                             </td>
                         </tr>
@@ -82,9 +80,8 @@
     <div class="ground">
         <div class="ground-shadow">
             <div class="content">
-                <table class="radio-box" data-ng-controller="RadioCtrl">
+                <table class="radio-box" data-ng-controller="PlayerCtrl">
                     <tr valign="top">
-
                         <!-- Минидисплей -->
                         <td width="312px">
                             <div class="display-ground">
@@ -167,7 +164,7 @@
                                     </td>
                                     <td>
                                         <button class="pause" data-ng-click="stop()" data-ng-show="isPlaying()"></button>
-                                        <button class="play" data-ng-click="play()" data-ng-hide="isPlaying()" data-ng-disabled="!currentStation()"></button>
+                                        <button class="play" data-ng-click="play()" data-ng-hide="isPlaying()"></button>
                                     </td>
                                     <td>
                                         <button class="random" data-ng-click="selectRandomStation()"></button>
@@ -228,18 +225,14 @@
 {{% block scripts %}}
     <script src="/static/js/common/swfobject.js"></script>
     <script src="/static/js/common/comet.js"></script>
+    <script src="/static/js/afm.js"></script>
+    <script src="/static/js/sound.js"></script>
     <script src="/static/js/player.js"></script>
     <script src="/static/js/common/ui-transition.js"></script>
     <script src="/static/js/common/ui-animate.js"></script>
     <script>
-        {# TODO: разобратся с этой хуйней #}
-        afm.value('bootstrapUser', {{{ user|json }}});
-        afm.value('bootstrapGenres', {{{ genres|json }}});
-        // configure comet over $provide.configuration
-        afm.value('cometUrl', {{{ config.COMET_URL|json }}});
-
         angular.element(document).ready(function(){
-            angular.bootstrap(document, ['afm']);
+            angular.bootstrap(document, ['afm.player']);
         });
     </script>
 {{% endblock %}}
