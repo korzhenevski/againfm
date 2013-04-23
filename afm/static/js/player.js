@@ -745,7 +745,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 /**
  * Дисплей радиостанции
  */
-.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tracks, onair) {
+.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, onair) {
     $rootScope.$watch(function(){ return onair.get(); }, function(air){
         $scope.air = air;
     }, true);
@@ -775,15 +775,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 
     $scope.like = function() {
-        var air = $scope.air;
 
-        if (tracks.exists(air.id)) {
-            tracks.remove(air.id);
-            air.favorite = false;
-        } else {
-            tracks.add(air.id, air.title);
-            air.favorite = true;
-        }
     };
 })
 

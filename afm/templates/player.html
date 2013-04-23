@@ -21,13 +21,6 @@
         <div class="topline-inner centroid">
 
             <div class="topmenu" ng-controller="MenuCtrl">
-                <div class="menu-item">
-                    <p>
-                        <a ng-click="toggleTracks($event)" class="tracks-toggle">
-                            <i class="tracks-icon"></i>Любимые песни из эфира
-                        </a>
-                    </p>
-                </div>
                 <div class="menu-item side-item">
                     <p ng-hide="user.isLogged()">
                         <a href="/signup">Стать постоянным слушателем</a>
@@ -36,32 +29,6 @@
                     <p ng-show="user.isLogged()">
                         <a ng-click="logout()">выйти</a>
                     </p>
-                </div>
-            </div>
-
-            <div ng-controller="TracksCtrl" class="tracks-box" ng-class="{visible: visible}">
-                <span class="tracks-corner"></span>
-                <div class="tracks-inner">
-                    <div class="search" ng-show="haveTracks()">
-                        <input type="text" class="text search-field" ng-model="searchQuery" placeholder="поиск треков" />
-                    </div>
-                    <div class="help" ng-hide="haveTracks()">
-                        <p>Сюда можно отложить название трека из&nbsp;<nobr>радио-эфира</nobr>.</p>
-                    </div>
-                    <table class="tracks">
-                        <tr ng-class="trackClass(track)" ng-repeat="track in getTracks()">
-                            {#
-                            artist - track          (today, yesterday, ..., 21 марта, 21.08.09)
-                            station | time
-                            #}
-                            <td class="title">{{ track.title }}</td>
-                            <td class="controls" align="right">
-                                <i ng-click="remove(track)" class="remove" ng-hide="track.removed"></i>
-                                {# TODO: fix hover bug #}
-                                <a ng-click="restore(track)" class="restore" ng-show="track.removed">отмена</a>
-                            </td>
-                        </tr>
-                    </table>
                 </div>
             </div>
         </div>
@@ -100,7 +67,7 @@
                                                 <span class="marquee" ng-show="track.artist">
                                                     <strong>{{ track.artist }}</strong> &mdash; {{ track.name }}
                                                 </span>
-                                                <span class="like"></span>
+                                                <!--span class="like"></span-->
                                             </p>
                                         </div>
                                         <div class="clock" clock="title"></div>
@@ -109,7 +76,7 @@
                             </div>
                         </td>
 
-                        <!-- Шкала -->
+                        {# плейлист #}
                         <td rowspan="3">
                             <div class="radio-table">
                                 <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="selectTab('featured')">
@@ -120,7 +87,7 @@
                                         <div class="loader"></div>
                                     </div>
 
-                                    <!-- навигация -->
+                                    {# навигация #}
                                     <ul class="tabs justified">
                                         <li>
                                             <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
@@ -130,7 +97,7 @@
                                         </li>
                                     </ul>
 
-                                    <!-- список радиостанций -->
+                                    {# список радиостанций #}
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
@@ -152,7 +119,7 @@
                     </tr>
                     <tr>
 
-                        <!-- Контролы управления -->
+                        {# элементы управления #}
                         <td align="center">
                             <table class="controls" width="80%">
                                 <tr align="center">
@@ -186,7 +153,7 @@
                     </tr>
 
                     <tr>
-                        <!-- Мое избранное -->
+                        {# избранное радио #}
                         <td class="favorites-cell">
                             <div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
