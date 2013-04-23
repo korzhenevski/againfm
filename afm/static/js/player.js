@@ -1,7 +1,11 @@
-angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
+angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
 .config(function($routeProvider, $locationProvider, cometProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
+
+    // controller don't execute without "template" attr
+    $routeProvider.when('/listen/:radioId', {template:'<div></div>', controller: 'ListenCtrl'});
+
     $locationProvider.html5Mode(true).hashPrefix('!');
 })
 
@@ -15,47 +19,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 
     user.update($rootScope.bootstrapUser);
-})
-
-.directive('modal', function($document, routeHistory){
-    return {
-        restrict: 'E',
-        replace: true,
-        transclude: true,
-        scope: {
-            title: '@'
-        },
-        template: '<div class="modal" ui-animate><h1 class="header">{{ title }} <i class="close"></i></h1>' +
-                  '<div ng-transclude></div></div>',
-        link: function(scope, element, attrs) {
-            element.addClass('modal-' + attrs.id);
-            element.find('i').bind('click', function(){
-                routeHistory.backToNotModal();
-            });
-
-            // close on escape
-            $document.bind('keyup', function(e){
-                if (e.keyCode == 27) {
-                    routeHistory.backToNotModal();
-                }
-            });
-        }
-    };
-})
-
-.directive('modalBox', function($route){
-    return {
-        restrict: 'AC',
-        link: function(scope, element) {
-            scope.$on('$routeChangeSuccess', update);
-            update();
-
-            function update() {
-                var modal = $route.current && $route.current.modal;
-                element.css('display', modal ? 'block' : 'none');
-            }
-        }
-    };
 })
 
 .factory('player', function($rootScope, storage) {
@@ -246,71 +209,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
                 cb(response.objects);
             });
         }
-    };
-})
-
-.controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
-    }
-
-    $scope.form = {};
-
-    // TODO: move to form controller
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.auth = function() {
-        $scope.error = null;
-
-        User.login($scope.form).success(function(response){
-            user.update(response.user);
-            $location.path('/');
-        }).error(passErrorToScope($scope));
-    };
-})
-
-.controller('SignupCtrl', function($scope, $location, user, User, passErrorToScope){
-
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
-    }
-
-    $scope.form = {};
-
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.signup = function() {
-        $scope.error = null;
-
-        User.signup($scope.form).success(function(response){
-            user.update(response.user);
-            $location.path('/');
-        }).error(passErrorToScope($scope));
-    };
-})
-
-.controller('AmnesiaCtrl', function($scope, $location, user, User, passErrorToScope){
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
-    }
-
-    $scope.form = {};
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.amnesia = function() {
-        $scope.error = null;
-        User.amnesia($scope.form).success(function(result){
-            $scope.result = result;
-        }).error(passErrorToScope($scope));
     };
 })
 
@@ -544,22 +442,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.factory('routeHistory', function($rootScope, $route, $location){
-    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
-    $rootScope.$on('$routeChangeSuccess', function(target, current){
-        if (current && current.$route && !current.$route.modal) {
-            returnTo = $location.path();
-        }
-    });
-    return {
-        backToNotModal: function() {
-            $location.path(returnTo);
-        }
-    };
-})
+
 
 .controller('PlayerCtrl', function($scope, $http, $location, player, radio){
-    $scope.radio = radio.get();
+    $scope.radio = radio.get;
 
     $scope.itemClass = function(item, current) {
         var selected = current && current.id == item.id;
@@ -708,7 +594,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
  * Дисплей радиостанции
  */
 .controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, onair) {
-    $rootScope.$watch(function(){ return onair.get(); }, function(air){
+    $scope.$watch(function(){ return onair.get(); }, function(air){
         $scope.air = air;
     }, true);
 
@@ -803,63 +689,5 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             });
             return result;
         }
-    };
-})
-
-.controller('TracksCtrl', function($scope, $rootScope, $filter, user, tracks){
-    $scope.tracks = [];
-    $scope.searchQuery = '';
-
-    // reload tracks on user login/logout
-    $rootScope.$watch(function() { return user.isLogged(); }, function(){
-        $scope.tracks = angular.copy(tracks.get());
-        $scope.searchQuery = '';
-    });
-
-    $scope.haveTracks = function() {
-        return !!$scope.tracks.length;
-    };
-
-    $scope.trackClass = function(track) {
-        return {
-            track: !track.removed,
-            'track-removed': track.removed
-        };
-    };
-
-    $scope.loadTracks = function() {
-        $scope.tracks = angular.copy(tracks.get());
-    };
-
-    // reload tracks when user toggle box
-    $rootScope.$on('tracks.toggle', function(){
-        $scope.loadTracks();
-    });
-
-    $scope.getTracks = function() {
-        if (!$scope.tracks.length || $scope.searchQuery) {
-            $scope.loadTracks();
-        }
-        if ($scope.searchQuery) {
-            return $filter('filter')(tracks.get(), $scope.searchQuery);
-        }
-        return $scope.tracks;
-    };
-
-    $scope.remove = function(track) {
-        track.removed = true;
-        tracks.remove(track.id);
-    };
-
-    $scope.restore = function(track) {
-        delete track.removed;
-        tracks.restore(track);
-    };
-})
-
-.controller('MenuCtrl', function($scope, $rootScope){
-    $scope.toggleTracks = function($event) {
-        $rootScope.$broadcast('tracks.toggle');
-        $event.stopPropagation();
     };
 });

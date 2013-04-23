@@ -19,7 +19,7 @@
     <div class="topline">
         {# TODO: нахера два центройда? #}
         <div class="topline-inner centroid">
-            <div class="topmenu" ng-controller="MenuCtrl">
+            <div class="topmenu">
                 <div class="menu-item side-item">
                     <p ng-hide="user.isLogged()">
                         <a href="/signup">Стать постоянным слушателем</a>
@@ -99,7 +99,8 @@
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
                                             <li ng-repeat="station in playlist">
-                                                <div class="block station-link" ng-click="selectStation(station)">
+                                                <div class="block station-link" ng-class="itemClass(station, radio())"
+                                                     ng-click="selectStation(station)">
                                                     <span class="link">{{ station.title }}</span>
                                                 </div>
                                             </li>
@@ -155,7 +156,7 @@
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="station in getFavorites()">
-                                        <div class="block" ng-click="selectStation(station)">
+                                        <div class="block" ng-class="itemClass(station, radio())" ng-click="selectStation(station)">
                                             {{ station.title }} <i class="remove" ng-click="remove(station.id)"></i>
                                         </div>
                                     </li>
@@ -188,8 +189,9 @@
 {{% block scripts %}}
     <script src="/static/js/common/swfobject.js"></script>
     <script src="/static/js/common/comet.js"></script>
-    <script src="/static/js/afm.js"></script>
+    <script src="/static/js/base.js"></script>
     <script src="/static/js/sound.js"></script>
+    <script src="/static/js/user.js"></script>
     <script src="/static/js/player.js"></script>
     <script src="/static/js/common/ui-transition.js"></script>
     <script src="/static/js/common/ui-animate.js"></script>

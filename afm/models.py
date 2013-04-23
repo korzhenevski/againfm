@@ -64,7 +64,7 @@ class BaseDocument(Document):
     def get_public(self, fields=None):
         if fields is None:
             fields = self.public
-        else:
+        elif isinstance(fields, basestring):
             fields = fields.split(',')
         fields = set(fields) & set(self.structure.keys())
         return dict((field, self.get(field)) for field in fields)

@@ -139,4 +139,59 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
             $scope.error = error;
         };
     };
+})
+
+.directive('modal', function($document, routeHistory){
+    return {
+        restrict: 'E',
+        replace: true,
+        transclude: true,
+        scope: {
+            title: '@'
+        },
+        template: '<div class="modal" ui-animate><h1 class="header">{{ title }} <i class="close"></i></h1>' +
+                  '<div ng-transclude></div></div>',
+        link: function(scope, element, attrs) {
+            element.addClass('modal-' + attrs.id);
+            element.find('i').bind('click', function(){
+                routeHistory.backToNotModal();
+            });
+
+            // close on escape
+            $document.bind('keyup', function(e){
+                if (e.keyCode == 27) {
+                    routeHistory.backToNotModal();
+                }
+            });
+        }
+    };
+})
+
+.directive('modalBox', function($route){
+    return {
+        restrict: 'AC',
+        link: function(scope, element) {
+            scope.$on('$routeChangeSuccess', update);
+            update();
+
+            function update() {
+                var modal = $route.current && $route.current.modal;
+                element.css('display', modal ? 'block' : 'none');
+            }
+        }
+    };
+})
+
+.factory('routeHistory', function($rootScope, $route, $location){
+    var returnTo = $route.current && !$route.current.$$route.modal ? $location.path() : '/';
+    $rootScope.$on('$routeChangeSuccess', function(target, current){
+        if (current && current.$$route && !current.$$route.modal) {
+            returnTo = $location.path();
+        }
+    });
+    return {
+        backToNotModal: function() {
+            $location.path(returnTo);
+        }
+    };
 });

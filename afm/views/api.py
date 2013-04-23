@@ -78,19 +78,15 @@ def user_favorites_add_or_remove(station_id):
     return jsonify({'favorite': state})
 
 
-@app.route('/api/radio/<int:radio_id>')
+@app.route('/api/radio/<int:radio_id>/listen')
 def api_radio(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id}).get_public()
+    radio = db.Radio.find_one_or_404({'id': radio_id}).get_public(['id', 'title'])
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
-    stream = db.Stream.find_one({
-        'radio_id': radio_id,
-        'content_type': 'audio/mpeg',
-        'deleted_at': 0,
-    })
-    if stream:
-        radio['stream'] = stream.get_public()
-    return jsonify(radio)
+
+    stream = db.Stream.find_one_or_404({'radio_id': radio_id, 'content_type': 'audio/mpeg', 'deleted_at': 0})
+    radio['stream'] = stream.get_public()
+    return jsonify({'radio': radio})
 
 
 @app.route('/api/station/random')
