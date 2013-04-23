@@ -19,7 +19,6 @@
     <div class="topline">
         {# TODO: нахера два центройда? #}
         <div class="topline-inner centroid">
-
             <div class="topmenu" ng-controller="MenuCtrl">
                 <div class="menu-item side-item">
                     <p ng-hide="user.isLogged()">
@@ -49,16 +48,14 @@
             <div class="content">
                 <table class="radio-box" ng-controller="PlayerCtrl">
                     <tr valign="top">
-                        <!-- Минидисплей -->
+                        {# минидисплей #}
                         <td width="312px">
                             <div class="display-ground">
                                 <div class="display-inner">
                                     <div class="display" ng-controller="DisplayCtrl">
                                         <div ng-show="title">
                                             <p class="title" ng-class="{starred: starred()}" ng-click="star()">
-                                                <span class="marquee">
-                                                    {{ title }}
-                                                </span>
+                                                <span class="marquee">{{ title }}</span>
                                                 <span class="star"></span>
                                             </p>
                                             <p class="track" ng-class="{liked: track.favorite}"
@@ -118,16 +115,15 @@
                         </td>
                     </tr>
                     <tr>
-
                         {# элементы управления #}
                         <td align="center">
                             <table class="controls" width="80%">
                                 <tr align="center">
                                     <td>
-                                        <!--button class="record"></button-->
+                                        <button class="record"></button>
                                     </td>
                                     <td>
-                                        <!--button class="back" ng-disabled="!previousStation()" ng-click="selectStation(previousStation())"></button-->
+                                        <button class="back"></button>
                                     </td>
                                     <td>
                                         <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>

@@ -115,45 +115,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-// TODO: prevent body scroll
-.directive('tracksBox', function($document){
-    return {
-        restrict: 'C',
-        link: function($scope, element) {
-            $scope.visible = false;
-            $scope.$on('tracks.toggle', function(){
-                $scope.visible = !$scope.visible;
-            });
-
-            element.bind('click', function(e){
-                e.stopPropagation();
-            });
-
-//            element.find('.tracks-inner').bind('mousewheel DOMMouseScroll', function(e){
-//                var delta = e.wheelDelta || -e.detail;
-//                this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
-//                e.preventDefault();
-//            });
-
-            // close on body click
-            $document.bind('click', function(){
-                $scope.$apply(function(){
-                    $scope.visible = false;
-                });
-            });
-
-            // close on escape
-            $document.bind('keyup', function(e){
-                if (e.keyCode == 27) {
-                    $scope.$apply(function(){
-                        $scope.visible = false;
-                    });
-                }
-            });
-        }
-    };
-})
-
 .factory('routeHistory', function($rootScope, $route, $location){
     var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
     $rootScope.$on('$routeChangeSuccess', function(target, current){
