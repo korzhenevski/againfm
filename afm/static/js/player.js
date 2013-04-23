@@ -168,7 +168,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.directive('modal', ['$document', 'routeHistory', function($document, routeHistory){
+.directive('modal', function($document, routeHistory){
     return {
         restrict: 'E',
         replace: true,
@@ -192,7 +192,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             });
         }
     };
-}])
+})
 
 .directive('modalBox', function($route){
     return {
@@ -578,50 +578,26 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 })
 
 .factory('radio', function(){
-    var radio = {
+    var self = {
         id: 0,
-        attrs: {},
-        set: function(newRadio) {
-            radio.id = newRadio.id;
-            radio.attrs = newRadio;
+        title: '',
+        current: {},
+
+        set: function(radio) {
+            self.id = radio.id;
+            self.title = radio.title;
+            self.current = radio;
         },
 
         get: function() {
-            return radio.attrs;
+            return self.current;
         }
     };
-    return radio;
+    return self;
 })
 
-.factory('radio2', function($rootScope){
-    var currentStation, previousStation;
-
-    function selectStation(station) {
-        // TODO: check this WTF...
-        if (station != previousStation) {
-            previousStation = currentStation;
-        }
-        currentStation = station;
-        $rootScope.$broadcast('stationChanged', currentStation, previousStation);
-    }
-
-    return {
-        getStation: function() {
-            return currentStation;
-        },
-        previousStation: function() {
-            return previousStation;
-        },
-        loaded: function() {
-            return currentStation && currentStation.id;
-        },
-        selectStation: selectStation
-    };
-})
-
-.controller('PlayerCtrl', function($rootScope, $scope, $http, $location, player, radio){
-    $scope.currentStation = radio.getStation;
-    $scope.previousStation = radio.previousStation;
+.controller('PlayerCtrl', function($scope, $http, $location, player, radio){
+    $scope.radio = radio.get();
 
     $scope.itemClass = function(item, current) {
         var selected = current && current.id == item.id;
@@ -734,15 +710,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         subscribe();
     });
 
-    $rootScope.$watch(function() { return radio.getStation(); }, function(station){
-        if (!angular.isObject(station)) {
+    $rootScope.$watch(function() { return radio.get(); }, function(radio){
+        if (!radio) {
             return;
         }
-        params.channel = station.stream.channel;
+        params.channel = radio.air_channel;
         subscribe();
     }, true);
 
-    function update(newTrack) {
+    function onUpdate(newTrack) {
         air = newTrack;
         // force convert to int, onair maybe return id as string
         if (angular.isString(air.id)) {
@@ -752,15 +728,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     }
 
     function subscribe() {
-        if (!radio.getStation()) {
+        if (!radio.id) {
             return;
         }
         comet.unsubscribe();
-        comet.subscribe('/onair/' + radio.getStation().id, params, update);
+        comet.subscribe('/onair/' + radio.id, params, onUpdate);
     }
 
     return {
-        getAir: function() {
+        get: function() {
             return air;
         }
     };
@@ -770,37 +746,37 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
  * Дисплей радиостанции
  */
 .controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, tracks, onair) {
-    $rootScope.$watch(function(){ return onair.getAir(); }, function(air){
+    $rootScope.$watch(function(){ return onair.get(); }, function(air){
         $scope.air = air;
     }, true);
 
-    $scope.$watch(function(){ return radio.getStation(); }, function(station){
-        $scope.title = station ? station.title : '';
+    // TODO: это вообще нафига?
+    $scope.$watch(function(){ return radio.get(); }, function(radio){
+        $scope.title = radio ? radio.title : '';
     });
 
     $scope.starred = function() {
-        var station = radio.getStation();
-        if (!station) {
+        if (!radio.id) {
             return false;
         }
-        return favorites.exists(station.id);
+        return favorites.exists(radio.id);
     };
 
     $scope.star = function() {
-        var station = radio.getStation();
-        if (!station) {
+        if (!radio.id) {
             return;
         }
 
-        if (favorites.exists(station.id)) {
-            favorites.remove(station.id);
+        if (favorites.exists(radio.id)) {
+            favorites.remove(radio.id);
         } else {
-            favorites.add(station.id, station.title);
+            favorites.add(radio.id, radio.title);
         }
     };
 
     $scope.like = function() {
         var air = $scope.air;
+
         if (tracks.exists(air.id)) {
             tracks.remove(air.id);
             air.favorite = false;
