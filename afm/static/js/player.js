@@ -577,7 +577,23 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.factory('radio', function($rootScope){
+.factory('radio', function(){
+    var radio = {
+        id: 0,
+        attrs: {},
+        set: function(newRadio) {
+            radio.id = newRadio.id;
+            radio.attrs = newRadio;
+        },
+
+        get: function() {
+            return radio.attrs;
+        }
+    };
+    return radio;
+})
+
+.factory('radio2', function($rootScope){
     var currentStation, previousStation;
 
     function selectStation(station) {
