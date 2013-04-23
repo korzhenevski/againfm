@@ -2,36 +2,18 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 
 .config(function($routeProvider, $locationProvider, cometProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
-
-    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
-    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
-    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
-    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
-
-    // controller don't execute without "template" attr
-    $routeProvider.when('/listen/:id', {template:'<div></div>', controller: 'RadioStationCtrl', resolve: {
-        station: ['$route', '$http', function($route, $http) {
-            // use $route instead $routeParams
-            // https://github.com/angular/angular.js/issues/1289
-            var id = $route.current.params.id;
-            return $http.get('/api/radio/' + id).then(function(req){
-                return req.data;
-            });
-        }]
-    }});
-
     $locationProvider.html5Mode(true).hashPrefix('!');
 })
 
-.run(function($rootScope, currentUser, User){
-    $rootScope.currentUser = currentUser;
+.run(function($rootScope, user, User){
+    $rootScope.user = user;
     $rootScope.logout = function() {
-        if (currentUser.isLogged()) {
-            currentUser.clear();
+        if (user.isLogged()) {
+            user.clear();
             User.logout();
         }
     };
-    currentUser.update($rootScope.bootstrapUser);
+    user.update($rootScope.bootstrapUser);
 })
 
 .directive('volumeWrapper', function(){
@@ -311,19 +293,19 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     return player;
 })
 
-.factory('favorites', function($rootScope, currentUser, storage, UserFavorite) {
+.factory('favorites', function($rootScope, user, storage, UserFavorite) {
     var STORAGE_ID = 'favorites';
     var favorites = storage.get(STORAGE_ID) || {};
 
     // sync favorites to localstorage
     $rootScope.$watch(function() { return favorites; }, function(data){
-        if (!currentUser.isLogged()) {
+        if (!user.isLogged()) {
             storage.put(STORAGE_ID, data);
         }
     }, true);
 
     $rootScope.$watch(function() {
-        return currentUser.isLogged();
+        return user.isLogged();
     }, function(logged){
         if (logged) {
             // clean local favorites
@@ -342,7 +324,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         add: function(id, title) {
             var ts = +(new Date());
             favorites[id] = {id: id, title: title, ts: ts};
-            if (currentUser.isLogged()) {
+            if (user.isLogged()) {
                 UserFavorite.add(id);
             }
         },
@@ -351,7 +333,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             if (favorites.hasOwnProperty(id)) {
                 delete favorites[id];
             }
-            if (currentUser.isLogged()) {
+            if (user.isLogged()) {
                 UserFavorite.remove(id);
             }
         },
@@ -418,8 +400,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.controller('LoginCtrl', function($scope, $location, currentUser, User, passErrorToScope){
-    if (currentUser.isLogged()) {
+.controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
+    if (user.isLogged()) {
         $location.path('/');
         return;
     }
@@ -435,15 +417,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         $scope.error = null;
 
         User.login($scope.form).success(function(response){
-            currentUser.update(response.user);
+            user.update(response.user);
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
 })
 
-.controller('SignupCtrl', function($scope, $location, currentUser, User, passErrorToScope){
+.controller('SignupCtrl', function($scope, $location, user, User, passErrorToScope){
 
-    if (currentUser.isLogged()) {
+    if (user.isLogged()) {
         $location.path('/');
         return;
     }
@@ -458,14 +440,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         $scope.error = null;
 
         User.signup($scope.form).success(function(response){
-            currentUser.update(response.user);
+            user.update(response.user);
             $location.path('/');
         }).error(passErrorToScope($scope));
     };
 })
 
-.controller('AmnesiaCtrl', function($scope, $location, currentUser, User, passErrorToScope){
-    if (currentUser.isLogged()) {
+.controller('AmnesiaCtrl', function($scope, $location, user, User, passErrorToScope){
+    if (user.isLogged()) {
         $location.path('/');
         return;
     }
@@ -525,7 +507,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
 /**
  * Контролер плейлиста
  */
-.controller('PlaylistCtrl', function($scope, $http, radio, $timeout){
+.controller('PlaylistCtrl', function($scope, $http, $timeout){
     $scope.searchQuery = '';
     $scope.tabs = [];
     $scope.playlist = [];
@@ -621,16 +603,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.controller('RadioStationCtrl', function(station, radio, player){
-    // prevent double load station, sound cause flickering
-    if (radio.loaded() && radio.getStation().id == station.id) {
-        return;
-    }
-    radio.selectStation(station);
-    player.stop();
-    player.play(station.stream.listen_url);
-})
-
 .controller('PlayerCtrl', function($rootScope, $scope, $http, $location, player, radio){
     $scope.currentStation = radio.getStation;
     $scope.previousStation = radio.previousStation;
@@ -650,21 +622,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         });
     };
 
-    $scope.volume = player.volume;
-    $scope.saveVolume = function() {
-        player.setVolume($scope.volume);
-    };
-
-    $scope.isMuted = function() {
-        return !$scope.volume || player.isMuted();
-    };
-
     $scope.play = function() {
-        if (!radio.loaded()) {
-            $rootScope.$broadcast('freePlay');
-            return;
-        }
-        player.play();
+
     };
 
     $scope.stop = function() {
@@ -683,6 +642,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             player.mute();
             $scope.volume = 0;
         }
+    };
+
+    $scope.volume = player.volume;
+    $scope.saveVolume = function() {
+        player.setVolume($scope.volume);
+    };
+
+    $scope.isMuted = function() {
+        return !$scope.volume || player.isMuted();
     };
 })
 
@@ -736,14 +704,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.factory('onair', function($rootScope, currentUser, radio, comet){
+.factory('onair', function($rootScope, user, radio, comet){
     var params = {wait: 30};
     var air = null;
 
-    $rootScope.$watch(function() { return currentUser.isLogged(); }, function(logged){
+    $rootScope.$watch(function() { return user.isLogged(); }, function(logged){
         // TODO: rename user_id => uid
         if (logged) {
-            params.uid = currentUser.get().id;
+            params.uid = user.get().id;
         } else {
             delete params.uid;
         }
@@ -827,19 +795,19 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.factory('tracks', function($rootScope, currentUser, storage, UserTrack) {
+.factory('tracks', function($rootScope, user, storage, UserTrack) {
     var STORAGE_ID = 'tracks';
     var tracks = storage.get(STORAGE_ID) || {};
 
     // sync tracks to localstorage
     $rootScope.$watch(function() { return tracks; }, function(data){
-        if (!currentUser.isLogged()) {
+        if (!user.isLogged()) {
             storage.put(STORAGE_ID, data);
         }
     }, true);
 
     $rootScope.$watch(function() {
-        return currentUser.isLogged();
+        return user.isLogged();
     }, function(logged){
         if (logged) {
             storage.put(STORAGE_ID, {});
@@ -857,14 +825,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
         add: function(id, title) {
             var ts = +(new Date());
             tracks[id] = {id: id, title: title, ts: ts};
-            if (currentUser.isLogged()) {
+            if (user.isLogged()) {
                 UserTrack.add(id);
             }
         },
 
         restore: function(track) {
             tracks[track.id] = track;
-            if (currentUser.isLogged()) {
+            if (user.isLogged()) {
                 UserTrack.restore(track.id);
             }
         },
@@ -873,7 +841,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
             if (tracks.hasOwnProperty(id)) {
                 delete tracks[id];
             }
-            if (currentUser.isLogged()) {
+            if (user.isLogged()) {
                 UserTrack.remove(id);
             }
         },
@@ -892,12 +860,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet'])
     };
 })
 
-.controller('TracksCtrl', function($scope, $rootScope, $filter, currentUser, tracks){
+.controller('TracksCtrl', function($scope, $rootScope, $filter, user, tracks){
     $scope.tracks = [];
     $scope.searchQuery = '';
 
     // reload tracks on user login/logout
-    $rootScope.$watch(function() { return currentUser.isLogged(); }, function(){
+    $rootScope.$watch(function() { return user.isLogged(); }, function(){
         $scope.tracks = angular.copy(tracks.get());
         $scope.searchQuery = '';
     });

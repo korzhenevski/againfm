@@ -60,7 +60,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
-.factory('currentUser', function(){
+.factory('user', function(){
     var user = null;
     return {
         update: function(userUpdate) {

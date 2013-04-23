@@ -29,11 +29,11 @@
                     </p>
                 </div>
                 <div class="menu-item side-item">
-                    <p data-ng-hide="currentUser.isLogged()">
+                    <p data-ng-hide="user.isLogged()">
                         <a href="/signup">Стать постоянным слушателем</a>
                         <a href="/login">Войти с паролем</a>
                     </p>
-                    <p data-ng-show="currentUser.isLogged()">
+                    <p data-ng-show="user.isLogged()">
                         <a data-ng-click="logout()">выйти</a>
                     </p>
                 </div>
