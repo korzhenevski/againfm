@@ -5,9 +5,9 @@ from flask.ext.login import login_required, current_user
 
 import random
 import requests
-from afm import app, db
+from afm import app, db, redis
 from afm.models import UserFavoritesCache
-from afm.helpers import safe_input_object, send_mail
+from afm.helpers import safe_input_object, send_mail, raw_redirect
 
 """
 TODO:
@@ -15,6 +15,7 @@ TODO:
     добавление радио
     страница эфира - история
     ngmin + grunt для боевого js
+    после логина/регистрации страница перезагружается
 """
 
 
@@ -66,7 +67,7 @@ def user_favorites_add_or_remove(station_id):
 
 
 @app.route('/api/radio/<int:radio_id>/listen')
-def api_radio(radio_id):
+def api_radio_listen(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id}).get_public(['id', 'title'])
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
@@ -75,14 +76,25 @@ def api_radio(radio_id):
     if not streams:
         return abort(404)
 
-    radio['stream'] = random.choice(streams).get_public()
+    stream = random.choice(streams)
+    radio['listen_url'] = stream.listen_url
+    radio['stream_id'] = stream.id
+    radio['bitrate'] = stream.bitrate
+
+    if request.args.get('redir'):
+        return raw_redirect(stream.listen_url)
+
     return jsonify(radio)
 
 
-@app.route('/api/station/random')
-def api_station_random():
-    station = db.Radio.find_random()
-    return jsonify({'station': station.get_public()})
+@app.route('/api/radio/random')
+def api_radio_random():
+    radio_id = redis.srandmember('radio:public')
+    if not radio_id:
+        abort(404)
+
+    radio = db.Radio.find_one_or_404({'id': int(radio_id), 'deleted_at': 0})
+    return jsonify(radio.get_public())
 
 
 @app.route('/api/feedback', methods=['POST'])

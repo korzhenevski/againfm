@@ -53,21 +53,21 @@
                             <div class="display-ground">
                                 <div class="display-inner">
                                     <div class="display" ng-controller="DisplayCtrl">
-                                        <div ng-show="title">
+                                        <div ng-show="currentRadio.title">
                                             <p class="title" ng-class="{starred: starred()}" ng-click="star()">
-                                                <span class="marquee">{{ title }}</span>
+                                                <span class="marquee">{{ currentRadio.title }}</span>
                                                 <span class="star"></span>
                                             </p>
+
                                             <p class="track" ng-class="{liked: track.favorite}"
                                                ng-click="like()" ng-show="track">
                                                 <span class="marquee" ng-hide="track.artist">{{ track.title }}</span>
                                                 <span class="marquee" ng-show="track.artist">
                                                     <strong>{{ track.artist }}</strong> &mdash; {{ track.name }}
                                                 </span>
-                                                <!--span class="like"></span-->
                                             </p>
                                         </div>
-                                        <div class="clock" clock="title"></div>
+                                        <div class="clock" clock="currentRadio.title"></div>
                                     </div>
                                 </div>
                             </div>
@@ -99,8 +99,8 @@
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
                                             <li ng-repeat="radio in playlist">
-                                                <div class="block station-link" ng-click="selectRadio(radio.id)"
-                                                     ng-class="itemClass(radio, currentRadio())">
+                                                <div class="block station-link" ng-click="selectRadio(radio)"
+                                                     ng-class="currentClass(radio)">
                                                     <span class="link">{{ radio.title }}</span>
                                                 </div>
                                             </li>
@@ -118,7 +118,7 @@
                     <tr>
                         {# элементы управления #}
                         <td align="center">
-                            <table class="controls" width="80%">
+                            <table class="controls" width="80%" ng-controller="PlayerControlsCtrl">
                                 <tr align="center">
                                     <td>
                                         <button class="record"></button>
@@ -131,7 +131,7 @@
                                         <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
                                     </td>
                                     <td>
-                                        <button class="random" ng-click="selectRandomStation()"></button>
+                                        <button class="random" ng-click="randomRadio()"></button>
                                     </td>
                                     <td>
                                         <div class="volume-wrapper" ng-class="{muted: isMuted()}">
@@ -157,7 +157,7 @@
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="radio in getFavorites()">
                                         <div class="block" ng-click="selectRadio(radio)"
-                                             ng-class="itemClass(radio, currentRadio())">
+                                             ng-class="currentClass(radio)">
                                             {{ radio.title }} <i class="remove" ng-click="remove(radio.id)"></i>
                                         </div>
                                     </li>

@@ -398,7 +398,6 @@ ul.justified
     position: relative
     +box-shadow(#526464 0 0 3px 2px inset)
     +background(linear-gradient(rgba(#fff, 0.6), rgba(#fff, 0)))
-    $disable-magic-sprite-selectors: true
 
     .title
       margin: 0
@@ -558,6 +557,7 @@ ul.justified
 
     .record
       @include player-controls-sprite(record)
+      visibility: hidden
       cursor: default
 
     .back

@@ -74,7 +74,7 @@
 
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 
-<script type="text/ng-template" id="/login.html">
+<script type="text/ng-template" id="login.html">
     <modal id="login" title="Вход с паролем">
         <form name="loginForm" data-ng-submit="auth()">
             <input class="text" name="login" data-ng-model="form.login" autofocus="autofocus"
@@ -94,7 +94,7 @@
     </modal>
 </script>
 
-<script type="text/ng-template" id="/signup.html">
+<script type="text/ng-template" id="signup.html">
     <modal id="signup" title="Регистрация">
         <form name="signupForm" data-ng-submit="signup()">
             <input class="text" name="email" data-ng-model="form.email" autofocus="autofocus"
@@ -109,7 +109,7 @@
     </modal>
 </script>
 
-<script type="text/ng-template" id="/amnesia.html">
+<script type="text/ng-template" id="amnesia.html">
     <modal id="amnesia" title="Сброс пароля">
         <form name="amnesiaForm" data-ng-hide="result" data-ng-submit="amnesia()">
             <input class="text" name="email" data-ng-model="form.email" required=""
@@ -128,7 +128,7 @@
     </modal>
 </script>
 
-<script type="text/ng-template" id="/feedback.html">
+<script type="text/ng-template" id="feedback.html">
     <modal id="feedback" title="Обратная связь">
         <form name="feedbackForm" data-ng-submit="feedback()" data-ng-hide="result">
             <input type="email" class="text" name="email" autofocus="autofocus"

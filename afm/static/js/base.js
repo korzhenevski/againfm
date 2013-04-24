@@ -60,47 +60,6 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
-.factory('user', function(){
-    var user = null;
-    return {
-        update: function(userUpdate) {
-            user = userUpdate;
-        },
-
-        clear: function() {
-            user = null;
-        },
-
-        isLogged: function() {
-            return !!user;
-        },
-
-        get: function() {
-            return user;
-        }
-    };
-})
-
-.factory('User', ['$http', function($http){
-    return {
-        login: function(params) {
-            return $http.post('/api/user/login', params);
-        },
-
-        signup: function(params) {
-            return $http.post('/api/user/signup', params);
-        },
-
-        amnesia: function(params) {
-            return $http.post('/api/user/amnesia', params);
-        },
-
-        logout: function() {
-            return $http.post('/api/user/logout');
-        }
-    };
-}])
-
 .factory('storage', function($window, $cacheFactory, $log){
     try {
         // test localStorage

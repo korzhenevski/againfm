@@ -3,13 +3,24 @@
 
 import logging
 import validictory
-from flask import request, abort, current_app
+from flask import request, abort, current_app, Response
 from datetime import date
 from time import time
 from urlparse import urlparse, urljoin
 from flask import url_for, redirect
 
 from afm import tasks
+
+
+class RedirectResponse(Response):
+    default_status = 302
+    autocorrect_location_header = False
+
+
+def raw_redirect(location):
+    response = RedirectResponse()
+    response.headers['Location'] = location.encode('utf8')
+    return response
 
 
 def naturalday(ts, ts_format=None):

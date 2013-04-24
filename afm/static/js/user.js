@@ -1,11 +1,52 @@
 angular.module('afm.user', ['afm.base'])
 
 .config(function($routeProvider){
-    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: '/login.html', modal: true});
-    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: '/signup.html', modal: true});
-    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: '/amnesia.html', modal: true});
-    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: '/feedback.html', modal: true});
+    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: 'login.html', modal: true});
+    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: 'signup.html', modal: true});
+    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: 'amnesia.html', modal: true});
+    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html', modal: true});
 })
+
+.factory('user', function(){
+    var user = null;
+    return {
+        update: function(userUpdate) {
+            user = userUpdate;
+        },
+
+        clear: function() {
+            user = null;
+        },
+
+        isLogged: function() {
+            return !!user;
+        },
+
+        get: function() {
+            return user;
+        }
+    };
+})
+
+.factory('User', ['$http', function($http){
+    return {
+        login: function(params) {
+            return $http.post('/api/user/login', params);
+        },
+
+        signup: function(params) {
+            return $http.post('/api/user/signup', params);
+        },
+
+        amnesia: function(params) {
+            return $http.post('/api/user/amnesia', params);
+        },
+
+        logout: function() {
+            return $http.post('/api/user/logout');
+        }
+    };
+}])
 
 .controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
     if (user.isLogged()) {

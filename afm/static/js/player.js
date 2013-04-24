@@ -9,10 +9,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 })
 
 .controller('ListenCtrl', function($routeParams, radio, player, $http){
-    $http.get('/api/radio/' + $routeParams.radioId + '/listen').success(function(data){
-        radio.set(data);
-        player.play(data.stream.listen_url);
-    });
+
 })
 
 .run(function($rootScope, user, User){
@@ -267,7 +264,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.$on('playerFreePlay', function(){
         if ($scope.playlist) {
-            $scope.selectRadio($scope.playlist[0].id);
+            $scope.selectRadio($scope.playlist[0]);
         }
     });
 
@@ -331,22 +328,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 })
 
 .factory('radio', function(){
-    var self = {
-        id: 0,
-        title: '',
-        current: {},
-
-        set: function(radio) {
-            self.id = radio.id;
-            self.title = radio.title;
-            self.current = radio;
-        },
-
-        get: function() {
-            return self.current;
-        }
-    };
-    return self;
+    return {id: 0, title: ''};
 })
 
 .directive('volumeWrapper', function(){
@@ -448,37 +430,47 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.controller('PlayerCtrl', function($scope, $http, $location, player, radio){
-    $scope.currentRadio = radio.get;
+.factory('Radio', function(){
+    return {
+        current: {},
+        set: function(radio) {
+            this.current.id = radio.id;
+            this.current.title = radio.title;
+        }
+    }
+})
 
-    $scope.itemClass = function(item, current) {
-        var selected = current && current.id == item.id;
-        return {selected: selected};
+
+.controller('PlayerCtrl', function($scope, $location, player, Radio){
+    $scope.currentRadio = Radio.current;
+    $scope.currentClass = function(radio) {
+        return {selected: Radio.current && Radio.current.id == radio.id};
     };
 
-    $scope.selectRadio = function(radioId) {
-        $location.path('/listen/' + radioId);
+    $scope.selectRadio = function(radio) {
+        Radio.set(radio);
+        player.play('/api/radio/' + radio.id + '/listen?redir=1');
+        $location.path('/listen/' + radio.id);
     };
+})
 
-    $scope.randomRadio = function() {
-        $http.get('/api/station/random').success(function(radio){
-            $scope.selectRadio(radio.id);
-        });
-    };
-
+.controller('PlayerControlsCtrl', function($scope, $http, player, Radio){
     $scope.play = function() {
-        if (radio.id) {
-            $http.get('/api/radio/' + radio.id + '/listen').success(function(data){
-                radio.set(data);
-                player.play(data.stream.listen_url);
-            });
+        if (Radio.current.id) {
+            $scope.selectRadio(Radio.current);
         } else {
-            $scope.$broadcast('playerFreePlay');
+            $scope.$root.$broadcast('playerFreePlay');
         }
     };
 
     $scope.stop = function() {
         player.stop();
+    };
+
+    $scope.randomRadio = function() {
+        $http.get('/api/radio/random').success(function(radio){
+            $scope.selectRadio(radio);
+        });
     };
 
     $scope.isPlaying = function() {
@@ -488,10 +480,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.toggleMute = function() {
         if ($scope.isMuted()) {
             player.unmute();
-            $scope.volume = player.volume;
         } else {
             player.mute();
-            $scope.volume = 0;
         }
     };
 
@@ -559,6 +549,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     var params = {wait: 30};
     var air = null;
 
+    /*
     $rootScope.$watch(function() { return user.isLogged(); }, function(logged){
         // TODO: rename user_id => uid
         if (logged) {
@@ -569,12 +560,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         subscribe();
     });
 
-    $rootScope.$watch(function() { return radio.get(); }, function(radio){
-        if (!radio) {
+    $rootScope.$watch(function() { return radio; }, function(radio){
+        if (radio && radio.air_channel) {
+            params.channel = radio.air_channel;
+            subscribe();
             return;
         }
-        params.channel = radio.air_channel;
-        subscribe();
     }, true);
 
     function onUpdate(newTrack) {
@@ -587,12 +578,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 
     function subscribe() {
-        if (!radio.id) {
-            return;
+        if (radio) {
+            comet.unsubscribe();
+            comet.subscribe('/onair/' + radio.id, params, onUpdate);
         }
-        comet.unsubscribe();
-        comet.subscribe('/onair/' + radio.id, params, onUpdate);
-    }
+    }*/
 
     return {
         get: function() {
@@ -610,31 +600,24 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }, true);
 
     // TODO: это вообще нафига?
-    $scope.$watch(function(){ return radio.get(); }, function(radio){
+    $scope.$watch(function(){ return radio; }, function(radio){
         $scope.title = radio ? radio.title : '';
     });
 
     $scope.starred = function() {
-        if (!radio.id) {
-            return false;
+        if (radio) {
+            return favorites.exists(radio.id);
         }
-        return favorites.exists(radio.id);
     };
 
     $scope.star = function() {
-        if (!radio.id) {
-            return;
+        if (radio) {
+            if (favorites.exists(radio.id)) {
+                favorites.remove(radio.id);
+            } else {
+                favorites.add(radio.id, radio.title);
+            }
         }
-
-        if (favorites.exists(radio.id)) {
-            favorites.remove(radio.id);
-        } else {
-            favorites.add(radio.id, radio.title);
-        }
-    };
-
-    $scope.like = function() {
-
     };
 })
 

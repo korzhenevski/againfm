@@ -4,13 +4,14 @@
 import time
 import string
 from . import app, db, search, login_manager
+from . import redis
 
 try:
     from flask.ext.mongokit import Document
 except ImportError:
     from mongokit import Document
 from hashlib import md5
-from random import choice
+import random
 from datetime import datetime
 import pymongo.errors
 from flask_login import AnonymousUser
@@ -83,13 +84,10 @@ class BaseDocument(Document):
             return self.json_schema
         return dict((key, self.json_schema.get(key)) for key in keys if key in self.json_schema)
 
+
 class UserFavoritesCache(object):
-    def __init__(self, user_id, redis=None):
-        if redis is None:
-            from . import redis as global_redis
-            self.redis = global_redis
-        else:
-            self.redis = redis
+    def __init__(self, user_id):
+        self.redis = redis
         self.user_id = user_id
 
     def add(self, object_type, object_id):
@@ -260,7 +258,7 @@ class User(BaseDocument):
 
     def generate_new_password(self, length=8):
         chars = string.letters + string.digits
-        password = [choice(chars) for i in xrange(length)]
+        password = [random.choice(chars) for i in xrange(length)]
         password = string.join(password, '')
         self['new_password'] = self._password_hash(password).decode('utf-8')
         self.save()
@@ -486,6 +484,7 @@ class Radio(BaseDocument):
 
     def push_to_search(self):
         return search.index(self.as_dict(), 'radio', self.id)
+
 
 @db.register
 class Playlist(BaseDocument):

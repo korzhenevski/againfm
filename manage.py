@@ -138,6 +138,19 @@ def update_search():
         print radio.push_to_search()
     print search.refresh()
 
+
+@manager.command
+def update_cache():
+    from afm import redis
+    from time import time
+
+    ts = time()
+    redis.delete('radio:public')
+    for radio in db.Radio.find_public(fields=['id']):
+        redis.sadd('radio:public', radio['id'])
+    print time() - ts
+
+
 @manager.command
 def get_icy_genre():
     import string
@@ -148,7 +161,7 @@ def get_icy_genre():
         for token in map(string.lower, genre.split(',')):
             c[token.strip()] += 1
 
-    for k,v in c.most_common(100):
+    for k, v in c.most_common(100):
         print k
 
 @manager.command

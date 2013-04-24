@@ -3,6 +3,7 @@
 from afm import app, celery, mailer, db
 from .radio import fetch_playlist, fetch_stream
 
+
 @celery.task
 def send_mail(email, body, subject=None):
     if subject is None:
@@ -35,6 +36,7 @@ def update_playlist(playlist_id):
 
         # добавление потоков
         db.Stream.bulk_add(playlist['radio_id'], result.urls, playlist_id=playlist['id'])
+
 
 @celery.task(ignore_result=True)
 def check_stream(stream_id):
