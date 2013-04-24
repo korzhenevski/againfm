@@ -8,6 +8,15 @@ from afm import app, db
 from afm.models import UserFavoritesCache
 from afm.helpers import safe_input_object, send_mail
 
+"""
+TODO:
+    директива modal, обертка для модальных окон любого размера
+    добавление радио
+    страница эфира - история
+    ngmin + grunt для боевого js
+
+"""
+
 
 @app.route('/api/radio/search')
 def radio_search():
@@ -26,28 +35,6 @@ def radio_by_genre(genre_id):
     where = {'is_public': True, 'deleted_at': 0, 'genres': genre_id}
     objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
-
-@app.route('/api/user/tracks')
-@login_required
-def user_tracks():
-    tracks = db.FavoriteTrack.find({'user_id': current_user.id, 'favorite': {'$not': {'$mod': [2, 0]}}})
-    tracks = [track.get_public() for track in tracks]
-    return jsonify({'objects': tracks})
-
-@app.route('/api/user/tracks/<int:track_id>/add', methods=['POST'])
-@app.route('/api/user/tracks/<int:track_id>/remove', methods=['POST'])
-@app.route('/api/user/tracks/<int:track_id>/restore', methods=['POST'])
-@login_required
-def user_tracks_add_or_remove(track_id):
-    onair_info = db.OnairHistory.find_one_or_404({'track_id': track_id})
-    station = db.Station.find_one_or_404({'id': onair_info['station_id']})
-    track = db.Track.find_one_or_404({'id': track_id})
-
-    favorite_cache = UserFavoritesCache(user_id=current_user.id)
-    info = db.FavoriteTrack.toggle(track, station, current_user.id)
-    state = favorite_cache.toggle('track', track_id, state=info['favorite'])
-    return jsonify({'favorite': state})
-
 
 @app.route('/api/user/favorites')
 @login_required
@@ -101,10 +88,6 @@ def feedback():
         'text': {'type': 'string', 'maxLength': 2048},
         'email': {'type': 'string', 'maxLength': 255}
     })
-
-    # TODO: fix this shit
-    form['text'] = unicode(form['text'])
-    form['email'] = unicode(form['email'])
 
     message = db.FeedbackMessage()
     message.update(form)
