@@ -5,8 +5,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     // controller don't execute without "template" attr
     $routeProvider.when('/listen/:radioId', {template:'<div></div>', controller: 'ListenCtrl'});
+    $locationProvider.html5Mode(false);//.hashPrefix('!');
+})
 
-    $locationProvider.html5Mode(true).hashPrefix('!');
+.controller('ListenCtrl', function($routeParams, radio, player, $http){
+    $http.get('/api/radio/' + $routeParams.radioId + '/listen').success(function(data){
+        radio.set(data);
+        player.play(data.stream.listen_url);
+    });
 })
 
 .run(function($rootScope, user, User){
@@ -259,9 +265,9 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.tabs = [];
     $scope.playlist = [];
 
-    $scope.$on('freePlay', function(){
+    $scope.$on('playerFreePlay', function(){
         if ($scope.playlist) {
-            $scope.selectStation($scope.playlist[0]);
+            $scope.selectRadio($scope.playlist[0].id);
         }
     });
 
@@ -442,28 +448,33 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-
-
 .controller('PlayerCtrl', function($scope, $http, $location, player, radio){
-    $scope.radio = radio.get;
+    $scope.currentRadio = radio.get;
 
     $scope.itemClass = function(item, current) {
         var selected = current && current.id == item.id;
         return {selected: selected};
     };
 
-    $scope.selectStation = function(station) {
-        $location.path('/listen/' + station.id);
+    $scope.selectRadio = function(radioId) {
+        $location.path('/listen/' + radioId);
     };
 
-    $scope.selectRandomStation = function() {
-        $http.get('/api/station/random').success(function(response){
-            $scope.selectStation(response.station);
+    $scope.randomRadio = function() {
+        $http.get('/api/station/random').success(function(radio){
+            $scope.selectRadio(radio.id);
         });
     };
 
     $scope.play = function() {
-
+        if (radio.id) {
+            $http.get('/api/radio/' + radio.id + '/listen').success(function(data){
+                radio.set(data);
+                player.play(data.stream.listen_url);
+            });
+        } else {
+            $scope.$broadcast('playerFreePlay');
+        }
     };
 
     $scope.stop = function() {

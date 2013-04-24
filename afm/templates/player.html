@@ -79,7 +79,7 @@
                                 <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="selectTab('featured')">
                                     <div class="group">
                                         <div class="search">
-                                            <input type="search" placeholder="поиск радио" class="search-field" ng-model="searchQuery" />
+                                            <input type="search" placeholder="Поиск" class="search-field" ng-model="searchQuery" />
                                         </div>
                                         <div class="loader"></div>
                                     </div>
@@ -98,10 +98,10 @@
                                     <div class="table-wrapper">
                                         <hr class="radio-line" />
                                         <ul class="playlist justified">
-                                            <li ng-repeat="station in playlist">
-                                                <div class="block station-link" ng-class="itemClass(station, radio())"
-                                                     ng-click="selectStation(station)">
-                                                    <span class="link">{{ station.title }}</span>
+                                            <li ng-repeat="radio in playlist">
+                                                <div class="block station-link" ng-click="selectRadio(radio.id)"
+                                                     ng-class="itemClass(radio, currentRadio())">
+                                                    <span class="link">{{ radio.title }}</span>
                                                 </div>
                                             </li>
                                             <li ng-hide="hasList()" class="ng-cloak not-found">
@@ -155,9 +155,10 @@
                             <div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
-                                    <li ng-repeat="station in getFavorites()">
-                                        <div class="block" ng-class="itemClass(station, radio())" ng-click="selectStation(station)">
-                                            {{ station.title }} <i class="remove" ng-click="remove(station.id)"></i>
+                                    <li ng-repeat="radio in getFavorites()">
+                                        <div class="block" ng-click="selectRadio(radio)"
+                                             ng-class="itemClass(radio, currentRadio())">
+                                            {{ radio.title }} <i class="remove" ng-click="remove(radio.id)"></i>
                                         </div>
                                     </li>
                                 </ul>

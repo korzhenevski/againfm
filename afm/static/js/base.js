@@ -141,6 +141,20 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
+.factory('routeHistory', function($rootScope, $route, $location){
+    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
+    $rootScope.$on('$routeChangeSuccess', function(target, current){
+        if (current && current.$route && !current.$route.modal) {
+            returnTo = $location.path();
+        }
+    });
+    return {
+        backToNotModal: function() {
+            $location.path(returnTo);
+        }
+    };
+})
+
 .directive('modal', function($document, routeHistory){
     return {
         restrict: 'E',

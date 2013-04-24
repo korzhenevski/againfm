@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, abort
 from flask.ext.login import login_required, current_user
 
+import random
 import requests
 from afm import app, db
 from afm.models import UserFavoritesCache
@@ -14,7 +15,6 @@ TODO:
     добавление радио
     страница эфира - история
     ngmin + grunt для боевого js
-
 """
 
 
@@ -71,19 +71,22 @@ def api_radio(radio_id):
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
 
-    stream = db.Stream.find_one_or_404({'radio_id': radio_id, 'content_type': 'audio/mpeg', 'deleted_at': 0})
-    radio['stream'] = stream.get_public()
-    return jsonify({'radio': radio})
+    streams = list(db.Stream.find({'radio_id': radio_id, 'is_online': True, 'deleted_at': 0}))
+    if not streams:
+        return abort(404)
+
+    radio['stream'] = random.choice(streams).get_public()
+    return jsonify(radio)
 
 
 @app.route('/api/station/random')
-def station_random():
+def api_station_random():
     station = db.Radio.find_random()
     return jsonify({'station': station.get_public()})
 
 
 @app.route('/api/feedback', methods=['POST'])
-def feedback():
+def api_feedback():
     form = safe_input_object({
         'text': {'type': 'string', 'maxLength': 2048},
         'email': {'type': 'string', 'maxLength': 255}
