@@ -9,6 +9,7 @@ from afm import app, db, redis
 from afm.models import UserFavoritesCache
 from afm.helpers import safe_input_object, send_mail, raw_redirect
 
+
 """
 TODO:
     директива modal, обертка для модальных окон любого размера

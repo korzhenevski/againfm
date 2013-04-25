@@ -1,6 +1,6 @@
 // The `$dialogProvider` can be used to configure global defaults for your
 // `$dialog` service.
-var dialogModule = angular.module('ui.bootstrap.dialog', ['ui.bootstrap.transition']);
+var dialogModule = angular.module('ui.bootstrap.dialog', ['afm.base']);
 
 dialogModule.controller('MessageBoxController', ['$scope', 'dialog', 'model', function ($scope, dialog, model) {
     $scope.title = model.title;

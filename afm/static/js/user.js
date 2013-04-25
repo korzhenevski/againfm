@@ -1,4 +1,4 @@
-angular.module('afm.user', ['afm.base'])
+angular.module('afm.user', ['afm.base', 'ui.bootstrap.modal'])
 
 .config(function($routeProvider){
     $routeProvider.when('/login', {controller: 'LoginCtrl', template: '<div></div>'});
@@ -48,9 +48,7 @@ angular.module('afm.user', ['afm.base'])
     };
 }])
 
-.controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
-    console.log('login');
-
+.controller('LoginCtrl', function($dialog){
     /*
     if (user.isLogged()) {
         $location.path('/');
