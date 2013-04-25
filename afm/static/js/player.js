@@ -2,14 +2,34 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
 .config(function($routeProvider, $locationProvider, cometProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
+    $locationProvider.html5Mode(true);
 
     // controller don't execute without "template" attr
-    $routeProvider.when('/listen/:radioId', {template:'<div></div>', controller: 'ListenCtrl'});
-    $locationProvider.html5Mode(false);//.hashPrefix('!');
+    $routeProvider.when('/listen/:radioId', {
+        template: '<div></div>',
+        controller: 'ListenCtrl',
+        resolve: {
+            radio: ['$http', '$route', 'Radio', '$q', function($http, $route, Radio, $q) {
+                var result = $q.defer();
+                var radioId = ~~$route.current.params.radioId;
+                if (radioId && radioId !== Radio.current.id) {
+                    return $http.get('/api/radio/' + radioId).then(function(http){
+                        return http.data;
+                    }, function() {
+                        // reject, if not found or other error
+                        return $q.reject();
+                    });
+                }
+
+                // reject, if invalid radioId or already listening
+                return $q.reject();
+            }]
+        }
+    });
 })
 
-.controller('ListenCtrl', function($routeParams, radio, player, $http){
-
+.controller('ListenCtrl', function(Radio, radio){
+    Radio.listen(radio);
 })
 
 .run(function($rootScope, user, User){
@@ -193,28 +213,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('UserTrack', function($http){
-    return {
-        add: function(id) {
-            $http.post('/api/user/tracks/' + id + '/add');
-        },
-
-        remove: function(id) {
-            $http.post('/api/user/tracks/' + id + '/remove');
-        },
-
-        restore: function(id) {
-            $http.post('/api/user/tracks/' + id + '/restore');
-        },
-
-        list: function(cb) {
-            $http.get('/api/user/tracks').success(function(response){
-                cb(response.objects);
-            });
-        }
-    };
-})
-
 .factory('Feedback', function($http) {
     return {
         send: function(params) {
@@ -327,10 +325,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('radio', function(){
-    return {id: 0, title: ''};
-})
-
 .directive('volumeWrapper', function(){
     return {
         restrict: 'C',
@@ -430,26 +424,31 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('Radio', function(){
+.factory('Radio', function(player){
     return {
         current: {},
         set: function(radio) {
             this.current.id = radio.id;
             this.current.title = radio.title;
+        },
+
+        listen: function(radio) {
+            this.set(radio);
+            player.play('/api/radio/' + radio.id + '/listen?redir=1');
         }
     }
 })
 
 
-.controller('PlayerCtrl', function($scope, $location, player, Radio){
+.controller('PlayerCtrl', function($scope, $location, Radio){
     $scope.currentRadio = Radio.current;
+
     $scope.currentClass = function(radio) {
         return {selected: Radio.current && Radio.current.id == radio.id};
     };
 
     $scope.selectRadio = function(radio) {
-        Radio.set(radio);
-        player.play('/api/radio/' + radio.id + '/listen?redir=1');
+        Radio.listen(radio);
         $location.path('/listen/' + radio.id);
     };
 })
@@ -545,7 +544,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('onair', function($rootScope, user, radio, comet){
+.factory('onair', function($rootScope, user, comet){
     var params = {wait: 30};
     var air = null;
 
@@ -594,94 +593,24 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 /**
  * Дисплей радиостанции
  */
-.controller('DisplayCtrl', function($scope, $rootScope, radio, favorites, onair) {
+.controller('DisplayCtrl', function($scope, Radio, favorites, onair) {
     $scope.$watch(function(){ return onair.get(); }, function(air){
         $scope.air = air;
     }, true);
 
-    // TODO: это вообще нафига?
-    $scope.$watch(function(){ return radio; }, function(radio){
-        $scope.title = radio ? radio.title : '';
-    });
-
     $scope.starred = function() {
-        if (radio) {
-            return favorites.exists(radio.id);
+        if (Radio.current.id) {
+            return favorites.exists(Radio.current.id);
         }
     };
 
     $scope.star = function() {
-        if (radio) {
-            if (favorites.exists(radio.id)) {
-                favorites.remove(radio.id);
+        if (Radio.current.id) {
+            if (favorites.exists(Radio.current.id)) {
+                favorites.remove(Radio.current.id);
             } else {
-                favorites.add(radio.id, radio.title);
+                favorites.add(Radio.current.id, Radio.current.title);
             }
-        }
-    };
-})
-
-.factory('tracks', function($rootScope, user, storage, UserTrack) {
-    var STORAGE_ID = 'tracks';
-    var tracks = storage.get(STORAGE_ID) || {};
-
-    // sync tracks to localstorage
-    $rootScope.$watch(function() { return tracks; }, function(data){
-        if (!user.isLogged()) {
-            storage.put(STORAGE_ID, data);
-        }
-    }, true);
-
-    $rootScope.$watch(function() {
-        return user.isLogged();
-    }, function(logged){
-        if (logged) {
-            storage.put(STORAGE_ID, {});
-            UserTrack.list(function(objects){
-                angular.forEach(objects, function(obj){
-                    tracks[obj.id] = obj;
-                });
-            });
-        } else {
-            tracks = storage.get(STORAGE_ID);
-        }
-    });
-
-    return {
-        add: function(id, title) {
-            var ts = +(new Date());
-            tracks[id] = {id: id, title: title, ts: ts};
-            if (user.isLogged()) {
-                UserTrack.add(id);
-            }
-        },
-
-        restore: function(track) {
-            tracks[track.id] = track;
-            if (user.isLogged()) {
-                UserTrack.restore(track.id);
-            }
-        },
-
-        remove: function(id) {
-            if (tracks.hasOwnProperty(id)) {
-                delete tracks[id];
-            }
-            if (user.isLogged()) {
-                UserTrack.remove(id);
-            }
-        },
-
-        exists: function(id) {
-            return !!tracks[id];
-        },
-
-        get: function() {
-            var result = [];
-            angular.forEach(tracks, function(obj){
-                result.unshift(obj);
-            });
-            return result;
         }
     };
 });

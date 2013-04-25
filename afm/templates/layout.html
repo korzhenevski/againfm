@@ -22,6 +22,7 @@
         {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
 </head>
+
 <body ng-init='bootstrapUser={{{ current_user.get_public()|json }}}; bootstrapGenres={{{ genres|json }}}'>
     {{% block top_content %}}{{% endblock %}}
     <table class="roof">

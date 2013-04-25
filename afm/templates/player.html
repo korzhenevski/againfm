@@ -46,7 +46,8 @@
     <div class="ground">
         <div class="ground-shadow">
             <div class="content">
-                <table class="radio-box" ng-controller="PlayerCtrl">
+                <table class="radio-box" ng-controller="PlayerCtrl"
+                {{% if radio %}} ng-init='selectRadio({{{ radio.get_public()|json }}})'{{% endif %}}>
                     <tr valign="top">
                         {# минидисплей #}
                         <td width="312px">
@@ -191,11 +192,15 @@
     <script src="/static/js/common/swfobject.js"></script>
     <script src="/static/js/common/comet.js"></script>
     <script src="/static/js/base.js"></script>
+
+    <script src="/static/js/common/ui-transition.js"></script>
+    <script src="/static/js/common/ui-animate.js"></script>
+    <script src="/static/js/common/ui-dialog.js"></script>
+    <script src="/static/js/common/ui-modal.js"></script>
+
     <script src="/static/js/sound.js"></script>
     <script src="/static/js/user.js"></script>
     <script src="/static/js/player.js"></script>
-    <script src="/static/js/common/ui-transition.js"></script>
-    <script src="/static/js/common/ui-animate.js"></script>
     <script>
         angular.element(document).ready(function(){
             angular.bootstrap(document, ['afm.player']);

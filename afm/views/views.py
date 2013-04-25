@@ -152,6 +152,7 @@ def radio_add_save():
     db.Stream.bulk_add(radio['id'], streams, playlist_id=playlist_id)
     return jsonify({'location': url_for('radio_admin')})
 
+
 @app.route('/')
 @app.route('/signup')
 @app.route('/amnesia')
@@ -159,10 +160,12 @@ def radio_add_save():
 def index():
     return render_template('player.html')
 
+
 @app.route('/listen/<int:radio_id>')
 def listen(radio_id):
-    # TODO: add radio preload by id
-    return render_template('player.html')
+    radio = db.Radio.find_one_or_404({'id': radio_id})
+    return render_template('player.html', radio=radio)
+
 
 @app.context_processor
 def app_context():

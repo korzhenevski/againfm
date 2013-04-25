@@ -20,26 +20,29 @@ TODO:
 
 
 @app.route('/api/radio/search')
-def radio_search():
+def api_radio_search():
     q = request.args.get('q', type=unicode)
     resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': u'title:{}*'.format(q)})
     hits = [hit['_source'] for hit in resp.json()['hits'].get('hits', [])]
     return jsonify({'objects': hits, 'q': q})
 
+
 @app.route('/api/radio/featured')
-def radio_featured():
+def api_radio_featured():
     objects = [radio.get_public() for radio in db.Radio.find_public({'is_public': True}).limit(30)]
     return jsonify({'objects': objects})
 
+
 @app.route('/api/radio/genre/<int:genre_id>')
-def radio_by_genre(genre_id):
+def api_radio_by_genre(genre_id):
     where = {'is_public': True, 'deleted_at': 0, 'genres': genre_id}
     objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
 
+
 @app.route('/api/user/favorites')
 @login_required
-def user_favorites():
+def api_user_favorites():
     favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
     favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
     # выборка по списку айдишников
@@ -49,10 +52,11 @@ def user_favorites():
     stations.sort(key=lambda station: favorite_stations.get(station['id']), reverse=True)
     return jsonify({'objects': stations})
 
+
 @app.route('/api/user/favorites/<int:station_id>/add', methods=['POST'])
 @app.route('/api/user/favorites/<int:station_id>/remove', methods=['POST'])
 @login_required
-def user_favorites_add_or_remove(station_id):
+def api_user_favorites_add_or_remove(station_id):
     # проверка на существование станции
     # можно конечно и без нее, но тогда реально засрать
     # избранное несуществующими станциями
@@ -84,6 +88,14 @@ def api_radio_listen(radio_id):
     if request.args.get('redir'):
         return raw_redirect(stream.listen_url)
 
+    return jsonify(radio)
+
+
+@app.route('/api/radio/<int:radio_id>')
+def api_radio(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id}).get_public()
+    if current_user.is_authenticated():
+        radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
     return jsonify(radio)
 
 
