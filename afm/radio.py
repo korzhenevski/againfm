@@ -15,6 +15,7 @@ PLAYLIST_ALLOWED_TYPES = (
     'audio/x-mpegurl', 'audio/x-scpls', 'application/pls+xml', 'audio/scpls',
     'text/html', 'text/plain', 'audio/scpls', 'audio/mpegurl',)
 
+
 class FetchStreamResult(object):
     def __init__(self):
         self.error = None
@@ -44,6 +45,7 @@ class FetchStreamResult(object):
               u'shoutcast: {is_shoutcast}>'
         return fmt.format(**self.__dict__)
 
+
 def normalize_url(url, path=None):
     try:
         if path:
@@ -55,8 +57,10 @@ def normalize_url(url, path=None):
     except urlnorm.InvalidUrl:
         pass
 
+
 def normalize_content_type(content_type):
     return content_type.split(';')[0].lower().strip()
+
 
 def safe_int(value, default=0):
     try:
@@ -118,6 +122,7 @@ def fetch_stream(url, timeout=5, as_player=False):
 
     return result
 
+
 class FetchPlaylistResult(object):
     def __init__(self):
         self.error = None
@@ -134,6 +139,7 @@ class FetchPlaylistResult(object):
 
     def as_dict(self):
         return self
+
 
 def fetch_playlist(url, timeout=5):
     result = FetchPlaylistResult()
@@ -163,15 +169,18 @@ def fetch_playlist(url, timeout=5):
     result.time = time() - result.time
     return result
 
+
 def parse_playlist(text):
     regex = r"(?im)^(file(\d+)=)?(http(.*?))$"
     urls = set([normalize_url(match.group(3).strip()) for match in re.finditer(regex, text)])
     return filter(None, urls)
 
+
 def parse_playlist_source(source, baseurl):
     rex = r'(?i)href="?((.*?)\.(pls|m3u))"?'
     urls = set([match.group(1).strip() for match in re.finditer(rex, source, flags=re.IGNORECASE)])
     return filter(None, [normalize_url(baseurl, url) for url in urls])
+
 
 class ShoutcastHTTPResponse(httplib.HTTPResponse):
     def _read_status(self):
@@ -217,5 +226,6 @@ class ShoutcastHTTPResponse(httplib.HTTPResponse):
         except ValueError:
             raise BadStatusLine(line)
         return version, status, reason
+
 
 httplib.HTTPConnection.response_class = ShoutcastHTTPResponse

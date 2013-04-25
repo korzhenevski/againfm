@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import pyes
 
+
 class Search(object):
     def __init__(self):
         # add configure

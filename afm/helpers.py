@@ -33,15 +33,18 @@ def naturalday(ts, ts_format=None):
         return u'yesterday'
     return ts.strftime(ts_format)
 
+
 def send_mail(**kwargs):
     if not current_app.config['SEND_MAIL']:
         # don't send mail in debug env
         return
     return tasks.send_mail.delay(**kwargs)
 
+
 def safe_input_field(field, schema):
     data = safe_input_object({field: schema})
     return data[field]
+
 
 def safe_input_object(schema, **kwargs):
     props = {}
@@ -58,6 +61,7 @@ def safe_input_object(schema, **kwargs):
             # строки принудительно приводим в юникод
             res[name] = unicode(val) if props[name].get('type') == 'string' else val
     return res
+
 
 def safe_input(schema, data=None, **kwargs):
     data = data or request.json or request.form.to_dict()
@@ -77,8 +81,10 @@ def get_email_provider(email):
             return u'http://{}/'.format(domain)
     return None
 
+
 def get_ts():
     return int(time())
+
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
@@ -86,12 +92,14 @@ def is_safe_url(target):
     return test_url.scheme in ('http', 'https') and \
            ref_url.netloc == test_url.netloc
 
+
 def get_redirect_target():
     for target in request.values.get('next'), request.referrer:
         if not target:
             continue
         if is_safe_url(target):
             return target
+
 
 def redirect_back(endpoint, **values):
     target = request.form['next']

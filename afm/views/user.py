@@ -7,6 +7,7 @@ from flask.ext.login import login_user, login_required, logout_user
 from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 
+
 def permanent_login_user(user):
     """
     Логин пользователя с фиксацией сессии
@@ -14,10 +15,12 @@ def permanent_login_user(user):
     login_user(user, remember=True)
     session.permanent = True
 
+
 @login_manager.user_loader
 def load_user(user_id):
     # проверка на активность в login_user
     return db.User.find_one({'id': user_id})
+
 
 @login_manager.unauthorized_handler
 def unauthorized():
@@ -25,9 +28,11 @@ def unauthorized():
         return jsonify({'error': 'Auth required'}), 401
     return redirect(url_for('index'))
 
+
 @app.context_processor
 def app_context():
     return dict(standalone=request.is_xhr)
+
 
 @app.route('/api/user/login', methods=['POST'])
 def api_user_login():
@@ -58,6 +63,7 @@ def api_user_amnesia():
         return jsonify({'email_provider': get_email_provider(user.email)})
     return jsonify({'error': 'no_user'}), 404
 
+
 @app.route('/api/user/signup', methods=['POST'])
 def api_user_signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
@@ -77,11 +83,13 @@ def api_user_signup():
     send_mail(email=user.email, body=body)
     return jsonify({'user': user.get_public()})
 
+
 @app.route('/api/user/logout', methods=['POST'])
 @login_required
 def api_user_logout():
     logout_user()
     return jsonify({'logout': True})
+
 
 @app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
 def token_auth(user_id, token):

@@ -13,10 +13,12 @@ from afm import app
 def save_start_time():
     g.start = time.time()
 
+
 @app.after_request
 def x_headers(response):
     response.headers['X-Request-Time'] = round(time.time() - g.start, 4)
     return response
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -28,5 +30,6 @@ def page_not_found(e):
 @app.template_filter('json')
 def template_filter_json(data):
     return Markup(json.dumps(data))
+
 
 from . import views, user, api, auth

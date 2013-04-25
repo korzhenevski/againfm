@@ -9,16 +9,19 @@ from datetime import datetime
 from afm import db, app
 from afm.helpers import safe_input_object
 
+
 @app.route('/radio/')
 def radio():
     # TODO: add pagination
     radio_list = db.Radio.find({'deleted_at': 0})
     return render_template('radio.html', radio_list=radio_list)
 
+
 @app.route('/radio/<int:radio_id>')
 def radio_page(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('radio_page.html', radio=radio)
+
 
 @app.route('/radio/<int:radio_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -35,15 +38,18 @@ def radio_edit(radio_id):
         return jsonify({'ok': True})
     return render_template('radio_edit.html', radio=radio)
 
+
 @app.route('/radio/genres/')
 def radio_genres():
     genres = db.RadioGenre.find({'is_public': True})
     return render_template('radio_genres.html', genres=genres)
 
+
 @app.route('/radio/genres/edit')
 @login_required
 def radio_genres_edit():
     return render_template('radio_genres_edit.html')
+
 
 @app.route('/api/radio/genres/edit', methods=['POST', 'GET'])
 @login_required
@@ -53,10 +59,12 @@ def api_radio_genres_edit():
 
     if request.method == 'POST':
         for genre in request.json['genres']:
-            db.radio_genre.update({'id': genre['id']}, {'$set': {'title': genre['title'], 'is_public': genre['is_public']}})
+            db.radio_genre.update({'id': genre['id']},
+                                  {'$set': {'title': genre['title'], 'is_public': genre['is_public']}})
 
     genres = [genre.get_public('id,title,is_public') for genre in db.RadioGenre.find()]
     return jsonify({'genres': genres})
+
 
 @app.route('/radio/admin/')
 @login_required
@@ -64,8 +72,10 @@ def radio_admin():
     radio_list = db.Radio.find_public({'owner_id': current_user['id']}).sort([('created_at', -1)])
     return render_template('radio_admin.html', radio_list=radio_list)
 
+
 def radio_add_check():
     from afm.radio import parse_playlist, fetch_stream
+
     result = dict(playlistUrl='', streams=[])
     playlist = None
 
@@ -99,6 +109,7 @@ def radio_add_check():
 
     return result
 
+
 @app.route('/radio/add', methods=['POST', 'GET'])
 @login_required
 def radio_add():
@@ -110,10 +121,12 @@ def radio_add():
 
     return render_template('radio_add_check.html')
 
+
 @app.route('/radio/add/save', methods=['POST'])
 @login_required
 def radio_add_save():
     from afm.radio import normalize_url
+
     schema = {
         'playlistUrl': {
             'type': 'string',

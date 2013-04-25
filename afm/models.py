@@ -16,13 +16,16 @@ from datetime import datetime
 import pymongo.errors
 from flask_login import AnonymousUser
 
+
 def md5hash(data):
     hashed = md5()
     hashed.update(data)
     return hashed.hexdigest()
 
+
 def get_ts():
     return int(time.time())
+
 
 def comma_fields(fields_str):
     fields = fields_str.split(',')
@@ -131,8 +134,9 @@ class AbstractFavorite(BaseDocument):
         # в upsert нельзя, иначе ломается его логика
         if 'created_at' not in row:
             row = collection.find_and_modify(query, {'$set': {'created_at': get_ts()}}, new=True)
-        # изменяем инкрементом, значение получаем остатком от деления
+            # изменяем инкрементом, значение получаем остатком от деления
         return cls.decorate(row)
+
 
 @db.register
 class FavoriteTrack(AbstractFavorite):
@@ -204,6 +208,7 @@ class AnonUser(AnonymousUser):
     def get_public(self):
         return None
 
+
 @db.register
 class User(BaseDocument):
     __collection__ = 'users'
@@ -267,7 +272,7 @@ class User(BaseDocument):
     def new_password_token(self):
         if not self['new_password']:
             return False
-        # double hashing
+            # double hashing
         return self._password_hash(self['new_password'])
 
     def confirm_new_password(self, password_or_token):
@@ -337,6 +342,7 @@ class Track(BaseDocument):
             #'name': self['name']
         }
 
+
 @db.register
 class FeedbackMessage(BaseDocument):
     __collection__ = 'feedback_messages'
@@ -353,6 +359,7 @@ class FeedbackMessage(BaseDocument):
         'created_at': datetime.now
     }
 
+
 @db.register
 class RadioGenre(BaseDocument):
     __collection__ = 'radio_genre'
@@ -367,6 +374,7 @@ class RadioGenre(BaseDocument):
     }
 
     public = ['id', 'title']
+
 
 @db.register
 class RadioGroup(BaseDocument):
@@ -464,6 +472,7 @@ class Radio(BaseDocument):
 
     def get_related(self, limit=5):
         from random import shuffle
+
         if not self['genres']:
             return []
         where = {'id': {'$ne': self['id']}, 'genres': self['genres']}
@@ -508,6 +517,7 @@ class Playlist(BaseDocument):
     }
 
     public = ['id', 'url', 'streams']
+
 
 @db.register
 class Stream(BaseDocument):
@@ -582,6 +592,7 @@ class Stream(BaseDocument):
                 # игнорируем, если поток уде был добавлен из другого плейлиста
                 pass
 
+
 @db.register
 class Air(BaseDocument):
     __collection__ = 'air'
@@ -594,6 +605,7 @@ class Air(BaseDocument):
         'ts': int,
     }
 
+
 login_manager.anonymous_user = AnonUser
 
 if __name__ == '__main__':
@@ -601,4 +613,5 @@ if __name__ == '__main__':
 
     class RadioTest(unittest.TestCase):
         pass
+
     unittest.main()

@@ -3,6 +3,7 @@
 
 from boto.ses.connection import SESConnection
 
+
 class AmazonMailer(SESConnection):
     def __init__(self, app, *args, **kwargs):
         super(AmazonMailer, self).__init__(

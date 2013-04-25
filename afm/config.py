@@ -43,7 +43,7 @@ BROKER_URL = 'mongodb://%(host)s:%(port)d/%(database)s' % CELERY_MONGODB_BACKEND
 
 # адрес инбокса для почтового домена
 EMAIL_PROVIDERS = {
-    'mail.yandex.ru': ['ya.ru','yandex.ru'],
+    'mail.yandex.ru': ['ya.ru', 'yandex.ru'],
     'mail.rambler.ru': ['rambler.ru', 'lenta.ru', 'myrambler.ru', 'autorambler.ru', 'ro.ru', 'r0.ru'],
     'mail.google.com': ['gmail.com', 'googlemail.com'],
     'mail.again.fm': ['again.fm', 'afm.fm'],
