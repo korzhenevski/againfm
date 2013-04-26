@@ -25,16 +25,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             }]
         }
     });
-
-    //$routeProvider.when('/radio/:radioId/:slug', {controller: 'RadioDetailsCtrl', templateUrl: 'fdsafsad'});
 })
 
 .controller('ListenCtrl', function(Radio, radio){
     Radio.listen(radio);
-})
-
-.controller('RadioDetailsCtrl', function($scope, modal, $routeParams){
-    //modal.open({templateUrl: '/partial/radio/' + $routeParams.radioId});
 })
 
 .run(function($rootScope, user, User){
@@ -618,4 +612,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             }
         }
     };
+
+
 });

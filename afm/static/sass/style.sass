@@ -453,6 +453,25 @@ ul.justified
         font-size: 35px
         margin: 0 1px
 
+    .buttons
+      position: absolute
+      bottom: 0px
+      margin-bottom: 19px
+
+      .display-button
+        border: 2px solid #39a1b7
+        background-color: transparent
+        font-size: 12px
+        padding: 4px 6px
+        margin-right: 7px
+        color: #358c9d
+        +border-radius(2px)
+        &:hover
+          border-color: #096f90
+          color: #096f90
+
+
+
   .favorites-cell
     height: 235px
 
@@ -897,6 +916,8 @@ input.text, textarea.text
   display: inline-block
   margin-right: -20px
 
+
+/* radio static */
 $control-group-width: 120px
 .control-group
   dt
@@ -970,3 +991,4 @@ $control-group-width: 120px
   .private
     color: #90919e
     text-decoration: line-through
+/* radio static end */

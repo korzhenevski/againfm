@@ -567,6 +567,28 @@ ul.justified .block {
   font-size: 35px;
   margin: 0 1px;
 }
+.radio-box .display .buttons {
+  position: absolute;
+  bottom: 0px;
+  margin-bottom: 19px;
+}
+.radio-box .display .buttons .display-button {
+  border: 2px solid #39a1b7;
+  background-color: transparent;
+  font-size: 12px;
+  padding: 4px 6px;
+  margin-right: 7px;
+  color: #358c9d;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+}
+.radio-box .display .buttons .display-button:hover {
+  border-color: #096f90;
+  color: #096f90;
+}
 .radio-box .favorites-cell {
   height: 235px;
 }
@@ -1240,6 +1262,7 @@ input.text:focus, textarea.text:focus {
   margin-right: -20px;
 }
 
+/* radio static */
 .control-group dt {
   width: 120px;
   float: left;
@@ -1322,3 +1345,5 @@ input.text:focus, textarea.text:focus {
   color: #90919e;
   text-decoration: line-through;
 }
+
+/* radio static end */

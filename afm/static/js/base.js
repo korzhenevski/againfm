@@ -180,25 +180,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
       var lastScope;
 
       scope.$on('$routeChangeSuccess', update);
-      scope.$on('modalChangeTemplate', changeTemplate);
       update();
-
-      function changeTemplate(scope, params) {
-        var template;
-        if (params.template) {
-            template = params.template;
-        } else if (params.templateUrl) {
-            template = $http.get(params.templateUrl, {cache: $templateCache}).then(function(http){
-                return http.data;
-            })
-        } else {
-            return;
-        }
-
-        $q.all([template]).then(function(results){
-            updateTemplate(results[0]);
-        });
-      }
 
       function destroyLastScope() {
         if (lastScope) {
@@ -214,8 +196,9 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
         destroyLastScope();
       }
 
-      function updateTemplate(template) {
+      function update() {
         var locals = $route.current && $route.current.locals;
+        var template = locals && locals.$template;
         if (template) {
           element.html(template);
           destroyLastScope();
@@ -237,21 +220,6 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
           clearContent();
         }
       }
-
-      function update() {
-        // ?
-        var locals = $route.current && $route.current.locals;
-        var template = locals && locals.$template;
-        updateTemplate(template)
-      }
     }
   };
-})
-
-.factory('modal', function($rootScope){
-    return {
-        open: function(params) {
-            $rootScope.$broadcast('modalChangeTemplate', params);
-        }
-    }
 });
