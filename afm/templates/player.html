@@ -44,7 +44,7 @@
 {{% endblock %}}
 
 {{% block content %}}
-<div class="radio">
+<div class="radio ng-cloak">
     <table class="top">
         <tr>
             <td class="top-left"></td>
@@ -64,19 +64,17 @@
                                 <div class="display-inner">
                                     <div class="display" ng-controller="DisplayCtrl">
                                         <div ng-show="currentRadio.title">
-                                            <p class="title" ng-class="{starred: starred()}" ng-click="star()">
+                                            <p class="title" title="Добавить в избранное"
+                                               ng-class="{starred: starred()}" ng-click="star()">
                                                 <span class="marquee">{{ currentRadio.title }}</span>
                                                 <span class="star"></span>
                                             </p>
-                                            <p class="track" ng-class="{liked: track.favorite}"
-                                               ng-click="like()" ng-show="track">
-                                                <span class="marquee" ng-hide="track.artist">{{ track.title }}</span>
-                                                <span class="marquee" ng-show="track.artist">
-                                                    <strong>{{ track.artist }}</strong> &mdash; {{ track.name }}
-                                                </span>
+                                            <p class="onair" ng-class="{liked: air.favorite}"
+                                               ng-click="like()" ng-show="air">
+                                                <span class="marquee">{{ air.title }}</span>
                                             </p>
                                             <div class="buttons">
-                                                <button class="display-button">Прямой эфир</button>
+                                                <button class="display-button air">Прямой эфир</button>
                                                 <button class="display-button share">Поделиться</button>
                                             </div>
                                         </div>
@@ -170,7 +168,7 @@
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="radio in getFavorites()">
                                         <div class="block" ng-click="selectRadio(radio)"
-                                             ng-class="currentClass(radio)">
+                                             ng-class="currentClass(radio)" ui-animate>
                                             {{ radio.title }} <i class="remove" ng-click="remove(radio.id)"></i>
                                         </div>
                                     </li>

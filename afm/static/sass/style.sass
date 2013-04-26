@@ -423,15 +423,15 @@ ul.justified
       .star
         @include display-controls-sprite(star_hover)
 
-    .track
+    .onair
       line-height: 16px
       cursor: pointer
       position: relative
-      padding-left: 25px
+      margin-top: 6px
       &:hover .like
         @include display-controls-sprite(like_hover)
 
-    .track.liked
+    .onair.liked
       .like
         @include display-controls-sprite(like_hover)
 
@@ -456,21 +456,19 @@ ul.justified
     .buttons
       position: absolute
       bottom: 0px
-      margin-bottom: 19px
+      margin-bottom: 16px
 
       .display-button
         border: 2px solid #39a1b7
         background-color: transparent
         font-size: 12px
-        padding: 4px 6px
+        padding: 4px 7px
         margin-right: 7px
         color: #358c9d
         +border-radius(2px)
         &:hover
           border-color: #096f90
           color: #096f90
-
-
 
   .favorites-cell
     height: 235px
@@ -526,6 +524,8 @@ ul.justified
       +border-radius(2px)
       +text-shadow(rgba(#314647, 0.2) 0px 1px 1px)
       +box-shadow(#0c0c0c 0px 2px 3px 1px)
+      +opacity(1)
+      +transition(all 400ms)
       &:active
         border: 1px solid #a3d3dd
         +background(linear-gradient(#54adc0, #88c6d3))
@@ -537,6 +537,9 @@ ul.justified
         .remove
           z-index: 900
           display: block
+
+    .block.ui-animate
+      +opacity(0)
 
     .block.selected
       border: 1px solid #a3d3dd

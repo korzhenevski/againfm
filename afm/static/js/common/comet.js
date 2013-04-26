@@ -119,15 +119,6 @@ Comet.prototype.execute = function() {
 angular.module('afm.comet', []).provider('comet', function(){
     this.url = '';
 
-    /*
-    this.$get = function() {
-        return {
-            subscribe: function() {},
-            unsubscribe: function() {}
-        }
-    };
-    */
-
     this.$get = function() {
         return new Comet(this.url);
     };

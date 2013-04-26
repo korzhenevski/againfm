@@ -423,7 +423,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('Radio', function(player){
+.factory('Radio', function($rootScope, player){
     return {
         current: {},
         set: function(radio) {
@@ -434,12 +434,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         listen: function(radio) {
             this.set(radio);
             player.play('/api/radio/' + radio.id + '/listen?redir=1');
+            $rootScope.$broadcast('radioListen', radio);
         }
     }
 })
 
 
-.controller('PlayerCtrl', function($scope, $location, Radio){
+.controller('PlayerCtrl', function($scope, $location, Radio, $document){
     $scope.currentRadio = Radio.current;
 
     $scope.currentClass = function(radio) {
@@ -450,6 +451,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         Radio.listen(radio);
         $location.path('/radio/' + radio.id);
     };
+
+    $scope.$on('radioListen', function(event, radio){
+        $document[0].title = radio.title;
+    });
 })
 
 .controller('PlayerControlsCtrl', function($scope, $http, player, Radio){
@@ -543,13 +548,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('onair', function($rootScope, user, comet){
-    var params = {wait: 30};
+.factory('onair', function($rootScope, user, comet, Radio, config){
+    var params = {wait: config.cometWait};
     var air = null;
 
-    /*
-    $rootScope.$watch(function() { return user.isLogged(); }, function(logged){
-        // TODO: rename user_id => uid
+    $rootScope.$watch(function() {
+        return user.isLogged();
+    }, function(logged){
         if (logged) {
             params.uid = user.get().id;
         } else {
@@ -558,16 +563,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         subscribe();
     });
 
-    $rootScope.$watch(function() { return radio; }, function(radio){
-        if (radio && radio.air_channel) {
-            params.channel = radio.air_channel;
+    $rootScope.$watch(function() { return Radio.current; }, function(radio){
+        if (radio) {
             subscribe();
-            return;
         }
     }, true);
 
-    function onUpdate(newTrack) {
-        air = newTrack;
+    function onAir(response) {
+        air = response.onair;
         // force convert to int, onair maybe return id as string
         if (angular.isString(air.id)) {
             air.id = parseInt(air.id, 10);
@@ -576,11 +579,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 
     function subscribe() {
-        if (radio) {
+        if (Radio.current.id) {
             comet.unsubscribe();
-            comet.subscribe('/onair/' + radio.id, params, onUpdate);
+            comet.subscribe('/onair/' + Radio.current.id, params, onAir);
         }
-    }*/
+    }
 
     return {
         get: function() {
@@ -612,6 +615,4 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             }
         }
     };
-
-
 });

@@ -2,7 +2,7 @@
   background: url('/static/i/player-controls-sc042c75487.png') no-repeat;
 }
 
-.display-controls-sprite, .radio-box .display .title:hover .star, .radio-box .display .star, .radio-box .display .title.starred .star, .radio-box .display .track:hover .like, .radio-box .display .track.liked .like, .radio-box .display .like, .radio-box .display .like:hover {
+.display-controls-sprite, .radio-box .display .title:hover .star, .radio-box .display .star, .radio-box .display .title.starred .star, .radio-box .display .onair:hover .like, .radio-box .display .onair.liked .like, .radio-box .display .like, .radio-box .display .like:hover {
   background: url('/static/i/display-controls-s5b2974258f.png') no-repeat;
 }
 
@@ -532,16 +532,16 @@ ul.justified .block {
 .radio-box .display .title.starred .star {
   background-position: 0 0;
 }
-.radio-box .display .track {
+.radio-box .display .onair {
   line-height: 16px;
   cursor: pointer;
   position: relative;
-  padding-left: 25px;
+  margin-top: 6px;
 }
-.radio-box .display .track:hover .like {
+.radio-box .display .onair:hover .like {
   background-position: 0 -54px;
 }
-.radio-box .display .track.liked .like {
+.radio-box .display .onair.liked .like {
   background-position: 0 -54px;
 }
 .radio-box .display .like {
@@ -570,13 +570,13 @@ ul.justified .block {
 .radio-box .display .buttons {
   position: absolute;
   bottom: 0px;
-  margin-bottom: 19px;
+  margin-bottom: 16px;
 }
 .radio-box .display .buttons .display-button {
   border: 2px solid #39a1b7;
   background-color: transparent;
   font-size: 12px;
-  padding: 4px 6px;
+  padding: 4px 7px;
   margin-right: 7px;
   color: #358c9d;
   -webkit-border-radius: 2px;
@@ -661,6 +661,12 @@ ul.justified .block {
   -webkit-box-shadow: #0c0c0c 0px 2px 3px 1px;
   -moz-box-shadow: #0c0c0c 0px 2px 3px 1px;
   box-shadow: #0c0c0c 0px 2px 3px 1px;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+  -webkit-transition: all 400ms;
+  -moz-transition: all 400ms;
+  -o-transition: all 400ms;
+  transition: all 400ms;
 }
 .radio-box .favorites-list .block:active {
   border: 1px solid #a3d3dd;
@@ -679,6 +685,10 @@ ul.justified .block {
 .radio-box .favorites-list .block:hover .remove {
   z-index: 900;
   display: block;
+}
+.radio-box .favorites-list .block.ui-animate {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
 }
 .radio-box .favorites-list .block.selected {
   border: 1px solid #a3d3dd;

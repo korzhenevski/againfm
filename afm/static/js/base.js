@@ -1,6 +1,13 @@
 angular.module('afm.base', ['ngResource', 'ngCookies'])
 
-.directive('marquee', function($transition){
+.factory('config', function(){
+    return {
+        cometWait: 25,
+        marqueeSpeed: 42
+    }
+})
+
+.directive('marquee', function($transition, config){
     return {
         restrict: 'C',
         transclude: true,
@@ -17,7 +24,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                     transition.cancel();
                 }
 
-                var duration = Math.round(delta * 42 / 1000);
+                var duration = Math.round(delta * config.marqueeSpeed / 1000);
                 if (duration < 1) {
                     return;
                 }
