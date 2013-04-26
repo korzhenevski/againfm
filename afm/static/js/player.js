@@ -5,12 +5,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $locationProvider.html5Mode(true);
 
     // controller don't execute without "template" attr
-    $routeProvider.when('/listen/:radioId', {
+    $routeProvider.when('/radio/:radioId', {
         template: '<div></div>',
         controller: 'ListenCtrl',
         resolve: {
             radio: ['$http', '$route', 'Radio', '$q', function($http, $route, Radio, $q) {
-                var result = $q.defer();
                 var radioId = ~~$route.current.params.radioId;
                 if (radioId && radioId !== Radio.current.id) {
                     return $http.get('/api/radio/' + radioId).then(function(http){
@@ -27,11 +26,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
     });
 
-    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html', modal: true});
+    //$routeProvider.when('/radio/:radioId/:slug', {controller: 'RadioDetailsCtrl', templateUrl: 'fdsafsad'});
 })
 
 .controller('ListenCtrl', function(Radio, radio){
     Radio.listen(radio);
+})
+
+.controller('RadioDetailsCtrl', function($scope, modal, $routeParams){
+    //modal.open({templateUrl: '/partial/radio/' + $routeParams.radioId});
 })
 
 .run(function($rootScope, user, User){
@@ -451,7 +454,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.selectRadio = function(radio) {
         Radio.listen(radio);
-        $location.path('/listen/' + radio.id);
+        $location.path('/radio/' + radio.id);
     };
 })
 

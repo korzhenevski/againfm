@@ -15,16 +15,24 @@ def index():
     return render_template('player.html')
 
 
-@app.route('/listen/<int:radio_id>')
+@app.route('/radio/<int:radio_id>')
 def listen(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     return render_template('player.html', radio=radio)
 
 
-@app.route('/radio/<int:radio_id>')
-def radio_details(radio_id):
+@app.route('/radio/<int:radio_id>/<slug>')
+def radio_details(radio_id, slug=None):
     radio = db.Radio.find_one_or_404({'id': radio_id})
+    if request.args.get('partial'):
+        return render_template('radio_details.html', radio_details=radio)
     return render_template('player.html', radio_details=radio)
+
+
+@app.route('/partial/radio/<int:radio_id>')
+def partial_radio_details(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id})
+    return render_template('radio_details.html', radio_details=radio)
 
 
 @app.context_processor

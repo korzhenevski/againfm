@@ -5,14 +5,11 @@
 {{% endif %}#}
 
 {{% block top_content %}}
-    {{% if radio_details %}}
-        <div class="modalbox" ng-init="modalview=true">
-            <div class="modal">{{% include 'radio_details.html' %}}</div>
-        </div>
-    {{% else %}}
-        <div class="modalbox"></div>
-    {{% endif %}}
-
+    <div class="modal-back ng-cloak" ng-show="visible" modal-view>
+        {{% if radio_details %}}
+            {{% include 'radio_details.html' %}}
+        {{% endif %}}
+    </div>
 
     {# шаблон индикатора загрузки на CSS3 #}
     <script type="text/ng-template" id="/loader.html">
@@ -36,6 +33,7 @@
                     <p ng-hide="user.isLogged()">
                         <a href="/signup">Стать постоянным слушателем</a>
                         <a href="/login">Войти с паролем</a>
+                        <a href="/radio/917/ah-fm">ah.fm</a>
                     </p>
                     <p ng-show="user.isLogged()">
                         <a ng-click="logout()">выйти</a>

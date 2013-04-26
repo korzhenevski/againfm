@@ -100,91 +100,158 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
-.factory('routeHistory', function($rootScope, $route, $location){
-    var returnTo = $route.current && !$route.current.$route.modal ? $location.path() : '/';
-    $rootScope.$on('$routeChangeSuccess', function(target, current){
-        if (current && current.$route && !current.$route.modal) {
-            returnTo = $location.path();
-        }
-    });
-    return {
-        backToNotModal: function() {
-            $location.path(returnTo);
-        }
-    };
-})
-
-.directive('modalbox', function(){
+.directive('modalBack', function($document, $location){
     return {
         restrict: 'C',
-        transclude: true,
-        replace: true,
-        template: '<div class="modal-box ng-cloak" modalview ng-view ng-show="modalview"></div>'
-    };
-})
-
-
-.directive('modalview', function(){
-    return {
-        restrict: 'A',
+        scope: {},
         controller: function($scope) {
-            $scope.modalview = false;
-
             this.hide = function() {
-                $scope.modalview = false;
-            }
+                $scope.visible = false;
+            };
 
             this.show = function() {
-                $scope.modalview = true;
-            }
-        }
-    };
-})
-
-.directive('modal', function($document, routeHistory){
-    return {
-        restrict: 'A',
-        replace: true,
-        transclude: true,
-        scope: {
-            title: '@'
+                $scope.visible = true;
+            };
         },
-        require: '^modalview',
-        template: '<div class="modal" ui-animate><h1 class="header">{{ title }} <i class="close"></i></h1>' +
-                  '<div ng-transclude></div></div>',
-        link: function($scope, element, attrs, modalViewCtrl) {
-            modalViewCtrl.show();
 
-            element.addClass('modal-' + attrs.modal);
-            element.find('i').bind('click', function(){
-                routeHistory.backToNotModal();
-            });
+        link: function($scope, element) {
+            function close() {
+                if (!$scope.visible) {
+                    return;
+                }
+                $scope.visible = false;
+                $scope.$apply();
+            }
 
-            // close on escape
-            $document.bind('keyup', function(e){
-                if (e.keyCode == 27) {
-                    routeHistory.backToNotModal();
+            $scope.$watch('visible', function(visible){
+                if (visible === false) {
+                    $location.path('/');
                 }
             });
 
-            $scope.$on('$destroy', function(){
-                modalViewCtrl.hide();
-                console.log('destroy');
+            element.bind('click', function(e){
+                // close by click only to modalBack
+                if (e.target == element[0]) {
+                    close();
+                }
             });
+
+            $document.find('body').bind('keydown', function(e){
+                // Press Escape
+                if (e.which === 27) {
+                    close();
+                }
+            })
         }
     };
 })
 
-.factory('routeHistory', function($rootScope, $route, $location){
-    var returnTo = $route.current && !$route.current.$$route.modal ? $location.path() : '/';
-    $rootScope.$on('$routeChangeSuccess', function(target, current){
-        if (current && current.$$route && !current.$$route.modal) {
-            returnTo = $location.path();
-        }
-    });
+.directive('modal', function(){
     return {
-        backToNotModal: function() {
-            $location.path(returnTo);
+        require: '^modalBack',
+        restrict: 'A',
+        replace: true,
+        transclude: true,
+        template: '<div class="modal">' +
+                  '<h1 class="header">{{ title }} <i class="close" ng-click="close()"></i></h1>' +
+                  '<div ng-transclude></div></div>',
+        scope: {
+            title: '@'
+        },
+
+        link: function($scope, element, attrs, back) {
+            back.show();
+
+            if (attrs.modal) {
+                element.addClass('modal-' + attrs.modal);
+            }
+
+            $scope.close = function() {
+                back.hide();
+            };
         }
     };
+})
+
+.directive('modalView', function($http, $templateCache, $route, $compile, $controller, $q) {
+  return {
+    restrict: 'A',
+    link: function(scope, element) {
+      var lastScope;
+
+      scope.$on('$routeChangeSuccess', update);
+      scope.$on('modalChangeTemplate', changeTemplate);
+      update();
+
+      function changeTemplate(scope, params) {
+        var template;
+        if (params.template) {
+            template = params.template;
+        } else if (params.templateUrl) {
+            template = $http.get(params.templateUrl, {cache: $templateCache}).then(function(http){
+                return http.data;
+            })
+        } else {
+            return;
+        }
+
+        $q.all([template]).then(function(results){
+            updateTemplate(results[0]);
+        });
+      }
+
+      function destroyLastScope() {
+        if (lastScope) {
+          lastScope.$destroy();
+          lastScope = null;
+        }
+      }
+
+      function clearContent() {
+        if (lastScope) {
+          element.html('');
+        }
+        destroyLastScope();
+      }
+
+      function updateTemplate(template) {
+        var locals = $route.current && $route.current.locals;
+        if (template) {
+          element.html(template);
+          destroyLastScope();
+
+          var link = $compile(element.contents()),
+              current = $route.current,
+              controller;
+
+          lastScope = current.scope = scope.$new();
+          if (current.controller) {
+            locals.$scope = lastScope;
+            controller = $controller(current.controller, locals);
+            element.children().data('$ngControllerController', controller);
+          }
+
+          link(lastScope);
+          lastScope.$emit('$viewContentLoaded');
+        } else {
+          clearContent();
+        }
+      }
+
+      function update() {
+        // ?
+        var locals = $route.current && $route.current.locals;
+        var template = locals && locals.$template;
+        updateTemplate(template)
+      }
+    }
+  };
+})
+
+.factory('modal', function($rootScope){
+    return {
+        open: function(params) {
+            $rootScope.$broadcast('modalChangeTemplate', params);
+        }
+    }
 });

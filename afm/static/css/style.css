@@ -76,12 +76,12 @@ ul.justified .block {
   display: inline-block;
 }
 
-.modal-box {
+.modal-back {
   position: absolute;
-  height: 100%;
   width: 100%;
-  overflow: hidden;
+  height: 100%;
   z-index: 1500;
+  overflow: hidden;
   background-color: rgba(0, 0, 0, 0.7);
 }
 
