@@ -21,6 +21,12 @@ def listen(radio_id):
     return render_template('player.html', radio=radio)
 
 
+@app.route('/radio/<int:radio_id>')
+def radio_details(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id})
+    return render_template('player.html', radio_details=radio)
+
+
 @app.context_processor
 def app_context():
     return {

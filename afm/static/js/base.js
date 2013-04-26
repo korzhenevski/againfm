@@ -114,18 +114,48 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
+.directive('modalbox', function(){
+    return {
+        restrict: 'C',
+        transclude: true,
+        replace: true,
+        template: '<div class="modal-box ng-cloak" modalview ng-view ng-show="modalview"></div>'
+    };
+})
+
+
+.directive('modalview', function(){
+    return {
+        restrict: 'A',
+        controller: function($scope) {
+            $scope.modalview = false;
+
+            this.hide = function() {
+                $scope.modalview = false;
+            }
+
+            this.show = function() {
+                $scope.modalview = true;
+            }
+        }
+    };
+})
+
 .directive('modal', function($document, routeHistory){
     return {
-        restrict: 'E',
+        restrict: 'A',
         replace: true,
         transclude: true,
         scope: {
             title: '@'
         },
+        require: '^modalview',
         template: '<div class="modal" ui-animate><h1 class="header">{{ title }} <i class="close"></i></h1>' +
                   '<div ng-transclude></div></div>',
-        link: function(scope, element, attrs) {
-            element.addClass('modal-' + attrs.id);
+        link: function($scope, element, attrs, modalViewCtrl) {
+            modalViewCtrl.show();
+
+            element.addClass('modal-' + attrs.modal);
             element.find('i').bind('click', function(){
                 routeHistory.backToNotModal();
             });
@@ -136,21 +166,11 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                     routeHistory.backToNotModal();
                 }
             });
-        }
-    };
-})
 
-.directive('modalBox', function($route){
-    return {
-        restrict: 'AC',
-        link: function(scope, element) {
-            scope.$on('$routeChangeSuccess', update);
-            update();
-
-            function update() {
-                var modal = $route.current && $route.current.modal;
-                element.css('display', modal ? 'block' : 'none');
-            }
+            $scope.$on('$destroy', function(){
+                modalViewCtrl.hide();
+                console.log('destroy');
+            });
         }
     };
 })

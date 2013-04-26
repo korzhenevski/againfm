@@ -23,7 +23,7 @@
     {{% endif %}}
 </head>
 
-<body ng-init='bootstrapUser={{{ current_user.get_public()|json }}}; bootstrapGenres={{{ genres|json }}}'>
+<body ng-init='bootstrapUser={{{ current_user.get_public()|json }}};'>
     {{% block top_content %}}{{% endblock %}}
 
     <table class="roof">
@@ -77,7 +77,7 @@
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 
 <script type="text/ng-template" id="login.html">
-    <modal id="login" title="Вход с паролем">
+    <div class="modal" modal="login" title="Вход с паролем">
         <form name="loginForm" data-ng-submit="auth()">
             <input class="text" name="login" data-ng-model="form.login" autofocus="autofocus"
                    type="email" placeholder="Электронная почта" required="" autofocus="" />
@@ -93,11 +93,11 @@
             </p>
             <!--hr class="line" /-->
         </form>
-    </modal>
+    </div>
 </script>
 
 <script type="text/ng-template" id="signup.html">
-    <modal id="signup" title="Регистрация">
+    <div class="modal" modal="signup" title="Регистрация">
         <form name="signupForm" data-ng-submit="signup()">
             <input class="text" name="email" data-ng-model="form.email" autofocus="autofocus"
                    type="email" placeholder="Электронная почта" required="" autofocus="" />
@@ -108,11 +108,11 @@
             <span data-ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
             <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
         </p>
-    </modal>
+    </div>
 </script>
 
 <script type="text/ng-template" id="amnesia.html">
-    <modal id="amnesia" title="Сброс пароля">
+    <div class="modal" modal="amnesia" title="Сброс пароля">
         <form name="amnesiaForm" data-ng-hide="result" data-ng-submit="amnesia()">
             <input class="text" name="email" data-ng-model="form.email" required=""
                    type="email" placeholder="Электронная почта" autofocus="autofocus" />
@@ -127,11 +127,11 @@
             <a href="{{ result.email_provider }}" data-ng-show="result.email_provider" target="_blank">Проверьте почту</a>
             <span data-ng-hide="result.email_provider">Проверьте почту</span>
         </p>
-    </modal>
+    </div>
 </script>
 
 <script type="text/ng-template" id="feedback.html">
-    <modal id="feedback" title="Обратная связь">
+    <div class="modal" modal="feedback" title="Обратная связь">
         <form name="feedbackForm" data-ng-submit="feedback()" data-ng-hide="result">
             <input type="email" class="text" name="email" autofocus="autofocus"
                    data-ng-model="form.email" placeholder="Электронная почта" required="" autofocus="" />
@@ -146,7 +146,7 @@
         <p class="error" data-ng-switch on="error.code" data-ng-show="error">
             <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
         </p>
-    </modal>
+    </div>
 </script>
 
 </body>

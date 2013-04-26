@@ -1,10 +1,10 @@
-angular.module('afm.user', ['afm.base', 'ui.bootstrap.modal'])
+angular.module('afm.user', ['afm.base'])
 
 .config(function($routeProvider){
-    $routeProvider.when('/login', {controller: 'LoginCtrl', template: '<div></div>'});
-    //$routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: 'signup.html', modal: true});
-    //$routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: 'amnesia.html', modal: true});
-    //$routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html', modal: true});
+    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: 'login.html', modal: true});
+    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: 'signup.html', modal: true});
+    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: 'amnesia.html', modal: true});
+    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html', modal: true});
 })
 
 .factory('user', function(){
@@ -48,8 +48,7 @@ angular.module('afm.user', ['afm.base', 'ui.bootstrap.modal'])
     };
 }])
 
-.controller('LoginCtrl', function($dialog){
-    /*
+.controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
     if (user.isLogged()) {
         $location.path('/');
         return;
@@ -69,7 +68,7 @@ angular.module('afm.user', ['afm.base', 'ui.bootstrap.modal'])
             user.update(response.user);
             $location.path('/');
         }).error(passErrorToScope($scope));
-    };*/
+    };
 })
 
 .controller('SignupCtrl', function($scope, $location, user, User, passErrorToScope){

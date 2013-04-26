@@ -1,7 +1,19 @@
 {{% extends "layout.html" %}}
 
+{# {% if radio_details %}}
+    {{% block title %}}Радио {{{ radio_details.title }}}{{% endblock %}}
+{{% endif %}#}
+
 {{% block top_content %}}
-    <div class="modal-box ng-cloak" ng-view=""></div>
+    {{% if radio_details %}}
+        <div class="modalbox" ng-init="modalview=true">
+            <div class="modal">{{% include 'radio_details.html' %}}</div>
+        </div>
+    {{% else %}}
+        <div class="modalbox"></div>
+    {{% endif %}}
+
+
     {# шаблон индикатора загрузки на CSS3 #}
     <script type="text/ng-template" id="/loader.html">
         <div id="floatingBarsG">
@@ -76,7 +88,7 @@
 
                         {# плейлист #}
                         <td rowspan="3">
-                            <div class="radio-table">
+                            <div class="radio-table" ng-init='bootstrapGenres={{{ genres|json }}}'>
                                 <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="selectTab('featured')">
                                     <div class="group">
                                         <div class="search">
@@ -195,8 +207,6 @@
 
     <script src="/static/js/common/ui-transition.js"></script>
     <script src="/static/js/common/ui-animate.js"></script>
-    <script src="/static/js/common/ui-dialog.js"></script>
-    <script src="/static/js/common/ui-modal.js"></script>
 
     <script src="/static/js/sound.js"></script>
     <script src="/static/js/user.js"></script>

@@ -26,6 +26,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             }]
         }
     });
+
+    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html', modal: true});
 })
 
 .controller('ListenCtrl', function(Radio, radio){
