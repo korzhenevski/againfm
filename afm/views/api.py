@@ -108,21 +108,3 @@ def api_radio_random():
 
     radio = db.Radio.find_one_or_404({'id': int(radio_id), 'deleted_at': 0})
     return jsonify(radio.get_public())
-
-
-@app.route('/api/feedback', methods=['POST'])
-def api_feedback():
-    form = safe_input_object({
-        'text': {'type': 'string', 'maxLength': 2048},
-        'email': {'type': 'string', 'maxLength': 255}
-    })
-
-    message = db.FeedbackMessage()
-    message.update(form)
-    message.remote_addr = unicode(request.remote_addr)
-    message.save()
-
-    body = render_template('mail/feedback.html', **message)
-    send_mail(email=app.config['ADMIN_EMAIL'], body=body, subject=u'Обратная связь')
-
-    return jsonify({'success': True})

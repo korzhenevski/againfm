@@ -91,6 +91,24 @@ def api_user_logout():
     return jsonify({'logout': True})
 
 
+@app.route('/api/user/feedback', methods=['POST'])
+def api_user_feedback():
+    form = safe_input_object({
+        'text': {'type': 'string', 'maxLength': 2048},
+        'email': {'type': 'string', 'maxLength': 255}
+    })
+
+    message = db.FeedbackMessage()
+    message.update(form)
+    message.remote_addr = unicode(request.remote_addr)
+    message.save()
+
+    body = render_template('mail/feedback.html', **message)
+    send_mail(email=app.config['ADMIN_EMAIL'], body=body, subject=u'Обратная связь')
+
+    return jsonify({'success': True})
+
+
 @app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
 def token_auth(user_id, token):
     user = db.User.find_one({'id': user_id})

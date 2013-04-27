@@ -23,7 +23,7 @@
     {{% endif %}}
 </head>
 
-<body ng-init='bootstrapUser={{{ current_user.get_public()|json }}}'>
+<body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>
     {{% block top_content %}}{{% endblock %}}
 
     <table class="roof">
@@ -77,74 +77,80 @@
 <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 
 <script type="text/ng-template" id="login.html">
-    <div modal class="modal-login" title="Вход с паролем">
-        <form name="loginForm" data-ng-submit="auth()">
-            <input class="text" name="login" data-ng-model="form.login" autofocus="autofocus"
-                   type="email" placeholder="Электронная почта" required="" autofocus="" />
-            <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required />
+    <div modal="login" title="Вход с паролем">
+        <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" user-form>
+            <input class="text" name="login" ng-model="data.login"
+                   type="email" placeholder="Электронная почта" required autofocus />
+
+            <input class="text" name="password" ng-model="data.password" type="password" placeholder="Пароль" required />
+
             <div class="controls">
-                <input type="submit" class="btn" value="Войти" data-ng-disabled="loginForm.$invalid" />
+                <input type="submit" class="btn" value="Войти" ng-disabled="form.$invalid && showErrors" />
                 <a href="/amnesia" class="amnesia">забыли пароль?</a>
             </div>
-            <p class="error" data-ng-switch data-on="error.code" data-ng-show="error">
-                <span data-ng-switch-when="404">Нет такого пользователя</span>
-                <span data-ng-switch-when="401">Неправильно введен логин или пароль</span>
-                <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+
+            <p class="error" ng-switch data-on="error.code" ng-show="error">
+                <span ng-switch-when="404">Нет такого пользователя</span>
+                <span ng-switch-when="401">Неправильно введен логин или пароль</span>
+                <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
             </p>
-            <!--hr class="line" /-->
         </form>
     </div>
 </script>
 
 <script type="text/ng-template" id="signup.html">
-    <div modal title="Регистрация">
-        <form name="signupForm" data-ng-submit="signup()">
-            <input class="text" name="email" data-ng-model="form.email" autofocus="autofocus"
-                   type="email" placeholder="Электронная почта" required="" autofocus="" />
-            <input class="text" name="password" data-ng-model="form.password" type="password" placeholder="Пароль" required="" />
-            <input type="submit" class="btn" value="Зарегистрироваться" data-ng-disabled="signupForm.$invalid" />
+    <div modal="signup" title="Регистрация">
+        <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" user-form>
+            <input class="text" name="email" ng-model="data.email"
+                   type="email" placeholder="Электронная почта" required autofocus />
+            <input class="text" name="password" ng-model="data.password" type="password" placeholder="Пароль" required />
+
+            <input type="submit" class="btn" value="Зарегистрироваться" ng-disabled="form.$invalid && showErrors" />
         </form>
-        <p class="error" data-ng-switch data-on="error.code" data-ng-show="error">
-            <span data-ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
-            <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+
+        <p class="error" ng-switch data-on="error.code" ng-show="error">
+            <span ng-switch-when="409">Такой пользователь уже зарегистрирован</span>
+            <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
         </p>
     </div>
 </script>
 
 <script type="text/ng-template" id="amnesia.html">
-    <div modal title="Сброс пароля">
-        <form name="amnesiaForm" data-ng-hide="result" data-ng-submit="amnesia()">
-            <input class="text" name="email" data-ng-model="form.email" required=""
-                   type="email" placeholder="Электронная почта" autofocus="autofocus" />
-            <input type="submit" class="btn" value="Выслать на почту" data-ng-disabled="amnesiaForm.$invalid" />
+    <div modal="amnesia" title="Сброс пароля">
+        <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" ng-hide="result" user-form>
+            <input class="text" name="email" ng-model="data.email"
+                   type="email" placeholder="Электронная почта" autofocus required />
+
+            <input type="submit" class="btn" value="Выслать на почту" ng-disabled="form.$invalid && showErrors" />
         </form>
-        <p class="error" data-ng-switch on="error.code" data-ng-show="error">
-            <span data-ng-switch-when="404">Пользователь не найден</span>
-            <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+
+        <p class="error" ng-switch on="error.code" ng-show="error">
+            <span ng-switch-when="404">Пользователь не найден</span>
+            <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
         </p>
-        <p data-ng-show="result">
+
+        <p ng-show="result">
             Пароль сброшен.
-            <a href="{{ result.email_provider }}" data-ng-show="result.email_provider" target="_blank">Проверьте почту</a>
-            <span data-ng-hide="result.email_provider">Проверьте почту</span>
+            <a href="{{ result.email_provider }}" ng-show="result.email_provider" target="_blank">Проверьте почту</a>
+            <span ng-hide="result.email_provider">Проверьте почту</span>
         </p>
     </div>
 </script>
 
 <script type="text/ng-template" id="feedback.html">
-    <div modal title="Обратная связь">
-        <form name="feedbackForm" data-ng-submit="feedback()" data-ng-hide="result">
-            <input type="email" class="text" name="email" autofocus="autofocus"
-                   data-ng-model="form.email" placeholder="Электронная почта" required="" autofocus="" />
-            <textarea rows="4" class="text" name="text" data-ng-model="form.text" placeholder="Текст" required=""></textarea>
-            <input type="submit" class="btn" value="Отправить сообщение" data-ng-disabled="feedbackForm.$invalid" />
-            {# <p class="mail">
-                Будет нечестно не сказать, что мы еще <br>читаем письма с
-                <a href="mailto:feedback@again.fm?subject=Обратная+связь" target="_blank">feedback@again.fm</a>
-            </p> #}
+    <div modal="feedback" title="Обратная связь">
+        <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" ng-hide="result" user-form>
+            <textarea rows="6" class="text" name="text" ng-model="data.text"
+                      placeholder="Текст" autofocus="" required=""></textarea>
+
+            <input ng-hide="user.isLogged()" type="email" class="text" name="email"
+                   ng-model="data.email" placeholder="Электронная почта" required />
+
+            <input type="submit" class="btn" value="Отправить" ng-disabled="form.$invalid && showErrors" />
         </form>
-        <p data-ng-show="result">Сообщение отправлено, спасибо :)</p>
-        <p class="error" data-ng-switch on="error.code" data-ng-show="error">
-            <span data-ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+        <p ng-show="result">Сообщение отправлено, спасибо :)</p>
+        <p class="error" ng-switch on="error.code" ng-show="error">
+            <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
         </p>
     </div>
 </script>

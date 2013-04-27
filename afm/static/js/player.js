@@ -31,18 +31,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     Radio.listen(radio);
 })
 
-.run(function($rootScope, user, User){
-    $rootScope.user = user;
-    $rootScope.logout = function() {
-        if (user.isLogged()) {
-            user.clear();
-            User.logout();
-        }
-    };
-
-    user.update($rootScope.bootstrapUser);
-})
-
 .factory('player', function($rootScope, storage) {
     var player = {
         url: null,
@@ -209,30 +197,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 cb(response.objects);
             });
         }
-    };
-})
-
-.factory('Feedback', function($http) {
-    return {
-        send: function(params) {
-            return $http.post('/api/feedback', params);
-        }
-    };
-})
-
-.controller('FeedbackCtrl', function($scope, Feedback, passErrorToScope){
-    $scope.form = {};
-
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.feedback = function() {
-        $scope.error = null;
-        $scope.result = null;
-        Feedback.send($scope.form).success(function(result){
-            $scope.result = result;
-        }).error(passErrorToScope($scope));
     };
 })
 

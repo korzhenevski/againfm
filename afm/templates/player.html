@@ -31,8 +31,8 @@
             <div class="topmenu">
                 <div class="menu-item side-item">
                     <p ng-hide="user.isLogged()">
-                        <a href="/signup">Стать постоянным слушателем</a>
                         <a href="/login">Войти с паролем</a>
+                        <a href="/signup">Стать постоянным слушателем</a>
                     </p>
                     <p ng-show="user.isLogged()">
                         <a ng-click="logout()">выйти</a>

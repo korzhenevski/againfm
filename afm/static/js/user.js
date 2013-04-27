@@ -44,70 +44,106 @@ angular.module('afm.user', ['afm.base'])
 
         logout: function() {
             return $http.post('/api/user/logout');
+        },
+
+        feedback: function(params) {
+            return $http.post('/api/user/feedback', params);
         }
     };
 }])
 
-.controller('LoginCtrl', function($scope, $location, user, User, passErrorToScope){
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
-    }
+.controller('UserCtrl', function($scope, User, user) {
+    $scope.user = user;
+    $scope.logout = function() {
+        if (user.isLogged()) {
+            user.clear();
+            User.logout();
+        }
+    };
 
-    $scope.form = {};
-
-    // TODO: move to form controller
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.auth = function() {
-        $scope.error = null;
-
-        User.login($scope.form).success(function(response){
-            user.update(response.user);
-            $location.path('/');
-        }).error(passErrorToScope($scope));
+    $scope.setUser = function(newUser) {
+        user.update(newUser);
     };
 })
 
-.controller('SignupCtrl', function($scope, $location, user, User, passErrorToScope){
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
+.directive('userForm', function(){
+    return {
+        restrict: 'A',
+        controller: function($scope, user, $window) {
+            $scope.user = user;
+
+            $scope.redirectLogged = function(){
+                if (user.isLogged()) {
+                    $window.location = '/';
+                    return;
+                }
+            };
+
+            $scope.$watch('data', function(){
+                $scope.error = false;
+            }, true);
+
+            $scope.submit = function() {
+                $scope.error = false;
+                $scope.showErrors = true;
+
+                $scope.send().error(function(response, statusCode){
+                    var error = {};
+                    if (angular.isObject(response) && response.error) {
+                        error.reason = response.error;
+                    }
+                    error.code = statusCode;
+                    $scope.error = error;
+                });
+            };
+        }
     }
+})
 
-    $scope.form = {};
+.controller('LoginCtrl', function($scope, $window, User){
+    $scope.data = {};
+    $scope.redirectLogged();
 
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
-
-    $scope.signup = function() {
-        $scope.error = null;
-
-        User.signup($scope.form).success(function(response){
-            user.update(response.user);
-            $location.path('/');
-        }).error(passErrorToScope($scope));
+    $scope.send = function() {
+        return User.login($scope.data).success(function(){
+            $window.location = '/';
+        });
     };
 })
 
-.controller('AmnesiaCtrl', function($scope, $location, user, User, passErrorToScope){
-    if (user.isLogged()) {
-        $location.path('/');
-        return;
-    }
+.controller('SignupCtrl', function($scope, $window, User){
+    $scope.data = {};
+    $scope.redirectLogged();
 
-    $scope.form = {};
-    $scope.$watch('form', function(){
-        $scope.error = null;
-    }, true);
+    $scope.send = function() {
+        return User.signup($scope.data).success(function(){
+            $window.location = '/';
+        });
+    };
+})
 
-    $scope.amnesia = function() {
-        $scope.error = null;
-        User.amnesia($scope.form).success(function(result){
+.controller('AmnesiaCtrl', function($scope, User){
+    $scope.data = {};
+    $scope.redirectLogged();
+
+    $scope.send = function() {
+        return User.amnesia($scope.data).success(function(result){
             $scope.result = result;
-        }).error(passErrorToScope($scope));
+        });
+    };
+})
+
+.controller('FeedbackCtrl', function($scope, user, User){
+    $scope.data = {};
+
+    if (user.isLogged()) {
+        $scope.data.email = user.get().email;
+    }
+
+    $scope.send = function() {
+        $scope.result = false;
+        return User.feedback($scope.data).success(function(result){
+            $scope.result = result;
+        });
     };
 });

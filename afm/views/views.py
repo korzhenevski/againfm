@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request
+from flask import render_template, request, redirect
+from flask.ext.login import current_user
 from datetime import datetime
 
 from afm import db, app
 
 
 @app.route('/')
-@app.route('/signup')
-@app.route('/amnesia')
-@app.route('/login')
+@app.route('/feedback')
 def index():
     return render_template('player.html')
 
+@app.route('/signup')
+@app.route('/amnesia')
+@app.route('/login')
+def user_actions():
+    if current_user.is_authenticated():
+        return redirect('/')
+    return render_template('player.html')
 
 @app.route('/radio/<int:radio_id>')
 def listen(radio_id):

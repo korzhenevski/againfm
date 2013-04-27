@@ -103,7 +103,7 @@ ul.justified .block {
 }
 .modal h1 {
   margin: 0;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: #f3f3f4;
   font-size: 22px;
   font-weight: normal;
@@ -140,6 +140,7 @@ ul.justified .block {
 }
 .modal .error {
   color: #ff6f7d;
+  margin-bottom: 0;
 }
 .modal .controls {
   position: relative;
@@ -152,20 +153,20 @@ ul.justified .block {
 .modal form.ng-invalid .error {
   display: none;
 }
-.modal form.ng-dirty input.ng-invalid {
+.modal form.errors input.ng-invalid {
   color: #ff6f7d;
   border: 1px solid #963841;
 }
-.modal form.ng-dirty input.ng-invalid.placeholder {
+.modal form.errors input.ng-invalid.placeholder {
   color: #ff6f7d;
 }
-.modal form.ng-dirty input.ng-invalid::-webkit-input-placeholder {
+.modal form.errors input.ng-invalid::-webkit-input-placeholder {
   color: #ff6f7d;
 }
-.modal form.ng-dirty input.ng-invalid:-moz-placeholder {
+.modal form.errors input.ng-invalid:-moz-placeholder {
   color: #ff6f7d;
 }
-.modal form.ng-dirty input.ng-invalid:-ms-input-placeholder {
+.modal form.errors input.ng-invalid:-ms-input-placeholder {
   color: #ff6f7d;
 }
 
@@ -174,56 +175,9 @@ ul.justified .block {
   opacity: 0;
 }
 
-.modal-feedback .mail {
-  margin-top: 2em;
-  margin-bottom: 0;
-}
-
 .centroid {
   width: 980px;
   margin: 0 auto;
-}
-
-.login {
-  display: inline;
-}
-.login .field {
-  width: 110px;
-  border: 1px solid #696a75;
-  color: #dcdcde;
-  padding: 4px 9px;
-  margin-right: 9px;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4c4e5d), color-stop(100%, #484955));
-  background: -webkit-linear-gradient(#4c4e5d, #484955);
-  background: -moz-linear-gradient(#4c4e5d, #484955);
-  background: -o-linear-gradient(#4c4e5d, #484955);
-  background: linear-gradient(#4c4e5d, #484955);
-  -webkit-box-shadow: #4b4a56 0 0 0px 1px inset;
-  -moz-box-shadow: #4b4a56 0 0 0px 1px inset;
-  box-shadow: #4b4a56 0 0 0px 1px inset;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  -ms-border-radius: 1px;
-  -o-border-radius: 1px;
-  border-radius: 1px;
-}
-.login .field:focus {
-  outline: none;
-}
-.login .button {
-  border: 1px solid #519fae;
-  padding: 4px 9px;
-  color: white;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  -ms-border-radius: 1px;
-  -o-border-radius: 1px;
-  border-radius: 1px;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #68acb9), color-stop(100%, #3892a3));
-  background: -webkit-linear-gradient(#68acb9, #3892a3);
-  background: -moz-linear-gradient(#68acb9, #3892a3);
-  background: -o-linear-gradient(#68acb9, #3892a3);
-  background: linear-gradient(#68acb9, #3892a3);
 }
 
 .roof {

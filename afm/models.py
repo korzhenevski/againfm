@@ -37,6 +37,7 @@ class BaseDocument(Document):
     use_dot_notation = True
     use_autoinc_id = False
     json_schema = {}
+    public = ['id']
 
     def save(self, *args, **kwargs):
         # автоинкремент числового идентификатора
@@ -205,7 +206,7 @@ class FavoriteStation(AbstractFavorite):
 
 
 class AnonUser(AnonymousUser):
-    def get_public(self):
+    def get_public(self, *args):
         return None
 
 
@@ -255,11 +256,6 @@ class User(BaseDocument):
 
     def is_admin(self):
         return self['is_admin']
-
-    def get_public(self):
-        return {
-            'id': self['id'],
-        }
 
     def generate_new_password(self, length=8):
         chars = string.letters + string.digits
