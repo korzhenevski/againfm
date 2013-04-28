@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:og="http://ogp.me/ns#">
 <head>
-    <title>{{% block title %}}Again.FM{{% endblock %}}</title>
+    <title>{{% block title %}}Эгейн.ФМ{{% endblock %}}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="{{% block description %}}Радиоплеер. Играет радио и сохраняет историю прямого эфира.{{% endblock %}}" />
+    <meta name="description" content="{{% block description %}}Радиоплеер. Играет музыку, вещает новости, ведет историю эфира.{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
+    <meta http-equiv="X-Frame-Options" content="deny" />
 
-    {# скрываем шаблоны до отработки ангулар парсера #}
     <style>.ng-cloak { display: none; }</style>
-
-    {# базовые стили #}
-    {{% assets "styles" %}}
-    <link href="{{{ ASSET_URL }}}" rel="stylesheet"/>
-    {{% endassets %}}
+    <link href="/static/css/normalize.css" rel="stylesheet" />
+    <link href="/static/css/style.css" rel="stylesheet" />
 
     {# подключаемые стили #}
     {{% block styles %}}{{% endblock %}}
@@ -60,9 +57,10 @@
     </div>
 
 {# базовые скрипты #}
-{{% assets 'scripts' %}}
-<script src="{{{ ASSET_URL }}}"></script>
-{{% endassets %}}
+
+{{% for name in ('angular', 'angular-cookies', 'angular-resource') %}}
+    <script src="/static/js/common/{{{ name }}}.js"></script>
+{{% endfor %}}
 
 {# подключаемые скрипты #}
 {{% block scripts %}}{{% endblock %}}

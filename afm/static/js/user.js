@@ -69,15 +69,8 @@ angular.module('afm.user', ['afm.base'])
 .directive('userForm', function(){
     return {
         restrict: 'A',
-        controller: function($scope, user, $window) {
+        controller: function($scope, user) {
             $scope.user = user;
-
-            $scope.redirectLogged = function(){
-                if (user.isLogged()) {
-                    $window.location = '/';
-                    return;
-                }
-            };
 
             $scope.$watch('data', function(){
                 $scope.error = false;
@@ -102,7 +95,6 @@ angular.module('afm.user', ['afm.base'])
 
 .controller('LoginCtrl', function($scope, $window, User){
     $scope.data = {};
-    $scope.redirectLogged();
 
     $scope.send = function() {
         return User.login($scope.data).success(function(){
@@ -113,7 +105,6 @@ angular.module('afm.user', ['afm.base'])
 
 .controller('SignupCtrl', function($scope, $window, User){
     $scope.data = {};
-    $scope.redirectLogged();
 
     $scope.send = function() {
         return User.signup($scope.data).success(function(){
@@ -124,7 +115,6 @@ angular.module('afm.user', ['afm.base'])
 
 .controller('AmnesiaCtrl', function($scope, User){
     $scope.data = {};
-    $scope.redirectLogged();
 
     $scope.send = function() {
         return User.amnesia($scope.data).success(function(result){

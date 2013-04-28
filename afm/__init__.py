@@ -8,7 +8,6 @@ from flask.ext.mongokit import MongoKit
 from redis import Redis
 from .mailer import AmazonMailer
 from .search import Search
-from afm.assets import assets
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -27,6 +26,7 @@ app.jinja_env.block_end_string = '%}}'
 db = MongoKit(app)
 search = Search()
 redis = Redis(**app.config['REDIS'])
+
 mailer = AmazonMailer(app)
 
 celery = Celery(__name__)
@@ -34,8 +34,6 @@ celery.conf.add_defaults(app.config)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-assets.init_app(app)
 
 from afm import views
 

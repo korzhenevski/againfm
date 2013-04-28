@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from flask.ext.script import Manager
-from flask.ext.assets import ManageAssets
-from afm import app, db, assets, models
+from afm import app, db, models
 from pprint import pprint as pp
 
 manager = Manager(app)
-manager.add_command('assets', ManageAssets(assets))
+
 
 @manager.shell
 def make_shell_context():

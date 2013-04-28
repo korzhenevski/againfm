@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import request, jsonify, render_template, abort
+from flask import request, jsonify, abort
 from flask.ext.login import login_required, current_user
 
 import random
 import requests
 from afm import app, db, redis
 from afm.models import UserFavoritesCache
-from afm.helpers import safe_input_object, send_mail, raw_redirect
+from afm.helpers import raw_redirect
 
 
 """
@@ -23,9 +23,13 @@ TODO:
 @app.route('/api/radio/search')
 def api_radio_search():
     q = request.args.get('q', type=unicode)
-    resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': u'title:{}*'.format(q)})
-    hits = [hit['_source'] for hit in resp.json()['hits'].get('hits', [])]
-    return jsonify({'objects': hits, 'q': q})
+    try:
+        resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': u'title:{}*'.format(q)}).json()
+    except (RuntimeError, ValueError):
+        return jsonify({'objects': [], 'error': True})
+
+    hits = [hit['_source'] for hit in resp.get('hits', {}).get('hits', [])]
+    return jsonify({'objects': hits})
 
 
 @app.route('/api/radio/featured')
