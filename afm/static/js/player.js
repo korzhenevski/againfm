@@ -12,6 +12,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             radio: ['$http', '$route', 'Radio', '$q', function($http, $route, Radio, $q) {
                 var radioId = ~~$route.current.params.radioId;
                 if (radioId && radioId !== Radio.current.id) {
+
                     return $http.get('/api/radio/' + radioId).then(function(http){
                         return http.data;
                     }, function() {
@@ -29,90 +30,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
 .controller('ListenCtrl', function(Radio, radio){
     Radio.listen(radio);
-})
-
-.factory('player', function($rootScope, storage) {
-    var player = {
-        url: null,
-        muted: false,
-        playing: false,
-        volume: 0.6,
-        defaultVolume: 0.6,
-        flashAudio: null,
-
-        play: function(url) {
-            if (url) {
-                player.url = url;
-            }
-
-            if (player.url && player.flashAudio) {
-                player.flashAudio.playStream(player.url);
-                player.playing = true;
-            }
-        },
-
-        stop: function() {
-            if (player.url && player.flashAudio) {
-                player.flashAudio.stopStream();
-            }
-            player.playing = false;
-        },
-
-        setAudioVolume: function(volume) {
-            if (player.flashAudio) {
-                player.flashAudio.setVolume(volume);
-            }
-        },
-
-        loadVolume: function() {
-            var volume = parseFloat(storage.get('volume'));
-            // громкость не установлена в куках - берем по умолчанию
-            if (isNaN(volume)) {
-                volume = player.defaultVolume;
-            }
-            player.setVolume(volume);
-        },
-
-        setVolume: function(volume) {
-            volume = parseFloat(volume);
-            player.volume = volume;
-            player.setAudioVolume(volume);
-            storage.put('volume', volume);
-        },
-
-        mute: function() {
-            player.setAudioVolume(0);
-            player.muted = player.volume;
-        },
-
-        unmute: function() {
-            player.setVolume(player.muted || player.defaultVolume);
-            player.muted = false;
-        },
-
-        isMuted: function() {
-            // TODO: fix this shit
-            return angular.isNumber(player.muted);
-        },
-
-        flashCallback: function(event) {
-            if (event == 'stopped') {
-                player.playing = false;
-            }
-            if (event == 'playing') {
-                player.playing = true;
-            }
-            if (event == 'ready') {
-                player.flashAudio = document.getElementById('flash-player-engine');
-                player.setAudioVolume(player.volume);
-                player.play();
-            }
-            $rootScope.$apply();
-        }
-    };
-
-    player.loadVolume();
-    return player;
 })
 
 .factory('favorites', function($rootScope, user, storage, UserFavorite) {
@@ -387,7 +304,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('Radio', function($rootScope, player){
+.factory('Radio', function($rootScope, $http, player){
     return {
         current: {},
         set: function(radio) {
@@ -396,6 +313,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         },
 
         listen: function(radio) {
+            console.log('Radio.listen', radio);
             this.set(radio);
             player.play('/api/radio/' + radio.id + '/listen?redir=1');
             $rootScope.$broadcast('radioListen', radio);
@@ -556,6 +474,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
+.controller('PlayerModalCtrl', function($scope){
+    $scope.modalSrc = null;
+
+    $scope.$on('showModal', function(ev, src){
+        $scope.modalSrc = src;
+        $scope.$emit('modalShow');
+    });
+})
+
 /**
  * Дисплей радиостанции
  */
@@ -578,5 +505,9 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 favorites.add(Radio.current.id, Radio.current.title);
             }
         }
+    };
+
+    $scope.showModal = function(modal) {
+        $scope.$root.$broadcast('showModal', '/partial/radio/' + Radio.current.id + '/' + modal);
     };
 });

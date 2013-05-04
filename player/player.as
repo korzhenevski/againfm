@@ -32,7 +32,7 @@ package {
       private var _loopSound:Sound;
       private var _loopChannel:SoundChannel;
 
-      private var _fadingTime:Number = 0.5; //secs
+      private var _fadingTime:Number = 0.3; //secs
       private var _volume:Number = 0.6;
       private var _stopped:Boolean = true;
 
@@ -44,7 +44,7 @@ package {
          ExternalInterface.addCallback("stopLoop", stopLoop);
          
          ExternalInterface.addCallback("stopStream", stopStream);
-         ExternalInterface.addCallback("stopStreamWithFade", stopStreamWithFade);
+         ExternalInterface.addCallback("canPlayType", canPlayType);
          ExternalInterface.addCallback("setVolume", setVolume);
          ExternalInterface.addCallback("getVolume", getVolume);
          ExternalInterface.addCallback("isPlaying", isPlaying);
@@ -58,7 +58,7 @@ package {
 
       public function playStream(url:String) {
           try {
-              stopStream();
+              cancelStream();
               debug('stream url: '+url);
 
               _sound = new Sound();
@@ -75,14 +75,14 @@ package {
           }
       }
 
-      public function stopStreamWithFade() {
+      public function stopStream() {
          stopped(true);
          if (_soundChannel) {
-             new EazeTween(_soundChannel).onComplete(stopStream).to(_fadingTime, {volume: 0});
+             new EazeTween(_soundChannel).onComplete(cancelStream).to(_fadingTime, {volume: 0});
          }
       }
 
-      public function stopStream() {
+      public function cancelStream() {
          if (_soundChannel != null) {
              try {
                 _soundChannel.stop();
@@ -117,6 +117,10 @@ package {
 
         debug('io-error: '+event.text);
         this.callbackWithData('error', event.text);
+      }
+
+      public function canPlayType(type:String) {
+          return type == 'audio/mpeg';
       }
 
       public function playLoop(url:String) {

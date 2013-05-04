@@ -127,6 +127,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 if (!$scope.visible) {
                     return;
                 }
+
                 $scope.visible = false;
                 $scope.$apply();
             }
@@ -135,6 +136,10 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 if (visible === false) {
                     $location.path('/');
                 }
+            });
+
+            $scope.$on('modalShow', function(){
+                $scope.visible = true;
             });
 
             element.bind('click', function (e) {

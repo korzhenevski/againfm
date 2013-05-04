@@ -21,6 +21,8 @@
 </head>
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>
+    <div class="modal-back ng-cloak" ng-show="visible" modal-view></div>
+
     {{% block top_content %}}{{% endblock %}}
 
     <table class="roof">
@@ -72,7 +74,6 @@
 {{% include 'extras/counters.html' %}}
 {{% endif %}}
 
-<div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 
 <script type="text/ng-template" id="login.html">
     <div modal="login" title="Вход с паролем">
@@ -153,5 +154,6 @@
     </div>
 </script>
 
+    <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 </body>
 </html>

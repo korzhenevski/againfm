@@ -1,15 +1,7 @@
 {{% extends "layout.html" %}}
 
-{# {% if radio_details %}}
-    {{% block title %}}Радио {{{ radio_details.title }}}{{% endblock %}}
-{{% endif %}#}
-
 {{% block top_content %}}
-    <div class="modal-back ng-cloak" ng-show="visible" modal-view>
-        {{% if radio_details %}}
-        {{% include 'radio_details.html' %}}
-        {{% endif %}}
-    </div>
+    <div ng-controller="PlayerModalCtrl" class="modal-back ng-cloak" ng-show="visible" ng-include="modalSrc"></div>
 
     {# шаблон индикатора загрузки на CSS3 #}
     <script type="text/ng-template" id="/loader.html">
@@ -74,8 +66,8 @@
                                                 <span class="marquee">{{ air.title }}</span>
                                             </p>
                                             <div class="buttons">
-                                                <button class="display-button air">Прямой эфир</button>
-                                                <button class="display-button share">Поделиться</button>
+                                                <button class="display-button" ng-click="showModal('air')">История эфира</button>
+                                                <button class="display-button" ng-click="showModal('share')">Поделиться</button>
                                             </div>
                                         </div>
                                         <div class="clock" clock="currentRadio.title"></div>
@@ -128,6 +120,8 @@
                     </tr>
                     <tr>
                         {# элементы управления #}
+                        {# громкость сделать линией #}
+                        {# TODO: Большая плей/пауза - назад - шафл - линия громкости #}
                         <td align="center">
                             <table class="controls" width="80%" ng-controller="PlayerControlsCtrl">
                                 <tr align="center">
@@ -135,11 +129,11 @@
                                         <button class="record"></button>
                                     </td>
                                     <td>
-                                        <button class="back"></button>
-                                    </td>
-                                    <td>
                                         <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>
                                         <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
+                                    </td>
+                                    <td>
+                                        <button class="back"></button>
                                     </td>
                                     <td>
                                         <button class="random" ng-click="randomRadio()"></button>
@@ -162,6 +156,8 @@
 
                     <tr>
                         {# избранное радио #}
+                        {# TODO: иконка закрытия без наведения заменяется точкой #}
+                        {# TODO: "мое избранное" открывает попап / список станций. подчеркнуть? #}
                         <td class="favorites-cell">
                             <div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">

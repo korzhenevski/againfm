@@ -3,7 +3,6 @@
 from flask import request, jsonify, abort
 from flask.ext.login import login_required, current_user
 
-import random
 import requests
 from afm import app, db, redis
 from afm.models import UserFavoritesCache
@@ -81,14 +80,31 @@ def api_radio_listen(radio_id):
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
 
-    streams = list(db.Stream.find({'radio_id': radio_id, 'is_online': True, 'deleted_at': 0}))
-    if not streams:
+    where = {'radio_id': radio_id, 'is_online': True, 'deleted_at': 0}
+    player_params = request.args.get('p')
+    if player_params is None:
+        player_params = 'mp3'
+
+    player_params = set(player_params.split(','))
+    formats = []
+    if 'ogg' in player_params:
+        formats.append('audio/ogg')
+    if 'mp3' in player_params:
+        formats.append('audio/mpeg')
+
+    if not formats:
+        abort(404)
+
+    where['content_type'] = {'$in': formats}
+
+    stream = db.Stream.find_one(where, sort=[('bitrate', 1)])
+    if not stream:
         return abort(404)
 
-    stream = random.choice(streams)
     radio['listen_url'] = stream.listen_url
     radio['stream_id'] = stream.id
     radio['bitrate'] = stream.bitrate
+    radio['content_type'] = 'audio/mpeg' if stream.is_shoutcast else stream.content_type
 
     if request.args.get('redir'):
         return raw_redirect(stream.listen_url)
