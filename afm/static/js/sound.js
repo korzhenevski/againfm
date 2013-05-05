@@ -96,6 +96,8 @@ angular.module('afm.sound', ['afm.base'])
                 this.setVolume(this.volume);
                 this.play();
             }
+
+            $rootScope.$apply();
         },
 
         init: function() {

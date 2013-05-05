@@ -78,8 +78,8 @@
 
                         {# плейлист #}
                         <td rowspan="3">
-                            <div class="radio-table" ng-init='bootstrapGenres={{{ genres|json }}}'>
-                                <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="selectTab('featured')">
+                            <div class="radio-table" ng-init='genres={{{ genres|json }}}'>
+                                <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="initTabs()">
                                     <div class="group">
                                         <div class="search">
                                             <input type="search" placeholder="Поиск" class="search-field" ng-model="searchQuery" />
@@ -91,6 +91,9 @@
                                     <ul class="tabs justified">
                                         <li>
                                             <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
+                                        </li>
+                                        <li ng-show="hasHistory()">
+                                            <span class="block" ng-class="tabClass('history')" ng-click="showHistory()">История</span>
                                         </li>
                                         <li ng-repeat="tab in tabs">
                                             <span class="block" ng-class="tabClass(tab.id)" ng-click="selectTab(tab.id)">{{ tab.title }}</span>
@@ -108,9 +111,7 @@
                                                 </div>
                                             </li>
                                             <li ng-hide="hasList()" class="ng-cloak not-found">
-                                                <div class="block">
-                                                    Ничего не найдено
-                                                </div>
+                                                <div class="block">Ничего не найдено</div>
                                             </li>
                                         </ul>
                                     </div>

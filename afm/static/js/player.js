@@ -132,10 +132,37 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-/**
- * Контролер плейлиста
- */
-.controller('PlaylistCtrl', function($scope, $http, $timeout){
+.factory('history', function(storage, $filter){
+    var history = storage.get('history');
+    return {
+        history: history || {},
+        add: function(radio) {
+            this.history[radio.id] = {id: radio.id, title: radio.title, ts: +new Date()};
+            storage.put('history', this.history);
+        },
+
+        getList: function() {
+            var list = [];
+            for (var i in this.history) {
+                if (this.history.hasOwnProperty(i)) {
+                    list.push(this.history[i]);
+                }
+            }
+            // order by latest usage
+            return $filter('orderBy')(list, 'ts', true);
+        },
+
+        has: function() {
+            var i;
+            for (i in this.history) {
+                return true;
+            }
+            return false;
+        }
+    };
+})
+
+.controller('PlaylistCtrl', function($scope, $http, $timeout, history){
     $scope.searchQuery = '';
     $scope.tabs = [];
     $scope.playlist = [];
@@ -146,15 +173,33 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
     });
 
-    angular.forEach($scope.bootstrapGenres, function(genre){
-        $scope.tabs.push({
-            id: 'genre/' + genre.id,
-            title: genre.title
+    $scope.showHistory = function() {
+        resetSearch();
+        $scope.currentTab = 'history';
+        $scope.playlist = history.getList();
+    };
+
+    $scope.initTabs = function() {
+        angular.forEach($scope.genres, function(genre){
+            $scope.tabs.push({
+                id: 'genre/' + genre.id,
+                title: genre.title
+            });
         });
-    });
+
+        if ($scope.hasHistory()) {
+            $scope.showHistory();
+        } else {
+            $scope.selectTab('featured');
+        }
+    };
+
+    $scope.hasHistory = function() {
+        return history.has();
+    };
 
     $scope.hasList = function() {
-        return $scope.playlist;
+        return !!$scope.playlist.length;
     };
 
     $scope.search = function(searchQuery) {
@@ -180,16 +225,21 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }, 200);
     });
 
-    $scope.selectTab = function(tabId) {
-        // если при поиске выбираем категорию, поиск сбрасывается
-        if (tabId.indexOf('search') == -1 && $scope.searchQuery) {
+    function resetSearch() {
+        if ($scope.searchQuery) {
             $scope.searchQuery = '';
             $scope.prevTab = null;
         }
+    }
+
+    $scope.selectTab = function(tabId) {
+        if (tabId.indexOf('search') == -1) {
+            resetSearch();
+        }
 
         $scope.currentTab = tabId;
-
         $scope.$broadcast('loading');
+
         $http.get('/api/radio/' + tabId).success(function(response){
             $scope.playlist = response.objects;
             $scope.$broadcast('loaded');
@@ -304,7 +354,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('Radio', function($rootScope, $http, player){
+.factory('Radio', function($rootScope, $http, player, history){
     return {
         current: {},
         set: function(radio) {
@@ -313,14 +363,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         },
 
         listen: function(radio) {
-            console.log('Radio.listen', radio);
             this.set(radio);
             player.play('/api/radio/' + radio.id + '/listen?redir=1');
+            history.add(radio);
             $rootScope.$broadcast('radioListen', radio);
         }
     }
 })
-
 
 .controller('PlayerCtrl', function($scope, $location, Radio, $document){
     $scope.currentRadio = Radio.current;
