@@ -32,7 +32,7 @@ package {
       private var _loopSound:Sound;
       private var _loopChannel:SoundChannel;
 
-      private var _fadingTime:Number = 0.3; //secs
+      private var _fadingTime:Number = 0.2; //secs
       private var _volume:Number = 0.6;
       private var _stopped:Boolean = true;
 
@@ -40,15 +40,12 @@ package {
          Security.allowDomain("*");
 
          ExternalInterface.addCallback("playStream", playStream);
-         ExternalInterface.addCallback("playLoop", playLoop);
-         ExternalInterface.addCallback("stopLoop", stopLoop);
-         
+
          ExternalInterface.addCallback("stopStream", stopStream);
          ExternalInterface.addCallback("canPlayType", canPlayType);
          ExternalInterface.addCallback("setVolume", setVolume);
          ExternalInterface.addCallback("getVolume", getVolume);
          ExternalInterface.addCallback("isPlaying", isPlaying);
-         ExternalInterface.addCallback("getSpectrum", getSpectrum);
          ExternalInterface.addCallback("getVersion", getVersion);
 
          _soundTransform = new SoundTransform(_volume);
@@ -106,12 +103,10 @@ package {
       public function onPlayStart(event:Event) {
         var eventDispatcher:IEventDispatcher = IEventDispatcher(event.target);
         eventDispatcher.removeEventListener(event.type, arguments.callee);
-        stopLoop();
       }
 
       private function onIOError(event:Event) {
         stopped(true);
-        stopLoop();
         _soundChannel = null;
         _sound = null;
 
@@ -121,58 +116,6 @@ package {
 
       public function canPlayType(type:String) {
           return type == 'audio/mpeg';
-      }
-
-      public function playLoop(url:String) {
-        debug('play loop: '+url);
-        stopLoop();
-        _loopSound = new Sound();
-        _loopSound.load(new URLRequest(url));
-
-        _loopChannel = _loopSound.play(250, int.MAX_VALUE);
-        _loopChannel.soundTransform = this._soundTransform;        
-      }
-
-      public function stopLoop() {
-        debug('stop loop');
-        try {
-          if (_loopSound) {
-            _loopChannel.stop();
-            _loopSound.close();
-          }
-          _loopSound = null;
-        } catch(e:Error) {}
-      }
-
-      public function getSpectrum(length:Number) {
-         var spectrum:Array = [];
-         if (!isPlaying() || _sound == null) {
-             return spectrum;
-         }
-
-         var bytes:ByteArray = new ByteArray();
-         var soundData:Boolean = false;
-         var val:Number = 0;
-
-         _sound.extract(bytes, length * 4);
-         bytes.position = 0;
-         while (bytes.bytesAvailable > 0) {
-            val = bytes.readFloat() + bytes.readFloat();
-            if (!soundData && val > 0.0) {
-                soundData = true;
-            }
-            bytes.readFloat() + bytes.readFloat();
-            bytes.readFloat() + bytes.readFloat();
-            bytes.readFloat() + bytes.readFloat();
-            val = (val + 1) / 2 * 100;
-            spectrum.push(val);
-         }
-
-         if (!soundData) {
-             return [];
-         }
-
-         return spectrum;
       }
 
        public function setVolume(volume:Number) {
