@@ -4,7 +4,7 @@
 from flask import render_template, request, redirect
 from flask.ext.login import current_user
 from datetime import datetime
-
+from afm.helpers import naturalday
 from afm import db, app
 
 
@@ -38,7 +38,8 @@ def radio_details(radio_id, slug=None):
 @app.route('/partial/radio/<int:radio_id>/air')
 def partial_radio_air(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
-    return render_template('radio_air.html', radio=radio)
+    history = db.Air.find({'radio_id': radio_id}).sort('ts', -1)
+    return render_template('radio_air.html', radio=radio, history=history)
 
 @app.route('/partial/radio/<int:radio_id>/share')
 def partial_radio_share(radio_id):

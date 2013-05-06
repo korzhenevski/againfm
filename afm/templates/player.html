@@ -93,7 +93,7 @@
                                             <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
                                         </li>
                                         <li ng-show="hasHistory()">
-                                            <span class="block" ng-class="tabClass('history')" ng-click="showHistory()">История</span>
+                                            <span class="block" ng-class="tabClass('history')" ng-click="selectTab('history')">История</span>
                                         </li>
                                         <li ng-repeat="tab in tabs">
                                             <span class="block" ng-class="tabClass(tab.id)" ng-click="selectTab(tab.id)">{{ tab.title }}</span>
@@ -123,12 +123,9 @@
                         {# элементы управления #}
                         {# громкость сделать линией #}
                         {# TODO: Большая плей/пауза - назад - шафл - линия громкости #}
-                        <td align="center">
+                        <td>
                             <table class="controls" width="80%" ng-controller="PlayerControlsCtrl">
                                 <tr align="center">
-                                    <td>
-                                        <button class="record"></button>
-                                    </td>
                                     <td>
                                         <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>
                                         <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>

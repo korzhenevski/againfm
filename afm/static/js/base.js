@@ -43,14 +43,14 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 });
             }
 
-            element.bind('mouseover', function () {
+            element.bind('mouseover', _.debounce(function () {
                 var scrollWidth = scroll[0].offsetWidth;
                 var elementWidth = element[0].offsetWidth;
                 delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
                 if (delta) {
                     animate();
                 }
-            });
+            }, 300));
 
             element.bind('mouseout', function () {
                 if (transition) {
@@ -108,7 +108,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
-.directive('modalBack', function ($document, $location) {
+.directive('modalBack', function ($document, $location, $window) {
     return {
         restrict: 'C',
         scope: {},
@@ -154,7 +154,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 if (e.which === 27) {
                     close();
                 }
-            })
+            });
         }
     };
 })

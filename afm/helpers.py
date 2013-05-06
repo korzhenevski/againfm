@@ -26,11 +26,11 @@ def raw_redirect(location):
 def naturalday(ts, ts_format=None):
     delta = ts.date() - date.today()
     if not delta.days:
-        return u'today'
+        return u'Сегодня'
     elif delta.days == 1:
-        return u'tomorrow'
+        return u'Завтра'
     elif delta.days == -1:
-        return u'yesterday'
+        return u'Вчера'
     return ts.strftime(ts_format)
 
 

@@ -3,8 +3,8 @@
 
 import time
 import string
-from . import app, db, search, login_manager
-from . import redis
+from afm import app, db, search, login_manager
+from afm import redis
 
 try:
     from flask.ext.mongokit import Document
@@ -15,6 +15,7 @@ import random
 from datetime import datetime
 import pymongo.errors
 from flask_login import AnonymousUser
+from afm.helpers import naturalday
 
 
 def md5hash(data):
@@ -601,6 +602,13 @@ class Air(BaseDocument):
         'ts': int,
     }
 
+    @property
+    def time(self):
+        return datetime.fromtimestamp(self.ts)
+
+    @property
+    def natural_day(self):
+        return naturalday(self.time, ts_format='%Y.%m.%d')
 
 login_manager.anonymous_user = AnonUser
 

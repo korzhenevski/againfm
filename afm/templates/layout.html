@@ -60,7 +60,7 @@
 
 {# базовые скрипты #}
 
-{{% for name in ('angular', 'angular-cookies', 'angular-resource') %}}
+{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom') %}}
     <script src="/static/js/common/{{{ name }}}.js"></script>
 {{% endfor %}}
 
@@ -76,7 +76,7 @@
 
 
 <script type="text/ng-template" id="login.html">
-    <div modal="login" title="Вход с паролем">
+    <div modal="user" title="Вход с паролем">
         <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" user-form>
             <input class="text" name="login" ng-model="data.login"
                    type="email" placeholder="Электронная почта" required autofocus />
@@ -98,7 +98,7 @@
 </script>
 
 <script type="text/ng-template" id="signup.html">
-    <div modal="signup" title="Регистрация">
+    <div modal="user" title="Регистрация">
         <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" user-form>
             <input class="text" name="email" ng-model="data.email"
                    type="email" placeholder="Электронная почта" required autofocus />
@@ -115,7 +115,7 @@
 </script>
 
 <script type="text/ng-template" id="amnesia.html">
-    <div modal="amnesia" title="Сброс пароля">
+    <div modal="user" title="Сброс пароля">
         <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" ng-hide="result" user-form>
             <input class="text" name="email" ng-model="data.email"
                    type="email" placeholder="Электронная почта" autofocus required />
@@ -137,7 +137,7 @@
 </script>
 
 <script type="text/ng-template" id="feedback.html">
-    <div modal="feedback" title="Обратная связь">
+    <div modal="user" title="Обратная связь">
         <form name="form" ng-submit="submit()" ng-class="{errors: showErrors}" ng-hide="result" user-form>
             <textarea rows="6" class="text" name="text" ng-model="data.text"
                       placeholder="Текст" autofocus="" required=""></textarea>

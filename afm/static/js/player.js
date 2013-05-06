@@ -173,12 +173,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
     });
 
-    $scope.showHistory = function() {
-        resetSearch();
-        $scope.currentTab = 'history';
-        $scope.playlist = history.getList();
-    };
-
     $scope.initTabs = function() {
         angular.forEach($scope.genres, function(genre){
             $scope.tabs.push({
@@ -188,7 +182,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         });
 
         if ($scope.hasHistory()) {
-            $scope.showHistory();
+            $scope.selectTab('history');
         } else {
             $scope.selectTab('featured');
         }
@@ -238,8 +232,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
 
         $scope.currentTab = tabId;
-        $scope.$broadcast('loading');
+        if ($scope.currentTab == 'history') {
+            $scope.playlist = history.getList();
+            return;
+        }
 
+        $scope.$broadcast('loading');
         $http.get('/api/radio/' + tabId).success(function(response){
             $scope.playlist = response.objects;
             $scope.$broadcast('loaded');
@@ -523,12 +521,22 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.controller('PlayerModalCtrl', function($scope){
+.controller('PlayerModalCtrl', function($scope, $templateCache){
     $scope.modalSrc = null;
 
     $scope.$on('showModal', function(ev, src){
+        // invalidate template cache
+        $templateCache.remove(src);
+
         $scope.modalSrc = src;
         $scope.$emit('modalShow');
+    });
+
+    // empty modal wrapper on close
+    $scope.$watch('visible', function(visible){
+        if (visible === false) {
+            $scope.modalSrc = '';
+        }
     });
 })
 

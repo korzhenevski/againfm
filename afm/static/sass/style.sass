@@ -75,20 +75,21 @@ ul.justified
     color: $color
 
 .modal-back
-  position: absolute
+  position: fixed
   width: 100%
-  height: 100%
   z-index: 1500
-  overflow: hidden
+  left: 0
+  top: 0
+  height: 100%
+  overflow: auto
   background-color: rgba(#000, 0.7)
 
 .modal
-  +border-radius(7px)
   border: 3px solid rgba(#252523, 0.5)
   background-color: #4b4c5b
-  width: 320px
-  margin: 8% auto
   padding: 19px
+  margin: 10px auto
+  +border-radius(7px)
   +transition(all, 300ms)
 
   h1
@@ -109,7 +110,7 @@ ul.justified
     .close
       cursor: pointer
       position: absolute
-      top: 3px
+      top: 6px
       right: 0
       width: 17px
       height: 17px
@@ -145,9 +146,24 @@ ul.justified
       border: 1px solid #963841
       @include placeholder-color(#ff6f7d)
 
-.modal.ui-animate
-  margin-top: -250px
-  opacity: 0
+
+.modal-user
+  width: 320px
+
+.modal-radio
+  width: 740px
+  min-height: 493px
+
+  .desc
+    margin-top: -10px
+    margin-bottom: 15px
+    color: #cccccf
+
+  .air-history
+    width: 70%
+
+    .time
+      width: 70px
 
 .centroid
   width: 980px
@@ -763,6 +779,7 @@ ul.justified
   .playlist
     .selected
       background-color: rgba(#b89738, 0.4)
+
 
 .page
   background-color: #4b4c5b
