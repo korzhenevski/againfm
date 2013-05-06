@@ -509,7 +509,7 @@ ul.justified .block {
   line-height: 16px;
   cursor: pointer;
   position: relative;
-  margin-top: 6px;
+  margin-top: 5px;
 }
 .radio-box .display .onair:hover .like {
   background-position: 0 -54px;

@@ -3,7 +3,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
 .factory('config', function () {
     return {
         cometWait: 25,
-        marqueeSpeed: 42
+        marqueeSpeed: 45
     }
 })
 
@@ -25,10 +25,6 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 }
 
                 var duration = Math.round(delta * config.marqueeSpeed / 1000);
-                if (duration < 1) {
-                    return;
-                }
-
                 element.removeClass('marquee-text-overflow');
                 scroll.css({transitionDuration: duration + 's'});
 
