@@ -4,8 +4,16 @@
 from flask import render_template, request, redirect
 from flask.ext.login import current_user
 from datetime import datetime
-from afm.helpers import naturalday
 from afm import db, app
+
+# TODO
+# следить за кол-вом слушателей и ставить в мониторинг
+# дисплей: показывать кол-во слушателей
+# горизонтальный регулятор громкости
+# история эфира с проигрыванием
+# cross-line animate при загрузке радио
+# фильтр рекламы в истории эфира
+# починить громкость
 
 
 @app.route('/')

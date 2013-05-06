@@ -7,7 +7,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     }
 })
 
-.directive('marquee', function ($transition, config) {
+.directive('marquee', function ($transition, $timeout, config) {
     return {
         restrict: 'C',
         transclude: true,
@@ -43,19 +43,31 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
                 });
             }
 
-            element.bind('mouseover', _.debounce(function () {
-                var scrollWidth = scroll[0].offsetWidth;
-                var elementWidth = element[0].offsetWidth;
-                delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
-                if (delta) {
-                    animate();
+            var startThrottle;
+            element.bind('mouseover', function () {
+                if (startThrottle) {
+                    $timeout.cancel(startThrottle);
                 }
-            }, 300));
+
+                startThrottle = $timeout(function(){
+                    var scrollWidth = scroll[0].offsetWidth;
+                    var elementWidth = element[0].offsetWidth;
+                    delta = scrollWidth > elementWidth ? (scrollWidth - elementWidth) : 0;
+                    if (delta) {
+                        animate();
+                    }
+                }, 500);
+            });
 
             element.bind('mouseout', function () {
+                if (startThrottle) {
+                    $timeout.cancel(startThrottle);
+                }
+
                 if (transition) {
                     transition.cancel();
                 }
+
                 element.addClass('marquee-text-overflow');
                 scroll.css({
                     transitionDuration: 0,

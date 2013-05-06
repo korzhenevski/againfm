@@ -2,7 +2,6 @@
     <p class="desc">{{{ radio.description }}}</p>
 
     <p>История эфира:</p>
-
     <table class="air-history">
         {{% for group in history|groupby('natural_day') %}}
             <tr>
@@ -11,7 +10,7 @@
             {{% for air in group.list %}}
             <tr>
                 <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
-                <td>{{{ air.title }}}</td>
+                <td class="title">{{{ air.title }}}</td>
             </tr>
             {{% endfor %}}
         {{% endfor %}}

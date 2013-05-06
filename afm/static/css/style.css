@@ -187,6 +187,9 @@ ul.justified .block {
 .modal-radio .air-history {
   width: 70%;
 }
+.modal-radio .air-history .title {
+  padding: 8px;
+}
 .modal-radio .air-history .time {
   width: 70px;
 }
