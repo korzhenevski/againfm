@@ -158,6 +158,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 return true;
             }
             return false;
+        },
+
+        getPrevious: function() {
+            var list = this.getList();
+            if (list.length > 1) {
+                return list[1];
+            }
         }
     };
 })
@@ -386,7 +393,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 })
 
-.controller('PlayerControlsCtrl', function($scope, $http, player, Radio){
+.controller('PlayerControlsCtrl', function($scope, $http, player, history, Radio){
     $scope.play = function() {
         if (Radio.current.id) {
             $scope.selectRadio(Radio.current);
@@ -403,6 +410,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         $http.get('/api/radio/random').success(function(radio){
             $scope.selectRadio(radio);
         });
+    };
+
+    $scope.previousRadio = function() {
+        var radio = history.getPrevious();
+        if (radio) {
+            $scope.selectRadio(radio);
+        }
     };
 
     $scope.isPlaying = function() {
