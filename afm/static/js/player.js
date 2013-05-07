@@ -581,4 +581,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.showModal = function(modal) {
         $scope.$root.$broadcast('showModal', '/partial/radio/' + Radio.current.id + '/' + modal);
     };
+
+
+    if (Radio.current.id)
+    $scope.showModal('air');
+})
+
+.controller('AirHistoryCtrl', function($scope){
+
 });

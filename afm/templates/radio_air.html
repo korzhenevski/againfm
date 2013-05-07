@@ -1,19 +1,20 @@
 <div modal="radio" title="{{{ radio.title }}}">
     <p class="desc">{{{ radio.description }}}</p>
 
-    <p>История эфира:</p>
-    <table class="air-history">
-        {{% for group in history|groupby('natural_day') %}}
-            <tr>
-                <td colspan="2">{{{ group.grouper }}}</td>
-            </tr>
-            {{% for air in group.list %}}
-            <tr>
-                <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
-                <td class="title">{{{ air.title }}}</td>
-            </tr>
+    <div class="" ng-controller="AirHistoryCtrl">
+        <h2>История эфира</h2>
+        <table class="air-history">
+            {{% for group in history|groupby('natural_day') %}}
+                <tr>
+                    <td colspan="2"><h3>{{{ group.grouper }}}</h3></td>
+                </tr>
+                {{% for air in group.list %}}
+                <tr>
+                    <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
+                    <td class="title">{{{ air.title }}}</td>
+                </tr>
+                {{% endfor %}}
             {{% endfor %}}
-        {{% endfor %}}
-    </table>
-
+        </table>
+    </div>
 </div>

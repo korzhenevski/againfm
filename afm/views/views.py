@@ -46,7 +46,8 @@ def radio_details(radio_id, slug=None):
 @app.route('/partial/radio/<int:radio_id>/air')
 def partial_radio_air(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
-    history = db.Air.find({'radio_id': radio_id}).sort('ts', -1)
+    history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(100)
+    #history = [{'title': u'Madonna - Artist' * 20, 'natural_day': u'Сегодня', 'time': datetime.now()}]
     return render_template('radio_air.html', radio=radio, history=history)
 
 @app.route('/partial/radio/<int:radio_id>/share')

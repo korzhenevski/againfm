@@ -30,6 +30,9 @@ body
   min-height: 800px
   +background-size(cover)
 
+h2, h3
+  font-weight: normal
+
 a
   color: #f3f3f3
   text-decoration: none
@@ -156,17 +159,20 @@ ul.justified
 
   .desc
     margin-top: -10px
-    margin-bottom: 15px
+    margin-bottom: 30px
     color: #cccccf
 
   .air-history
-    width: 70%
+    width: 100%
 
     .title
-      padding: 8px
+      padding: 5px
 
     .time
-      width: 70px
+      width: 65px
+
+  h2, h3
+    margin-bottom: 0
 
 .centroid
   width: 980px
@@ -197,7 +203,7 @@ ul.justified
     float: left
   .side-item
     float: right
-  a
+  .pseudo-link, a
     margin-right: 20px
     border-bottom: 1px dotted #a49ca3
 
@@ -748,7 +754,7 @@ ul.justified
 
     .block
       cursor: pointer
-      padding: 5px 8px
+      padding: 5px
       margin: 3px 0
       +transition(all, 150ms)
       &:hover
@@ -987,3 +993,10 @@ $control-group-width: 120px
     color: #90919e
     text-decoration: line-through
 /* radio static end */
+
+.pseudo-link
+  color: #c6c5c8
+  border-bottom: 1px dotted #a49ca3
+  cursor: pointer
+  &:hover
+    color: #f3f3f3
