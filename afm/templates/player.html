@@ -123,8 +123,8 @@
                         {# громкость сделать линией #}
                         {# TODO: Большая плей/пауза - назад - шафл - линия громкости #}
                         <td>
-                            <table class="controls" width="80%" ng-controller="PlayerControlsCtrl">
-                                <tr align="center">
+                            <table class="controls" ng-controller="PlayerControlsCtrl">
+                                <tr>
                                     <td>
                                         <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>
                                         <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
@@ -136,13 +136,9 @@
                                         <button class="random" ng-click="randomRadio()"></button>
                                     </td>
                                     <td>
-                                        <div class="volume-wrapper" ng-class="{muted: isMuted()}">
-                                            <button class="volume" ng-click="toggleMute()"></button>
-                                            <div class="volume-slider hidden">
-                                                <div class="line">
-                                                    <div class="handle" volume="volume" on-change="saveVolume()" volume-handle></div>
-                                                </div>
-                                                <div class="volume-icon" ng-click="toggleMute()"></div>
+                                        <div class="vol-wrap">
+                                            <div class="vol-line">
+                                                <div class="volume-slider"></div>
                                             </div>
                                         </div>
                                     </td>

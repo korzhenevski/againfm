@@ -1,4 +1,4 @@
-.player-controls-sprite, .radio-box .controls .record, .radio-box .controls .back, .radio-box .controls .play, .radio-box .controls .pause, .radio-box .controls .random, .radio-box .controls .volume-wrapper .volume, .radio-box .controls .volume-wrapper.muted .volume-icon, .radio-box .controls .volume-wrapper.muted .volume, .radio-box .controls .volume-slider .volume-icon {
+.player-controls-sprite, .radio-box .controls .record, .radio-box .controls .back, .radio-box .controls .play, .radio-box .controls .pause, .radio-box .controls .random {
   background: url('/static/i/player-controls-sc042c75487.png') no-repeat;
 }
 
@@ -449,6 +449,13 @@ ul.justified .block {
   text-overflow: ellipsis;
 }
 
+.global-pointer {
+  cursor: pointer !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
 .radio-box {
   width: 100%;
 }
@@ -694,7 +701,7 @@ ul.justified .block {
   border-radius: 2px;
 }
 .radio-box .controls {
-  min-height: 90px;
+  height: 90px;
 }
 .radio-box .controls button {
   border: 0;
@@ -761,50 +768,23 @@ ul.justified .block {
 .radio-box .controls .random:active, .radio-box .controls .random.random_active, .radio-box .controls .random.random-active {
   background-position: 0 -177px;
 }
-.radio-box .controls .volume-wrapper {
-  position: relative;
-}
-.radio-box .controls .volume-wrapper .volume {
-  background-position: 0 -648px;
-}
-.radio-box .controls .volume-wrapper .volume:hover, .radio-box .controls .volume-wrapper .volume.volume_hover, .radio-box .controls .volume-wrapper .volume.volume-hover {
-  background-position: 0 -689px;
-}
-.radio-box .controls .volume-wrapper.muted .volume-icon {
-  background-position: 0 -952px;
-}
-.radio-box .controls .volume-wrapper.muted .volume {
-  background-position: 0 -730px;
-}
-.radio-box .controls .volume-wrapper.muted .volume:hover, .radio-box .controls .volume-wrapper.muted .volume.novolume_hover, .radio-box .controls .volume-wrapper.muted .volume.novolume-hover {
-  background-position: 0 -771px;
-}
-.radio-box .controls .volume-slider {
-  bottom: 8px;
-  left: 8px;
-  width: 31px;
-  height: 67px;
-  background-color: #f3f5f4;
-  border: 1px solid #bcbab5;
-  padding: 10px 0;
-  overflow: hidden;
-  position: relative;
-  padding-bottom: 34px;
-  position: absolute;
-  -webkit-border-radius: 17px;
-  -moz-border-radius: 17px;
-  -ms-border-radius: 17px;
-  -o-border-radius: 17px;
-  border-radius: 17px;
+.radio-box .controls .vol-wrap {
+  width: 86px;
+  height: 32px;
+  padding: 0 10px;
   -webkit-transition: all, 100ms;
   -moz-transition: all, 100ms;
   -o-transition: all, 100ms;
   transition: all, 100ms;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
-.radio-box .controls .volume-slider .line {
-  width: 6px;
-  height: 100%;
-  margin: 0 auto;
+.radio-box .controls .vol-wrap .vol-line {
+  height: 6px;
+  width: 100%;
+  top: 13px;
+  margin: auto 0;
   cursor: pointer;
   position: relative;
   background-color: #384c4c;
@@ -814,12 +794,12 @@ ul.justified .block {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-.radio-box .controls .volume-slider .handle {
+.radio-box .controls .vol-wrap .volume-slider {
   width: 14px;
   height: 14px;
   border: 1px solid #6f7e7f;
-  top: 0;
-  left: -5px;
+  top: -5px;
+  left: 0;
   cursor: pointer;
   position: absolute;
   -webkit-border-radius: 15px;
@@ -833,15 +813,7 @@ ul.justified .block {
   background: -o-linear-gradient(#ffffff, #dde1df);
   background: linear-gradient(#ffffff, #dde1df);
 }
-.radio-box .controls .volume-slider .volume-icon {
-  background-position: 0 -935px;
-  height: 17px;
-  width: 19px;
-  margin: 0 auto;
-  margin-top: 10px;
-  cursor: pointer;
-}
-.radio-box .controls .volume-slider.hidden {
+.radio-box .controls .vol-wrap.hidden {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
   opacity: 0;
 }

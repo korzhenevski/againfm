@@ -260,103 +260,76 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.directive('volumeWrapper', function(){
+.directive('volumeSlider', function($rootScope, $document){
     return {
         restrict: 'C',
         link: function(scope, element) {
-            element.bind('mouseenter', function(){
-                element.find('div').removeClass('hidden');
-                scope.$broadcast('volumeShow');
-            });
-            element.bind('mouseout', function(){
-                element.find('div').addClass('hidden');
-            });
-        }
-    };
-})
-
-// TODO: add touch support
-.directive('volumeHandle', function($rootScope, $document){
-    return {
-        restrict: 'A',
-        scope: {
-            volume: '=',
-            onChange: '&'
-        },
-        link: function(scope, element) {
             var startValue;
             var startPosition;
-            var max = 1.0;
             var volumeLine = element.parent();
-
-            scope.$on('volumeShow', function(){
-                updateValue(scope.volume);
-            });
-
-            scope.$watch('volume', function(volume){
-                updateValue(volume);
-            });
-
-            volumeLine.bind('click', function(e){
-                // TODO: offsetY available only on Chrome, support other browsers
-                updateValue(posToValue(e.offsetY - element.prop('offsetHeight') / 2));
-            });
+            var lineWidth = volumeLine.prop('offsetWidth') - element.prop('offsetWidth');
+            var max = 1.0;
 
             element.bind('click', function(e){
                 e.stopPropagation();
             });
 
+            scope.$watch('volume', function(volume){
+                updateValue(volume, 'skipScope');
+            });
+
+            volumeLine.bind('click', function(e){
+                var value = posToValue(e.offsetX - element.prop('offsetWidth') / 2);
+                // TODO: offsetY available only on Chrome, support other browsers
+                updateValue(value);
+            });
+
             element.bind('mousedown', function(e){
-                startPosition = e.pageY;
+                startPosition = e.pageX;
                 startValue = parseFloat(scope.volume) || 0;
+                $document.find('body').addClass('global-pointer');
             });
 
             $document.bind('mousemove', function(e){
                 if (!startPosition) {
                     return;
                 }
-                var pos = e.pageY - startPosition;
-                var value = startValue - (pos / getLineHeight()) * max;
+                var pos = startPosition - e.pageX;
+                var value = startValue - (pos / lineWidth) * max;
                 value = clamp(value, 0, max);
                 updateValue(value);
             });
 
             $document.bind('mouseup', function(){
                 startPosition = startValue = null;
+                $document.find('body').removeClass('global-pointer');
             });
-
+            
             function posToValue(pos) {
-                pos = Math.abs(getLineHeight() - clamp(pos, 0, getLineHeight()));
-                return pos ? (pos / getLineHeight()) * max : 0;
+                return pos ? (pos / lineWidth) * max : 0;
             }
 
-            function getLineHeight() {
-                return volumeLine.prop('offsetHeight') - element.prop('offsetHeight');
-            }
-
-            function updateValue(value) {
+            function updateValue(value, skipScope) {
                 value = clamp(parseFloat(value), 0, max);
-                // decimal round
-                value = Math.round(value * 10) / 10;
-                var pos = getLineHeight();
+                value = Math.round(value * 100) / 100;
+                var pos = 0;
                 if (value > 0) {
-                    pos = (Math.abs(max - value) / max) * getLineHeight();
+                    pos = (value / max) * lineWidth;
                 }
-                // TODO: investigation - fix apply already in progress
-                // TODO: fix this shit
-                scope.volume = value;
-                element.css('top', Math.round(pos) + 'px');
-                if (!$rootScope.$$phase) { $rootScope.$apply(); }
-                scope.onChange();
+                element.css('left', Math.round(pos) + 'px');
+                if (!skipScope) {
+                    scope.volume = value;
+                    scope.$apply();
+                }
             }
 
             function clamp(value, min, max) {
                 if (value <= min) { value = min; }
                 if (value >= max) { value = max; }
                 return value;
-            }
+            }            
         }
-    };
+    }
 })
 
 .factory('Radio', function($rootScope, $http, player, history){
@@ -423,22 +396,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         return player.playing;
     };
 
-    $scope.toggleMute = function() {
-        if ($scope.isMuted()) {
-            player.unmute();
-        } else {
-            player.mute();
-        }
-    };
-
     $scope.volume = player.volume;
-    $scope.saveVolume = function() {
-        player.setVolume($scope.volume);
-    };
-
-    $scope.isMuted = function() {
-        return !$scope.volume || player.isMuted();
-    };
+    $scope.$watch('volume', function(volume){
+        player.setVolume(volume);
+    });
 })
 
 .controller('FavoritesCtrl', function($scope, favorites){

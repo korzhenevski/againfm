@@ -7,6 +7,7 @@
 @import "compass/css3/opacity"
 @import "compass/css3/transition"
 @import "compass/css3/filter"
+@import "compass/css3/user-interface"
 
 $use-mozilla-ellipsis-binding: true
 @import "compass/typography/text/ellipsis"
@@ -376,6 +377,10 @@ ul.justified
 .marquee-text-overflow
   text-overflow: ellipsis
 
+.global-pointer
+  cursor: pointer !important
+  +user-select(none)
+
 .radio-box
   width: 100%
 
@@ -556,7 +561,7 @@ ul.justified
       +border-radius(2px)
 
   .controls
-    min-height: 90px
+    height: 90px
 
     button
       border: 0
@@ -593,62 +598,35 @@ ul.justified
     .random
       @include player-controls-sprite(random)
 
-    .volume-wrapper
-      position: relative
-      .volume
-        @include player-controls-sprite(volume)
-
-    .volume-wrapper.muted
-      .volume-icon
-        @include player-controls-sprite(novolume-icon)
-
-      .volume
-        @include player-controls-sprite(novolume)
-
-    .volume-slider
-      bottom: 8px
-      left: 8px
-      width: 31px
-      height: 67px
-      background-color: #f3f5f4
-      border: 1px solid #bcbab5
-      padding: 10px 0
-      overflow: hidden
-      position: relative
-      padding-bottom: 34px
-      position: absolute
-      +border-radius(17px)
+    .vol-wrap
+      width: 86px
+      height: 32px
+      padding: 0 10px
       +transition(all, 100ms)
+      +user-select(none)
 
-      .line
-        width: 6px
-        height: 100%
-        margin: 0 auto
+      .vol-line
+        height: 6px
+        width: 100%
+        top: 13px
+        margin: auto 0
         cursor: pointer
         position: relative
         background-color: #384c4c
         +border-radius(4px)
 
-      .handle
+      .volume-slider
         width: 14px
         height: 14px
         border: 1px solid #6f7e7f
-        top: 0
-        left: -5px
+        top: -5px
+        left: 0
         cursor: pointer
         position: absolute
         +border-radius(15px)
         +background(linear-gradient(white, #dde1df))
 
-      .volume-icon
-        @include player-controls-sprite(volume-icon)
-        height: 17px
-        width: 19px
-        margin: 0 auto
-        margin-top: 10px
-        cursor: pointer
-
-    .volume-slider.hidden
+    .vol-wrap.hidden
       +opacity(0)
 
 .radio-table

@@ -47,7 +47,9 @@ angular.module('afm.sound', ['afm.base'])
 
         setVolume: function(volume) {
             if (this.player) {
-                this.player.setVolume(volume);
+                //var expVol = 1 - Math.sqrt(1-(volume * volume));
+                var expVol = Math.sin(volume * Math.PI / 2);
+                this.player.setVolume(expVol);
             }
         },
 
@@ -65,21 +67,6 @@ angular.module('afm.sound', ['afm.base'])
                 volume = this.defaultVolume;
             }
             this.updateVolume(volume);
-        },
-
-        mute: function() {
-            this.setVolume(0);
-            this.muted = this.volume;
-        },
-
-        unmute: function() {
-            this.updateVolume(this.muted || this.defaultVolume);
-            this.muted = false;
-        },
-
-        isMuted: function() {
-            // TODO: fix this shit
-            return angular.isNumber(this.muted);
         },
 
         flashCallback: function(event) {
