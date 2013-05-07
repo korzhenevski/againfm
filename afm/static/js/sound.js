@@ -54,10 +54,9 @@ angular.module('afm.sound', ['afm.base'])
         },
 
         updateVolume: function(volume) {
-            volume = parseFloat(volume);
             this.volume = volume;
             this.setVolume(volume);
-            storage.put('volume', volume);
+            storage.put('volume', parseFloat(volume));
         },
 
         loadVolume: function() {

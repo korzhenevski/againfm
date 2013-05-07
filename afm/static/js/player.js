@@ -398,7 +398,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.volume = player.volume;
     $scope.$watch('volume', function(volume){
-        player.setVolume(volume);
+        player.updateVolume(volume);
     });
 })
 
