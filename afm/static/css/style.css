@@ -210,11 +210,11 @@ ul.justified .block {
   width: 980px;
   margin: 20px auto 5px auto;
 }
-.roof .logo img {
-  margin-left: -2px;
-  margin-bottom: -2px;
+
+.logo img {
+  margin-top: 11px;
 }
-.roof .logo a {
+.logo a {
   border: none !important;
 }
 
@@ -366,6 +366,7 @@ ul.justified .block {
   position: relative;
   border: 1px solid transparent;
   width: 1043px;
+  margin-top: 30px;
 }
 .radio .top {
   position: absolute;

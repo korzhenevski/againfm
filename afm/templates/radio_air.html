@@ -3,12 +3,17 @@
 
     <div class="" ng-controller="AirHistoryCtrl">
         <h2>История эфира</h2>
+        {{% if current_air %}}
+        <p>Прямо сейчас: {{{ current_air.title }}}</p>
+        {{% endif %}}
+
+
         <table class="air-history">
-            {{% for group in history|groupby('natural_day') %}}
+            {{% for group in history|groupby('natural_day')|sort(attribute='grouper', reverse=True) %}}
                 <tr>
                     <td colspan="2"><h3>{{{ group.grouper }}}</h3></td>
                 </tr>
-                {{% for air in group.list %}}
+                {{% for air in group.list|sort(attribute='time') %}}
                 <tr>
                     <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
                     <td class="title">{{{ air.title }}}</td>

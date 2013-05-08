@@ -95,7 +95,7 @@ def api_radio_listen(radio_id):
     if not formats:
         abort(404)
 
-    where['content_type'] = {'$in': formats}
+    #where['content_type'] = {'$in': formats}
 
     stream = db.Stream.find_one(where, sort=[('bitrate', 1)])
     if not stream:
@@ -104,7 +104,7 @@ def api_radio_listen(radio_id):
     radio['listen_url'] = stream.listen_url
     radio['stream_id'] = stream.id
     radio['bitrate'] = stream.bitrate
-    radio['content_type'] = 'audio/mpeg' if stream.is_shoutcast else stream.content_type
+    #radio['content_type'] = 'audio/mpeg' if stream.is_shoutcast else stream.content_type
 
     if request.args.get('redir'):
         return raw_redirect(stream.listen_url)

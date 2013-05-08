@@ -4,16 +4,14 @@
 from flask import render_template, request, redirect
 from flask.ext.login import current_user
 from datetime import datetime
-from afm import db, app
+from afm import db, app, redis
 
-# TODO
-# следить за кол-вом слушателей и ставить в мониторинг
+# TODO:
+#
 # дисплей: показывать кол-во слушателей
-# горизонтальный регулятор громкости
-# история эфира с проигрыванием
+# проигрывание истории эфира
 # cross-line animate при загрузке радио
 # фильтр рекламы в истории эфира
-# починить громкость
 
 
 @app.route('/')
@@ -47,8 +45,9 @@ def radio_details(radio_id, slug=None):
 def partial_radio_air(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(100)
+    current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
     #history = [{'title': u'Madonna - Artist' * 20, 'natural_day': u'Сегодня', 'time': datetime.now()}]
-    return render_template('radio_air.html', radio=radio, history=history)
+    return render_template('radio_air.html', radio=radio, history=history, current_air=current_air)
 
 @app.route('/partial/radio/<int:radio_id>/share')
 def partial_radio_share(radio_id):

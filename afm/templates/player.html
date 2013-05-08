@@ -16,23 +16,6 @@
             <div class="blockG" id="rotateG_08"></div>
         </div>
     </script>
-
-    <div class="topline">
-        {# TODO: нахера два центройда? #}
-        <div class="topline-inner centroid">
-            <div class="topmenu">
-                <div class="menu-item side-item">
-                    <p ng-hide="user.isLogged()">
-                        <a href="/login">Войти с паролем</a>
-                        <a href="/signup">Стать постоянным слушателем</a>
-                    </p>
-                    <p ng-show="user.isLogged()">
-                        <span class="pseudo-link" ng-click="logout()">выйти</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
 {{% endblock %}}
 
 {{% block content %}}
