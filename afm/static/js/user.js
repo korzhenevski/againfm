@@ -1,10 +1,29 @@
 angular.module('afm.user', ['afm.base'])
 
-.config(function($routeProvider){
-    $routeProvider.when('/login', {controller: 'LoginCtrl', templateUrl: 'login.html'});
-    $routeProvider.when('/signup', {controller: 'SignupCtrl', templateUrl: 'signup.html'});
-    $routeProvider.when('/amnesia', {controller: 'AmnesiaCtrl', templateUrl: 'amnesia.html'});
-    $routeProvider.when('/feedback', {controller: 'FeedbackCtrl', templateUrl: 'feedback.html'});
+.config(function($stateProvider){
+    $stateProvider.state('login', {
+        url: '/login',
+        templateUrl: 'login.html',
+        controller: 'LoginCtrl'
+    });
+
+    $stateProvider.state('signup', {
+        url: '/signup',
+        templateUrl: 'signup.html',
+        controller: 'SignupCtrl'
+    });
+
+    $stateProvider.state('amnesia', {
+        url: '/amnesia',
+        templateUrl: 'amnesia.html',
+        controller: 'AmnesiaCtrl'
+    });
+
+    $stateProvider.state('feedback', {
+        url: '/feedback',
+        templateUrl: 'feedback.html',
+        controller: 'FeedbackCtrl'
+    });
 })
 
 .factory('user', function(){

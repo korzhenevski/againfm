@@ -21,7 +21,7 @@
 </head>
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>
-    <div class="modal-back ng-cloak" ng-show="visible" modal-view></div>
+    <div class="modal-back ng-cloak" ng-show="visible" ui-view></div>
 
     {{% block top_content %}}{{% endblock %}}
     <div class="topline">
@@ -72,7 +72,7 @@
 
 {# базовые скрипты #}
 
-{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom') %}}
+{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states') %}}
     <script src="/static/js/common/{{{ name }}}.js"></script>
 {{% endfor %}}
 
@@ -166,6 +166,6 @@
     </div>
 </script>
 
-    <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
+<div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
 </body>
 </html>

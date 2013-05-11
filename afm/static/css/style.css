@@ -6,7 +6,7 @@
   background: url('/static/i/display-controls-s5b2974258f.png') no-repeat;
 }
 
-.common-icons-sprite, .modal .header .close, .radio-box .favorites .signage, .radio-box .favorites-list .remove {
+.common-icons-sprite, .modal .header .close, .radio-box .favorites .signage {
   background: url('/static/i/common-icons-sa4baa05130.png') no-repeat;
 }
 
@@ -28,14 +28,11 @@ body {
   font-size: 14px;
   line-height: 20px;
   color: #efefef;
-  background-color: #453745;
-  background: url("/static/i/background.jpg");
   min-width: 1200px;
   min-height: 800px;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background: radial-gradient(#000000 15%, transparent 16%) 0 0, radial-gradient(#000000 15%, transparent 16%) 8px 8px, radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%) 8px 9px;
+  background-color: #282828;
+  background-size: 16px 16px;
 }
 
 h2, h3 {
@@ -43,7 +40,7 @@ h2, h3 {
 }
 
 a {
-  color: #f3f3f3;
+  color: #c6c5c8;
   text-decoration: none;
   border-bottom: 1px solid #a49ca3;
 }
@@ -369,7 +366,7 @@ ul.justified .block {
   position: relative;
   border: 1px solid transparent;
   width: 1043px;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 .radio .top {
   position: absolute;
@@ -603,7 +600,7 @@ ul.justified .block {
   display: block;
   position: absolute;
   margin-left: 40px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   width: 232px;
   height: 40px;
   background-position: 0 0;
@@ -624,24 +621,20 @@ ul.justified .block {
   background: -o-linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   min-height: 153px;
-  padding: 9px;
-  padding-left: 2px;
-  padding-bottom: 65px;
+  padding: 9px 9px 60px 2px;
   text-align: left;
 }
 .radio-box .favorites-list .block {
-  text-align: center;
   max-width: 272px;
   min-width: 50px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border: 1px solid #dee1e0;
   color: #314647;
-  padding: 3px 9px;
-  margin-bottom: 10px;
-  margin-left: 7px;
+  padding: 2px 9px;
+  margin: 0px 0px 12px 7px;
   cursor: pointer;
-  position: relative;
-  display: inline-block;
   background-color: #ced4d1;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -652,12 +645,6 @@ ul.justified .block {
   -webkit-box-shadow: #0c0c0c 0px 2px 3px 1px;
   -moz-box-shadow: #0c0c0c 0px 2px 3px 1px;
   box-shadow: #0c0c0c 0px 2px 3px 1px;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
-  -webkit-transition: all 400ms;
-  -moz-transition: all 400ms;
-  -o-transition: all 400ms;
-  transition: all 400ms;
 }
 .radio-box .favorites-list .block:active {
   border: 1px solid #a3d3dd;
@@ -667,20 +654,6 @@ ul.justified .block {
   background: -o-linear-gradient(#54adc0, #88c6d3);
   background: linear-gradient(#54adc0, #88c6d3);
 }
-.radio-box .favorites-list .block:active .remove {
-  display: none !important;
-}
-.radio-box .favorites-list .block:active:after {
-  display: none;
-}
-.radio-box .favorites-list .block:hover .remove {
-  z-index: 900;
-  display: block;
-}
-.radio-box .favorites-list .block.ui-animate {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
-  opacity: 0;
-}
 .radio-box .favorites-list .block.selected {
   border: 1px solid #a3d3dd;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #54adc0), color-stop(100%, #88c6d3));
@@ -688,21 +661,6 @@ ul.justified .block {
   background: -moz-linear-gradient(#54adc0, #88c6d3);
   background: -o-linear-gradient(#54adc0, #88c6d3);
   background: linear-gradient(#54adc0, #88c6d3);
-}
-.radio-box .favorites-list .remove {
-  display: none;
-  top: 5px;
-  right: 5px;
-  width: 17px;
-  height: 17px;
-  position: absolute;
-  background-color: #cad0ce;
-  background-position: 0 -123px;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .radio-box .controls {
   height: 90px;
@@ -852,7 +810,7 @@ ul.justified .block {
   right: 2px;
 }
 .radio-table .radio-line {
-  margin: 15px -20px 0 -20px;
+  margin: 8px -20px 0 -20px;
   height: 3px;
   border: none;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #644f24), color-stop(100%, #91753a));
@@ -860,29 +818,6 @@ ul.justified .block {
   background: -moz-linear-gradient(#644f24, #91753a);
   background: -o-linear-gradient(#644f24, #91753a);
   background: linear-gradient(#644f24, #91753a);
-}
-.radio-table .radio-cursor {
-  width: 4px;
-  height: 110%;
-  position: absolute;
-  top: 1px;
-  left: 0px;
-  background-color: #e2641e;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-  opacity: 0.7;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.1) 2px 0px 2px;
-  -moz-box-shadow: rgba(0, 0, 0, 0.1) 2px 0px 2px;
-  box-shadow: rgba(0, 0, 0, 0.1) 2px 0px 2px;
-  -webkit-transition: left 0.5s ease;
-  -webkit-transition-delay: 0;
-  -moz-transition: left 0.5s ease 0;
-  -o-transition: left 0.5s ease 0;
-  transition: left 0.5s ease 0;
-}
-.radio-table .table-wrapper {
-  position: relative;
-  min-height: 310px;
-  margin-bottom: 20px;
 }
 .radio-table .table-inner {
   height: 100%;

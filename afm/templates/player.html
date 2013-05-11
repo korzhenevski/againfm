@@ -1,8 +1,6 @@
 {{% extends "layout.html" %}}
 
 {{% block top_content %}}
-    <div ng-controller="PlayerModalCtrl" class="modal-back ng-cloak" ng-show="visible" ng-include="modalSrc"></div>
-
     {# шаблон индикатора загрузки на CSS3 #}
     <script type="text/ng-template" id="/loader.html">
         <div id="floatingBarsG">
@@ -48,8 +46,7 @@
                                                 <span class="marquee">{{ air.title }}</span>
                                             </p>
                                             <div class="buttons">
-                                                <button class="display-button" ng-click="showModal('air')">История эфира</button>
-                                                <!--button class="display-button" ng-click="showModal('share')">Поделиться</button-->
+                                                <button class="display-button" ng-click="showAir()">История эфира</button>
                                             </div>
                                         </div>
                                         <div class="clock" clock="currentRadio.title"></div>
@@ -83,20 +80,18 @@
                                     </ul>
 
                                     {# список радиостанций #}
-                                    <div class="table-wrapper">
-                                        <hr class="radio-line" />
-                                        <ul class="playlist justified">
-                                            <li ng-repeat="radio in playlist">
-                                                <div class="block station-link" ng-click="selectRadio(radio)"
-                                                     ng-class="currentClass(radio)">
-                                                    <span class="link">{{ radio.title }}</span>
-                                                </div>
-                                            </li>
-                                            <li ng-hide="hasList()" class="ng-cloak not-found">
-                                                <div class="block">Ничего не найдено</div>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <hr class="radio-line" />
+                                    <ul class="playlist justified">
+                                        <li ng-repeat="radio in playlist">
+                                            <div class="block station-link" ng-click="selectRadio(radio)"
+                                                 ng-class="currentClass(radio)">
+                                                <span class="link">{{ radio.title }}</span>
+                                            </div>
+                                        </li>
+                                        <li ng-hide="hasList()" class="ng-cloak not-found">
+                                            <div class="block">Ничего не найдено</div>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </td>
@@ -132,20 +127,17 @@
 
                     <tr>
                         {# избранное радио #}
-                        {# TODO: иконка закрытия без наведения заменяется точкой #}
-                        {# TODO: "мое избранное" открывает попап / список станций. подчеркнуть? #}
                         <td class="favorites-cell">
                             <div class="favorites" ng-controller="FavoritesCtrl">
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="radio in getFavorites()">
-                                        <div class="block" ng-click="selectRadio(radio)"
-                                             ng-class="currentClass(radio)" ui-animate>
-                                            {{ radio.title }} <i class="remove" ng-click="remove(radio.id)"></i>
+                                        <div class="block" ng-click="selectRadio(radio)" ng-class="currentClass(radio)">
+                                            {{ radio.title }}
                                         </div>
                                     </li>
                                 </ul>
-                                <div class="signage"></div>
+                                <div class="signage" ng-click="showModal()"></div>
                             </div>
                             </div>
                         </td>
@@ -171,6 +163,13 @@
 {{% endblock %}}
 
 {{% block scripts %}}
+    <script type="text/ng-template" id="favorite_radio.html">
+        <div modal="favorite-radio" title="Мое Избранное">
+
+        </div>
+    </script>
+
+
     <script src="/static/js/common/swfobject.js"></script>
     <script src="/static/js/common/comet.js"></script>
     <script src="/static/js/base.js"></script>

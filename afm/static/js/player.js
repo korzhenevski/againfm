@@ -1,16 +1,16 @@
 angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
-.config(function($routeProvider, $locationProvider, cometProvider){
+.config(function($routeProvider, $locationProvider, cometProvider, $stateProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
     $locationProvider.html5Mode(true);
 
-    // controller don't execute without "template" attr
-    $routeProvider.when('/radio/:radioId', {
-        template: '<div></div>',
+    $stateProvider.state('radio_listen', {
+        url: '/radio/:radioId',
         controller: 'ListenCtrl',
+        template: '<div ng-init="visible=false"></div>',
         resolve: {
-            radio: ['$http', '$route', 'Radio', '$q', function($http, $route, Radio, $q) {
-                var radioId = ~~$route.current.params.radioId;
+            radio: ['$http', '$route', 'Radio', '$q', function($http, $stateParams, Radio, $q) {
+                var radioId = ~~$stateParams.radioId;
                 if (radioId && radioId !== Radio.current.id) {
 
                     return $http.get('/api/radio/' + radioId).then(function(http){
@@ -25,6 +25,22 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 return $q.reject();
             }]
         }
+    });
+
+    $stateProvider.state('radio_air', {
+        url: '/radio/:radioId/air',
+        templateUrl: function($stateParams) {
+            return '/partial/radio/' + $stateParams.radioId + '/air';
+        }
+    });
+
+    $stateProvider.state('home', {
+        url: '/',
+        template: '<div ng-init="visible=false"></div>'
+    });
+
+    $stateProvider.state('favorite_radio', {
+        templateUrl: 'favorite_radio.html'
     });
 })
 
@@ -402,13 +418,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 })
 
-.controller('FavoritesCtrl', function($scope, favorites){
+.controller('FavoritesCtrl', function($scope, favorites, $filter, $state){
     $scope.getFavorites = function() {
-        return favorites.get();
+        return $filter('orderBy')(favorites.get(), 'ts', true);
     };
 
-    $scope.remove = function(id) {
-        favorites.remove(id);
+    $scope.showModal = function() {
+        $state.transitionTo('favorite_radio');
     };
 })
 
@@ -496,29 +512,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.controller('PlayerModalCtrl', function($scope, $templateCache){
-    $scope.modalSrc = null;
-
-    $scope.$on('showModal', function(ev, src){
-        // invalidate template cache
-        $templateCache.remove(src);
-
-        $scope.modalSrc = src;
-        $scope.$emit('modalShow');
-    });
-
-    // empty modal wrapper on close
-    $scope.$watch('visible', function(visible){
-        if (visible === false) {
-            $scope.modalSrc = '';
-        }
-    });
-})
-
 /**
  * Дисплей радиостанции
  */
-.controller('DisplayCtrl', function($scope, Radio, favorites, onair) {
+.controller('DisplayCtrl', function($scope, $state, Radio, favorites, onair) {
     $scope.$watch(function(){ return onair.get(); }, function(air){
         $scope.air = air;
     }, true);
@@ -539,15 +536,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
     };
 
-    $scope.showModal = function(modal) {
-        $scope.$root.$broadcast('showModal', '/partial/radio/' + Radio.current.id + '/' + modal);
+    $scope.showAir = function() {
+        $state.transitionTo('radio_air', {radioId: Radio.current.id});
     };
-
-
-    if (Radio.current.id)
-    $scope.showModal('air');
-})
-
-.controller('AirHistoryCtrl', function($scope){
-
 });

@@ -1,4 +1,4 @@
-angular.module('afm.base', ['ngResource', 'ngCookies'])
+angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 
 .factory('config', function () {
     return {
@@ -116,7 +116,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
     };
 })
 
-.directive('modalBack', function ($document, $location, $window) {
+.directive('modalBack', function ($document, $location, Radio) {
     return {
         restrict: 'C',
         scope: {},
@@ -142,7 +142,11 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
 
             $scope.$watch('visible', function (visible) {
                 if (visible === false) {
-                    $location.path('/');
+                    if (Radio.current.id) {
+                        $location.path('/radio/' + Radio.current.id);
+                    } else {
+                        $location.path('/');
+                    }
                 }
             });
 
@@ -190,57 +194,6 @@ angular.module('afm.base', ['ngResource', 'ngCookies'])
             $scope.close = function () {
                 back.hide();
             };
-        }
-    };
-})
-
-.directive('modalView', function ($http, $templateCache, $route, $compile, $controller) {
-    return {
-        restrict: 'A',
-        link: function (scope, element) {
-            var lastScope;
-
-            scope.$on('$routeChangeSuccess', update);
-            update();
-
-            function destroyLastScope() {
-                if (lastScope) {
-                    lastScope.$destroy();
-                    lastScope = null;
-                }
-            }
-
-            function clearContent() {
-                if (lastScope) {
-                    element.html('');
-                }
-                destroyLastScope();
-            }
-
-            function update() {
-                var locals = $route.current && $route.current.locals;
-                var template = locals && locals.$template;
-                if (template) {
-                    element.html(template);
-                    destroyLastScope();
-
-                    var link = $compile(element.contents()),
-                        current = $route.current,
-                        controller;
-
-                    lastScope = current.scope = scope.$new();
-                    if (current.controller) {
-                        locals.$scope = lastScope;
-                        controller = $controller(current.controller, locals);
-                        element.children().data('$ngControllerController', controller);
-                    }
-
-                    link(lastScope);
-                    lastScope.$emit('$viewContentLoaded');
-                } else {
-                    clearContent();
-                }
-            }
         }
     };
 });
