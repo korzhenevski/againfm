@@ -119,7 +119,7 @@ def update_places():
 def sitemap():
     from flask import url_for
     from lxml import etree as ET
-    from lxml.builder import E, ElementMaker
+    from lxml.builder import E
     base = u'http://again.fm'
     urlset = ET.Element('urlset', xmlns='http://www.sitemaps.org/schemas/sitemap/0.9')
     for radio in db.radio.find({'deleted_at': 0}):

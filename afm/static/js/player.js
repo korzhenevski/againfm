@@ -474,7 +474,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }, true);
 
     function onAir(response) {
-        air = response.onair;
+        air = response.air;
         // force convert to int, onair maybe return id as string
         if (angular.isString(air.id)) {
             air.id = parseInt(air.id, 10);
@@ -485,7 +485,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     function subscribe() {
         if (Radio.current.id) {
             comet.unsubscribe();
-            comet.subscribe('/onair/' + Radio.current.id, params, onAir);
+            comet.subscribe('/air/' + Radio.current.id, params, onAir);
         }
     }
 

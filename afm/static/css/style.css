@@ -125,7 +125,7 @@ ul.justified .block {
 .modal .header .close {
   cursor: pointer;
   position: absolute;
-  top: 6px;
+  top: 4px;
   right: 0;
   width: 17px;
   height: 17px;
@@ -183,22 +183,22 @@ ul.justified .block {
   width: 740px;
   min-height: 493px;
 }
-.modal-radio .desc {
-  margin-top: -10px;
-  margin-bottom: 30px;
-  color: #cccccf;
-}
 .modal-radio .air-history {
   width: 100%;
 }
 .modal-radio .air-history .title {
-  padding: 5px;
+  padding: 3px;
 }
 .modal-radio .air-history .time {
-  width: 65px;
+  width: 70px;
+  color: #cccccf;
 }
 .modal-radio h2, .modal-radio h3 {
   margin-bottom: 0;
+}
+
+.modal-radio-share {
+  width: 740px;
 }
 
 .centroid {
@@ -239,6 +239,9 @@ ul.justified .block {
 .topmenu .menu-item {
   margin-left: 20px;
   float: left;
+}
+.topmenu .menu-item p {
+  margin: 12px 0;
 }
 .topmenu .side-item {
   float: right;
@@ -482,7 +485,7 @@ ul.justified .block {
 .radio-box .display {
   padding: 20px;
   color: #2e403f;
-  min-height: 88px;
+  min-height: 80px;
   position: relative;
   -webkit-box-shadow: #526464 0 0 3px 2px inset;
   -moz-box-shadow: #526464 0 0 3px 2px inset;
@@ -973,7 +976,7 @@ ul.justified .block {
 }
 .radio-table .tabs .block {
   cursor: pointer;
-  padding: 5px;
+  padding: 3px 7px;
   margin: 3px 0;
   -webkit-transition: all, 150ms;
   -moz-transition: all, 150ms;

@@ -7,6 +7,11 @@ from datetime import datetime
 from afm import db, app, redis
 
 # TODO:
+# отключение от комет сервера при паузе
+# модал с моим избранным (удаление)
+# в историю попадают только играющие радиостанции
+# чекер радиостанций
+# ui-router
 #
 # дисплей: показывать кол-во слушателей
 # проигрывание истории эфира
@@ -46,7 +51,6 @@ def partial_radio_air(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(100)
     current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
-    #history = [{'title': u'Madonna - Artist' * 20, 'natural_day': u'Сегодня', 'time': datetime.now()}]
     return render_template('radio_air.html', radio=radio, history=history, current_air=current_air)
 
 @app.route('/partial/radio/<int:radio_id>/share')
