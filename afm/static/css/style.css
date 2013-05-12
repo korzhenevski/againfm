@@ -1150,7 +1150,9 @@ input.text:focus, textarea.text:focus {
 }
 .footer p {
   color: #c6c5c8;
-  color-color: #f3f3f3;
+}
+.footer .info a {
+  margin-right: 10px;
 }
 
 #vk-like {

@@ -104,11 +104,11 @@
                             <table class="controls" ng-controller="PlayerControlsCtrl">
                                 <tr>
                                     <td>
-                                        <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>
-                                        <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
+                                        <button class="back" ng-click="previousRadio()"></button>
                                     </td>
                                     <td>
-                                        <button class="back" ng-click="previousRadio()"></button>
+                                        <button class="play" ng-click="play()" ng-hide="isPlaying()"></button>
+                                        <button class="pause" ng-click="stop()" ng-show="isPlaying()"></button>
                                     </td>
                                     <td>
                                         <button class="random" ng-click="randomRadio()"></button>
