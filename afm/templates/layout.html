@@ -11,6 +11,9 @@
     <link href="/static/css/normalize.css" rel="stylesheet" />
     <link href="/static/css/style.css" rel="stylesheet" />
 
+    <noscript><meta http-equiv="refresh" content="0; URL=/badbrowser.html"></noscript>
+    <!--[if lt IE 9]><meta http-equiv="refresh" content="0; URL=/badbrowser.html"><![endif]-->
+
     {# подключаемые стили #}
     {{% block styles %}}{{% endblock %}}
 
@@ -18,6 +21,20 @@
     {{% if not config.DEBUG %}}
         {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
+
+    <script>
+        var _ua = navigator.userAgent.toLowerCase();
+        var browser = {
+            v: (_ua.match( /.+(?:me|ox|on|rv|it|era|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
+            msie: (/msie/i.test(_ua) && !/opera/i.test(_ua)),
+            mozilla: /firefox/i.test(_ua),
+            chrome: /chrome/i.test(_ua),
+            safari: (!(/chrome/i.test(_ua)) && /webkit|safari|khtml/i.test(_ua)),
+            android: /android/i.test(_ua),
+            mobile: /iphone|ipod|ipad|opera mini|opera mobi|iemobile|android/i.test(_ua),
+            mac: /mac/i.test(_ua)
+        };
+    </script>
 </head>
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>
@@ -79,7 +96,7 @@
 {# подключаемые скрипты #}
 {{% block scripts %}}{{% endblock %}}
 
-{{% include 'extras/scriptjs.html' %}}
+{# {% include 'extras/scriptjs.html' %} #}
 
 {# счетчики: yandex, google analytics, ... #}
 {{% if not config.DEBUG %}}
