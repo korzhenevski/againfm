@@ -900,7 +900,7 @@ ul.justified .block {
 }
 .radio-table .tabs {
   margin: 0 -8px;
-  margin-top: 15px;
+  margin-top: 10px;
   overflow: hidden;
   min-width: 245px;
   font-size: 0;
@@ -927,7 +927,7 @@ ul.justified .block {
   border-radius: 4px;
 }
 .radio-table .playlist {
-  margin: 10px -10px;
+  margin: 10px -14px;
 }
 .radio-table .playlist .block {
   padding: 5px;
@@ -1150,12 +1150,7 @@ input.text:focus, textarea.text:focus {
 }
 .footer p {
   color: #c6c5c8;
-}
-.footer a {
-  color: #c6c5c8;
-}
-.footer a:hover {
-  color: #f3f3f3;
+  color-color: #f3f3f3;
 }
 
 #vk-like {
