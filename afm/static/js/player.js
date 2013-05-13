@@ -40,7 +40,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $stateProvider.state('favorite_radio', {
-        templateUrl: 'favorite_radio.html'
+        templateUrl: 'favorite_radio.html',
+        controller: 'FavoriteRadioCtrl'
     });
 })
 
@@ -510,6 +511,16 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             return air;
         }
     };
+})
+
+.controller('FavoriteRadioCtrl', function($scope, favorites){
+    $scope.getList = function() {
+        return favorites.get();
+    };
+
+    $scope.remove = function(id) {
+        favorites.remove(id);
+    }
 })
 
 /**

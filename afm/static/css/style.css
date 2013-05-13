@@ -198,6 +198,29 @@ ul.justified .block {
   width: 740px;
 }
 
+.modal-favorite-radio {
+  width: 400px;
+}
+.modal-favorite-radio .list {
+  width: 100%;
+}
+.modal-favorite-radio .actions {
+  width: 17px;
+}
+.modal-favorite-radio .remove {
+  display: block;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  background-image: url("/static/i/remove.png");
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
+  opacity: 0.7;
+}
+.modal-favorite-radio .remove:hover {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+
 .centroid {
   width: 980px;
   margin: 0 auto;
@@ -603,6 +626,7 @@ ul.justified .block {
   margin-bottom: 10px;
   width: 232px;
   height: 40px;
+  cursor: pointer;
   background-position: 0 0;
 }
 .radio-box .favorites-inner {

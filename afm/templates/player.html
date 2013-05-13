@@ -165,7 +165,12 @@
 {{% block scripts %}}
     <script type="text/ng-template" id="favorite_radio.html">
         <div modal="favorite-radio" title="Мое Избранное">
-
+            <table class="list">
+                <tr ng-repeat="radio in getList()">
+                    <td class="ellipsis">{{ radio.title }}</td>
+                    <td class="actions"><i class="remove" ng-click="remove(radio.id)"></i></td>
+                </tr>
+            </table>
         </div>
     </script>
 

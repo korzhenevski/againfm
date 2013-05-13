@@ -116,7 +116,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
-.directive('modalBack', function ($document, $location, Radio) {
+.directive('modalBack', function ($document, $location, $rootElement, Radio) {
     return {
         restrict: 'C',
         scope: {},
@@ -142,11 +142,8 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 
             $scope.$watch('visible', function (visible) {
                 if (visible === false) {
-                    if (Radio.current.id) {
-                        $location.path('/radio/' + Radio.current.id);
-                    } else {
-                        $location.path('/');
-                    }
+                    var path = Radio.current.id ? ('/radio/' + Radio.current.id) : '/';
+                    $location.replace().path(path);
                 }
             });
 
@@ -161,7 +158,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
                 }
             });
 
-            $document.find('body').bind('keydown', function (e) {
+            $rootElement.bind('keydown', function (e) {
                 // Press Escape
                 if (e.which === 27) {
                     close();
