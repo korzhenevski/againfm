@@ -41,6 +41,7 @@
     <div class="modal-back ng-cloak" ng-show="visible" ui-view></div>
 
     {{% block top_content %}}{{% endblock %}}
+
     <div class="topline">
         <div class="topline-inner centroid">
             <div class="topmenu">
@@ -49,6 +50,8 @@
                         <img src="/static/i/logo.png" width="132" height="31" alt="Радиоплеер Эгейн" />
                     </a>
                 </div>
+
+                {{% block topline %}}{{% endblock %}}
                 <div class="menu-item side-item">
                     <p ng-hide="user.isLogged()">
                         <a href="/login">Войти с паролем</a>
@@ -61,7 +64,6 @@
             </div>
         </div>
     </div>
-
     {{% block content %}}{{% endblock %}}
 
     {# подвал #}
@@ -71,11 +73,8 @@
                 <tr>
                     <td>
                         <p class="info">
-                            <!--span class="copyright">&copy; {{{ year }}}</span-->
                             <a class="pseudo-link" href="/feedback">обратная связь</a>
-                            <a href="/developers">разработчикам</a>
-                            <a href="/about">радиостанциям</a>
-                            <a href="/about">о проекте</a>
+                            <a href="/about" target="_self">о проекте</a>
                         </p>
                     </td>
                     <td><p>Играем 3 000 радиостанций с 2 456 потоками. Обновлено: 10.05.10</p></td>
@@ -95,6 +94,9 @@
 {{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states') %}}
     <script src="/static/js/common/{{{ name }}}.js"></script>
 {{% endfor %}}
+
+<script src="/static/js/base.js"></script>
+<script src="/static/js/user.js"></script>
 
 {# подключаемые скрипты #}
 {{% block scripts %}}{{% endblock %}}

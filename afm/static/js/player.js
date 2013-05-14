@@ -1,8 +1,7 @@
 angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
-.config(function($routeProvider, $locationProvider, cometProvider, $stateProvider){
+.config(function($routeProvider, cometProvider, $stateProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
-    $locationProvider.html5Mode(true);
 
     $stateProvider.state('radio_listen', {
         url: '/radio/:radioId',
