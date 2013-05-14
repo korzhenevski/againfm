@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:og="http://ogp.me/ns#">
 <head>
-    <title>{{% block title %}}Радиоплеер{{% endblock %}}</title>
+    <title>{{% block title %}}Again.FM{{% endblock %}}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="{{% block description %}} Включи музыку для любимого дела. {{% endblock %}}" />
+    <meta name="description" content="{{% block description %}}{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
     <meta http-equiv="X-Frame-Options" content="deny" />
 
@@ -68,25 +68,20 @@
 
     {# подвал #}
     <div class="footer centroid">
-        <div class="container">
-            <table width="100%">
-                <tr>
-                    <td>
-                        <p class="info">
-                            <a class="pseudo-link" href="/feedback">обратная связь</a>
-                            <a href="/about" target="_self">о проекте</a>
-                        </p>
-                    </td>
-                    <td><p>Играем 3 000 радиостанций с 2 456 потоками. Обновлено: 10.05.10</p></td>
-                    <td align="right">
-                        <a href="https://twitter.com/share" class="twitter-share-button"
-                           data-url="http://again.fm/" data-via="againfm" data-lang="en"
-                           data-text="Радиоплеер Эгейн"></a>
-                        <div id="vk-like"></div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <ul class="inline">
+            <li class="item">
+                <a class="pseudo-link" href="/feedback">обратная связь</a>
+            </li>
+            <li class="item"><a href="/about" target="_self">о проекте</a></li>
+            <li class="item shift">Играем 3 000 радиостанций с 2 456 потоками.</li>
+            <li class="share">
+                <script type="text/javascript" src="//yandex.st/share/share.js"
+charset="utf-8"></script>
+<div class="yashare-auto-init" data-yashareL10n="ru"
+ data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj"></div>
+
+            </li>
+        </ul>
     </div>
 
 {# базовые скрипты #}

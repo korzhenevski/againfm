@@ -26,7 +26,7 @@
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
-  line-height: 23px;
+  line-height: 20px;
   color: #efefef;
   min-width: 1200px;
   min-height: 800px;
@@ -254,7 +254,7 @@ ul.justified .block {
 }
 
 .logo img {
-  margin-top: 11px;
+  margin-top: 12px;
 }
 .logo a {
   border: none !important;
@@ -1106,6 +1106,10 @@ input.text:focus, textarea.text:focus {
   color: #f2f2f4;
 }
 
+p.large {
+  margin-top: 1.8em;
+}
+
 .btn {
   color: white;
   margin-top: 1px;
@@ -1171,16 +1175,32 @@ input.text:focus, textarea.text:focus {
 .footer {
   clear: both;
   font-size: 13px;
-  margin-top: 10px;
-}
-.footer .copyright {
-  margin-right: 1em;
-}
-.footer p {
+  margin-top: 15px;
   color: #c6c5c8;
 }
-.footer .info a {
-  margin-right: 10px;
+.footer .item {
+  white-space: nowrap;
+  margin-right: 15px;
+}
+.footer .shift {
+  margin-left: 20px;
+}
+.footer .share {
+  margin-right: -5px;
+  float: right;
+}
+.footer .share a {
+  border: none;
+}
+.footer .share .b-share__handle {
+  padding: 1px 4px !important;
+}
+.footer .share .b-share, .footer .share .b-share__handle {
+  padding-top: 1px !important;
+}
+
+.b-share-popup a {
+  border: none;
 }
 
 #vk-like {

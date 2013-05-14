@@ -1,0 +1,14 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}{{{ radio.title }}}{{% endblock %}}
+{{% block description %}}{{{ radio.description }}}{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid">
+        <h1>{{{ radio.title }}}</h1>
+        <p class="text-muted">{{{ radio.description }}}</p>
+        <p>
+            <a class="link" href="{{{ url_for('listen', radio_id=radio.id) }}}">Слушать в плеере</a>
+        </p>
+    </div>
+{{% endblock %}}

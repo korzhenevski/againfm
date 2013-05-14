@@ -120,11 +120,12 @@ def sitemap():
     from flask import url_for
     from lxml import etree as ET
     from lxml.builder import E
+
     base = u'http://again.fm'
     urlset = ET.Element('urlset', xmlns='http://www.sitemaps.org/schemas/sitemap/0.9')
     for radio in db.radio.find({'deleted_at': 0}):
         url = E.url(
-            E.loc(base + url_for('radio_page', radio_id=radio['id'])),
+            E.loc(base + url_for('radio', radio_id=radio['id'])),
         )
         urlset.append(url)
     print ET.tostring(urlset, pretty_print=True, xml_declaration=True, encoding='UTF-8')

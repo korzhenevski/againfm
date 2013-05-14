@@ -23,7 +23,7 @@ $use-mozilla-ellipsis-binding: true
 body
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
   font-size: 14px
-  line-height: 23px
+  line-height: 20px
   color: #efefef
   min-width: 1200px
   min-height: 800px
@@ -225,7 +225,7 @@ ul.justified
 
 .logo
   img
-    margin-top: 11px
+    margin-top: 12px
   a
     border: none !important
 
@@ -244,8 +244,10 @@ ul.justified
       margin: 12px 0
     margin-left: 20px
     float: left
+
   .side-item
     float: right
+
   .pseudo-link, a
     margin-right: 20px
     border-bottom: 1px dotted #a49ca3
@@ -839,6 +841,9 @@ input.text, textarea.text
   &:focus
     color: #f2f2f4
 
+p.large
+  margin-top: 1.8em
+
 .btn
   color: #fff
   margin-top: 1px
@@ -868,13 +873,25 @@ input.text, textarea.text
 .footer
   clear: both
   font-size: 13px
-  margin-top: 10px
-  .copyright
-    margin-right: 1em
-  p
-    color: #c6c5c8
-  .info a
-    margin-right: 10px
+  margin-top: 15px
+  color: #c6c5c8
+  .item
+    white-space: nowrap
+    margin-right: 15px
+  .shift
+    margin-left: 20px
+  .share
+    margin-right: -5px
+    float: right
+    a
+      border: none
+    .b-share__handle
+      padding: 1px 4px !important
+    .b-share, .b-share__handle
+      padding-top: 1px !important
+
+.b-share-popup a
+  border: none
 
 #vk-like
   display: inline-block

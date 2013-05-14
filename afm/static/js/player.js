@@ -4,7 +4,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     cometProvider.setUrl('http://comet.' + document.location.host);
 
     $stateProvider.state('radio_listen', {
-        url: '/radio/:radioId',
+        url: '/listen/:radioId',
         controller: 'ListenCtrl',
         template: '<div ng-init="visible=false"></div>',
         resolve: {
@@ -27,7 +27,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $stateProvider.state('radio_air', {
-        url: '/radio/:radioId/air',
+        url: '/listen/:radioId/air',
         templateUrl: function($stateParams) {
             return '/partial/radio/' + $stateParams.radioId + '/air';
         }
@@ -374,7 +374,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.selectRadio = function(radio) {
         Radio.listen(radio);
-        $location.path('/radio/' + radio.id);
+        $location.path('/listen/' + radio.id);
     };
 
     $scope.$on('radioListen', function(event, radio){

@@ -33,7 +33,7 @@ def user_actions():
         return redirect('/')
     return render_template('player.html')
 
-@app.route('/radio/<int:radio_id>')
+@app.route('/listen/<int:radio_id>')
 def listen(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
     return render_template('player.html', radio=radio)
@@ -42,14 +42,10 @@ def listen(radio_id):
 def about():
     return render_template('about.html')
 
-"""
-@app.route('/radio/<int:radio_id>/<slug>')
-def radio_details(radio_id, slug=None):
+@app.route('/radio/<int:radio_id>')
+def radio(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id})
-    if request.args.get('partial'):
-        return render_template('radio_details.html', radio_details=radio)
-    return render_template('player.html', radio_details=radio)
-"""
+    return render_template('radio.html', radio=radio)
 
 @app.route('/partial/radio/<int:radio_id>/air')
 def partial_radio_air(radio_id):
