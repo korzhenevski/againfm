@@ -133,11 +133,6 @@ ul.justified .block {
   font-weight: normal;
   line-height: 1em;
 }
-.modal .text {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-}
 .modal .header {
   position: relative;
 }
@@ -162,36 +157,48 @@ ul.justified .block {
   border-bottom: 1px solid #40414e;
   margin: 20px -19px;
 }
-.modal .error {
+
+.form .text {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.form .error {
   color: #ff6f7d;
   margin-bottom: 0;
 }
-.modal .controls {
+.form .controls {
   position: relative;
 }
-.modal .controls .amnesia {
+.form .controls .amnesia {
   position: absolute;
   right: 0;
   top: 0;
 }
-.modal form.ng-invalid .error {
+
+.form.ng-invalid .error {
   display: none;
 }
-.modal form.errors input.ng-invalid {
+
+.form.errors input.ng-invalid {
   color: #ff6f7d;
   border: 1px solid #963841;
 }
-.modal form.errors input.ng-invalid.placeholder {
+.form.errors input.ng-invalid.placeholder {
   color: #ff6f7d;
 }
-.modal form.errors input.ng-invalid::-webkit-input-placeholder {
+.form.errors input.ng-invalid::-webkit-input-placeholder {
   color: #ff6f7d;
 }
-.modal form.errors input.ng-invalid:-moz-placeholder {
+.form.errors input.ng-invalid:-moz-placeholder {
   color: #ff6f7d;
 }
-.modal form.errors input.ng-invalid:-ms-input-placeholder {
+.form.errors input.ng-invalid:-ms-input-placeholder {
   color: #ff6f7d;
+}
+
+.feedback-form {
+  width: 400px;
 }
 
 .modal-user {

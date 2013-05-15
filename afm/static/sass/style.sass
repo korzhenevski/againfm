@@ -123,11 +123,6 @@ ul.justified
     font-weight: normal
     line-height: 1em
 
-  .text
-    width: 100%
-    padding: 10px 12px
-    margin-bottom: 12px
-
   .header
     position: relative
     .close
@@ -148,6 +143,12 @@ ul.justified
     border-bottom: 1px solid #40414e
     margin: 20px -19px
 
+.form
+  .text
+    width: 100%
+    padding: 10px 12px
+    margin-bottom: 12px
+
   .error
     color: #ff6f7d
     margin-bottom: 0
@@ -159,16 +160,18 @@ ul.justified
       right: 0
       top: 0
 
-  form.ng-invalid
-    .error
-      display: none
+.form.ng-invalid
+  .error
+    display: none
 
-  form.errors
-    input.ng-invalid
-      color: #ff6f7d
-      border: 1px solid #963841
-      @include placeholder-color(#ff6f7d)
+.form.errors
+  input.ng-invalid
+    color: #ff6f7d
+    border: 1px solid #963841
+    @include placeholder-color(#ff6f7d)
 
+.feedback-form
+  width: 400px
 
 .modal-user
   width: 320px

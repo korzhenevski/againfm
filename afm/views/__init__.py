@@ -26,8 +26,10 @@ def page_not_found(e):
         return jsonify({'error': 'Not Found'}), 404
     return '<h1>Not Found</h1>', 404
 
+
 @app.template_filter('json')
 def template_filter_json(data):
     return escape(json.dumps(data))
 
-from . import views, user, api, auth
+
+from . import views, user, api, auth, admin

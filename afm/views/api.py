@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask import request, jsonify, abort
-from flask.ext.login import login_required, current_user
-
 import requests
+
+from flask.ext.login import login_required, current_user
 from afm import app, db, redis
 from afm.models import UserFavoritesCache
 from afm.helpers import raw_redirect

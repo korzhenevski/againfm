@@ -18,12 +18,6 @@ angular.module('afm.user', ['afm.base'])
         templateUrl: 'amnesia.html',
         controller: 'AmnesiaCtrl'
     });
-
-    $stateProvider.state('feedback', {
-        url: '/feedback',
-        templateUrl: 'feedback.html',
-        controller: 'FeedbackCtrl'
-    });
 })
 
 .factory('user', function(){

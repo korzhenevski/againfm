@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request, redirect
-from flask.ext.login import current_user
 from datetime import datetime
+
+from flask.ext.login import current_user
 from afm import db, app, redis
+
 
 # TODO:
 # починить pushState историю при работе с модалами
@@ -21,9 +23,9 @@ from afm import db, app, redis
 
 
 @app.route('/')
-@app.route('/feedback')
 def index():
     return render_template('player.html')
+
 
 @app.route('/signup')
 @app.route('/amnesia')
@@ -33,31 +35,43 @@ def user_actions():
         return redirect('/')
     return render_template('player.html')
 
+
 @app.route('/listen/<int:radio_id>')
 def listen(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id})
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('player.html', radio=radio)
+
 
 @app.route('/about')
 def about():
     return render_template('about.html')
 
+
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id})
-    return render_template('radio.html', radio=radio)
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
+    history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)
+    current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
+    return render_template('radio.html', radio=radio, history=history, current_air=current_air)
+
 
 @app.route('/partial/radio/<int:radio_id>/air')
 def partial_radio_air(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id})
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(100)
     current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
     return render_template('radio_air.html', radio=radio, history=history, current_air=current_air)
 
+
 @app.route('/partial/radio/<int:radio_id>/share')
 def partial_radio_share(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id})
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('radio_share.html', radio=radio)
+
+
+@app.route('/feedback')
+def feedback():
+    return render_template('user/feedback.html')
 
 @app.context_processor
 def app_context():

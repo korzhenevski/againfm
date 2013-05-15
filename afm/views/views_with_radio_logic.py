@@ -3,9 +3,9 @@
 
 import requests
 from flask import render_template, request, jsonify, url_for, redirect
-from flask.ext.login import current_user, login_required
 from datetime import datetime
 
+from flask.ext.login import current_user, login_required
 from afm import db, app
 from afm.helpers import safe_input_object
 

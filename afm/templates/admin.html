@@ -1,0 +1,22 @@
+{{% extends "layout.html" %}}
+
+{{% block content %}}
+    <div class="page centroid">
+        <table ng-controller="AdminCtrl">
+            <tr ng-repeat="radio in radioList">
+                <td>
+                    {{ radio.title }}
+                </td>
+            </tr>
+        </table>
+    </div>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script src="/static/js/admin.js"></script>
+    <script>
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm.admin']);
+        });
+    </script>
+{{% endblock %}}

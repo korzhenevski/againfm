@@ -414,11 +414,8 @@ class Radio(BaseDocument):
         'owner_id': int,
         'is_channel': bool,
         'is_public': bool,
-        'air': {
-            'track': bool,
-            'record': bool,
-        },
-        'stat': dict,
+        'air_history': bool,
+        'air_record': bool,
         'tag': dict,
         'created_at': int,
         'deleted_at': int,
@@ -434,10 +431,8 @@ class Radio(BaseDocument):
         'is_public': False,
         'created_at': get_ts,
         'deleted_at': 0,
-        'air': {
-            'track': False,
-            'record': False,
-        }
+        'air_history': False,
+        'air_record': False,
     }
 
     json_schema = {

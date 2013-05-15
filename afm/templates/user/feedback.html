@@ -1,0 +1,30 @@
+{{% extends "layout.html" %}}
+{{% block title %}}Обратная связь{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid" ng-controller="FeedbackCtrl">
+        <h1>Обратная связь</h1>
+        <form name="form" class="form feedback-form"
+              ng-submit="submit()" ng-class="{errors: showErrors}" ng-hide="result" user-form>
+            <textarea rows="6" class="text" name="text" ng-model="data.text"
+                      placeholder="Текст" autofocus="" required=""></textarea>
+
+            <input ng-hide="user.isLogged()" type="email" class="text" name="email"
+                   ng-model="data.email" placeholder="Электронная почта" required />
+
+            <input type="submit" class="btn" value="Отправить" ng-disabled="form.$invalid && showErrors" />
+        </form>
+        <p ng-show="result">Сообщение отправлено, спасибо :)</p>
+        <p class="error" ng-switch on="error.code" ng-show="error">
+            <span ng-switch-default>Ошибка при обработке запроса. Попробуйте позже.</span>
+        </p>
+    </div>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script>
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm.user']);
+        });
+    </script>
+{{% endblock %}}

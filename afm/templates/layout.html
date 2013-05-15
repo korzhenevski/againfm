@@ -69,23 +69,19 @@
     {# подвал #}
     <div class="footer centroid">
         <ul class="inline">
-            <li class="item">
-                <a class="pseudo-link" href="/feedback">обратная связь</a>
-            </li>
+            <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
             <li class="item"><a href="/about" target="_self">о проекте</a></li>
             <li class="item shift">Играем 3 000 радиостанций с 2 456 потоками.</li>
             <li class="share">
-                <script type="text/javascript" src="//yandex.st/share/share.js"
-charset="utf-8"></script>
-<div class="yashare-auto-init" data-yashareL10n="ru"
- data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj"></div>
-
+                <script src="//yandex.st/share/share.js"></script>
+                <div class="yashare-auto-init" data-yashareL10n="ru"
+                     data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj">
+                </div>
             </li>
         </ul>
     </div>
 
 {# базовые скрипты #}
-
 {{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states') %}}
     <script src="/static/js/common/{{{ name }}}.js"></script>
 {{% endfor %}}
