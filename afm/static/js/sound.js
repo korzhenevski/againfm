@@ -132,6 +132,7 @@ angular.module('afm.sound', ['afm.base'])
             }
         }
     }
+    return {};
 })
 
 .factory('flash', function(){

@@ -32,15 +32,20 @@
     <div class="ground">
         <div class="ground-shadow">
             <div class="content">
-                <table class="radio-box" ng-controller="PlayerCtrl"
-                {{% if radio %}} ng-init='selectRadio({{{ radio.get_public()|json }}})'{{% endif %}}>
+                <table class="radio-box" ng-controller="PlayerCtrl">
                     <tr valign="top">
                         {# минидисплей #}
                         <td width="312px">
                             <div class="display-ground">
                                 <div class="display-inner">
                                     <div class="display" ng-controller="DisplayCtrl">
-                                        <div ng-show="currentRadio.title">
+                                        <div ng-show="error">
+                                            <p class="title" ng-switch on="error">
+                                                <span ng-switch-default>Радио недоступно</span>
+                                            </p>
+                                        </div>
+
+                                        <div ng-show="needShowRadio()">
                                             <p class="title" ng-class="{starred: starred()}" ng-click="star()">
                                                 <span class="marquee">{{ currentRadio.title }}</span>
                                                 <span class="star"></span>
@@ -53,7 +58,8 @@
                                                 <button class="display-button" ng-click="showAir()">История эфира</button>
                                             </div>
                                         </div>
-                                        <div class="clock" clock="currentRadio.title"></div>
+
+                                        <div class="clock" clock="needShowClock()"></div>
                                     </div>
                                 </div>
                             </div>
@@ -87,9 +93,8 @@
                                     <hr class="radio-line" />
                                     <ul class="playlist justified">
                                         <li ng-repeat="radio in playlist">
-                                            <div class="block station-link" ng-click="selectRadio(radio)"
-                                                 ng-class="currentClass(radio)">
-                                                <span class="link">{{ radio.title }}</span>
+                                            <div class="block" ng-class="currentClass(radio)">
+                                                <a href="/listen/{{ radio.id }}" class="playlist-link">{{ radio.title }}</a>
                                             </div>
                                         </li>
                                         <li ng-hide="hasList()" class="ng-cloak not-found">
@@ -136,9 +141,9 @@
                             <div class="favorites-inner">
                                 <ul class="favorites-list justified">
                                     <li ng-repeat="radio in getFavorites()">
-                                        <div class="block" ng-click="selectRadio(radio)" ng-class="currentClass(radio)">
+                                        <a class="block" href="/listen/{{ radio.id }}" ng-class="currentClass(radio)">
                                             {{ radio.title }}
-                                        </div>
+                                        </a>
                                     </li>
                                 </ul>
                                 <div class="signage" ng-click="showModal()"></div>
