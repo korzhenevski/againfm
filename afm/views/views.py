@@ -46,6 +46,9 @@ def listen(radio_id):
 def about():
     return render_template('about.html')
 
+@app.route('/jobs')
+def jobs():
+    return render_template('jobs.html')
 
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):

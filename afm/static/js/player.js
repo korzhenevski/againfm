@@ -9,7 +9,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $stateProvider.state('radio_air', {
-        url: '/listen/:radioId/air',
         templateUrl: function($stateParams) {
             return '/partial/radio/' + $stateParams.radioId + '/air';
         }
@@ -27,8 +26,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 })
 
 .controller('ListenCtrl', function($rootScope, $stateParams, $http, Radio){
-    Radio.reset();
+    if (Radio.current.id == $stateParams.radioId) {
+        return;
+    }
 
+    Radio.reset();
     $http.get('/api/radio/' + $stateParams.radioId).success(function(radio){
         Radio.listen(radio);
     }).error(function(resp, statusCode){
@@ -173,7 +175,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.controller('PlaylistCtrl', function($scope, $http, $timeout, history){
+.controller('PlaylistCtrl', function($scope, $http, $timeout, $location, history){
     $scope.searchQuery = '';
     $scope.tabs = [];
     $scope.playlist = [];
@@ -192,6 +194,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             $scope.selectTab('featured');
         }
     };
+
+    $scope.$on('playerFreePlay', function(ev){
+        if ($scope.playlist.length) {
+            $location.path('/listen/' + $scope.playlist[0].id);
+        }
+    });
 
     $scope.$on('radioListen', function(ev, radio){
         history.add(radio);
@@ -348,7 +356,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         },
 
         listen: function(radio) {
+            if (radio.id != this.current.id) {
+                this.play(radio);
+            }
             this.set(radio);
+        },
+
+        play: function(radio) {
             player.play('/api/radio/' + radio.id + '/listen?redir=1');
             $rootScope.$broadcast('radioListen', radio);
         }
@@ -370,7 +384,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 })
 
-.controller('PlayerCtrl', function($scope, $location, Radio, title){
+.controller('PlayerCtrl', function($scope, Radio, title){
     $scope.currentRadio = Radio.current;
 
     $scope.currentClass = function(radio) {
@@ -382,13 +396,17 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 })
 
-.controller('PlayerControlsCtrl', function($scope, $http, player, history, Radio){
+.controller('PlayerControlsCtrl', function($scope, $http, player, history, Radio, $location){
     $scope.play = function() {
         if (Radio.current.id) {
-            $scope.selectRadio(Radio.current);
+            Radio.play(Radio.current);
         } else {
             $scope.$root.$broadcast('playerFreePlay');
         }
+    };
+
+    $scope.selectRadio = function(radio) {
+        $location.path('/listen/' + radio.id);
     };
 
     $scope.stop = function() {
@@ -530,12 +548,16 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         $scope.air = air;
     }, true);*/
 
+    $scope.needShowClock = true;
+
+    $scope.$watch(function(){return Radio.current.id}, function(id){
+        if (id) {
+            $scope.needShowClock = false;
+        }
+    });
+
     $scope.needShowRadio = function() {
         return !!Radio.current.id && !$scope.error;
-    };
-
-    $scope.needShowClock = function() {
-        return !Radio.current.id && !$scope.error;
     };
 
     $scope.$on('radioListen', function(){

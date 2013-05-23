@@ -120,7 +120,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
-.directive('modalBack', function ($document, $location, $rootElement, Radio) {
+.directive('modalBack', function ($document, $location, $rootElement, $state) {
     return {
         restrict: 'C',
         scope: {},
@@ -144,10 +144,22 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
                 $scope.$apply();
             }
 
+            var backTo = {};
+
+            $scope.$on('$stateChangeStart', function(ev, to, toParams, from, fromParams){
+                if (angular.isUndefined(from.templateUrl) && angular.isDefined(to.templateUrl)) {
+                    backTo = {name: from.name, params: fromParams};
+                }
+            });
+
             $scope.$watch('visible', function (visible) {
                 if (visible === false) {
-                    var path = Radio.current.id ? ('/radio/' + Radio.current.id) : '/';
-                    $location.replace().path(path);
+                    if (backTo.name) {
+                        $state.transitionTo(backTo.name, backTo.params);
+                    } else {
+                        $state.transitionTo('home');
+                    }
+                    backTo = {};
                 }
             });
 

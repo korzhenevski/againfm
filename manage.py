@@ -66,55 +66,6 @@ def update_playlist():
 
 
 @manager.command
-def check_stream():
-    from afm.tasks import check_stream
-    from afm.helpers import get_ts
-    check_deadline = get_ts() - 3600
-    streams = db.streams.find({'checked_at': {'$lte': check_deadline}, 'deleted_at': 0}, fields=['id']).limit(100)
-    for stream in streams:
-        print check_stream.delay(stream_id=stream['id'])
-
-@manager.command
-def update_places():
-    access_token = '56fd22cacbc4b5d67d429d3030cb913df2000f9c7f7d8be1459c80515884b7624db30424a926820c04d44'
-    import requests
-    db.countries.drop()
-    db.regions.drop()
-    db.cities.drop()
-    from time import sleep
-
-    def call_method(name, **params):
-        params['access_token'] = access_token
-        tries = 10
-        resp = None
-        while tries:
-            tries -= 1
-            resp = requests.get('https://api.vk.com/method/' + name, params=params)
-            data = resp.json()
-            if 'error' in data and data.get('error').get('error_code') == 6:
-                print 'sleep...'
-                sleep(2)
-                continue
-            break
-        if resp is None:
-            raise RuntimeError('too many tries')
-        return resp.json().get('response', [])
-
-    countries = call_method('places.getCountries', need_full=1)
-    for country in countries:
-        print country['cid']
-        print db.countries.insert({'_id': country['cid'], 'title': country['title']})
-        regions = call_method('places.getRegions', country=country['cid'])
-        for region in regions:
-            print('- region', region['region_id'])
-            print db.regions.insert({'_id': region['region_id'], 'country_id': country['cid'], 'title': region['title']})
-        cities = call_method('places.getCities', country=country['cid'])
-        for city in cities:
-            city['country_id'] = country['cid']
-            print('- city', city['cid'])
-            db.cities.insert(city)
-
-@manager.command
 def sitemap():
     from flask import url_for
     from lxml import etree as ET
@@ -139,13 +90,15 @@ def update_search():
 
 
 @manager.command
-def update_radio_cache():
+def warm_cache():
     from afm import redis
 
-    redis.delete('radio:public')
+    # Generate new ids set and replace existent
+    redis.delete('radio:public_new')
     for radio in db.Radio.find_public(fields=['id']):
-        redis.sadd('radio:public', radio['id'])
-
+        redis.sadd('radio:public_new', radio['id'])
+    redis.rename('radio:public_new', 'radio:public')
+    print redis.scard('radio:public'), 'public radio'
 
 @manager.command
 def get_icy_genre():

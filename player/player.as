@@ -48,7 +48,7 @@ package {
 
       public function playStream(url:String) {
           try {
-              cancelStream();
+              stopStream();
               debug('stream url: '+url);
 
               _sound = new Sound();
@@ -65,14 +65,14 @@ package {
           }
       }
 
-      public function stopStream() {
+      public function stopStreamWithFade() {
          stopped(true);
          if (_soundChannel) {
-             new EazeTween(_soundChannel).onComplete(cancelStream).to(_fadingTime, {volume: 0});
+             new EazeTween(_soundChannel).onComplete(stopStream).to(_fadingTime, {volume: 0});
          }
       }
 
-      public function cancelStream() {
+      public function stopStream() {
          if (_soundChannel != null) {
              try {
                 _soundChannel.stop();
