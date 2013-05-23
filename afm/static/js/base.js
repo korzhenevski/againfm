@@ -120,7 +120,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
-.directive('modalBack', function ($document, $location, $rootElement, $state) {
+.directive('modalBack', function ($document, $location, $rootElement, $state, $window) {
     return {
         restrict: 'C',
         scope: {},
@@ -135,16 +135,25 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
         },
 
         link: function ($scope, element) {
-            function close() {
+            var backTo = {};
+
+            $scope.closeModal = function(skipApply) {
                 if (!$scope.visible) {
                     return;
                 }
 
                 $scope.visible = false;
-                $scope.$apply();
-            }
+                if (!skipApply) {
+                    $scope.$apply();
+                }
+            };
 
-            var backTo = {};
+            $scope.reload = function() {
+                $scope.visible = false;
+                setTimeout(function(){
+                    $window.location = $window.location;
+                }, 10);
+            };
 
             $scope.$on('$stateChangeStart', function(ev, to, toParams, from, fromParams){
                 if (angular.isUndefined(from.templateUrl) && angular.isDefined(to.templateUrl)) {
@@ -170,14 +179,14 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
             element.bind('click', function (e) {
                 // close by click only to modalBack
                 if (e.target == element[0]) {
-                    close();
+                    $scope.closeModal();
                 }
             });
 
             $rootElement.bind('keydown', function (e) {
                 // Press Escape
                 if (e.which === 27) {
-                    close();
+                    $scope.closeModal();
                 }
             });
         }

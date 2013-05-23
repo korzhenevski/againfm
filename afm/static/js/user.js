@@ -65,12 +65,14 @@ angular.module('afm.user', ['afm.base'])
     };
 }])
 
-.controller('UserCtrl', function($scope, User, user) {
+.controller('UserCtrl', function($scope, $window, User, user) {
     $scope.user = user;
     $scope.logout = function() {
         if (user.isLogged()) {
             user.clear();
-            User.logout();
+            User.logout().success(function(){
+                $window.location = $window.location;
+            })
         }
     };
 
@@ -111,7 +113,7 @@ angular.module('afm.user', ['afm.base'])
 
     $scope.send = function() {
         return User.login($scope.data).success(function(){
-            $window.location = '/';
+            $scope.reload();
         });
     };
 })
@@ -121,7 +123,7 @@ angular.module('afm.user', ['afm.base'])
 
     $scope.send = function() {
         return User.signup($scope.data).success(function(){
-            $window.location = '/';
+            $scope.reload();
         });
     };
 })
