@@ -183,14 +183,18 @@
         </div>
     </script>
 
-    <script src="/static/js/common/swfobject.js"></script>
-    <script src="/static/js/common/comet.js"></script>
+    {{% if production %}}
+        <script src="/static/js/dist/player.js"></script>
+    {{% else %}}
+        <script src="/static/js/common/swfobject.js"></script>
+        <script src="/static/js/common/comet.js"></script>
 
-    <script src="/static/js/common/ui-transition.js"></script>
-    <script src="/static/js/common/ui-animate.js"></script>
+        <script src="/static/js/common/ui-transition.js"></script>
+        <script src="/static/js/common/ui-animate.js"></script>
 
-    <script src="/static/js/sound.js"></script>
-    <script src="/static/js/player.js"></script>
+        <script src="/static/js/sound.js"></script>
+        <script src="/static/js/player.js"></script>
+    {{% endif %}}
     <script>
         angular.element(document).ready(function(){
             angular.bootstrap(document, ['afm.player']);

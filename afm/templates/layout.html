@@ -87,13 +87,17 @@
         </ul>
     </div>
 
-{# базовые скрипты #}
-{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states', 'angular-locale_ru') %}}
-    <script src="/static/js/common/{{{ name }}}.js"></script>
-{{% endfor %}}
+{{% if production %}}
+    <script src="/static/js/dist/core.js"></script>
+{{% else %}}
+    {# базовые скрипты #}
+    {{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states', 'angular-locale_ru') %}}
+        <script src="/static/js/core/{{{ name }}}.js"></script>
+    {{% endfor %}}
 
-<script src="/static/js/base.js"></script>
-<script src="/static/js/user.js"></script>
+    <script src="/static/js/base.js"></script>
+    <script src="/static/js/user.js"></script>
+{{% endif %}}
 
 {# подключаемые скрипты #}
 {{% block scripts %}}

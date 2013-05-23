@@ -89,5 +89,6 @@ def app_context():
         'standalone': request.is_xhr,
         'genres': [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})],
         'year': datetime.now().year,
-        'stats': app_stats()
+        'stats': app_stats(),
+        'production': False,
     }

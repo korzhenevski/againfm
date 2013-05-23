@@ -3,13 +3,14 @@
 .sass-cache
 
 .webassets-cache
-afm/static/js/deploy
+afm/static/js/dist
 venv
 .vagrant
 .DS_Store
 local_config.py
 src/
 ui-bootstrap
+node_modules
 
 jasmine
 script.js/
@@ -25,6 +26,7 @@ var
 sdist
 develop-eggs
 .installed.cfg
+
 
 # Installer logs
 pip-log.txt
