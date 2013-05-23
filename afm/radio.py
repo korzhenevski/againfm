@@ -90,7 +90,7 @@ def fetch_stream(url, timeout=5, as_player=False):
     result.time = float('%.4f' % (time() - result.time))
 
     if not result.error:
-        headers = dict([(name.lower(), val) for name, val in client.info().items()])
+        headers = dict([(name.lower(), val.decode('utf8', 'ignore')) for name, val in client.info().items()])
         content_type = normalize_content_type(headers.get('content-type', ''))
         result.headers = headers
         result.content_type = content_type
@@ -104,13 +104,9 @@ def fetch_stream(url, timeout=5, as_player=False):
                     bitrate = result.meta.get(name)
             result.bitrate = safe_int(bitrate)
         elif content_type == 'text/html':
-            page_content = client.read(8096)
+            page_content = client.read(1024)
             if 'SHOUTcast Administrator' in page_content:
-                # Bitrate is important for stream selection,
-                # extract value from Shoutcast Info HTML.
-                bitrate_match = re.search(r"at (\d+) kbps", page_content, re.IGNORECASE)
-                if bitrate_match:
-                    result.bitrate = safe_int(bitrate_match.group(1))
+                result = fetch_stream(url + ';')
                 result.is_shoutcast = True
             else:
                 result.error = 'Invalid content type: text/html'

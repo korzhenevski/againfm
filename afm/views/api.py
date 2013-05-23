@@ -6,7 +6,7 @@ import requests
 from flask.ext.login import login_required, current_user
 from afm import app, db, redis
 from afm.models import UserFavoritesCache
-from afm.helpers import raw_redirect
+from afm.helpers import raw_redirect, get_ts
 
 
 """
@@ -80,7 +80,14 @@ def api_radio_listen(radio_id):
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
 
-    where = {'radio_id': radio_id, 'is_online': True, 'deleted_at': 0}
+    where = {
+        'radio_id': radio_id,
+        'is_online': True,
+        'deleted_at': 0,
+        'check.error_at': {'$lte': get_ts() - 12*3600}
+    }
+
+    """
     player_params = request.args.get('p')
     if player_params is None:
         player_params = 'mp3'
@@ -94,12 +101,14 @@ def api_radio_listen(radio_id):
 
     if not formats:
         abort(404)
+    where['content_type'] = {'$in': formats}
+    """
 
-    #where['content_type'] = {'$in': formats}
-
-    stream = db.Stream.find_one(where, sort=[('bitrate', 1)])
-    if not stream:
+    streams = list(db.Stream.find(where, sort=[('bitrate', 1)]))
+    if not streams:
         return abort(404)
+
+    stream = streams[0]
 
     radio['listen_url'] = stream.listen_url
     radio['stream_id'] = stream.id

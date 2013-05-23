@@ -3,7 +3,6 @@
 from afm import app, celery, mailer, db
 from .radio import fetch_playlist, fetch_stream
 
-
 @celery.task
 def send_mail(email, body, subject=None):
     if subject is None:
@@ -39,25 +38,36 @@ def update_playlist(playlist_id):
         db.Stream.bulk_add(playlist['radio_id'], result.urls, playlist_id=playlist['id'])
 
 
+def check_stream_raw(stream):
+    from .helpers import get_ts
+    result = fetch_stream(stream['url'])
+    update = {
+        'bitrate': result.bitrate,
+        'content_type': result.content_type,
+        'is_shoutcast': result.is_shoutcast,
+        'meta': result.meta,
+        'check': {
+            'error': result.error,
+            'time': result.time,
+            'headers': result.headers
+        },
+        'checked_at': get_ts(),
+    }
+
+    if result.error:
+        update['check']['error_at'] = get_ts()
+    else:
+        update['check']['success_at'] = get_ts()
+        update['check']['error_at'] = 0
+    return update
+
+
 @celery.task(ignore_result=True)
 def check_stream(stream_id):
-    from .helpers import get_ts
-
     with app.test_request_context():
         stream = db.streams.find_one({'id': stream_id, 'deleted_at': 0}, fields=['id', 'url'])
         if not stream:
             return
-        result = fetch_stream(stream['url'])
-        check_result = {
-            'bitrate': result.bitrate,
-            'content_type': result.content_type,
-            'is_shoutcast': result.is_shoutcast,
-            'meta': result.meta,
-            'check': {
-                'error': result.error,
-                'time': result.time,
-                'headers': result.headers
-            },
-            'checked_at': get_ts(),
-        }
-        db.streams.update({'id': stream['id']}, {'$set': check_result})
+
+        update = check_stream_raw(stream)
+        db.streams.update({'id': stream['id']}, {'$set': update})

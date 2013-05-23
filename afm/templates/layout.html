@@ -69,9 +69,14 @@
     {# подвал #}
     <div class="footer centroid">
         <ul class="inline">
+            <li class="item">&copy {{{ year }}}</li>
             <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
             <li class="item"><a href="/about" target="_self">о проекте</a></li>
-            <li class="item shift">Играем 3 000 радиостанций с 2 456 потоками.</li>
+            <li class="item shift" ng-init='stats={{{ stats|json }}}'>
+                Играем {{ stats.radio|number }}
+                <span ng-pluralize count="stats.radio"
+                      when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>.
+            </li>
             <li class="share">
                 <script src="//yandex.st/share/share.js"></script>
                 <div class="yashare-auto-init" data-yashareL10n="ru"
@@ -82,7 +87,7 @@
     </div>
 
 {# базовые скрипты #}
-{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states') %}}
+{{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states', 'angular-locale_ru') %}}
     <script src="/static/js/common/{{{ name }}}.js"></script>
 {{% endfor %}}
 

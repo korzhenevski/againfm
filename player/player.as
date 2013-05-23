@@ -1,8 +1,6 @@
 // add build tracking
 
 package {
-   import flash.display.Sprite;
-   import flash.display.Graphics;
    import flash.display.MovieClip;
    import flash.events.Event;
    import flash.events.IOErrorEvent;
@@ -14,8 +12,6 @@ package {
    import flash.media.SoundTransform;
    import flash.media.SoundLoaderContext;
    import flash.net.URLRequest;
-   import flash.utils.ByteArray;
-   import flash.text.TextField;
    import flash.external.ExternalInterface;
    import flash.system.Security;
    import flash.display.LoaderInfo;
@@ -29,9 +25,6 @@ package {
       private var _soundTransform:SoundTransform;
       private var _soundChannel:SoundChannel;
       private var _sound:Sound;
-      private var _loopSound:Sound;
-      private var _loopChannel:SoundChannel;
-
       private var _fadingTime:Number = 0.2; //secs
       private var _volume:Number = 0.6;
       private var _stopped:Boolean = true;
@@ -124,10 +117,6 @@ package {
 
            if (_soundChannel != null) {
                _soundChannel.soundTransform = _soundTransform;
-           }
-
-           if (_loopChannel != null) {
-              _loopChannel.soundTransform = _soundTransform;
            }
        }
 

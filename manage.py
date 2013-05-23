@@ -70,10 +70,9 @@ def check_stream():
     from afm.tasks import check_stream
     from afm.helpers import get_ts
     check_deadline = get_ts() - 3600
-    streams = db.streams.find({'checked_at': {'$lte': check_deadline}, 'deleted_at': 0}, fields=['id'])
+    streams = db.streams.find({'checked_at': {'$lte': check_deadline}, 'deleted_at': 0}, fields=['id']).limit(100)
     for stream in streams:
         print check_stream.delay(stream_id=stream['id'])
-
 
 @manager.command
 def update_places():
@@ -140,15 +139,12 @@ def update_search():
 
 
 @manager.command
-def update_cache():
+def update_radio_cache():
     from afm import redis
-    from time import time
 
-    ts = time()
     redis.delete('radio:public')
     for radio in db.Radio.find_public(fields=['id']):
         redis.sadd('radio:public', radio['id'])
-    print time() - ts
 
 
 @manager.command
@@ -163,6 +159,7 @@ def get_icy_genre():
 
     for k, v in c.most_common(100):
         print k
+
 
 @manager.command
 def ctrl_search():

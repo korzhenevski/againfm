@@ -6,7 +6,7 @@ from datetime import datetime
 
 from flask.ext.login import current_user
 from afm import db, app, redis
-
+from afm.helpers import get_ts
 
 # TODO:
 # починить pushState историю при работе с модалами
@@ -73,10 +73,18 @@ def partial_radio_share(radio_id):
 def feedback():
     return render_template('user/feedback.html')
 
+
+def app_stats():
+    radio_count = db.radio.find({'deleted_at': 0}).count()
+    return {
+        'radio': radio_count
+    }
+
 @app.context_processor
 def app_context():
     return {
         'standalone': request.is_xhr,
         'genres': [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})],
         'year': datetime.now().year,
+        'stats': app_stats()
     }
