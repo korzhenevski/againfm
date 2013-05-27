@@ -20,6 +20,18 @@
     </script>
 {{% endblock %}}
 
+{{% block topline %}}
+    <div class="menu-item side-item">
+        <p ng-hide="user.isLogged()">
+            <a href="/login">Войти с паролем</a>
+            <a href="/signup">Стать постоянным слушателем</a>
+        </p>
+        <p ng-show="user.isLogged()">
+            <span class="pseudo-link" ng-click="logout()">выйти</span>
+        </p>
+    </div>
+{{% endblock %}}
+
 {{% block content %}}
 <div class="radio ng-cloak">
     <table class="top">
@@ -50,7 +62,10 @@
                                                 <span class="marquee">{{ currentRadio.title }}</span>
                                                 <span class="star"></span>
                                             </p>
-                                            <p class="onair" ng-class="{liked: air.favorite}"
+                                            <p class="line" ng-show="needShowDesc()">
+                                                <span class="marquee">{{ currentRadio.description }}</span>
+                                            </p>
+                                            <p class="line onair" ng-class="{liked: air.favorite}"
                                                ng-click="like()" ng-show="air" title="{{ air.title }}">
                                                 <span class="marquee">{{ air.title }}</span>
                                             </p>
@@ -170,6 +185,21 @@
 {{% block styles %}}
     <link href="/static/css/loader.css" rel="stylesheet"/>
 {{% endblock %}}
+
+{{% block footer %}}
+    <li class="item shift" ng-init='stats={{{ stats|json }}}'>
+        Играем {{ stats.radio|number }}
+        <span ng-pluralize count="stats.radio"
+              when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>.
+    </li>
+    <li class="share">
+        <script src="//yandex.st/share/share.js"></script>
+        <div class="yashare-auto-init" data-yashareL10n="ru"
+             data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj">
+        </div>
+    </li>
+{{% endblock %}}
+
 
 {{% block scripts %}}
     <script type="text/ng-template" id="favorite_radio.html">

@@ -151,6 +151,7 @@ ul.justified
     margin-bottom: 12px
 
   .error
+    margin-top: 1em
     color: #ff6f7d
     margin-bottom: 0
 
@@ -476,11 +477,13 @@ ul.justified
       .star
         @include display-controls-sprite(star_hover)
 
-    .onair
+    .line
       line-height: 16px
       cursor: pointer
       position: relative
       margin-top: 5px
+
+    .onair
       &:hover .like
         @include display-controls-sprite(like_hover)
 
@@ -786,6 +789,7 @@ ul.justified
   border: 3px solid #2b2b2b
   overflow: hidden
   margin-top: 40px
+  margin-bottom: 18px
   +border-radius(8px)
 
   a.link

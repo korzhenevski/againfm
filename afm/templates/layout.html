@@ -52,15 +52,6 @@
                 </div>
 
                 {{% block topline %}}{{% endblock %}}
-                <div class="menu-item side-item">
-                    <p ng-hide="user.isLogged()">
-                        <a href="/login">Войти с паролем</a>
-                        <a href="/signup">Стать постоянным слушателем</a>
-                    </p>
-                    <p ng-show="user.isLogged()">
-                        <span class="pseudo-link" ng-click="logout()">выйти</span>
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -70,20 +61,14 @@
     <div class="footer centroid">
         <ul class="inline">
             <li class="item">&copy {{{ year }}}</li>
-            <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
-            <!--li class="item"><a href="{{{ url_for('jobs') }}}" target="_self">вакансии</a></li-->
-            <li class="item"><a href="/about" target="_self">о проекте</a></li>
-            <li class="item shift" ng-init='stats={{{ stats|json }}}'>
-                Играем {{ stats.radio|number }}
-                <span ng-pluralize count="stats.radio"
-                      when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>.
-            </li>
-            <li class="share">
-                <script src="//yandex.st/share/share.js"></script>
-                <div class="yashare-auto-init" data-yashareL10n="ru"
-                     data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj">
-                </div>
-            </li>
+            {{% if request.path != '/feedback' %}}
+                <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
+            {{% endif %}}
+
+            {{% if request.path != '/about' %}}
+                <li class="item"><a href="/about" target="_self">о проекте</a></li>
+            {{% endif %}}
+            {{% block footer %}}{{% endblock %}}
         </ul>
     </div>
 

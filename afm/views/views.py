@@ -44,11 +44,13 @@ def listen(radio_id):
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('pages/about.html')
+
 
 @app.route('/jobs')
 def jobs():
-    return render_template('jobs.html')
+    return render_template('pages/jobs.html')
+
 
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):
@@ -82,6 +84,7 @@ def app_stats():
     return {
         'radio': radio_count
     }
+
 
 @app.context_processor
 def app_context():

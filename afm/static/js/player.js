@@ -348,6 +348,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         set: function(radio) {
             this.current.id = radio.id;
             this.current.title = radio.title;
+            this.current.description = radio.description || '';
         },
 
         reset: function() {
@@ -556,11 +557,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
     });
 
+    $scope.needShowDesc = function() {
+        return !!Radio.current.id && !$scope.air;
+    };
+
     $scope.needShowRadio = function() {
         return !!Radio.current.id && !$scope.error;
     };
 
-    $scope.$on('radioListen', function(){
+    $scope.$on('radioListen', function(ev, radio){
         $scope.error = false;
     });
 

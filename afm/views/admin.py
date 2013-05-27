@@ -7,4 +7,4 @@ from afm import app
 
 @app.route('/admin')
 def admin():
-    return render_template('admin.html')
+    return render_template('pages/admin.html')
