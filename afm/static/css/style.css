@@ -1013,6 +1013,18 @@ ul.justified .block {
   background-color: rgba(184, 151, 56, 0.4);
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #cccccf;
+}
+
+.text-error {
+  color: #ff6f7d;
+}
+
 .page {
   background-color: #4b4c5b;
   padding: 30px;
@@ -1033,12 +1045,6 @@ ul.justified .block {
 }
 .page a.link:hover {
   text-decoration: none;
-}
-.page .text-muted {
-  color: #cccccf;
-}
-.page .text-error {
-  color: #ff6f7d;
 }
 .page .content,
 .page .sidebar {

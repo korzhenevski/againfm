@@ -213,8 +213,8 @@
                     <td class="actions"><i class="remove" ng-click="remove(radio.id)"></i></td>
                 </tr>
             </table>
-            <p ng-hide="hasList()">
-                В избранном пока ничего нет.
+            <p ng-show="isEmpty()" class="text-center text-muted">
+                В избранном пока ничего нет
             </p>
         </div>
     </script>

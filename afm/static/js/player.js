@@ -95,6 +95,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 return cache.getData();
             },
 
+            isEmpty: function() {
+                return _.isEmpty(cache.getData());
+            },
+
             exists: function(key) {
                 return cache.exists(key);
             }
@@ -166,7 +170,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .factory('history', function (collectionFactory, config) {
     var history = collectionFactory('history', {capacity: config.listenHistorySize});
     return angular.extend(history, {
-        empty: function() {
+        isEmpty: function() {
             return _.isEmpty(history.getData());
         },
 
@@ -189,7 +193,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             });
         });
 
-        if (history.empty()) {
+        if (history.isEmpty()) {
             $scope.selectTab('featured');
         } else {
             $scope.selectTab('history');
@@ -207,7 +211,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $scope.isHistoryEmpty = function () {
-        return history.empty();
+        return history.isEmpty();
     };
 
     $scope.hasList = function () {
@@ -485,6 +489,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .controller('FavoriteRadioCtrl', function ($scope, favorites) {
     $scope.getList = function () {
         return favorites.list();
+    };
+
+    $scope.isEmpty = function() {
+        return favorites.isEmpty();
     };
 
     $scope.remove = function (id) {
