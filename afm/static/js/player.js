@@ -170,12 +170,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .factory('history', function (collectionFactory, config) {
     var history = collectionFactory('history', {capacity: config.listenHistorySize});
     return angular.extend(history, {
-        isEmpty: function() {
-            return _.isEmpty(history.getData());
-        },
-
         getPrevious: function() {
-            return _.first(history.list());
+            var list = history.list();
+            if (list.length > 1) {
+                return list[1];
+            }
         }
     });
 })
