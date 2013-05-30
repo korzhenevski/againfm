@@ -69,10 +69,10 @@ def safe_int(value, default=0):
         return default
 
 
-def fetch_stream(url, timeout=5, as_player=False):
+def fetch_stream(url, timeout=5, shoutcast=False):
     client = None
     result = FetchStreamResult()
-    user_agent = PLAYER_USER_AGENT if as_player else USER_AGENT
+    user_agent = USER_AGENT
 
     try:
         req = urllib2.Request(url, None, {'User-Agent': user_agent, 'Icy-Metadata': '1'})
@@ -105,8 +105,8 @@ def fetch_stream(url, timeout=5, as_player=False):
             result.bitrate = safe_int(bitrate)
         elif content_type == 'text/html':
             page_content = client.read(1024)
-            if 'SHOUTcast Administrator' in page_content:
-                result = fetch_stream(url + ';')
+            if not shoutcast and 'SHOUTcast Administrator' in page_content:
+                result = fetch_stream(url + ';', shoutcast=True)
                 result.is_shoutcast = True
             else:
                 result.error = 'Invalid content type: text/html'

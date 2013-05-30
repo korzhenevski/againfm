@@ -39,7 +39,6 @@
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>
     <div class="modal-back ng-cloak" ng-show="visible" ui-view></div>
-
     {{% block top_content %}}{{% endblock %}}
 
     <div class="topline">
@@ -60,11 +59,10 @@
     {# подвал #}
     <div class="footer centroid">
         <ul class="inline">
-            <li class="item">&copy {{{ year }}}</li>
+            <li class="item">&copy; {{{ year }}}</li>
             {{% if request.path != '/feedback' %}}
                 <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
             {{% endif %}}
-
             {{% if request.path != '/about' %}}
                 <li class="item"><a href="/about" target="_self">о проекте</a></li>
             {{% endif %}}
@@ -72,14 +70,13 @@
         </ul>
     </div>
 
-{{% if production %}}
+{# базовые скрипты #}
+{{% if config.PRODUCTION %}}
     <script src="/static/js/dist/core.js"></script>
 {{% else %}}
-    {# базовые скрипты #}
     {{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states', 'angular-locale_ru') %}}
         <script src="/static/js/core/{{{ name }}}.js"></script>
     {{% endfor %}}
-
     <script src="/static/js/base.js"></script>
     <script src="/static/js/user.js"></script>
 {{% endif %}}
@@ -93,11 +90,10 @@
     </script>
 {{% endblock %}}
 
-{# {% include 'extras/scriptjs.html' %} #}
-
-{# счетчики: yandex, google analytics, ... #}
-{{% if not config.DEBUG %}}
-{{% include 'extras/counters.html' %}}
+{# счетчики #}
+{{% if config.PRODUCTION %}}
+    {{% include 'extras/scriptjs.html' %}}
+    {{% include 'extras/counters.html' %}}
 {{% endif %}}
 
 {{% include 'js_templates.html' %}}

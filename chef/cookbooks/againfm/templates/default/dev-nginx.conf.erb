@@ -9,10 +9,4 @@ server {
 	location /static {
 		alias /var/www/againfm/afm/static;
 	}
-
-	location /admin/static {
-		expires 7d;
-		add_header Cache-Control public;
-		alias /var/www/againfm/afm/admin/static;
-	}
 }

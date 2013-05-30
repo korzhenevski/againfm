@@ -3,21 +3,22 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .config(function($routeProvider, cometProvider, $stateProvider){
     cometProvider.setUrl('http://comet.' + document.location.host);
 
+    $stateProvider.state('home', {
+        url: '/',
+        template: '<div ng-init="visible=false"></div>'
+    });
+
     $stateProvider.state('listen', {
         url: '/listen/:radioId',
         controller: 'ListenCtrl'
     });
 
+    /*
     $stateProvider.state('radio_air', {
         templateUrl: function($stateParams) {
             return '/partial/radio/' + $stateParams.radioId + '/air';
         }
-    });
-
-    $stateProvider.state('home', {
-        url: '/',
-        template: '<div ng-init="visible=false"></div>'
-    });
+    });*/
 
     $stateProvider.state('favorite_radio', {
         templateUrl: 'favorite_radio.html',
@@ -67,8 +68,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     return {
         add: function(id, title) {
-            var ts = +(new Date());
-            favorites[id] = {id: id, title: title, ts: ts};
+            favorites[id] = {id: id, title: title, ts: +(new Date())};
             if (user.isLogged()) {
                 UserFavorite.add(id);
             }
@@ -88,11 +88,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         },
 
         get: function() {
-            var result = [];
-            angular.forEach(favorites, function(obj){
-                result.unshift(obj);
-            });
-            return result;
+            return _.values(favorites);
         }
     };
 })
@@ -138,24 +134,17 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.factory('history', function(storage, $filter){
-    var history = storage.get('history');
+.factory('history', function(storage){
+    var history = storage.get('history') || {};
     return {
-        history: history || {},
+        history: history,
         add: function(radio) {
             this.history[radio.id] = {id: radio.id, title: radio.title, ts: +new Date()};
             storage.put('history', this.history);
         },
 
         getList: function() {
-            var list = [];
-            for (var i in this.history) {
-                if (this.history.hasOwnProperty(i)) {
-                    list.push(this.history[i]);
-                }
-            }
-            // order by latest usage
-            return $filter('orderBy')(list, 'ts', true);
+            return _.sortBy(_.values(this.history), 'ts');
         },
 
         has: function() {
@@ -439,7 +428,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
 .controller('FavoritesCtrl', function($scope, favorites, $filter, $state){
     $scope.getFavorites = function() {
-        return $filter('orderBy')(favorites.get(), 'ts', true);
+        return favorites.get();
     };
 
     $scope.showModal = function() {

@@ -28,12 +28,6 @@ server {
 		alias /var/www/againfm/current/afm/static;
 	}
 
-	location /admin/static {
-		expires 7d;
-		add_header Cache-Control public;
-		alias /var/www/againfm/current/afm/admin/static;
-	}
-
 	location /mu-fa76d39d-fa0a0082-d8815605-c151db4b {
 	    return 200 '42';
 	}

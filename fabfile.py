@@ -35,6 +35,10 @@ def playfm():
     env.repo = 'https://github.com/outself/playfm.git'
     env.gitssh = env.project + '/.ssh'
 
+def grunt():
+    with lcd('afm/static/js'):
+        local('grunt')
+
 def vagrant():
     env.user = 'vagrant'
     env.hosts = ['10.0.0.2']

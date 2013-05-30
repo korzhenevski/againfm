@@ -190,14 +190,16 @@
     <li class="item shift" ng-init='stats={{{ stats|json }}}'>
         Играем {{ stats.radio|number }}
         <span ng-pluralize count="stats.radio"
-              when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>.
+              when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span> без выходных.
     </li>
+    {{% if config.PRODUCTION %}}
     <li class="share">
         <script src="//yandex.st/share/share.js"></script>
         <div class="yashare-auto-init" data-yashareL10n="ru"
              data-yashareType="button" data-yashareQuickServices="vkontakte,facebook,twitter,lj">
         </div>
     </li>
+    {{% endif %}}
 {{% endblock %}}
 
 
@@ -210,10 +212,13 @@
                     <td class="actions"><i class="remove" ng-click="remove(radio.id)"></i></td>
                 </tr>
             </table>
+            <p ng-hide="hasList()">
+                В избранном пока ничего нет.
+            </p>
         </div>
     </script>
 
-    {{% if production %}}
+    {{% if config.PRODUCTION %}}
         <script src="/static/js/dist/player.js"></script>
     {{% else %}}
         <script src="/static/js/common/swfobject.js"></script>
