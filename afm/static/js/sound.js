@@ -15,7 +15,7 @@ angular.module('afm.sound', ['afm.base'])
             }
 
             if (this.player && this.url) {
-                this.player.playStream(this.url + '&p=' + this.getParams());
+                this.player.playStream(this.url);
                 this.playing = true;
             }
         },

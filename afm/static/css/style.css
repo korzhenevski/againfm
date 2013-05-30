@@ -986,6 +986,7 @@ ul.justified .block {
   padding: 5px;
   margin: 5px 3px;
   cursor: pointer;
+  border-bottom: none;
 }
 .radio-table .playlist .block .playlist-link {
   color: #3d3017;

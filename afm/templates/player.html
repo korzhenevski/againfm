@@ -67,8 +67,8 @@
                                                 <span class="marquee">{{ currentRadio.description }}</span>
                                             </p>
 
-                                            <p class="line onair" ng-show="air" ng-class="{liked: air.favorite}"
-                                               title="{{ air.title }}">
+                                            <p class="line onair" ng-show="air"
+                                               ng-class="{liked: air.favorite}" title="{{ air.title }}">
                                                 <span class="marquee">{{ air.title }}</span>
                                             </p>
 
@@ -111,9 +111,9 @@
                                     <hr class="radio-line" />
                                     <ul class="playlist justified">
                                         <li ng-repeat="radio in playlist">
-                                            <div class="block" ng-class="currentClass(radio)">
-                                                <a href="/listen/{{ radio.id }}" class="playlist-link">{{ radio.title }}</a>
-                                            </div>
+                                            <a href="/listen/{{ radio.id }}" class="block" ng-class="currentClass(radio)">
+                                                <span class="playlist-link">{{ radio.title }}</span>
+                                            </a>
                                         </li>
                                         <li ng-hide="hasList()" class="ng-cloak not-found">
                                             <div class="block">Ничего не найдено</div>
@@ -125,8 +125,6 @@
                     </tr>
                     <tr>
                         {# элементы управления #}
-                        {# громкость сделать линией #}
-                        {# TODO: Большая плей/пауза - назад - шафл - линия громкости #}
                         <td>
                             <table class="controls" ng-controller="PlayerControlsCtrl">
                                 <tr>

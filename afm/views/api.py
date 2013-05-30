@@ -74,12 +74,7 @@ def api_user_favorites_add_or_remove(station_id):
     return jsonify({'favorite': state})
 
 
-@app.route('/api/radio/<int:radio_id>/listen')
-def api_radio_listen(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id}).get_public(['id', 'title'])
-    if current_user.is_authenticated():
-        radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
-
+def select_stream(radio_id):
     where = {
         'radio_id': radio_id,
         'is_online': True,
@@ -106,19 +101,14 @@ def api_radio_listen(radio_id):
 
     streams = list(db.Stream.find(where, sort=[('bitrate', 1)]))
     if not streams:
-        return abort(404)
+        return
 
     stream = streams[0]
-
-    radio['listen_url'] = stream.listen_url
-    radio['stream_id'] = stream.id
-    radio['bitrate'] = stream.bitrate
-    #radio['content_type'] = 'audio/mpeg' if stream.is_shoutcast else stream.content_type
-
-    if request.args.get('redir'):
-        return raw_redirect(stream.listen_url)
-
-    return jsonify(radio)
+    return {
+        'id': stream.id,
+        'url': stream.listen_url,
+        'bitrate': stream.bitrate
+    }
 
 
 @app.route('/api/radio/<int:radio_id>')
@@ -126,7 +116,20 @@ def api_radio(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id}).get_public()
     if current_user.is_authenticated():
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
+    radio['stream'] = select_stream(radio_id)
     return jsonify(radio)
+
+
+@app.route('/api/radio/<int:radio_id>/stream')
+def api_radio_listen(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id})
+    stream = select_stream(radio_id)
+    if not stream:
+        abort(404)
+    stream['radio'] = radio.get_public('id,title')
+    if request.args.get('redir'):
+        return raw_redirect(stream['url'])
+    return jsonify(stream)
 
 
 @app.route('/api/radio/random')

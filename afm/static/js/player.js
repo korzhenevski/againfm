@@ -35,6 +35,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .factory('Radio', function ($rootScope, $http, player) {
     return {
         current: {},
+        stream: {},
+
         set: function (radio) {
             this.current.id = radio.id;
             this.current.title = radio.title;
@@ -43,6 +45,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
         reset: function () {
             this.set({});
+            this.stream = {};
             player.stop();
         },
 
@@ -54,7 +57,18 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         },
 
         play: function (radio) {
-            player.play('/api/radio/' + radio.id + '/listen?redir=1');
+            var self = this;
+
+            if (radio.stream) {
+                self.stream = angular.copy(radio.stream);
+                player.play(self.stream.url);
+            } else {
+                $http.get('/api/radio/' + radio.id + '/stream').success(function(stream){
+                    self.stream = stream;
+                    player.play(stream.url);
+                });
+            }
+
             $rootScope.$broadcast('radioListen', radio);
         }
     }
