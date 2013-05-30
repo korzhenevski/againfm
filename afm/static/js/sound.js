@@ -31,7 +31,7 @@ angular.module('afm.sound', ['afm.base'])
                     params.push('ogg');
                 }
 
-                if (this.player == audioEngine) {
+                if (this.player.html5) {
                     params.push('html5');
                 }
             }
@@ -68,13 +68,16 @@ angular.module('afm.sound', ['afm.base'])
             this.updateVolume(volume);
         },
 
-        flashCallback: function(event) {
+        callback: function(event) {
+            console.log('player.callback', event);
             if (event == 'stopped') {
                 this.playing = false;
+                $rootScope.$broadcast('playerStopped');
             }
 
             if (event == 'playing') {
                 this.playing = true;
+                $rootScope.$broadcast('playerPlaying');
             }
 
             if (event == 'ready') {
@@ -90,15 +93,16 @@ angular.module('afm.sound', ['afm.base'])
             this.loadVolume();
 
             // html5 player fallback
-            if (!flash.installed()) {
+            if (!flash.present()) {
                 this.tryHtml5Fallback();
             }
         },
 
         tryHtml5Fallback: function() {
-            if (audioEngine && audioEngine.canPlayType('audio/mpeg')) {
+            var player = audioEngine(_.bind(this.callback, this));
+            if (player && player.canPlayType('audio/mpeg')) {
                 console.log('use html5 fallback');
-                this.player = audioEngine;
+                this.player = player;
             } else {
                 this.player = null;
             }
@@ -110,9 +114,23 @@ angular.module('afm.sound', ['afm.base'])
 })
 
 .factory('audioEngine', function($document) {
-    var audio = $document[0].createElement('audio');
-    if (audio.canPlayType) {
+    return function(eventCallback) {
+        var audio = $document[0].createElement('audio');
+        if (!audio.canPlayType) {
+            return;
+        }
+
+        audio.addEventListener('playing', function(){
+            eventCallback('playing');
+        });
+
+        audio.addEventListener('error', function(){
+            eventCallback('stopped');
+        });
+
         return {
+            html5: true,
+
             playStream: function(url) {
                 audio.src = url;
                 audio.play();
@@ -131,8 +149,7 @@ angular.module('afm.sound', ['afm.base'])
                 return !!audio.canPlayType(type).replace(/^no$/, '');
             }
         }
-    }
-    return {};
+    };
 })
 
 .factory('flash', function(){
@@ -145,7 +162,7 @@ angular.module('afm.sound', ['afm.base'])
             }, {});
         },
 
-        installed: function() {
+        present: function() {
             return swfobject.hasFlashPlayerVersion('10');
         }
     }
@@ -153,7 +170,7 @@ angular.module('afm.sound', ['afm.base'])
 
 .directive('flashEngine', function($window, $rootScope, player, flash){
     $window.flashPlayerCallback = function(event){
-        player.flashCallback(event);
+        player.callback(event);
     };
 
     return {

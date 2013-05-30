@@ -361,6 +361,38 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
+.factory('collectionFactory', function (cacheFactory, storage) {
+    return function (cacheId, options) {
+        options = angular.extend({}, options, {persistent: storage});
+        var cache = cacheFactory(cacheId, options);
+        return {
+            add: function(key, value) {
+                cache.put(key, angular.extend({}, value, {ts: +(new Date())}));
+            },
+
+            remove: function(key) {
+                cache.remove(key);
+            },
+
+            list: function() {
+                return _.sortBy(_.values(cache.getData()), 'ts').reverse();
+            },
+
+            getData: function() {
+                return cache.getData();
+            },
+
+            isEmpty: function() {
+                return _.isEmpty(cache.getData());
+            },
+
+            exists: function(key) {
+                return cache.exists(key);
+            }
+        };
+    };
+})
+
 .directive('modal', function () {
     return {
         require: '^modalBack',
