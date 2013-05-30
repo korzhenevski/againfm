@@ -44,23 +44,23 @@ angular.module('afm.user', ['afm.base'])
 .factory('User', ['$http', function($http){
     return {
         login: function(params) {
-            return $http.post('/api/user/login', params);
+            return $http.post('/_user/login', params);
         },
 
         signup: function(params) {
-            return $http.post('/api/user/signup', params);
+            return $http.post('/_user/signup', params);
         },
 
         amnesia: function(params) {
-            return $http.post('/api/user/amnesia', params);
+            return $http.post('/_user/amnesia', params);
         },
 
         logout: function() {
-            return $http.post('/api/user/logout');
+            return $http.post('/_user/logout');
         },
 
         feedback: function(params) {
-            return $http.post('/api/user/feedback', params);
+            return $http.post('/_user/feedback', params);
         }
     };
 }])

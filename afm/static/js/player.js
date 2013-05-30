@@ -25,7 +25,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 
     Radio.reset();
-    $http.get('/api/radio/' + $stateParams.radioId).success(function (radio) {
+    $http.get('/_radio/' + $stateParams.radioId).success(function (radio) {
         Radio.listen(radio);
     }).error(function (resp, statusCode) {
         $rootScope.$broadcast('radioListenError', statusCode);
@@ -63,7 +63,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 self.stream = angular.copy(radio.stream);
                 player.play(self.stream.url);
             } else {
-                $http.get('/api/radio/' + radio.id + '/stream').success(function(stream){
+                $http.get('/_radio/' + radio.id + '/stream').success(function(stream){
                     self.stream = stream;
                     player.play(stream.url);
                 });
@@ -125,7 +125,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .factory('Station', function ($http) {
     return {
         get: function (stationId) {
-            return $http.get('/api/station/' + stationId);
+            return $http.get('/_station/' + stationId);
         }
     };
 })
@@ -133,15 +133,15 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 .factory('UserFavorite', function ($http) {
     return {
         add: function (id) {
-            $http.post('/api/user/favorites/' + id + '/add');
+            $http.post('/_user/favorites/' + id + '/add');
         },
 
         remove: function (id) {
-            $http.post('/api/user/favorites/' + id + '/remove');
+            $http.post('/_user/favorites/' + id + '/remove');
         },
 
         list: function (cb) {
-            $http.get('/api/user/favorites').success(function (response) {
+            $http.get('/_user/favorites').success(function (response) {
                 cb(response.objects);
             });
         }
@@ -256,7 +256,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         }
 
         $scope.$broadcast('loading');
-        $http.get('/api/radio/' + tabId).success(function (response) {
+        $http.get('/_radio/' + tabId).success(function (response) {
             $scope.playlist = response.objects;
             $scope.$broadcast('loaded');
         }).error(function () {
@@ -377,7 +377,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 
     $scope.randomRadio = function () {
-        $http.get('/api/radio/random').success(function (radio) {
+        $http.get('/_radio/random').success(function (radio) {
             $scope.selectRadio(radio);
         });
     };

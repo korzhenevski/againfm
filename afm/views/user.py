@@ -34,8 +34,8 @@ def app_context():
     return dict(standalone=request.is_xhr)
 
 
-@app.route('/api/user/login', methods=['POST'])
-def api_user_login():
+@app.route('/_user/login', methods=['POST'])
+def user_login():
     data = safe_input_object({'login': 'string', 'password': 'string'})
     data['login'] = data['login'].lower()
     user = db.User.find_login(data['login'])
@@ -50,22 +50,22 @@ def api_user_login():
     return jsonify({'error': 'no_user'}), 404
 
 
-@app.route('/api/user/amnesia', methods=['POST'])
-def api_user_amnesia():
+@app.route('/_user/amnesia', methods=['POST'])
+def user_amnesia():
     email = safe_input_field('email', 'string')
     email = email.lower()
     user = db.User.find_one({'email': email})
     if user:
         password, token = user.generate_new_password()
-        auth_url = url_for('token_auth', user_id=user.id, token=token, _external=True)
+        auth_url = url_for('user_token_auth', user_id=user.id, token=token, _external=True)
         body = render_template('mail/amnesia.html', auth_url=auth_url, password=password)
         send_mail(email=user.email, body=body)
         return jsonify({'email_provider': get_email_provider(user.email)})
     return jsonify({'error': 'no_user'}), 404
 
 
-@app.route('/api/user/signup', methods=['POST'])
-def api_user_signup():
+@app.route('/_user/signup', methods=['POST'])
+def user_signup():
     data = safe_input_object({'email': 'string', 'password': 'string'})
     data['email'] = data['email'].lower()
     if db.User.find_one({'email': data['email']}):
@@ -84,15 +84,15 @@ def api_user_signup():
     return jsonify({'user': user.get_public()})
 
 
-@app.route('/api/user/logout', methods=['POST'])
+@app.route('/_user/logout', methods=['POST'])
 @login_required
-def api_user_logout():
+def user_logout():
     logout_user()
     return jsonify({'logout': True})
 
 
-@app.route('/api/user/feedback', methods=['POST'])
-def api_user_feedback():
+@app.route('/_user/feedback', methods=['POST'])
+def user_feedback():
     form = safe_input_object({
         'text': {'type': 'string', 'maxLength': 2048},
         'email': {'type': 'string', 'maxLength': 255}
@@ -109,8 +109,8 @@ def api_user_feedback():
     return jsonify({'success': True})
 
 
-@app.route('/auth/token/<int:user_id>/<token>', methods=['GET'])
-def token_auth(user_id, token):
+@app.route('/_user/<int:user_id>/auth_token/<token>', methods=['GET'])
+def user_token_auth(user_id, token):
     user = db.User.find_one({'id': user_id})
     if user and user.confirm_new_password(token):
         permanent_login_user(user)
