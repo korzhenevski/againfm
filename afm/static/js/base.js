@@ -7,7 +7,8 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 .factory('config', function () {
     return {
         cometWait: 25,
-        marqueeSpeed: 45
+        marqueeSpeed: 45,
+        listenHistorySize: 25
     }
 })
 
@@ -79,6 +80,21 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
+.factory('title', function($document){
+    var def = $document[0].title;
+    return {
+        current: def,
+        change: function(title) {
+            this.current = title;
+            $document[0].title = title;
+        },
+
+        reset: function() {
+            this.change(def);
+        }
+    }
+})
+
 .factory('storage', function ($window, $cacheFactory, $log) {
     try {
         // test localStorage
@@ -105,6 +121,158 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     // fallback
     $log.warn('localStorage not available. fallback used.');
     return $cacheFactory('storage');
+})
+
+.provider('cacheFactory', function() {
+    this.$get = function () {
+        var caches = {};
+
+        function cacheFactory(cacheId, options) {
+            if (cacheId in caches) {
+                throw Error('cacheId ' + cacheId + ' taken');
+            }
+
+            var size = 0,
+                stats = angular.extend({}, options, {id: cacheId}),
+                data = {},
+                capacity = (options && options.capacity) || Number.MAX_VALUE,
+                lruHash = {},
+                persistentStorage = options && options.persistent,
+                freshEnd = null,
+                staleEnd = null;
+
+            caches[cacheId] = {
+                put: function (key, value) {
+                    var lruEntry = lruHash[key] || (lruHash[key] = {key: key});
+
+                    refresh(lruEntry);
+
+                    if (angular.isUndefined(value)) return;
+                    if (!(key in data)) size++;
+                    data[key] = value;
+
+                    if (size > capacity) {
+                        this.remove(staleEnd.key);
+                    } else {
+                    	sync();
+                    }
+                },
+
+                get: function (key) {
+                    var lruEntry = lruHash[key];
+                    if (!lruEntry) return;
+                    refresh(lruEntry);
+                    return data[key];
+                },
+
+                remove: function (key) {
+                    var lruEntry = lruHash[key];
+
+                    if (!lruEntry) return;
+
+                    if (lruEntry == freshEnd) freshEnd = lruEntry.p;
+                    if (lruEntry == staleEnd) staleEnd = lruEntry.n;
+                    link(lruEntry.n, lruEntry.p);
+
+                    delete lruHash[key];
+                    delete data[key];
+                    size--;
+
+                    sync();
+                },
+
+                removeAll: function () {
+                    data = {};
+                    size = 0;
+                    lruHash = {};
+                    freshEnd = staleEnd = null;
+
+                    sync();
+                },
+
+                destroy: function () {
+                    data = null;
+                    stats = null;
+                    lruHash = null;
+                    delete caches[cacheId];
+
+                    if (persistentStorage) {
+                        persistentStorage.remove(cacheId);
+                    }
+                },
+
+                getData: function() {
+                    return data;
+                },
+
+                exists: function(key) {
+                    return key in data;
+                },
+
+                info: function () {
+                    return angular.extend({}, stats, {size: size});
+                }
+            };
+
+            if (persistentStorage) {
+                angular.forEach(persistentStorage.get(cacheId) || {}, function(value, key){
+                    caches[cacheId].put(key, value);
+                });
+            }
+            return caches[cacheId];
+
+            function sync() {
+                if (persistentStorage) {
+                    persistentStorage.put(cacheId, data);
+                }
+            }
+
+            /**
+             * makes the `entry` the freshEnd of the LRU linked list
+             */
+
+            function refresh(entry) {
+                if (entry != freshEnd) {
+                    if (!staleEnd) {
+                        staleEnd = entry;
+                    } else if (staleEnd == entry) {
+                        staleEnd = entry.n;
+                    }
+
+                    link(entry.n, entry.p);
+                    link(entry, freshEnd);
+                    freshEnd = entry;
+                    freshEnd.n = null;
+                }
+            }
+
+
+            /**
+             * bidirectionally links two entries of the LRU linked list
+             */
+
+            function link(nextEntry, prevEntry) {
+                if (nextEntry != prevEntry) {
+                    if (nextEntry) nextEntry.p = prevEntry; //p stands for previous, 'prev' didn't minify
+                    if (prevEntry) prevEntry.n = nextEntry; //n stands for next, 'next' didn't minify
+                }
+            }
+        }
+
+        cacheFactory.info = function () {
+            var info = {};
+            angular.forEach(caches, function (cache, cacheId) {
+                info[cacheId] = cache.info();
+            });
+            return info;
+        };
+
+        cacheFactory.get = function (cacheId) {
+            return caches[cacheId];
+        };
+
+        return cacheFactory;
+    };
 })
 
 .factory('passErrorToScope', function () {

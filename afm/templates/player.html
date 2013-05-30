@@ -58,17 +58,20 @@
                                         </div>
 
                                         <div ng-show="needShowRadio()">
-                                            <p class="title" ng-class="{starred: starred()}" ng-click="star()">
+                                            <p class="title" ng-class="{starred: isStarred()}" ng-click="star()">
                                                 <span class="marquee">{{ currentRadio.title }}</span>
                                                 <span class="star"></span>
                                             </p>
+
                                             <p class="line" ng-show="needShowDesc()">
                                                 <span class="marquee">{{ currentRadio.description }}</span>
                                             </p>
-                                            <p class="line onair" ng-class="{liked: air.favorite}"
-                                               ng-click="like()" ng-show="air" title="{{ air.title }}">
+
+                                            <p class="line onair" ng-show="air" ng-class="{liked: air.favorite}"
+                                               title="{{ air.title }}">
                                                 <span class="marquee">{{ air.title }}</span>
                                             </p>
+
                                             <div class="buttons">
                                                 <button class="display-button" ng-click="showAir()">История эфира</button>
                                             </div>
@@ -96,7 +99,7 @@
                                         <li>
                                             <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
                                         </li>
-                                        <li ng-show="hasHistory()">
+                                        <li ng-hide="isHistoryEmpty()">
                                             <span class="block" ng-class="tabClass('history')" ng-click="selectTab('history')">История</span>
                                         </li>
                                         <li ng-repeat="tab in tabs">
