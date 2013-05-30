@@ -80,6 +80,15 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     };
 })
 
+.factory('trackEvent', function($http, user){
+    return function(name, data) {
+        var userId = user.isLogged() ? user.id : -1;
+        var params = angular.extend({}, data, {uid: userId});
+        console.log('event '+name, params);
+        $http.post('/_event/' + name, params);
+    };
+})
+
 .factory('title', function($document){
     var def = $document[0].title;
     return {

@@ -318,7 +318,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 })
 
-.controller('PlayerCtrl', function ($scope, Radio, title) {
+.controller('PlayerCtrl', function ($scope, Radio, title, trackEvent) {
     $scope.currentRadio = Radio.cur;
 
     $scope.currentClass = function (radio) {
@@ -328,9 +328,26 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.$on('radioListen', function (ev, radio) {
         title.change(radio.title);
     });
+
+    function ts() {
+        return Math.round(+(new Date()) / 1000);
+    }
+
+    var playStart = 0;
+    $scope.$on('playerPlaying', function(){
+        playStart = ts();
+        trackEvent('radio', {act: 'play', sid: Radio.stream.id});
+    });
+
+    $scope.$on('playerStopped', function(){
+        if (playStart) {
+            trackEvent('radio', {act: 'stop', dur: ts() - playStart});
+        }
+        playStart = 0;
+    });
 })
 
-.controller('PlayerControlsCtrl', function ($scope, $http, player, history, Radio, $location) {
+.controller('PlayerControlsCtrl', function ($scope, $http, $location, player, history, Radio, trackEvent) {
     $scope.play = function () {
         if (Radio.cur.id) {
             Radio.play(Radio.cur);
@@ -356,6 +373,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.previousRadio = function () {
         var radio = history.getPrevious();
         if (radio) {
+            trackEvent('radio', {act: 'select_prev', id: radio.id});
             $scope.selectRadio(radio);
         }
     };

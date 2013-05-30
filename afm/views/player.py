@@ -135,3 +135,8 @@ def player_radio_random():
 
     radio = db.Radio.find_one_or_404({'id': int(radio_id), 'deleted_at': 0})
     return jsonify(radio.get_public())
+
+
+@app.route('/_event/radio', methods=['POST'])
+def player_event_radio():
+    return jsonify({'ok': 1})
