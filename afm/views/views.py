@@ -78,6 +78,9 @@ def partial_radio_share(radio_id):
 def feedback():
     return render_template('user/feedback.html')
 
+@app.route('/siberia')
+def siberia():
+    return render_template('siberia.html')
 
 def app_stats():
     radio_count = db.radio.find({'deleted_at': 0}).count()

@@ -32,4 +32,4 @@ def template_filter_json(data):
     return escape(json.dumps(data))
 
 
-from . import views, user, player, auth, admin
+from . import views, user, player, auth, admin, api

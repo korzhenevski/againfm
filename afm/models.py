@@ -460,7 +460,7 @@ class Radio(BaseDocument):
         },
     }
 
-    public = ['id', 'title', 'description', 'location']
+    public = ['id', 'title', 'description']
 
     def get_related(self, limit=5):
         from random import shuffle

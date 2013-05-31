@@ -8,7 +8,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     return {
         cometWait: 25,
         marqueeSpeed: 45,
-        listenHistorySize: 25
+        listenHistorySize: 20
     }
 })
 
