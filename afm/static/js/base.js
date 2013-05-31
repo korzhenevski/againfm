@@ -7,8 +7,9 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 .factory('config', function () {
     return {
         cometWait: 25,
-        marqueeSpeed: 45,
-        listenHistorySize: 20
+        marqueeSpeed: 35,
+        listenHistorySize: 20,
+        defaultVolume: 0.6
     }
 })
 
@@ -57,7 +58,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
                     if (delta) {
                         animate();
                     }
-                }, 500);
+                }, 300);
             });
 
             element.bind('mouseout', function () {

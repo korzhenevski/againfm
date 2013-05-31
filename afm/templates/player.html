@@ -51,33 +51,26 @@
                             <div class="display-ground">
                                 <div class="display-inner">
                                     <div class="display" ng-controller="DisplayCtrl">
-                                        <div ng-show="error">
-                                            <p class="title" ng-switch on="error">
-                                                <span ng-switch-default>Радио недоступно</span>
-                                            </p>
-                                        </div>
-
-                                        <div ng-show="needShowRadio()">
-                                            <p class="title" ng-class="{starred: isStarred()}" ng-click="star()">
+                                        <div ng-show="isInfoVisible()">
+                                            <h1 class="title pointer" ng-class="titleClass()" ng-click="star()">
                                                 <span class="marquee">{{ currentRadio.title }}</span>
-                                                <span class="star"></span>
-                                            </p>
+                                                <i class="star"></i>
+                                            </h1>
 
-                                            <p class="line" ng-show="needShowDesc()">
-                                                <span class="marquee">{{ currentRadio.description }}</span>
-                                            </p>
-
-                                            <p class="line onair" ng-show="air"
-                                               ng-class="{liked: air.favorite}" title="{{ air.title }}">
-                                                <span class="marquee">{{ air.title }}</span>
-                                            </p>
+                                            <h2 class="caption">
+                                                <span class="marquee">{{ getCaption() }}</span>
+                                            </h2>
 
                                             <div class="buttons">
                                                 <button class="display-button" ng-click="showAir()">История эфира</button>
                                             </div>
                                         </div>
 
-                                        <div class="clock" clock="needShowClock"></div>
+                                        <div ng-show="error">
+                                            <h1 class="title error">Радио недоступно</h1>
+                                        </div>
+
+                                        <div class="clock" clock="isClockVisible()"></div>
                                     </div>
                                 </div>
                             </div>

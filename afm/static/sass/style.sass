@@ -453,15 +453,20 @@ ul.justified
 
     .title
       margin: 0
+      position: relative
       font-size: 19px
       line-height: 26px
-      position: relative
-      cursor: pointer
+      font-weight: bold
+      .marquee
+        width: 242px
       &:hover .star
         @include display-controls-sprite(star_hover)
 
-      .marquee
-        width: 242px
+    .pointer
+      cursor: pointer
+
+    .error
+      text-align: center
 
     .star
       position: absolute
@@ -475,11 +480,11 @@ ul.justified
       .star
         @include display-controls-sprite(star_hover)
 
-    .line
-      line-height: 16px
-      cursor: pointer
+    .caption
+      font-size: 14px
+      line-height: 24px
       position: relative
-      margin-top: 5px
+      margin: 0px
 
     .onair
       &:hover .like
@@ -502,7 +507,8 @@ ul.justified
     .clock
       text-align: center
       font-size: 28px
-      margin-top: 25px
+      margin-top: 27px
+      font-weight: bold
       .dots
         font-size: 35px
         margin: 0 1px

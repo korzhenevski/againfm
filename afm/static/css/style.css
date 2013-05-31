@@ -547,16 +547,22 @@ ul.justified .block {
 }
 .radio-box .display .title {
   margin: 0;
+  position: relative;
   font-size: 19px;
   line-height: 26px;
-  position: relative;
-  cursor: pointer;
+  font-weight: bold;
+}
+.radio-box .display .title .marquee {
+  width: 242px;
 }
 .radio-box .display .title:hover .star {
   background-position: 0 0;
 }
-.radio-box .display .title .marquee {
-  width: 242px;
+.radio-box .display .pointer {
+  cursor: pointer;
+}
+.radio-box .display .error {
+  text-align: center;
 }
 .radio-box .display .star {
   position: absolute;
@@ -572,11 +578,11 @@ ul.justified .block {
 .radio-box .display .title.starred .star {
   background-position: 0 0;
 }
-.radio-box .display .line {
-  line-height: 16px;
-  cursor: pointer;
+.radio-box .display .caption {
+  font-size: 14px;
+  line-height: 24px;
   position: relative;
-  margin-top: 5px;
+  margin: 0px;
 }
 .radio-box .display .onair:hover .like {
   background-position: 0 -54px;
@@ -601,7 +607,8 @@ ul.justified .block {
 .radio-box .display .clock {
   text-align: center;
   font-size: 28px;
-  margin-top: 25px;
+  margin-top: 27px;
+  font-weight: bold;
 }
 .radio-box .display .clock .dots {
   font-size: 35px;

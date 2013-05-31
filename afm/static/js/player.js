@@ -485,10 +485,60 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     }
 })
 
-/**
-* Дисплей радиостанции
-*/
-.controller('DisplayCtrl', function ($scope, $state, Radio, favorites, onair) {
+.controller('DisplayCtrl', function ($scope, Radio, favorites, onair, player) {
+    $scope.titleClass = function() {
+        return {
+            starred: Radio.cur.id && favorites.exists(Radio.cur.id)
+        };
+    };
+
+    $scope.star = function () {
+        if (!Radio.cur.id) {
+            return;
+        }
+
+        if (favorites.exists(Radio.cur.id)) {
+            favorites.remove(Radio.cur.id);
+        } else {
+            favorites.add(Radio.cur.id, Radio.cur);
+        }
+    };
+
+    $scope.isInfoVisible = function() {
+        return Radio.cur.id && !$scope.error;
+    };
+
+    $scope.isClockVisible = function() {
+        return !Radio.cur.id && !$scope.error;
+    };
+
+    $scope.$on('playerPlaying', function(){
+        onair.subscribe(Radio.cur.id);
+    });
+
+    $scope.$on('playerStopped', function(){
+        onair.unsubscribe();
+    });
+
+    $scope.$on('radioListen', function () {
+        $scope.error = false;
+    });
+
+    $scope.$on('radioListenError', function (error) {
+        $scope.error = error;
+    });
+
+    $scope.getCaption = function() {
+        var air = onair.get();
+        if (air && air.title && player.playing) {
+            return air.title;
+        }
+
+        return Radio.cur.description;
+    };
+})
+
+.controller('DisplayCtrl2', function ($scope, $state, Radio, favorites, onair) {
     $scope.$watch(function(){
         return onair.get();
     }, function(air){
@@ -498,7 +548,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.needShowClock = true;
 
     $scope.$watch(function () {
-        return Radio.cur.id
+        return Radio.cur.id;
     }, function (id) {
         if (id) {
             $scope.needShowClock = false;

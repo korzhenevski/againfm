@@ -1,13 +1,13 @@
 angular.module('afm.sound', ['afm.base'])
 
-.factory('player', function($rootScope, storage, audioEngine, flash){
+.factory('player', function($rootScope, storage, audioEngine, flash, config){
     var obj = {
         url: null,
         player: null,
         muted: false,
         playing: false,
-        volume: 0.6,
-        defaultVolume: 0.6,
+        volume: config.defaultVolume,
+        defaultVolume: config.defaultVolume,
 
         play: function(url) {
             if (url) {
@@ -47,7 +47,6 @@ angular.module('afm.sound', ['afm.base'])
 
         setVolume: function(volume) {
             if (this.player) {
-                //var expVol = 1 - Math.sqrt(1-(volume * volume));
                 var expVol = Math.sin(volume * Math.PI / 2);
                 this.player.setVolume(expVol);
             }
@@ -61,7 +60,6 @@ angular.module('afm.sound', ['afm.base'])
 
         loadVolume: function() {
             var volume = parseFloat(storage.get('volume'));
-            // громкость не установлена в куках - берем по умолчанию
             if (isNaN(volume)) {
                 volume = this.defaultVolume;
             }
@@ -69,7 +67,6 @@ angular.module('afm.sound', ['afm.base'])
         },
 
         callback: function(event) {
-            console.log('player.callback', event);
             if (event == 'stopped') {
                 this.playing = false;
                 $rootScope.$broadcast('playerStopped');
