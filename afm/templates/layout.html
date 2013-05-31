@@ -59,7 +59,6 @@
     {# подвал #}
     <div class="footer centroid">
         <ul class="inline">
-            <li class="item">&copy; {{{ year }}}</li>
             {{% if request.path != '/feedback' %}}
                 <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
             {{% endif %}}
