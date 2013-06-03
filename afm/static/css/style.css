@@ -14,7 +14,7 @@
   background: url('/static/i/tracks-box-s7fd78cfa8e.png') no-repeat;
 }
 
-.ellipsis {
+.text-overflow {
   white-space: nowrap;
   overflow: hidden;
   -ms-text-overflow: ellipsis;
@@ -114,6 +114,7 @@ ul.justified .block {
   background-color: #4b4c5b;
   padding: 19px;
   margin: 10px auto;
+  overflow: hidden;
   -webkit-border-radius: 7px;
   -moz-border-radius: 7px;
   -ms-border-radius: 7px;
@@ -208,18 +209,27 @@ ul.justified .block {
 .modal-onair {
   width: 740px;
   min-height: 493px;
+  color: #cccccf;
+}
+.modal-onair h1 {
+  margin-bottom: 0.4em;
 }
 .modal-onair .air-history {
   width: 100%;
 }
 .modal-onair .air-history .title {
+  color: #efefef;
   padding: 3px;
 }
 .modal-onair .air-history .time {
-  width: 70px;
-  color: #cccccf;
+  width: 50px;
 }
-.modal-onair h2, .modal-onair h3 {
+.modal-onair h2 {
+  margin-bottom: 0.5em;
+}
+.modal-onair h3 {
+  font-size: 14px;
+  font-weight: bold;
   margin-bottom: 0;
 }
 
@@ -587,6 +597,18 @@ ul.justified .block {
   line-height: 24px;
   position: relative;
   margin: 0px;
+  overflow: hidden;
+  height: 1.6em;
+}
+.radio-box .display .caption-anim {
+  margin-top: 0;
+  -webkit-transition: margin-top 400ms linear;
+  -moz-transition: margin-top 400ms linear;
+  -o-transition: margin-top 400ms linear;
+  transition: margin-top 400ms linear;
+}
+.radio-box .display .caption-anim.ui-animate {
+  margin-top: -2em;
 }
 .radio-box .display .onair:hover .like {
   background-position: 0 -54px;

@@ -5,21 +5,8 @@ from flask import render_template, request, redirect
 from datetime import datetime
 
 from flask.ext.login import current_user
-from afm import db, app, redis
-from afm.helpers import get_ts
-
-# TODO:
-# починить pushState историю при работе с модалами
-# ~ ui-router
-# отключение от комет сервера при паузе
-# в историю попадают только играющие радиостанции
-# чекер радиостанций
-# страница радиостанции
-#
-# дисплей: показывать кол-во слушателей
-# проигрывание истории эфира
-# cross-line animate при загрузке радио
-# фильтр рекламы в истории эфира
+from afm import db, app
+from afm.helpers import get_onair
 
 
 @app.route('/')
@@ -56,11 +43,7 @@ def jobs():
 def radio(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)
-
-    current_onair = redis.get('radio:{}:onair'.format(radio_id))
-    current_onair = json.loads(current_onair) if current_onair else {}
-
-    current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
+    current_air = get_onair(radio_id)
     return render_template('radio.html', radio=radio, history=history, current_air=current_air)
 
 
@@ -74,9 +57,11 @@ def partial_radio_share(radio_id):
 def feedback():
     return render_template('user/feedback.html')
 
+
 @app.route('/siberia')
 def siberia():
     return render_template('siberia.html')
+
 
 def app_stats():
     radio_count = db.radio.find({'deleted_at': 0}).count()

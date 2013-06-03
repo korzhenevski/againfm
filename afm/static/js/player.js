@@ -542,13 +542,17 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.getListeners = onair.getListeners;
 
-    $scope.getCaption = function() {
+    $scope.getSubtitle = function() {
         var air = onair.get();
         if (air && air.title && player.playing) {
             return air.title;
         }
 
         return Radio.cur.description;
+    };
+
+    $scope.getCaption = function() {
+        return [$scope.getSubtitle()];
     };
 
     $scope.showAir = function() {

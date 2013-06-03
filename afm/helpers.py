@@ -13,6 +13,7 @@ from flask import url_for, redirect
 from afm import tasks, redis
 
 
+# TODO: move to models
 def get_onair(radio_id):
     print 'radio:{}:onair'.format(radio_id)
     air = redis.get('radio:{}:onair'.format(radio_id))

@@ -94,7 +94,7 @@ def select_stream(radio_id):
     where['content_type'] = {'$in': formats}
     """
 
-    streams = list(db.Stream.find(where, sort=[('bitrate', 1)]))
+    streams = list(db.Stream.find(where, sort=[('bitrate', -1)]))
     if not streams:
         return
 

@@ -17,7 +17,7 @@ $use-mozilla-ellipsis-binding: true
 @import "common-icons/*.png"
 @import "tracks-box/*.png"
 
-.ellipsis
+.text-overflow
   @include ellipsis
 
 body
@@ -111,6 +111,7 @@ ul.justified
   background-color: #4b4c5b
   padding: 19px
   margin: 10px auto
+  overflow: hidden
   +border-radius(7px)
   +transition(all, 300ms)
 
@@ -179,18 +180,27 @@ ul.justified
 .modal-onair
   width: 740px
   min-height: 493px
+  color: #cccccf
+
+  h1
+    margin-bottom: 0.4em
 
   .air-history
     width: 100%
 
     .title
+      color: #efefef
       padding: 3px
 
     .time
-      width: 70px
-      color: #cccccf
+      width: 50px
 
-  h2, h3
+  h2
+    margin-bottom: 0.5em
+
+  h3
+    font-size: 14px
+    font-weight: bold
     margin-bottom: 0
 
 
@@ -489,6 +499,15 @@ ul.justified
       line-height: 24px
       position: relative
       margin: 0px
+      overflow: hidden
+      height: 1.6em
+
+    .caption-anim
+      margin-top: 0
+      +transition(margin-top 400ms linear)
+
+    .caption-anim.ui-animate
+      margin-top: -2em
 
     .onair
       &:hover .like

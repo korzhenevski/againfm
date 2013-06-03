@@ -57,8 +57,10 @@
                                                 <i class="star"></i>
                                             </h1>
 
-                                            <h2 class="caption">
-                                                <span class="marquee">{{ getCaption() }}</span>
+                                            <h2 class="caption ng-cloak">
+                                                <span class="caption-anim marquee" ng-repeat="caption in getCaption()" ui-animate>
+                                                    {{ caption }}
+                                                </span>
                                             </h2>
 
                                             <div class="buttons">
@@ -205,7 +207,7 @@
         <div modal="favorite-radio" title="Мое Избранное">
             <table class="list">
                 <tr ng-repeat="radio in getList()">
-                    <td class="ellipsis">{{ radio.title }}</td>
+                    <td class="text-overflow">{{ radio.title }}</td>
                     <td class="actions"><i class="remove" ng-click="remove(radio.id)"></i></td>
                 </tr>
             </table>
