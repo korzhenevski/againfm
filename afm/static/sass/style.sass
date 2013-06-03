@@ -176,7 +176,7 @@ ul.justified
 .modal-user
   width: 320px
 
-.modal-radio
+.modal-onair
   width: 740px
   min-height: 493px
 
@@ -457,8 +457,12 @@ ul.justified
       font-size: 19px
       line-height: 26px
       font-weight: bold
-      .marquee
+      .overflow
+        white-space: nowrap
         width: 242px
+        overflow: hidden
+        display: block
+        text-overflow: ellipsis
       &:hover .star
         @include display-controls-sprite(star_hover)
 
@@ -508,7 +512,6 @@ ul.justified
       text-align: center
       font-size: 28px
       margin-top: 27px
-      font-weight: bold
       .dots
         font-size: 35px
         margin: 0 1px

@@ -1,0 +1,25 @@
+<div modal="onair" title="{{{ radio.title }}}">
+    {{% if current_onair %}}
+    <p>Сейчас играет: {{{ current_onair.title }}}</p>
+    {{% endif %}}
+
+    {{% if history %}}
+        <h2>История эфира</h2>
+        <table class="air-history">
+            {{% for group in history|groupby('natural_day')|sort(attribute='grouper', reverse=True) %}}
+                <tr>
+                    <td colspan="2"><h3>{{{ group.grouper }}}</h3></td>
+                </tr>
+                {{% for air in group.list|sort(attribute='time', reverse=True) %}}
+                <tr>
+                    <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
+                    <td class="title">{{{ air.title }}}</td>
+                </tr>
+                {{% endfor %}}
+            {{% endfor %}}
+        </table>
+    {{% else %}}
+        <p class="text-center text-muted">История еще не записана.</p>
+    {{% endif %}}
+
+</div>

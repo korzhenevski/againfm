@@ -6,7 +6,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 
 .factory('config', function () {
     return {
-        cometWait: 25,
+        cometWait: 30,
         marqueeSpeed: 35,
         listenHistorySize: 20,
         defaultVolume: 0.6

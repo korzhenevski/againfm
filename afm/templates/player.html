@@ -53,7 +53,7 @@
                                     <div class="display" ng-controller="DisplayCtrl">
                                         <div ng-show="isInfoVisible()">
                                             <h1 class="title pointer" ng-class="titleClass()" ng-click="star()">
-                                                <span class="marquee">{{ currentRadio.title }}</span>
+                                                <span class="overflow">{{ currentRadio.title }}</span>
                                                 <i class="star"></i>
                                             </h1>
 
@@ -62,7 +62,8 @@
                                             </h2>
 
                                             <div class="buttons">
-                                                <button class="display-button" ng-click="showAir()">История эфира</button>
+                                                <button class="display-button" ng-click="showAir()"
+                                                        ng-show="hasAirInfo()">Прямой эфир (<strong>{{ getListeners() }}</strong>)</button>
                                             </div>
                                         </div>
 

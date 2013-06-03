@@ -3,13 +3,21 @@
 
 import logging
 import validictory
+import ujson as json
 from flask import request, abort, current_app, Response
 from datetime import date
 from time import time
 from urlparse import urlparse, urljoin
 from flask import url_for, redirect
 
-from afm import tasks
+from afm import tasks, redis
+
+
+def get_onair(radio_id):
+    print 'radio:{}:onair'.format(radio_id)
+    air = redis.get('radio:{}:onair'.format(radio_id))
+    air = json.loads(air) if air else {}
+    return air
 
 
 class RedirectResponse(Response):

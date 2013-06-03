@@ -56,16 +56,12 @@ def jobs():
 def radio(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)
+
+    current_onair = redis.get('radio:{}:onair'.format(radio_id))
+    current_onair = json.loads(current_onair) if current_onair else {}
+
     current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
     return render_template('radio.html', radio=radio, history=history, current_air=current_air)
-
-
-@app.route('/partial/radio/<int:radio_id>/air')
-def partial_radio_air(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
-    history = db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(100)
-    current_air = redis.hgetall('radio:{}:onair'.format(radio_id))
-    return render_template('radio_air.html', radio=radio, history=history, current_air=current_air)
 
 
 @app.route('/partial/radio/<int:radio_id>/share')

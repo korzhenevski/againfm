@@ -205,21 +205,21 @@ ul.justified .block {
   width: 320px;
 }
 
-.modal-radio {
+.modal-onair {
   width: 740px;
   min-height: 493px;
 }
-.modal-radio .air-history {
+.modal-onair .air-history {
   width: 100%;
 }
-.modal-radio .air-history .title {
+.modal-onair .air-history .title {
   padding: 3px;
 }
-.modal-radio .air-history .time {
+.modal-onair .air-history .time {
   width: 70px;
   color: #cccccf;
 }
-.modal-radio h2, .modal-radio h3 {
+.modal-onair h2, .modal-onair h3 {
   margin-bottom: 0;
 }
 
@@ -552,8 +552,12 @@ ul.justified .block {
   line-height: 26px;
   font-weight: bold;
 }
-.radio-box .display .title .marquee {
+.radio-box .display .title .overflow {
+  white-space: nowrap;
   width: 242px;
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
 }
 .radio-box .display .title:hover .star {
   background-position: 0 0;
@@ -608,7 +612,6 @@ ul.justified .block {
   text-align: center;
   font-size: 28px;
   margin-top: 27px;
-  font-weight: bold;
 }
 .radio-box .display .clock .dots {
   font-size: 35px;

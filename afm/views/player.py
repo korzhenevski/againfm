@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import request, jsonify, abort
+from flask import request, jsonify, abort, render_template
 import requests
 
 from flask.ext.login import login_required, current_user
 from afm import app, db, redis
 from afm.models import UserFavoritesCache
-from afm.helpers import raw_redirect, get_ts
+from afm.helpers import raw_redirect, get_ts, get_onair
 
 """
 TODO:
@@ -113,6 +113,12 @@ def player_radio(radio_id):
         radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
     radio['stream'] = select_stream(radio_id)
     return jsonify(radio)
+
+@app.route('/_radio/<int:radio_id>/onair_history')
+def player_radio_onair(radio_id):
+    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
+    history = list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(20))
+    return render_template('radio_onair.html', radio=radio, history=history, current_onair=get_onair(radio_id))
 
 
 @app.route('/_radio/<int:radio_id>/stream')
