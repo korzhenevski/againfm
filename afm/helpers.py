@@ -115,3 +115,8 @@ def redirect_back(endpoint, **values):
     if not target or not is_safe_url(target):
         target = url_for(endpoint, **values)
     return redirect(target)
+
+
+def build_playlist(items):
+    content = ['File{}={}'.format(i + 1, item) for i, item in enumerate(items)]
+    return "[playlist]\nNumberOfEntries={}\n{}\n".format(len(content), '\n'.join(content))

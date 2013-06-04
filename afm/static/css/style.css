@@ -214,20 +214,23 @@ ul.justified .block {
 .modal-onair h1 {
   margin-bottom: 0.4em;
 }
-.modal-onair .air-history {
-  width: 100%;
-}
-.modal-onair .air-history .title {
-  color: #efefef;
-  padding: 3px;
-}
-.modal-onair .air-history .time {
-  width: 50px;
-}
 .modal-onair h2 {
   margin-bottom: 0.5em;
 }
-.modal-onair h3 {
+
+.air-history {
+  color: #cccccf;
+  width: 100%;
+}
+.air-history .title {
+  color: #efefef;
+  padding: 3px;
+}
+.air-history .time {
+  width: 50px;
+  padding-left: 3px;
+}
+.air-history .day {
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 0;
@@ -512,11 +515,11 @@ ul.justified .block {
   text-overflow: ellipsis;
 }
 
-.global-pointer {
-  cursor: pointer !important;
+.moving {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+  cursor: pointer !important;
 }
 
 .radio-box {
@@ -560,7 +563,7 @@ ul.justified .block {
   position: relative;
   font-size: 19px;
   line-height: 26px;
-  font-weight: bold;
+  font-weight: 450;
 }
 .radio-box .display .title .overflow {
   white-space: nowrap;
@@ -672,7 +675,6 @@ ul.justified .block {
   background-color: #222121;
   background-repeat: no-repeat;
   background-position: center 20px;
-  background-image: url("/static/i/speaker.png");
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;

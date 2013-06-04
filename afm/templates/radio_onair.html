@@ -8,7 +8,7 @@
         <table class="air-history">
             {{% for group in history|groupby('natural_day')|sort(attribute='grouper', reverse=True) %}}
                 <tr>
-                    <td colspan="2"><h3>{{{ group.grouper }}}</h3></td>
+                    <td colspan="2"><h3 class="day">{{{ group.grouper }}}</h3></td>
                 </tr>
                 {{% for air in group.list|sort(attribute='time', reverse=True) %}}
                 <tr>

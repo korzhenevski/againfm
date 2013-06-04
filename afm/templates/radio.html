@@ -7,8 +7,29 @@
     <div class="page centroid">
         <h1>{{{ radio.title }}}</h1>
         <p class="text-muted">{{{ radio.description }}}</p>
+        {# упростить class=link target=self #}
         <p>
-            <a class="link" href="{{{ url_for('listen', radio_id=radio.id) }}}">Слушать в плеере</a>
+            <a class="link" href="{{{ url_for('listen', radio_id=radio.id) }}}" target="_self">cлушать</a>
         </p>
+        <p>
+            <a class="link" href="{{{ url_for('download_playlist', radio_id=radio.id) }}}" target="_self">скачать плейлист</a>
+        </p>
+
+        {{% if history %}}
+        <h2>История эфира</h2>
+        <table class="air-history">
+            {{% for group in history|groupby('natural_day')|sort(attribute='grouper', reverse=True) %}}
+                <tr>
+                    <td colspan="2"><h3 class="day">{{{ group.grouper }}}</h3></td>
+                </tr>
+                {{% for air in group.list|sort(attribute='time', reverse=True) %}}
+                <tr>
+                    <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
+                    <td class="title text-overflow">{{{ air.title }}}</td>
+                </tr>
+                {{% endfor %}}
+            {{% endfor %}}
+        </table>
+        {{% endif %}}
     </div>
 {{% endblock %}}

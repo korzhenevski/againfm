@@ -185,20 +185,23 @@ ul.justified
   h1
     margin-bottom: 0.4em
 
-  .air-history
-    width: 100%
-
-    .title
-      color: #efefef
-      padding: 3px
-
-    .time
-      width: 50px
-
   h2
     margin-bottom: 0.5em
 
-  h3
+
+.air-history
+  color: #cccccf
+  width: 100%
+
+  .title
+    color: #efefef
+    padding: 3px
+
+  .time
+    width: 50px
+    padding-left: 3px
+
+  .day
     font-size: 14px
     font-weight: bold
     margin-bottom: 0
@@ -435,9 +438,9 @@ ul.justified
 .marquee-text-overflow
   text-overflow: ellipsis
 
-.global-pointer
-  cursor: pointer !important
+.moving
   +user-select(none)
+  cursor: pointer !important
 
 .radio-box
   width: 100%
@@ -466,7 +469,7 @@ ul.justified
       position: relative
       font-size: 19px
       line-height: 26px
-      font-weight: bold
+      font-weight: 450
       .overflow
         white-space: nowrap
         width: 242px
@@ -563,7 +566,6 @@ ul.justified
     background-color: #222121
     background-repeat: no-repeat
     background-position: center 20px
-    background-image: url('/static/i/speaker.png')
     +border-radius(4px)
 
     .signage

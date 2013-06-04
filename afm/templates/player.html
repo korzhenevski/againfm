@@ -186,7 +186,7 @@
 {{% endblock %}}
 
 {{% block footer %}}
-    <li class="item shift" ng-init='stats={{{ stats|json }}}'>
+    <li class="item shift ng-cloak" ng-init='stats={{{ stats|json }}}'>
         Играем {{ stats.radio|number }}
         <span ng-pluralize count="stats.radio"
               when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span> без выходных.

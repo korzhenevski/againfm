@@ -276,7 +276,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             element.bind('mousedown', function (e) {
                 startPosition = e.pageX;
                 startValue = parseFloat(scope.volume) || 0;
-                $document.find('body').addClass('global-pointer');
+                $document.find('body').addClass('moving');
             });
 
             $document.bind('mousemove', function (e) {
@@ -291,7 +291,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
             $document.bind('mouseup', function () {
                 startPosition = startValue = null;
-                $document.find('body').removeClass('global-pointer');
+                $document.find('body').removeClass('moving');
             });
 
             function posToValue(pos) {
