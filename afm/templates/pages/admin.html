@@ -1,19 +1,71 @@
 {{% extends "layout.html" %}}
 
+{{% block title %}}Управление вселенной{{% endblock %}}
+
 {{% block content %}}
-    <div class="page centroid">
-        <table ng-controller="AdminCtrl">
-            <tr ng-repeat="radio in radioList">
-                <td>
-                    {{ radio.title }}
+    <div class="page centroid manager">
+        <h1>Управление</h1>
+
+        <table class="manager-table" ng-controller="ManagerCtrl">
+            <tr valign="top">
+                <td class="col">
+                    <ul class="list genres-list">
+                        <li ng-repeat="genre in genres" ng-click="selectGenre(genre)" ng-class="genreClass(genre)">{{ genre.title }}</li>
+                    </ul>
+                </td>
+                <td class="col" ng-show="radios">
+                    <ul class="list">
+                        <li ng-repeat="radio in radios" ng-click="selectRadio(radio)" ng-class="radioClass(radio)">{{ radio.title }}</li>
+                    </ul>
+                </td>
+                <td ng-show="radio">
+                    <form class="radio-form" ng-submit="saveRadio()">
+                        <table width="100%">
+                            <tr>
+                                <td class="label">Заголовок: </td>
+                                <td class="field"><input class="text" type="text" ng-model="radio.title" /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">Веб-сайт: </td>
+                                <td class="field"><input class="text" type="text" ng-model="radio.website" /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">Описание: </td>
+                                <td class="field">
+                                    <textarea class="text" ng-model="radio.description" rows="5"></textarea>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label"></td>
+                                <td class="field">
+                                    <input type="checkbox" id="is_public" class="checkbox" ng-model="radio.is_public" />
+                                    <label for="is_public">Доступна на сайте</label>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <input class="btn" type="submit" value="Сохранить" />
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
                 </td>
             </tr>
         </table>
     </div>
 {{% endblock %}}
 
+{{% block styles %}}
+    <link href="/static/css/admin.css" rel="stylesheet"/>
+{{% endblock %}}
+
 {{% block scripts %}}
-    <script src="/static/js/admin.js"></script>
+    <script src="/static/js/admin/base.js"></script>
     <script>
         angular.element(document).ready(function(){
             angular.bootstrap(document, ['afm.admin']);

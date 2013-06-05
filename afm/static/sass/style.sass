@@ -16,6 +16,7 @@ $use-mozilla-ellipsis-binding: true
 @import "display-controls/*.png"
 @import "common-icons/*.png"
 @import "tracks-box/*.png"
+@import "checkbox/*.png"
 
 .text-overflow
   @include ellipsis
@@ -70,6 +71,11 @@ ul.inline
   padding: 0
   li
     float: left
+
+ul.list
+  list-style-type: none
+  margin: 0
+  padding: 0
 
 ul.justified
   margin: 0
@@ -240,6 +246,7 @@ ul.justified
   margin: 20px auto 5px auto
 
 .logo
+  visibility: hidden
   img
     margin-top: 12px
   a
@@ -885,6 +892,23 @@ input.text, textarea.text
 
 p.large
   margin-top: 1.8em
+
+.checkbox
+  display: none
+
+.checkbox + label
+  cursor: pointer
+  margin: 8px 0
+  margin-left: 1px
+  padding-left: 23px
+  vertical-align: middle
+  line-height: 17px
+  width: 16px
+  height: 16px
+  @include checkbox-sprite(checkbox)
+
+.checkbox:checked + label
+  @include checkbox-sprite(checkbox_checked)
 
 .btn
   color: #fff

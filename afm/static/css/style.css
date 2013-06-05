@@ -14,6 +14,10 @@
   background: url('/static/i/tracks-box-s7fd78cfa8e.png') no-repeat;
 }
 
+.checkbox-sprite, .checkbox + label, .checkbox:checked + label {
+  background: url('/static/i/checkbox-s178d9fcd54.png') no-repeat;
+}
+
 .text-overflow {
   white-space: nowrap;
   overflow: hidden;
@@ -82,6 +86,12 @@ ul.inline {
 }
 ul.inline li {
   float: left;
+}
+
+ul.list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 ul.justified {
@@ -273,6 +283,9 @@ ul.justified .block {
   margin: 20px auto 5px auto;
 }
 
+.logo {
+  visibility: hidden;
+}
 .logo img {
   margin-top: 12px;
 }
@@ -1159,6 +1172,26 @@ input.text:focus, textarea.text:focus {
 
 p.large {
   margin-top: 1.8em;
+}
+
+.checkbox {
+  display: none;
+}
+
+.checkbox + label {
+  cursor: pointer;
+  margin: 8px 0;
+  margin-left: 1px;
+  padding-left: 23px;
+  vertical-align: middle;
+  line-height: 17px;
+  width: 16px;
+  height: 16px;
+  background-position: 0 0;
+}
+
+.checkbox:checked + label {
+  background-position: 0 -16px;
 }
 
 .btn {

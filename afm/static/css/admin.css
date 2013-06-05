@@ -1,0 +1,32 @@
+.manager-table .field {
+  padding-bottom: 10px;
+}
+.manager-table .label {
+  width: 100px;
+  text-align: right;
+  padding-right: 10px;
+  color: #c6c5c8;
+  vertical-align: top;
+  padding-top: 6px;
+}
+.manager-table .text {
+  width: 300px;
+}
+.manager-table .col {
+  padding-right: 20px;
+  width: 150px;
+}
+.manager-table .selected {
+  color: white !important;
+}
+.manager-table .list li {
+  cursor: pointer;
+  color: #c6c5c8;
+  padding: 5px 0;
+}
+.manager-table .list li:hover {
+  color: #f3f3f3;
+}
+.manager-table .btn {
+  margin-top: 20px;
+}
