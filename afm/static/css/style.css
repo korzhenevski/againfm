@@ -867,6 +867,13 @@ ul.justified .block {
   opacity: 0;
 }
 
+.spinner {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 2px;
+}
+
 .radio-table {
   height: 100%;
   border: 1px solid #e5e4e0;
@@ -889,12 +896,6 @@ ul.justified .block {
   position: relative;
   overflow: hidden;
   width: 100%;
-}
-.radio-table .loader {
-  display: none;
-  position: absolute;
-  top: 5px;
-  right: 2px;
 }
 .radio-table .radio-line {
   margin: 8px -20px 0 -20px;

@@ -101,14 +101,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     return favorites;
 })
 
-.factory('Station', function ($http) {
-    return {
-        get: function (stationId) {
-            return $http.get('/_station/' + stationId);
-        }
-    };
-})
-
 .factory('UserFavorite', function ($http) {
     return {
         add: function (id) {
@@ -127,10 +119,10 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     };
 })
 
-.directive('loader', function () {
+.directive('spinner', function () {
     return {
-        restrict: 'C',
-        templateUrl: '/loader.html',
+        restrict: 'CA',
+        templateUrl: 'spinner.html',
         link: function ($scope, element) {
             $scope.$on('loading', function () {
                 element.css('display', 'block');

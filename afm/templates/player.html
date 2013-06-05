@@ -5,8 +5,8 @@
 {{% block description %}}Включи музыку для любимого дела.{{% endblock %}}
 
 {{% block top_content %}}
-    {# шаблон индикатора загрузки на CSS3 #}
-    <script type="text/ng-template" id="/loader.html">
+    {# индикатор загрузки на CSS3 #}
+    <script type="text/ng-template" id="spinner.html">
         <div id="floatingBarsG">
             <div class="blockG" id="rotateG_01"></div>
             <div class="blockG" id="rotateG_02"></div>
@@ -87,7 +87,7 @@
                                         <div class="search">
                                             <input type="search" placeholder="Поиск" class="search-field" ng-model="searchQuery" />
                                         </div>
-                                        <div class="loader"></div>
+                                        <div class="spinner"></div>
                                     </div>
 
                                     {# навигация #}
@@ -182,7 +182,7 @@
 {{% endblock %}}
 
 {{% block styles %}}
-    <link href="/static/css/loader.css" rel="stylesheet"/>
+    <link href="/static/css/spinner.css" rel="stylesheet"/>
 {{% endblock %}}
 
 {{% block footer %}}
