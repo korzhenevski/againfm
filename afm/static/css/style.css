@@ -283,9 +283,16 @@ ul.justified .block {
   margin: 20px auto 5px auto;
 }
 
-.logo {
-  visibility: hidden;
+.flash-message {
+  background-color: rgba(75, 76, 91, 0.5);
+  padding: 15px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
 }
+
 .logo img {
   margin-top: 12px;
 }
