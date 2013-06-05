@@ -43,6 +43,10 @@ def about():
 def jobs():
     return render_template('pages/jobs.html')
 
+@app.route('/badbrowser')
+def badbrowser():
+    return render_template('pages/badbrowser.html')
+
 
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):

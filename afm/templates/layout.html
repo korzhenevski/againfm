@@ -5,14 +5,16 @@
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}{{% endblock %}}" />
     <meta name="og:url" content="http://again.fm/" />
+
     <meta http-equiv="X-Frame-Options" content="deny" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <noscript><meta http-equiv="refresh" content="0; URL=/badbrowser"></noscript>
+    <!--[if lt IE 9]><meta http-equiv="refresh" content="0; URL=/badbrowser"><![endif]-->
 
     <style>.ng-cloak { display: none; }</style>
     <link href="/static/css/normalize.css" rel="stylesheet" />
     <link href="/static/css/style.css" rel="stylesheet" />
-
-    <noscript><meta http-equiv="refresh" content="0; URL=/badbrowser.html"></noscript>
-    <!--[if lt IE 9]><meta http-equiv="refresh" content="0; URL=/badbrowser.html"><![endif]-->
 
     {# подключаемые стили #}
     {{% block styles %}}{{% endblock %}}
