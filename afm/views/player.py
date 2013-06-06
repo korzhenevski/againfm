@@ -34,7 +34,7 @@ def player_radio_featured():
 
 @app.route('/_radio/genre/<int:genre_id>')
 def player_radio_by_genre(genre_id):
-    where = {'is_public': True, 'deleted_at': 0, 'genres': genre_id}
+    where = {'is_public': True, 'deleted_at': 0, 'genre': genre_id}
     objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
     return jsonify({'objects': objects})
 

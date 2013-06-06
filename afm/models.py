@@ -403,13 +403,11 @@ class Radio(BaseDocument):
     structure = {
         'id': int,
         'title': unicode,
-        # короткое URL-имя
         'slug': unicode,
         'description': unicode,
-        # страна, город
-        'location': unicode,
+        'city': int,
         'website': unicode,
-        'genres': [int],
+        'genre': int,
         'group': dict,
         'owner_id': int,
         'is_channel': bool,
@@ -425,9 +423,9 @@ class Radio(BaseDocument):
     default_values = {
         'slug': u'',
         'description': u'',
-        'location': u'',
+        'city': 0,
         'website': u'',
-        'genres': [],
+        'genre': 0,
         'is_channel': False,
         'is_public': False,
         'created_at': get_ts,
@@ -454,8 +452,8 @@ class Radio(BaseDocument):
             'required': False,
             'maxLength': 512,
         },
-        'location': {
-            'type': 'string',
+        'city': {
+            'type': 'int',
             'blank': True,
             'required': False,
             'maxLength': 64,
@@ -463,11 +461,6 @@ class Radio(BaseDocument):
     }
 
     public = ['id', 'title', 'description']
-
-    def get_genres(self):
-        if not self['genres']:
-            return []
-        return list(db.RadioGenre.find({'id': self['genres']}))
 
     def get_streams(self):
         return list(stream.get_public() for stream in db.Stream.find({'radio_id': self['id'], 'deleted_at': 0}))

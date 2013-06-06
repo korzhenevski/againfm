@@ -153,5 +153,12 @@ def ctrl_search():
     print requests.get('http://192.168.2.2:9200/againfm/_mapping').json()
     #print requests.post('http://192.168.2.2:9200/test/_refresh').json()
 
+@manager.command
+def convert_genres():
+    for radio in db.radio.find({}, fields=['id', 'genres']):
+        genre = radio['genres'][0] if radio['genres'] else 0
+        db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
+        #print radio['id']
+
 if __name__ == "__main__":
     manager.run()

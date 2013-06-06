@@ -17,14 +17,16 @@ def admin_genres():
 
 @app.route('/_admin/radio/genre/<int:genre_id>')
 def admin_radio_by_genre(genre_id):
-    where = {'deleted_at': 0, 'genres': genre_id}
+    where = {'deleted_at': 0, 'genre': genre_id}
     objects = [radio.get_public() for radio in db.Radio.find(where)]
     return jsonify({'objects': objects})
 
+
 def get_radio(radio_id):
     radio = db.Radio.find_one({'id': radio_id})
-    radio = radio.get_public(['id', 'title', 'description', 'is_public', 'updated_at'])
+    radio = radio.get_public(['id', 'title', 'description', 'is_public', 'updated_at', 'city', 'genre', 'website'])
     return radio
+
 
 @app.route('/_admin/radio/<int:radio_id>')
 def admin_radio(radio_id):

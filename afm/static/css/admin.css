@@ -5,11 +5,15 @@
   float: left;
   overflow: hidden;
   padding-right: 20px;
+}
+.manager-table .col-genres,
+.manager-table .col-radiolist {
   max-height: 430px;
   overflow-y: auto;
 }
 .manager-table .col-genres {
   width: 160px;
+  max-height: 430px;
 }
 .manager-table .col-radiolist {
   width: 250px;

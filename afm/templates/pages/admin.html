@@ -40,10 +40,25 @@
                         </tr>
 
                         <tr>
+                            <td class="label">Город: </td>
+                            <td class="field"><input class="text" type="text" ng-model="radio.city" /></td>
+                        </tr>
+
+                        <tr>
+                            <td class="label">Жанр: </td>
+                            <td class="field-text">
+                                <select ng-model="radio.genre" ng-options="genre.id as genre.title for genre in genres">
+                                    <option value="">- select genre -</option>
+                                </select>
+                            </td>
+                        </tr>
+
+
+                        <tr>
                             <td class="label"></td>
                             <td class="field">
                                 <input type="checkbox" id="is_public" class="checkbox" ng-model="radio.is_public" />
-                                <label for="is_public">Показать на сайте</label>
+                                <label for="is_public">Опубликовано</label>
                             </td>
                         </tr>
 
@@ -56,7 +71,9 @@
 
                         <tr>
                             <td class="label"> </td>
-                            <td class="field-text">Обновлено: {{ radio.updated_at|fromNow }}<br> Айди: {{ radio.id }}</td>
+                            <td class="field-text">
+                                Обновлено: {{ radio.updated_at|fromNow }}<br> Айди: {{ radio.id }}
+                            </td>
                         </tr>
                     </table>
                 </form>
