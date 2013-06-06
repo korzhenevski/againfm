@@ -15,7 +15,7 @@
 }
 
 .checkbox-sprite, .checkbox + label, .checkbox:checked + label {
-  background: url('/static/i/checkbox-s178d9fcd54.png') no-repeat;
+  background: url('/static/i/checkbox-s03b440639d.png') no-repeat;
 }
 
 .text-overflow {
@@ -285,7 +285,9 @@ ul.justified .block {
 
 .flash-message {
   background-color: rgba(75, 76, 91, 0.5);
-  padding: 15px;
+  padding: 15px 17px;
+  display: none;
+  margin-bottom: 20px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
@@ -293,6 +295,9 @@ ul.justified .block {
   border-radius: 10px;
 }
 
+.logo {
+  visibility: hidden;
+}
 .logo img {
   margin-top: 12px;
 }
@@ -318,12 +323,16 @@ ul.justified .block {
   overflow: hidden;
   width: 100%;
 }
+.topmenu .username {
+  color: #c6c5c8;
+  margin-right: 15px;
+}
 .topmenu .menu-item {
   margin-left: 20px;
   float: left;
 }
 .topmenu .menu-item p {
-  margin: 12px 0;
+  margin: 13px 0;
 }
 .topmenu .side-item {
   float: right;
@@ -1186,19 +1195,23 @@ p.large {
 }
 
 .checkbox + label {
+  color: #c6c5c8;
   cursor: pointer;
   margin: 8px 0;
   margin-left: 1px;
-  padding-left: 23px;
+  padding-left: 22px;
   vertical-align: middle;
   line-height: 17px;
   width: 16px;
   height: 16px;
-  background-position: 0 0;
+  background-position: 0 -16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 .checkbox:checked + label {
-  background-position: 0 -16px;
+  background-position: 0 0;
 }
 
 .btn {
@@ -1266,7 +1279,6 @@ p.large {
 .footer {
   clear: both;
   font-size: 13px;
-  margin-top: 15px;
   color: #c6c5c8;
 }
 .footer .item {

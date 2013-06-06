@@ -6,57 +6,62 @@
     <div class="page centroid manager">
         <h1>Управление</h1>
 
-        <table class="manager-table" ng-controller="ManagerCtrl">
-            <tr valign="top">
-                <td class="col">
-                    <ul class="list genres-list">
-                        <li ng-repeat="genre in genres" ng-click="selectGenre(genre)" ng-class="genreClass(genre)">{{ genre.title }}</li>
-                    </ul>
-                </td>
-                <td class="col" ng-show="radios">
-                    <ul class="list">
-                        <li ng-repeat="radio in radios" ng-click="selectRadio(radio)" ng-class="radioClass(radio)">{{ radio.title }}</li>
-                    </ul>
-                </td>
-                <td ng-show="radio">
-                    <form class="radio-form" ng-submit="saveRadio()">
-                        <table width="100%">
-                            <tr>
-                                <td class="label">Заголовок: </td>
-                                <td class="field"><input class="text" type="text" ng-model="radio.title" /></td>
-                            </tr>
+        <div class="manager-table" ng-controller="ManagerCtrl">
+            <div class="col col-genres">
+                <ul class="list genres-list">
+                    <li ng-repeat="genre in genres" ng-click="selectGenre(genre)" ng-class="genreClass(genre)">{{ genre.title }}</li>
+                </ul>
+            </div>
+            <div class="col col-radiolist" ng-show="radios">
+                <input type="text" class="text list-search" ng-model="radioQuery" placeholder="поиск..." />
+                <ul class="list">
+                    <li ng-repeat="radio in radios|filter:radioQuery" ng-click="selectRadio(radio)"
+                        ng-class="radioClass(radio)" class="text-overflow" title="{{ radio.title }}">{{ radio.title }}</li>
+                </ul>
+            </div>
+            <div class="col" ng-show="radio">
+                <form class="radio-form" ng-submit="saveRadio()">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">Заголовок: </td>
+                            <td class="field"><input class="text" type="text" ng-model="radio.title" /></td>
+                        </tr>
 
-                            <tr>
-                                <td class="label">Веб-сайт: </td>
-                                <td class="field"><input class="text" type="text" ng-model="radio.website" /></td>
-                            </tr>
+                        <tr>
+                            <td class="label">Веб-сайт: </td>
+                            <td class="field"><input class="text" type="text" ng-model="radio.website" /></td>
+                        </tr>
 
-                            <tr>
-                                <td class="label">Описание: </td>
-                                <td class="field">
-                                    <textarea class="text" ng-model="radio.description" rows="5"></textarea>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="label">Описание: </td>
+                            <td class="field">
+                                <textarea class="text" ng-model="radio.description" rows="5"></textarea>
+                            </td>
+                        </tr>
 
-                            <tr>
-                                <td class="label"></td>
-                                <td class="field">
-                                    <input type="checkbox" id="is_public" class="checkbox" ng-model="radio.is_public" />
-                                    <label for="is_public">Доступна на сайте</label>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="label"></td>
+                            <td class="field">
+                                <input type="checkbox" id="is_public" class="checkbox" ng-model="radio.is_public" />
+                                <label for="is_public">Показать на сайте</label>
+                            </td>
+                        </tr>
 
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>
-                                    <input class="btn" type="submit" value="Сохранить" />
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </td>
-            </tr>
-        </table>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input class="btn" type="submit" value="Сохранить" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="label"> </td>
+                            <td class="field-text">Обновлено: {{ radio.updated_at|fromNow }}<br> Айди: {{ radio.id }}</td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
     </div>
 {{% endblock %}}
 
@@ -66,6 +71,7 @@
 
 {{% block scripts %}}
     <script src="/static/js/admin/base.js"></script>
+    <script src="/static/js/common/moment.js"></script>
     <script>
         angular.element(document).ready(function(){
             angular.bootstrap(document, ['afm.admin']);

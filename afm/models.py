@@ -419,6 +419,7 @@ class Radio(BaseDocument):
         'tag': dict,
         'created_at': int,
         'deleted_at': int,
+        'updated_at': int,
     }
 
     default_values = {
@@ -431,6 +432,7 @@ class Radio(BaseDocument):
         'is_public': False,
         'created_at': get_ts,
         'deleted_at': 0,
+        'updated_at': 0,
         'air_history': False,
         'air_record': False,
     }
@@ -462,16 +464,6 @@ class Radio(BaseDocument):
 
     public = ['id', 'title', 'description']
 
-    def get_related(self, limit=5):
-        from random import shuffle
-
-        if not self['genres']:
-            return []
-        where = {'id': {'$ne': self['id']}, 'genres': self['genres']}
-        results = list(db.Radio.find(where, sort=[('title', 1)], limit=limit * 3))
-        shuffle(results)
-        return results[:limit]
-
     def get_genres(self):
         if not self['genres']:
             return []
@@ -486,6 +478,12 @@ class Radio(BaseDocument):
     def push_to_search(self):
         return search.index(self.as_dict(), 'radio', self.id)
 
+    def modify(self, data):
+        # TODO: пушить обновленные данные в поиск
+        # TODO: переместить в BaseDocument ?
+        data.pop('id', False)
+        data['updated_at'] = get_ts()
+        self.collection.update({'id': self['id']}, {'$set': data})
 
 @db.register
 class Playlist(BaseDocument):

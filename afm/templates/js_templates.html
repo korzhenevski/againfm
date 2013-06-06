@@ -27,6 +27,11 @@
                    type="email" placeholder="Электронная почта" required autofocus />
             <input class="text" name="password" ng-model="data.password" type="password" placeholder="Пароль" required />
 
+            <p class="agree">
+                <input type="checkbox" id="signup-agree" class="checkbox" checked="checked" />
+                <label for="signup-agree">Я согласен на всё</label>
+            </p>
+
             <input type="submit" class="btn" value="Зарегистрироваться" ng-disabled="form.$invalid && showErrors" />
         </form>
 

@@ -13,6 +13,20 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     }
 })
 
+.directive('flashMessage', function(storage){
+    return {
+        restrict: 'C',
+        link: function($scope, element) {
+            $scope.hideFlash = function() {
+                element.css('display', 'none');
+                storage.put('hideFlashMessage', true);
+            };
+
+            element.css('display', storage.get('hideFlashMessage') ? 'none' : 'block');
+        }
+    }
+})
+
 .directive('marquee', function ($transition, $timeout, config) {
     return {
         restrict: 'C',

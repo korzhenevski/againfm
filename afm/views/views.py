@@ -14,7 +14,6 @@ from afm.helpers import get_onair, build_playlist
 # перелинковка радиостанций
 # основные жанры: релакс, фон, рок, блюз, джаз, транс, драм, рэп, новости, прочее
 
-
 @app.route('/')
 def index():
     return render_template('player.html')

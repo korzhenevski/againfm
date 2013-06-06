@@ -247,10 +247,13 @@ ul.justified
 
 .flash-message
   background-color: rgba(#4b4c5b, 0.5)
-  padding: 15px
+  padding: 15px 17px
+  display: none
+  margin-bottom: 20px
   +border-radius(10px)
 
 .logo
+  visibility: hidden
   img
     margin-top: 12px
   a
@@ -266,9 +269,14 @@ ul.justified
   height: 48px
   overflow: hidden
   width: 100%
+
+  .username
+    color: #c6c5c8
+    margin-right: 15px
+
   .menu-item
     p
-      margin: 12px 0
+      margin: 13px 0
     margin-left: 20px
     float: left
 
@@ -901,15 +909,17 @@ p.large
   display: none
 
 .checkbox + label
+  color: #c6c5c8
   cursor: pointer
   margin: 8px 0
   margin-left: 1px
-  padding-left: 23px
+  padding-left: 22px
   vertical-align: middle
   line-height: 17px
   width: 16px
   height: 16px
   @include checkbox-sprite(checkbox)
+  +user-select(none)
 
 .checkbox:checked + label
   @include checkbox-sprite(checkbox_checked)
@@ -943,7 +953,6 @@ p.large
 .footer
   clear: both
   font-size: 13px
-  margin-top: 15px
   color: #c6c5c8
   .item
     white-space: nowrap

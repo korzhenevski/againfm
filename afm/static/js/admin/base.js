@@ -35,12 +35,19 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     };
 
     $scope.saveRadio = function() {
-        $http.post('/_admin/radio/' + $scope.radio.id + '/save', {radio: $scope.radio}).success(function(){
-
+        $http.post('/_admin/radio/' + $scope.radio.id + '/save', {radio: $scope.radio}).success(function(resp){
+            $scope.radio = resp.radio;
         });
     };
 
     //$scope.selectRadio({id: 917});
-
     $scope.loadGenres();
+
+})
+
+
+.filter('fromNow', function() {
+    return function(dateString) {
+        return moment('' + dateString, 'X').fromNow();
+    };
 });
