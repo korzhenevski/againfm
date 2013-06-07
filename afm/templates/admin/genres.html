@@ -17,12 +17,13 @@
 
         <div class="manager-table" ng-controller="GenresCtrl">
             <p><span class="pseudo-link" ng-click="new()">добавить</span></p>
-            <ul class="list">
-                <li ng-repeat="genre in genres" ng-show="genre.is_public">
-                    <i class="remove-icon" ng-click="genre.is_public=false"></i>
-                    <inline-edit model="genre.title"></inline-edit>
-                </li>
-            </ul>
+            <table class="genres">
+                <tr ng-repeat="genre in genres" ng-show="genre.is_public">
+                    <td><inline-edit model="genre.title"></inline-edit></td>
+                    <td class="col-id">{{ genre.id }}</td>
+                    <td><i class="remove-icon" ng-click="genre.is_public=false"></i></td>
+                </tr>
+            </table>
             <button class="btn" ng-click="save()">Cохранить</button>
         </div>
     </div>

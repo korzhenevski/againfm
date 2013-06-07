@@ -108,6 +108,18 @@ ul.justified .block {
   display: inline-block;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #cccccf;
+}
+
+.text-error {
+  color: #ff6f7d;
+}
+
 .modal-back {
   position: fixed;
   width: 100%;
@@ -1076,18 +1088,6 @@ ul.justified .block {
 }
 .radio-table .playlist .selected {
   background-color: rgba(184, 151, 56, 0.4);
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-muted {
-  color: #cccccf;
-}
-
-.text-error {
-  color: #ff6f7d;
 }
 
 .page {

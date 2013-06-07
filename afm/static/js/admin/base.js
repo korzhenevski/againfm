@@ -15,25 +15,32 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     };
 
     $scope.selectGenre = function(genre) {
+        $scope.radioQuery = '';
         $scope.currentGenre = genre;
-        $scope.radios = $http.get('/_admin/radio/genre/' + genre.id).then(function(resp){
-            return resp.data.objects;
+        $http.get('/_admin/radio/genre/' + genre.id).success(function(resp){
+            $scope.radios = resp.objects;
         });
     };
 
     $scope.radioClass = function(radio) {
         return {
-            selected: $scope.currentRadio && $scope.currentRadio.id == radio.id,
-            nopub: !radio.is_public
+            selected: $scope.currentRadio && $scope.currentRadio.id == radio.id
         };
     };
 
-    $scope.selectRadio = function(radio) {
-        $scope.currentRadio = radio;
-
+    function resetRadio() {
         $scope.radio = null;
+        $scope.radioStreams = null;
+        $scope.currentRadio = null;
+    }
+
+    $scope.selectRadio = function(radio) {
+        resetRadio();
+
+        $scope.currentRadio = radio;
         $http.get('/_admin/radio/' + radio.id).success(function(resp){
             $scope.radio = resp.radio;
+            $scope.radioStreams = resp.streams;
         });
     };
 
@@ -44,7 +51,15 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
         });
     };
 
-    //$scope.selectRadio({id: 917});
+    $scope.deleteRadio = function() {
+        $http.post('/_admin/radio/' + $scope.radio.id + '/delete').success(function(){
+            // refresh list
+            var idx = _.findIndex($scope.radios, {id: $scope.radio.id});
+            $scope.radios.splice(idx, 1);
+            resetRadio();
+        });
+    };
+
     $scope.loadGenres();
 })
 
@@ -62,7 +77,10 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     };
 
     $scope.new = function() {
-        $scope.genres.unshift({title: 'new', is_public: true});
+        $scope.genres.unshift({
+            title: 'new',
+            is_public: true
+        });
     };
 
     $scope.loadGenres();
@@ -72,7 +90,7 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     return {
         restrict: 'E',
         replace: true,
-        template: '<div><span ng-hide="editMode" ng-click="editMode=true" class="inline-edit">{{ model }}</span>' +
+        template: '<div><span ng-hide="editMode" ng-click="editMode=true" class="inline-edit pseudo-link">{{ model }}</span>' +
                   '<input class="text" ng-model="model" ng-show="editMode" ui-enter="editMode=false" /></div>',
         scope: {
             model: '='

@@ -34,6 +34,30 @@ def comma_fields(fields_str):
     return fields
 
 
+def list_public(objects, fields=None):
+    return [item.get_public(fields) for item in objects]
+
+
+def create_obj(klass, data):
+    obj = klass()
+    obj.update(data)
+    obj.save()
+    return obj
+
+
+def soft_delete(coll, obj_id):
+    db[coll].update({'id': obj_id}, {'$set': {'deleted_at': get_ts()}})
+
+
+def restore_obj(coll, obj_id):
+    db[coll].update({'id': obj_id}, {'$set': {'deleted_at': 0}})
+
+
+def get_next_id(ns):
+    ret = db.object_ids.find_and_modify(query={'_id': ns}, update={'$inc': {'next': 1}}, new=True, upsert=True)
+    return int(ret['next'])
+
+
 class BaseDocument(Document):
     use_dot_notation = True
     use_autoinc_id = False
@@ -43,29 +67,13 @@ class BaseDocument(Document):
     def save(self, *args, **kwargs):
         # автоинкремент числового идентификатора
         if self.use_autoinc_id:
-            self['_id'] = self.get_next_id(self.collection.name)
+            self['_id'] = get_next_id(self.collection.name)
 
         spec = self.structure.get('id')
         if spec is int and not self['id']:
-            self['id'] = self.get_next_id(self.collection.name)
+            self['id'] = get_next_id(self.collection.name)
 
         return super(BaseDocument, self).save(*args, **kwargs)
-
-    def get_next_id(self, ns):
-        ret = self.db.object_ids.find_and_modify(query={'_id': ns}, update={'$inc': {'next': 1}}, new=True, upsert=True)
-        return ret['next']
-
-    @classmethod
-    def soft_delete(cls, **where):
-        if not cls.__collection__ or where:
-            return
-        db[cls.__collection__].update(where, {'$set': {'deleted_at': get_ts()}})
-
-    @classmethod
-    def restore(cls, **where):
-        if not cls.__collection__ or where:
-            return
-        db[cls.__collection__].update(where, {'$set': {'deleted_at': 0}})
 
     def get_public(self, fields=None):
         if fields is None:
@@ -175,7 +183,7 @@ class FavoriteTrack(AbstractFavorite):
     def remove(cls, track_id, station_id, user_id):
         cls.remove({'track.id': track_id, 'station.id': station_id, 'user_id': user_id})
 
-    def get_public(self):
+    def get_public(self, fields=None):
         return {
             'id': self['track']['id'],
             'title': self['track']['title']
@@ -331,7 +339,7 @@ class Track(BaseDocument):
         'created_at': datetime.now,
     }
 
-    def get_public(self):
+    def get_public(self, fields=None):
         return {
             'id': self['id'],
             'title': self['title'],
@@ -372,6 +380,11 @@ class RadioGenre(BaseDocument):
 
     public = ['id', 'title']
 
+    def find_public(self, where=None, **kwargs):
+        if where is None:
+            where = {}
+        where['is_public'] = True
+        return self.find(where, **kwargs)
 
 @db.register
 class RadioGroup(BaseDocument):
@@ -541,6 +554,8 @@ class Stream(BaseDocument):
         'deleted_at': 0,
     }
 
+    public = ['id', 'bitrate', 'listen_url', 'content_type']
+
     @property
     def listen_url(self):
         # если поток вешается через шауткаст,
@@ -550,7 +565,7 @@ class Stream(BaseDocument):
             return u'{};'.format(self.url)
         return self.url
 
-    def get_public(self):
+    def get_public(self, fields=None):
         return {
             'id': self['id'],
             'bitrate': self['bitrate'],
@@ -561,18 +576,11 @@ class Stream(BaseDocument):
     @classmethod
     def bulk_add(cls, radio_id, urls, playlist_id=0):
         # добавление потоков
+        # игнорируем, если поток уде был добавлен из другого плейлиста
         for stream_url in urls:
-            stream = db.Stream()
-            stream.update({
-                'url': stream_url,
-                'playlist_id': playlist_id,
-                'radio_id': radio_id,
-            })
-
             try:
-                stream.save()
+                create_obj(db.Stream, {'url': stream_url, 'playlist_id': playlist_id, 'radio_id': radio_id})
             except pymongo.errors.DuplicateKeyError:
-                # игнорируем, если поток уде был добавлен из другого плейлиста
                 pass
 
 
@@ -597,6 +605,7 @@ class Air(BaseDocument):
         return naturalday(self.time, ts_format='%Y.%m.%d')
 
 login_manager.anonymous_user = AnonUser
+
 
 if __name__ == '__main__':
     import unittest

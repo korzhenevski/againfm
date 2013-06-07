@@ -9,7 +9,7 @@ from datetime import date
 from time import time
 from urlparse import urlparse, urljoin
 from flask import url_for, redirect
-
+from zlib import crc32
 from afm import tasks, redis
 
 
@@ -19,6 +19,10 @@ def get_onair(radio_id):
     air = redis.get('radio:{}:onair'.format(radio_id))
     air = json.loads(air) if air else {}
     return air
+
+
+def fasthash(data):
+    return unicode(crc32(data) & 0xffffffff)
 
 
 class RedirectResponse(Response):

@@ -4,7 +4,7 @@
 from flask.ext.script import Manager
 from afm import app, db, models
 from pprint import pprint as pp
-
+from afm.helpers import fasthash
 manager = Manager(app)
 
 
@@ -159,6 +159,22 @@ def convert_genres():
         genre = radio['genres'][0] if radio['genres'] else 0
         db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
         #print radio['id']
+
+
+@manager.command
+def group_radio():
+    from collections import defaultdict
+    agg = defaultdict(set)
+    for stream in db.Stream.find_public(fields=['id', 'url', 'radio_id']):
+        try:
+            h = fasthash(stream['url'])
+            agg[h].add(stream['radio_id'])
+        except UnicodeEncodeError:
+            pass
+
+    for h, radios in agg.iteritems():
+        if len(radios) > 1:
+            lead_id = radios
 
 if __name__ == "__main__":
     manager.run()

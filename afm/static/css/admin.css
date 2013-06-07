@@ -20,8 +20,8 @@
   width: 250px;
   max-width: 250px;
 }
-.manager-table .col-radiolist .nopub {
-  opacity: 0.4;
+.manager-table .col-radio {
+  width: 400px;
 }
 .manager-table .selected {
   color: white !important;
@@ -57,10 +57,7 @@
 }
 
 .genres-admin .inline-edit {
-  display: block;
-}
-.genres-admin .list {
-  width: 200px;
+  cursor: pointer;
 }
 .genres-admin .remove-icon {
   float: left;
@@ -68,4 +65,17 @@
 }
 .genres-admin .btn {
   margin-top: 15px;
+}
+.genres-admin .col-id {
+  width: 30px;
+  color: #aaaaaa;
+}
+.genres-admin .genres {
+  width: 220px;
+}
+.genres-admin .text {
+  width: 80%;
+}
+.genres-admin td {
+  padding: 3px 0;
 }

@@ -25,11 +25,13 @@
             <div class="col col-radiolist" ng-show="radios">
                 <input type="text" class="text list-search" ng-model="radioQuery" placeholder="поиск..." />
                 <ul class="list">
-                    <li ng-repeat="radio in radios|filter:radioQuery" ng-click="selectRadio(radio)"
-                        ng-class="radioClass(radio)" class="text-overflow" title="{{ radio.title }}">{{ radio.title }}</li>
+                    <li ng-repeat="radio in radios|filter:radioQuery" ng-class="radioClass(radio)">
+                        <span ng-click="selectRadio(radio)" class="text-overflow"
+                              title="{{ radio.title }}">{{ radio.title }}</span>
+                    </li>
                 </ul>
             </div>
-            <div class="col" ng-show="radio">
+            <div class="col col-radio" ng-show="radio">
                 <form class="radio-form" ng-submit="saveRadio()">
                     <table width="100%">
                         <tr>
@@ -76,6 +78,14 @@
                             </td>
                         </tr>
 
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input class="btn" type="submit" value="Сохранить" />
+                                <span class="pseudo-link text-error" ng-click="deleteRadio()">удалить</span>
+                            </td>
+                        </tr>
+
                         <tr ng-show="radio.updated_at">
                             <td class="label">Обновлено:</td>
                             <td class="field-text">
@@ -83,10 +93,12 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td>&nbsp;</td>
+                        <tr ng-show="radioStreams">
+                            <td class="label">Потоки:</td>
                             <td>
-                                <input class="btn" type="submit" value="Сохранить" />
+                                <ul class="list">
+                                    <li ng-repeat="stream in radioStreams" class="text-overflow">{{ stream.id }} - {{ stream.listen_url }}</li>
+                                </ul>
                             </td>
                         </tr>
                     </table>

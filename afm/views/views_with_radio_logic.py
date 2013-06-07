@@ -100,7 +100,7 @@ def radio_add_check():
     result['streams'] = [dict(url=stream, id=stream_id, use=True) for stream_id, stream in enumerate(streams, start=1)]
 
     if streams:
-        meta = fetch_stream(streams[0], timeout=2, as_player=True).meta
+        meta = fetch_stream(streams[0], timeout=2).meta
         result.update({
             'title': meta.get('name', ''),
             'website': meta.get('url', ''),
