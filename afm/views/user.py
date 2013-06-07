@@ -91,6 +91,12 @@ def user_logout():
     return jsonify({'logout': True})
 
 
+@app.route('/user/<int:user_id>')
+def user_page(user_id):
+    user = db.User.find_one_or_404({'id': user_id})
+    return "user page"
+
+
 @app.route('/_user/feedback', methods=['POST'])
 def user_feedback():
     form = safe_input_object({
