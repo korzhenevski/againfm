@@ -1,0 +1,42 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}Управление жанрами{{% endblock %}}
+
+{{% block topline %}}
+    <div class="menu-item">
+        <p>
+            <a href="/admin" target="_self">Управление</a>
+        </p>
+    </div>
+{{% endblock %}}
+
+
+{{% block content %}}
+    <div class="page centroid genres-admin">
+        <h1>Жанры</h1>
+
+        <div class="manager-table" ng-controller="GenresCtrl">
+            <p><span class="pseudo-link" ng-click="new()">добавить</span></p>
+            <ul class="list">
+                <li ng-repeat="genre in genres" ng-show="genre.is_public">
+                    <i class="remove-icon" ng-click="genre.is_public=false"></i>
+                    <inline-edit model="genre.title"></inline-edit>
+                </li>
+            </ul>
+            <button class="btn" ng-click="save()">Cохранить</button>
+        </div>
+    </div>
+{{% endblock %}}
+
+{{% block styles %}}
+    <link href="/static/css/admin.css" rel="stylesheet"/>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script src="/static/js/admin/base.js"></script>
+    <script>
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm.admin']);
+        });
+    </script>
+{{% endblock %}}

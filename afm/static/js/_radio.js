@@ -71,13 +71,7 @@ afm.controller('EditGenresCtrl', function($scope, $http){
     $scope.reset();
 });
 
-afm.directive('ngEnter', function() {
-    return function(scope, elm, attrs) {
-        elm.bind('keypress', function(e) {
-            if (e.charCode === 13) scope.$apply(attrs.ngEnter);
-        });
-    };
-});
+afm
 
 afm.directive('inlineEdit', function() {
     return {

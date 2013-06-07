@@ -1,5 +1,6 @@
 .manager-table .list-search {
   margin-bottom: 0.6em;
+  width: 100%;
 }
 .manager-table .col {
   float: left;
@@ -18,6 +19,9 @@
 .manager-table .col-radiolist {
   width: 250px;
   max-width: 250px;
+}
+.manager-table .col-radiolist .nopub {
+  opacity: 0.4;
 }
 .manager-table .selected {
   color: white !important;
@@ -50,4 +54,18 @@
 }
 .manager-table .radio-form .btn {
   margin-top: 20px;
+}
+
+.genres-admin .inline-edit {
+  display: block;
+}
+.genres-admin .list {
+  width: 200px;
+}
+.genres-admin .remove-icon {
+  float: left;
+  margin-right: 6px;
+}
+.genres-admin .btn {
+  margin-top: 15px;
 }

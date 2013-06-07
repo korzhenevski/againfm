@@ -2,6 +2,15 @@
 
 {{% block title %}}Управление вселенной{{% endblock %}}
 
+{{% block topline %}}
+    <div class="menu-item">
+        <p>
+            <a href="/admin/genres" target="_self">Редактор жанров</a>
+        </p>
+    </div>
+{{% endblock %}}
+
+
 {{% block content %}}
     <div class="page centroid manager">
         <h1>Управление</h1>
@@ -9,7 +18,8 @@
         <div class="manager-table" ng-controller="ManagerCtrl">
             <div class="col col-genres">
                 <ul class="list genres-list">
-                    <li ng-repeat="genre in genres" ng-click="selectGenre(genre)" ng-class="genreClass(genre)">{{ genre.title }}</li>
+                    <li ng-repeat="genre in genres" ng-click="selectGenre(genre)"
+                        ng-class="genreClass(genre)">{{ genre.title }}</li>
                 </ul>
             </div>
             <div class="col col-radiolist" ng-show="radios">
@@ -22,6 +32,11 @@
             <div class="col" ng-show="radio">
                 <form class="radio-form" ng-submit="saveRadio()">
                     <table width="100%">
+                        <tr>
+                            <td class="label">ID: </td>
+                            <td class="field-text">{{ radio.id }}</td>
+                        </tr>
+
                         <tr>
                             <td class="label">Заголовок: </td>
                             <td class="field"><input class="text" type="text" ng-model="radio.title" /></td>
@@ -53,7 +68,6 @@
                             </td>
                         </tr>
 
-
                         <tr>
                             <td class="label"></td>
                             <td class="field">
@@ -62,17 +76,17 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td>
-                                <input class="btn" type="submit" value="Сохранить" />
+                        <tr ng-show="radio.updated_at">
+                            <td class="label">Обновлено:</td>
+                            <td class="field-text">
+                                {{ radio.updated_at|fromNow }}
                             </td>
                         </tr>
 
                         <tr>
-                            <td class="label"> </td>
-                            <td class="field-text">
-                                Обновлено: {{ radio.updated_at|fromNow }}<br> Айди: {{ radio.id }}
+                            <td>&nbsp;</td>
+                            <td>
+                                <input class="btn" type="submit" value="Сохранить" />
                             </td>
                         </tr>
                     </table>

@@ -2,7 +2,7 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
 
 .controller('ManagerCtrl', function($scope, $http){
     $scope.loadGenres = function() {
-        $scope.genres = $http.get('/_admin/genres').then(function(resp){
+        $scope.genres = $http.get('/_admin/genres/nav').then(function(resp){
             return resp.data.genres;
         });
     };
@@ -22,7 +22,10 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     };
 
     $scope.radioClass = function(radio) {
-        return {selected: $scope.currentRadio == radio};
+        return {
+            selected: $scope.currentRadio && $scope.currentRadio.id == radio.id,
+            nopub: !radio.is_public
+        };
     };
 
     $scope.selectRadio = function(radio) {
@@ -41,11 +44,41 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
         });
     };
 
-    $scope.selectRadio({id: 917});
+    //$scope.selectRadio({id: 917});
     $scope.loadGenres();
-
 })
 
+.controller('GenresCtrl', function($scope, $http){
+    $scope.loadGenres = function() {
+        $http.get('/_admin/genres').success(function(resp){
+            $scope.genres = resp.genres;
+        });
+    };
+
+    $scope.save = function() {
+        $http.post('/_admin/genres/save', {genres: $scope.genres}).success(function(resp){
+            $scope.genres = resp.genres;
+        });
+    };
+
+    $scope.new = function() {
+        $scope.genres.unshift({title: 'new', is_public: true});
+    };
+
+    $scope.loadGenres();
+})
+
+.directive('inlineEdit', function() {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: '<div><span ng-hide="editMode" ng-click="editMode=true" class="inline-edit">{{ model }}</span>' +
+                  '<input class="text" ng-model="model" ng-show="editMode" ui-enter="editMode=false" /></div>',
+        scope: {
+            model: '='
+        }
+    };
+})
 
 .filter('fromNow', function() {
     return function(dateString) {

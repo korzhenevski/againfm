@@ -259,7 +259,8 @@ ul.justified .block {
 .modal-favorite-radio .actions {
   width: 17px;
 }
-.modal-favorite-radio .remove {
+
+.remove-icon {
   display: block;
   width: 17px;
   height: 17px;
@@ -268,7 +269,7 @@ ul.justified .block {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
   opacity: 0.7;
 }
-.modal-favorite-radio .remove:hover {
+.remove-icon:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }

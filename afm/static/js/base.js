@@ -27,6 +27,16 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     }
 })
 
+.directive('uiEnter', function() {
+    return function(scope, elm, attrs) {
+        elm.bind('keypress', function(e) {
+            if (e.charCode === 13) {
+                scope.$apply(attrs.uiEnter);
+            }
+        });
+    };
+})
+
 .directive('marquee', function ($transition, $timeout, config) {
     return {
         restrict: 'C',
