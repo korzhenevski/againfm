@@ -218,6 +218,8 @@ class AnonUser(AnonymousUser):
     def get_public(self, *args):
         return None
 
+login_manager.anonymous_user = AnonUser
+
 
 @db.register
 class User(BaseDocument):
@@ -604,7 +606,25 @@ class Air(BaseDocument):
     def natural_day(self):
         return naturalday(self.time, ts_format='%Y.%m.%d')
 
-login_manager.anonymous_user = AnonUser
+
+@db.register
+class BlogPost(BaseDocument):
+    __collection__ = 'blog_post'
+
+    structure = {
+        'id': int,
+        'title': unicode,
+        'content': unicode,
+        'created_at': int,
+        'updated_at': int,
+        'deleted_at': int,
+    }
+
+    default_values = {
+        'created_at': get_ts,
+        'updated_at': 0,
+        'deleted_at': 0,
+    }
 
 
 if __name__ == '__main__':

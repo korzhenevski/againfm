@@ -1,0 +1,12 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}{{{ post.title }}}{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid">
+        <p><a href="/blog">Блог</a> /</p>
+        <h1>{{{ post.title }}}</h1>
+        {{% include "blog/_post.html" %}}
+    </div>
+{{% endblock %}}
+

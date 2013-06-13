@@ -2,7 +2,7 @@
 
 {{% block title %}}Радиоплеер{{% endblock %}}
 
-{{% block description %}}Коллективный радиоплеер свежей музыки{{% endblock %}}
+{{% block description %}}Коллективный радиоплеер интернет-радиостанций{{% endblock %}}
 
 {{% block top_content %}}
     {# индикатор загрузки на CSS3 #}
@@ -190,7 +190,7 @@
     <li class="item shift ng-cloak" ng-init='stats={{{ stats|json }}}'>
         Играем {{ stats.radio|number }}
         <span ng-pluralize count="stats.radio"
-              when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>
+              when="{one: 'радиостанцию', few: 'радиостанции', many: 'радиостанций'}"></span>.
     </li>
     {{% if config.PRODUCTION %}}
     <li class="share">

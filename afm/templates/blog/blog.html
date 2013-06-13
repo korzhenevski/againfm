@@ -1,0 +1,15 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}Блог{{% endblock %}}
+{{% block description %}}Новости проекта{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid blog">
+        <h1>Блог</h1>
+
+        {{% for post in posts %}}
+            <h2><a href="{{{ url_for('blog_post', post_id=post.id) }}}">{{{ post.title }}}</a></h2>
+            {{% include "blog/_post.html" %}}
+        {{% endfor %}}
+    </div>
+{{% endblock %}}

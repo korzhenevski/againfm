@@ -1,0 +1,29 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}Публикация{{% endblock %}}
+{{% block content %}}
+    <div class="page centroid blog-admin">
+        <h1>Публикация</h1>
+
+        <form action="{{{ url_for('blog_admin') }}}" method="post">
+            <input class="text" type="text" name="title" /><br />
+            <textarea name="content" cols="30" rows="10" id="editor"></textarea>
+            <input type="submit" value="отправить" class="btn" />
+        </form>
+    </div>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/markdown.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.css" />
+    <link rel="stylesheet" href="/static/css/codemirror-solarized.css" />
+    <script type="text/javascript">
+      var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        height: "dynamic",
+        mode: "text/x-markdown",
+        theme: "solarized againfm"
+      });
+    </script>
+{{% endblock %}}
+

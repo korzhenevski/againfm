@@ -5,11 +5,14 @@ from flask import Flask
 from celery import Celery
 from flask.ext.login import LoginManager
 from flask.ext.mongokit import MongoKit
+from flask.ext.misaka import Misaka
 from redis import Redis
 from .mailer import AmazonMailer
 from .search import Search
 
 app = Flask(__name__)
+Misaka(app)
+
 app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
 app.config.from_envvar('AGAINFM_CONFIG', silent=True)

@@ -872,9 +872,9 @@ ul.justified .block {
   user-select: none;
 }
 .radio-box .controls .vol-wrap .vol-line {
-  height: 6px;
+  height: 8px;
   width: 100%;
-  top: 13px;
+  top: 12px;
   margin: auto 0;
   cursor: pointer;
   position: relative;
@@ -889,7 +889,7 @@ ul.justified .block {
   width: 14px;
   height: 14px;
   border: 1px solid #6f7e7f;
-  top: -5px;
+  top: -4px;
   left: 0;
   cursor: pointer;
   position: absolute;
@@ -1147,7 +1147,7 @@ input[disabled], button[disabled] {
   opacity: 0.4;
 }
 
-input.text, textarea.text {
+input.text, textarea.text, .cm-s-againfm {
   color: #7b7c87;
   outline: none;
   border: 1px solid #505160;
@@ -1171,19 +1171,19 @@ input.text, textarea.text {
   -moz-box-shadow: #505160 0 1px 1px 0px, #3a3b48 0 2px 5px 1px inset;
   box-shadow: #505160 0 1px 1px 0px, #3a3b48 0 2px 5px 1px inset;
 }
-input.text.placeholder, textarea.text.placeholder {
+input.text.placeholder, textarea.text.placeholder, .cm-s-againfm.placeholder {
   color: #64656e;
 }
-input.text::-webkit-input-placeholder, textarea.text::-webkit-input-placeholder {
+input.text::-webkit-input-placeholder, textarea.text::-webkit-input-placeholder, .cm-s-againfm::-webkit-input-placeholder {
   color: #64656e;
 }
-input.text:-moz-placeholder, textarea.text:-moz-placeholder {
+input.text:-moz-placeholder, textarea.text:-moz-placeholder, .cm-s-againfm:-moz-placeholder {
   color: #64656e;
 }
-input.text:-ms-input-placeholder, textarea.text:-ms-input-placeholder {
+input.text:-ms-input-placeholder, textarea.text:-ms-input-placeholder, .cm-s-againfm:-ms-input-placeholder {
   color: #64656e;
 }
-input.text:focus, textarea.text:focus {
+input.text:focus, textarea.text:focus, .cm-s-againfm:focus {
   color: #f2f2f4;
 }
 
@@ -1404,4 +1404,21 @@ p.large {
 }
 .pseudo-link:hover {
   color: #f3f3f3;
+}
+
+.blog h2 {
+  margin-top: 0.8em;
+  margin-bottom: 0.3em;
+  font-weight: 400;
+}
+.blog .post-time {
+  font-size: 12px;
+}
+.blog .post-content {
+  margin-bottom: 2em;
+}
+
+.blog-admin #editor {
+  width: 600px;
+  height: 300px;
 }

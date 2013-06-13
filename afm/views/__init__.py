@@ -5,7 +5,7 @@ import time
 import ujson as json
 from flask import g, request, jsonify
 from jinja2 import escape
-
+from datetime import datetime
 from afm import app
 
 
@@ -32,4 +32,11 @@ def template_filter_json(data):
     return escape(json.dumps(data))
 
 
-from . import views, user, player, admin
+@app.template_filter('ts')
+def format_timestamp_time(ts, fmt=None):
+    if fmt is None:
+        fmt = '%Y-%m-%d %H:%M'
+    return datetime.fromtimestamp(ts).strftime(fmt)
+
+
+from . import views, user, player, admin, blog
