@@ -23,20 +23,6 @@
     {{% if not config.DEBUG %}}
         {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
-
-    {# <script>
-        var _ua = navigator.userAgent.toLowerCase();
-        var browser = {
-            v: (_ua.match( /.+(?:me|ox|on|rv|it|era|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
-            msie: (/msie/i.test(_ua) && !/opera/i.test(_ua)),
-            mozilla: /firefox/i.test(_ua),
-            chrome: /chrome/i.test(_ua),
-            safari: (!(/chrome/i.test(_ua)) && /webkit|safari|khtml/i.test(_ua)),
-            android: /android/i.test(_ua),
-            mobile: /iphone|ipod|ipad|opera mini|opera mobi|iemobile|android/i.test(_ua),
-            mac: /mac/i.test(_ua)
-        };
-    </script> #}
 </head>
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>

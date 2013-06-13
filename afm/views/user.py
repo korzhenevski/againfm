@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, render_template, url_for, session, redirect, request
-from flask.ext.login import login_user, login_required, logout_user
+from flask.ext.login import login_user, login_required, logout_user, current_user
 
 from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
-
+from afm.models import get_ts, list_public
 
 def permanent_login_user(user):
     """
@@ -95,6 +95,32 @@ def user_logout():
 def user_page(user_id):
     user = db.User.find_one_or_404({'id': user_id})
     return "user page"
+
+
+@app.route('/_user/favorites')
+@login_required
+def user_favorites():
+    favorites = db.User.find_one_or_404({'id': current_user.id}, fields={'favorites': 1, '_id': 0})
+    favorites = favorites.get('favorites', {}) if favorites else {}
+
+    ids = map(int, favorites.keys())
+    objects = list_public(db.Radio.find({'id': {'$in': ids}}), fields=['id', 'title'])
+    objects.sort(key=lambda obj: favorites.get(obj['id']), reverse=True)
+    return jsonify({'objects': objects})
+
+
+@app.route('/_user/favorites/<int:radio_id>/<any(add,remove):action>', methods=['POST'])
+@login_required
+def user_favorites_action(radio_id, action):
+    db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0}, fields=['id'])
+    key = 'favorites.{}'.format(radio_id)
+    if action == 'add':
+        update = {'$set': {key: get_ts()}}
+    else:
+        update = {'$unset': {key: 1}}
+
+    res = db.users.find_and_modify({'id': current_user.id}, update, fields=[key], new=True)
+    return jsonify({'favorite': res['favorites']})
 
 
 @app.route('/_user/feedback', methods=['POST'])

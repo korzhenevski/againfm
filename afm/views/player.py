@@ -3,16 +3,14 @@
 from flask import request, jsonify, abort, render_template
 import requests
 
-from flask.ext.login import login_required, current_user
 from afm import app, db, redis
-from afm.models import UserFavoritesCache
 from afm.helpers import raw_redirect, get_ts, get_onair
 
 """
 TODO:
     добавление радио
-    страница эфира - история
 """
+
 
 @app.route('/_radio/search')
 def player_radio_search():
@@ -39,42 +37,12 @@ def player_radio_by_genre(genre_id):
     return jsonify({'objects': objects})
 
 
-@app.route('/_user/favorites')
-@login_required
-def player_user_favorites():
-    favorite_stations = db.FavoriteStation.find({'user_id': current_user.id})
-    favorite_stations = dict([(row['station_id'], row['created_at']) for row in favorite_stations])
-    # выборка по списку айдишников
-    query = {'id': {'$in': favorite_stations.keys()}}
-    stations = [station.get_public() for station in db.Station.find(query)]
-    # сортируем по времени добавления
-    stations.sort(key=lambda station: favorite_stations.get(station['id']), reverse=True)
-    return jsonify({'objects': stations})
-
-
-@app.route('/_user/favorites/<int:station_id>/add', methods=['POST'])
-@app.route('/_user/favorites/<int:station_id>/remove', methods=['POST'])
-@login_required
-def player_user_favorites_add_or_remove(station_id):
-    # проверка на существование станции
-    # можно конечно и без нее, но тогда реально засрать
-    # избранное несуществующими станциями
-    db.Station.find_one_or_404({'id': station_id})
-    favorite_cache = UserFavoritesCache(user_id=current_user.id)
-    info = db.FavoriteStation.toggle(station_id, user_id=current_user.id)
-    state = favorite_cache.toggle('station', station_id, state=info['favorite'])
-    # удаляем станцию из списка
-    if not state:
-        db.FavoriteStation.remove(station_id, user_id=current_user.id)
-    return jsonify({'favorite': state})
-
-
 def select_stream(radio_id):
     where = {
         'radio_id': radio_id,
         'is_online': True,
         'deleted_at': 0,
-        'check.error_at': {'$lte': get_ts() - 12*3600}
+        'check.error_at': {'$lte': get_ts() - 12 * 3600}
     }
 
     """
@@ -109,10 +77,11 @@ def select_stream(radio_id):
 @app.route('/_radio/<int:radio_id>')
 def player_radio(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id}).get_public()
-    if current_user.is_authenticated():
-        radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
+    #if current_user.is_authenticated():
+    #    radio['favorite'] = UserFavoritesCache(user_id=current_user.id).exists('station', radio_id)
     radio['stream'] = select_stream(radio_id)
     return jsonify(radio)
+
 
 @app.route('/_radio/<int:radio_id>/onair_history')
 def player_radio_onair(radio_id):

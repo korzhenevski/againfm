@@ -84,7 +84,19 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 })
 
 .factory('favorites', function ($rootScope, user, storage, UserFavorite, collectionFactory) {
-    var coll = collectionFactory('favorites');
+    var name = 'favorites' + (user.isLogged() ? '_user' + user.get().id : '');
+    var coll = collectionFactory(name);
+
+    // load favorites list
+    if (user.isLogged()) {
+        coll.removeAll();
+        UserFavorite.list(function(objects){
+            angular.forEach(objects, function(obj){
+                coll.add(obj['id'], obj);
+            });
+        });
+    }
+
     var favorites = angular.extend({}, coll, {
         add: function(id, obj) {
             coll.add(id, obj);
@@ -100,6 +112,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             }
         }
     });
+        
     return favorites;
 })
 

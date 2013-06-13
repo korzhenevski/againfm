@@ -418,6 +418,10 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 
             exists: function(key) {
                 return cache.exists(key);
+            },
+
+            removeAll: function() {
+                cache.removeAll();
             }
         };
     };
