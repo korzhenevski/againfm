@@ -68,12 +68,18 @@
     {# подвал #}
     <div class="footer centroid">
         <ul class="inline">
-            {{% if request.path != '/feedback' %}}
-                <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
-            {{% endif %}}
             {{% if request.path != '/about' %}}
                 <li class="item"><a href="/about" target="_self">о проекте</a></li>
             {{% endif %}}
+
+            {{% if request.path != '/feedback' %}}
+                <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
+            {{% endif %}}
+
+            {{% if request.path != '/blog' %}}
+                <li class="item"><a href="/blog" target="_self">блог</a></li>
+            {{% endif %}}
+
             {{% block footer %}}{{% endblock %}}
         </ul>
     </div>
