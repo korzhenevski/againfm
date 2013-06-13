@@ -1,9 +1,5 @@
 angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
 
-.config(function($locationProvider){
-    $locationProvider.html5Mode(true);
-})
-
 .factory('config', function () {
     return {
         cometWait: 30,

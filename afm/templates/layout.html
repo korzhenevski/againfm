@@ -24,7 +24,7 @@
         {{% include 'extras/qbaka.html' %}}
     {{% endif %}}
 
-    <script>
+    {# <script>
         var _ua = navigator.userAgent.toLowerCase();
         var browser = {
             v: (_ua.match( /.+(?:me|ox|on|rv|it|era|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
@@ -36,7 +36,7 @@
             mobile: /iphone|ipod|ipad|opera mini|opera mobi|iemobile|android/i.test(_ua),
             mac: /mac/i.test(_ua)
         };
-    </script>
+    </script> #}
 </head>
 
 <body ng-controller="UserCtrl" ng-init='setUser({{{ current_user.get_public('id,email')|json }}})'>

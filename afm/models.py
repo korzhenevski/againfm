@@ -623,7 +623,7 @@ class BlogPost(BaseDocument):
     default_values = {
         'created_at': get_ts,
         'updated_at': 0,
-        'deleted_at': 0,
+        'deleted_at': 0
     }
 
 

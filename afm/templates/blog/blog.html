@@ -3,12 +3,21 @@
 {{% block title %}}Блог{{% endblock %}}
 {{% block description %}}Новости проекта{{% endblock %}}
 
+{{% block topline %}}
+    <div class="menu-item">
+        <p>
+            <a href="{{{ url_for('blog_admin') }}}">Управление блогом</a>
+        </p>
+    </div>
+{{% endblock %}}
+
 {{% block content %}}
     <div class="page centroid blog">
         <h1>Блог</h1>
 
         {{% for post in posts %}}
             <h2><a href="{{{ url_for('blog_post', post_id=post.id) }}}">{{{ post.title }}}</a></h2>
+            <p class="text-muted post-time">{{{ post.created_at|ts }}}</p>
             {{% include "blog/_post.html" %}}
         {{% endfor %}}
     </div>
