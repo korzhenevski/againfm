@@ -124,3 +124,4 @@ def redirect_back(endpoint, **values):
 def build_playlist(items):
     content = ['File{}={}'.format(i + 1, item) for i, item in enumerate(items)]
     return "[playlist]\nNumberOfEntries={}\n{}\n".format(len(content), '\n'.join(content))
+

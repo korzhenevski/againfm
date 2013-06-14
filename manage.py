@@ -168,6 +168,8 @@ def convert():
     from afm.models import get_next_id
     ids = set([3,4,5,7,17,21,32,34,40,41,43,28340,28344,28345,58,28351,65,28354,69,72,28361,86])
 
+    db.object_ids.update({'_id': 'radio'}, {'$set': {'next': 50000}})
+
     for radio in db.radio.find(fields=['id', 'tag.old_id']):
         old_id = radio['tag'].get('old_id')
         if old_id in ids:

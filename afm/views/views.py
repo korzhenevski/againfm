@@ -66,6 +66,7 @@ def download_playlist(radio_id):
     response.content_type = 'audio/x-scpls'
     return response
 
+
 @app.route('/feedback')
 def feedback():
     return render_template('user/feedback.html')

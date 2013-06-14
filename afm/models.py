@@ -4,7 +4,6 @@
 import time
 import string
 from afm import app, db, search, login_manager
-from afm import redis
 
 try:
     from flask.ext.mongokit import Document
@@ -101,6 +100,7 @@ class BaseDocument(Document):
 class AnonUser(AnonymousUser):
     def get_public(self, *args):
         return None
+
 
 login_manager.anonymous_user = AnonUser
 
@@ -272,6 +272,7 @@ class RadioGenre(BaseDocument):
         where['is_public'] = True
         return self.find(where, **kwargs)
 
+
 @db.register
 class RadioGroup(BaseDocument):
     __collection__ = 'radio_group'
@@ -376,6 +377,7 @@ class Radio(BaseDocument):
         data.pop('id', False)
         data['updated_at'] = get_ts()
         self.collection.update({'id': self['id']}, {'$set': data})
+
 
 @db.register
 class Playlist(BaseDocument):

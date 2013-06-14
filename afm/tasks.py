@@ -3,6 +3,7 @@
 from afm import app, celery, mailer, db
 from .radio import fetch_playlist, fetch_stream
 
+
 @celery.task
 def send_mail(email, body, subject=None):
     if subject is None:
@@ -40,6 +41,7 @@ def update_playlist(playlist_id):
 
 def check_stream_raw(stream):
     from .helpers import get_ts
+
     result = fetch_stream(stream['url'])
     update = {
         'bitrate': result.bitrate,

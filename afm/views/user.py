@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, render_template, url_for, session, redirect, request
+from flask import jsonify, render_template, url_for, session, redirect, request, Response
 from flask.ext.login import login_user, login_required, logout_user, current_user
 
 from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 from afm.models import get_ts, list_public
+from functools import wraps
 
 
 def permanent_login_user(user):
@@ -30,9 +31,20 @@ def unauthorized():
     return redirect(url_for('index'))
 
 
-@app.context_processor
-def app_context():
-    return dict(standalone=request.is_xhr)
+def check_auth(login, password):
+    user = db.User.find_login(login)
+    if user and user.is_admin():
+        return user.check_password(password)
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return Response('Login Required', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        return f(*args, **kwargs)
+    return decorated
 
 
 @app.route('/_user/login', methods=['POST'])

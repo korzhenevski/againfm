@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from afm import app, db
-from flask import render_template, request, redirect, url_for, make_response, safe_join
-from afm.models import create_obj
+from flask import render_template, request, redirect, url_for, make_response
 from datetime import datetime
 
+from afm import app, db
+from afm.models import create_obj
+from afm.views.user import admin_required
 
 @app.route('/blog')
 def blog():
@@ -14,6 +15,7 @@ def blog():
 
 
 @app.route('/blog/admin', methods=['GET', 'POST'])
+@admin_required
 def blog_admin():
     if request.method == 'POST':
         post = create_obj(db.BlogPost, request.form.to_dict())
