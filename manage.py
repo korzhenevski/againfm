@@ -78,6 +78,7 @@ def sitemap():
             E.loc(base + url_for('radio', radio_id=radio['id'])),
         )
         urlset.append(url)
+
     print ET.tostring(urlset, pretty_print=True, xml_declaration=True, encoding='UTF-8')
 
 
@@ -153,12 +154,41 @@ def ctrl_search():
     print requests.get('http://192.168.2.2:9200/againfm/_mapping').json()
     #print requests.post('http://192.168.2.2:9200/test/_refresh').json()
 
+
 @manager.command
 def convert_genres():
     for radio in db.radio.find({}, fields=['id', 'genres']):
         genre = radio['genres'][0] if radio['genres'] else 0
         db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
         #print radio['id']
+
+
+@manager.command
+def convert():
+    from afm.models import get_next_id
+    ids = set([3,4,5,7,17,21,32,34,40,41,43,28340,28344,28345,58,28351,65,28354,69,72,28361,86])
+
+    for radio in db.radio.find(fields=['id', 'tag.old_id']):
+        old_id = radio['tag'].get('old_id')
+        if old_id in ids:
+            new_id = old_id
+        else:
+            new_id = get_next_id('radio')
+
+        db.radio.update({'id': radio['id']}, {'$set': {'id': new_id, 'tag.ng_id': radio['id']}})
+
+        db.playlist.update({'radio_id': radio['id']}, {'$set': {'radio_id': new_id}}, multi=True)
+        db.streams.update({'radio_id': radio['id']}, {'$set': {'radio_id': new_id}}, multi=True)
+
+
+@manager.command
+def convert_favs():
+    for fav in db.favorite_stations.find():
+        radio = db.radio.find_one({'tag.old_id': fav['station_id']}, fields=['id'])
+        if radio:
+            print 'adding', fav['user_id'], radio['id']
+            key = 'favorites.{}'.format(radio['id'])
+            db.users.update({'id': fav['user_id']}, {'$set': {key: fav['created_at']}})
 
 
 @manager.command
@@ -175,6 +205,7 @@ def group_radio():
     for h, radios in agg.iteritems():
         if len(radios) > 1:
             lead_id = radios
+
 
 if __name__ == "__main__":
     manager.run()

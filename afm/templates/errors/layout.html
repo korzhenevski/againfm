@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>{{% block page_title %}}{{% endblock %}}</title>
+    <link href="/static/css/normalize.css" rel="stylesheet" />
+    <style>
+        .wrapper {
+            margin: 0 auto;
+            margin-top: 5%;
+            width: 50%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 20px;
+            color: #efefef;
+            background-color: #3f3943;
+        }
+
+        h1 { font-weight: 200; }
+        a { color: #42d5f4; text-decoration: none; border-bottom: 1px solid #42d5f4; }
+        a:hover { text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <h1>{{% block title %}}{{% endblock %}}</h1>
+        {{% block content %}}{{% endblock %}}
+    </div>
+</body>
+</html>

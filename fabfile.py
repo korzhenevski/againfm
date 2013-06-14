@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from fabric.api import env, local, run, lcd, cd, sudo, settings, put, prefix
-from fabric.contrib.files import exists, append, uncomment
+from fabric.api import env, local, run, lcd, cd, sudo, settings, put
+from fabric.contrib.files import exists, append
 from fabric.contrib.console import confirm
 
 """

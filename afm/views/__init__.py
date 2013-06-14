@@ -3,7 +3,7 @@
 
 import time
 import ujson as json
-from flask import g, request, jsonify
+from flask import g, request, jsonify, render_template
 from jinja2 import escape
 from datetime import datetime
 from afm import app
@@ -24,7 +24,7 @@ def x_headers(response):
 def page_not_found(e):
     if request.is_xhr:
         return jsonify({'error': 'Not Found'}), 404
-    return '<h1>Not Found</h1>', 404
+    return render_template('errors/404.html'), 404
 
 
 @app.template_filter('json')

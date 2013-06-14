@@ -8,6 +8,7 @@ from afm import app, db, login_manager
 from afm.helpers import safe_input_field, safe_input_object, send_mail, get_email_provider
 from afm.models import get_ts, list_public
 
+
 def permanent_login_user(user):
     """
     Логин пользователя с фиксацией сессии
@@ -91,10 +92,12 @@ def user_logout():
     return jsonify({'logout': True})
 
 
+"""
 @app.route('/user/<int:user_id>')
 def user_page(user_id):
     user = db.User.find_one_or_404({'id': user_id})
     return "user page"
+"""
 
 
 @app.route('/_user/favorites')
