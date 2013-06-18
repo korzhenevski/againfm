@@ -8,7 +8,6 @@ from flask.ext.mongokit import MongoKit
 from flask.ext.misaka import Misaka
 from redis import Redis
 from .mailer import AmazonMailer
-from .search import Search
 
 app = Flask(__name__)
 Misaka(app)
@@ -27,7 +26,6 @@ app.jinja_env.block_start_string = '{{%'
 app.jinja_env.block_end_string = '%}}'
 
 db = MongoKit(app)
-search = Search()
 redis = Redis(**app.config['REDIS'])
 
 mailer = AmazonMailer(app)

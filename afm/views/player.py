@@ -1,39 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask import request, jsonify, abort, render_template
-import requests
-
 from afm import app, db, redis
 from afm.helpers import raw_redirect, get_ts, get_onair
-
-"""
-TODO:
-    добавление радио
-"""
+from afm.search import search
 
 
 @app.route('/_radio/search')
-def player_radio_search():
+def player_radio_search_sphinx():
     q = request.args.get('q', type=unicode)
-    try:
-        resp = requests.get('http://localhost:9200/afm/radio/_search', params={'q': u'title:{}*'.format(q)}).json()
-    except (RuntimeError, ValueError):
-        return jsonify({'objects': [], 'error': True})
-
-    hits = [hit['_source'] for hit in resp.get('hits', {}).get('hits', [])]
-    return jsonify({'objects': hits})
+    objects = search(q, app.config['RADIO_INDEX'])
+    return jsonify({'objects': objects})
 
 
 @app.route('/_radio/featured')
 def player_radio_featured():
-    objects = [radio.get_public() for radio in db.Radio.find_public({'is_public': True}).limit(30)]
+    where = {
+        'is_public': True,
+        'stream_type': 'audio/mpeg',
+    }
+    objects = [radio.get_public() for radio in db.Radio.find_public(where).limit(30)]
     return jsonify({'objects': objects})
 
 
 @app.route('/_radio/genre/<int:genre_id>')
 def player_radio_by_genre(genre_id):
-    where = {'is_public': True, 'deleted_at': 0, 'genre': genre_id}
-    objects = [radio.get_public() for radio in db.Radio.find(where).limit(30)]
+    where = {
+        'is_public': True,
+        'stream_type': 'audio/mpeg',
+        'genre': genre_id
+    }
+    objects = [radio.get_public() for radio in db.Radio.find_public(where).limit(30)]
     return jsonify({'objects': objects})
 
 
@@ -42,6 +39,7 @@ def select_stream(radio_id):
         'radio_id': radio_id,
         'is_online': True,
         'deleted_at': 0,
+        'content_type': 'audio/mpeg',
         'check.error_at': {'$lte': get_ts() - 12 * 3600}
     }
 

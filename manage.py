@@ -3,8 +3,9 @@
 
 from flask.ext.script import Manager
 from afm import app, db, models
-from pprint import pprint as pp
 from afm.helpers import fasthash
+from pprint import pprint as pp
+
 manager = Manager(app)
 
 
@@ -60,6 +61,7 @@ def agg(key):
 @manager.command
 def update_playlist():
     from afm.tasks import update_playlist
+
     for playlist in db.playlist.find(fields=['id']):
         print playlist['id']
         print update_playlist.delay(playlist_id=playlist['id'])
@@ -83,14 +85,6 @@ def sitemap():
 
 
 @manager.command
-def update_search():
-    from afm import search
-    for radio in db.Radio.find_public():
-        print radio.push_to_search()
-    print search.refresh()
-
-
-@manager.command
 def warm_cache():
     from afm import redis
 
@@ -101,10 +95,12 @@ def warm_cache():
     redis.rename('radio:public_new', 'radio:public')
     print redis.scard('radio:public'), 'public radio'
 
+
 @manager.command
 def get_icy_genre():
     import string
     from collections import Counter
+
     c = Counter()
     for stream in db.streams.find({'meta.genre': {'$exists': True}}):
         genre = stream['meta']['genre']
@@ -113,46 +109,6 @@ def get_icy_genre():
 
     for k, v in c.most_common(100):
         print k
-
-
-@manager.command
-def ctrl_search():
-    settings = {
-        "analysis": {
-            "filter": {
-                "ngram_filter": {
-                    "min_gram": 3,
-                    "max_gram": 8,
-                    "type": "nGram"
-                }
-            },
-            "analyzer": {
-                "ngram_analyzer": {
-                    "tokenizer": "lowercase",
-                    "filter": ["ngram_filter"],
-                    "type": "custom",
-                }
-            }
-        }
-    }
-
-    import requests
-    import json
-    print requests.delete('http://192.168.2.2:9200/againfm').json()
-    pp(requests.post('http://192.168.2.2:9200/againfm', data=json.dumps({'settings': settings})).json())
-    maping = {
-        'properties': {
-            'title': {
-                'type': 'string',
-                'analyzer': 'ngram_analyzer'
-            }
-        }
-    }
-    pp(requests.put('http://192.168.2.2:9200/againfm/radio/_mapping', data=json.dumps({'radio': maping})).json())
-
-    print requests.get('http://192.168.2.2:9200/againfm/_settings').json()
-    print requests.get('http://192.168.2.2:9200/againfm/_mapping').json()
-    #print requests.post('http://192.168.2.2:9200/test/_refresh').json()
 
 
 @manager.command
@@ -166,7 +122,8 @@ def convert_genres():
 @manager.command
 def convert():
     from afm.models import get_next_id
-    ids = set([3,4,5,7,17,21,32,34,40,41,43,28340,28344,28345,58,28351,65,28354,69,72,28361,86])
+
+    ids = set([3, 4, 5, 7, 17, 21, 32, 34, 40, 41, 43, 28340, 28344, 28345, 58, 28351, 65, 28354, 69, 72, 28361, 86])
 
     db.object_ids.update({'_id': 'radio'}, {'$set': {'next': 50000}})
 
@@ -196,6 +153,7 @@ def convert_favs():
 @manager.command
 def group_radio():
     from collections import defaultdict
+
     agg = defaultdict(set)
     for stream in db.Stream.find_public(fields=['id', 'url', 'radio_id']):
         try:
@@ -207,6 +165,69 @@ def group_radio():
     for h, radios in agg.iteritems():
         if len(radios) > 1:
             lead_id = radios
+
+
+@manager.command
+def xmlpipe():
+    from afm.sphinx import SphinxPipe
+
+    pipe = SphinxPipe()
+    pipe.AddField('title', attr='string')
+    pipe.AddField('description', attr='string')
+
+    for radio in db.radio.find({'deleted_at': 0}, fields=['id', 'title', 'description']):
+        doc = {'title': radio['title'], 'description': radio['description'] or ''}
+        pipe.AddDoc(radio['id'], doc)
+
+    print pipe.GetXml()
+
+@manager.command
+def index():
+    from whoosh.fields import ID, TEXT, Schema, NUMERIC
+    from whoosh.index import create_in
+    from whoosh.analysis import NgramWordAnalyzer
+    from whoosh.analysis import NgramAnalyzer
+
+    schema = Schema(
+        id=NUMERIC(int, stored=True),
+        title=TEXT(stored=True, analyzer=NgramAnalyzer(2)),
+        #description=TEXT(stored=True),
+    )
+
+    ix = create_in(app.config['RADIO_INDEX'], schema)
+    writer = ix.writer()
+    cursor = db.radio.find({'deleted_at': 0, 'stream_type': 'audio/mpeg'}, fields={'id': 1, 'title': 1, '_id': 0})
+    for radio in cursor:
+        #radio['id'] = unicode(radio['id'])
+        writer.add_document(**radio)
+
+    writer.commit(optimize=True)
+    print cursor.count(), 'radio in index'
+
+
+@manager.command
+def search():
+    from time import time
+    from afm.search import search
+    ts = time()
+
+    pp(search('house', app.config['RADIO_INDEX']))
+
+    print time() - ts
+
+
+@manager.command
+def akado():
+    import ujson as json
+    from afm.models import create_obj
+    data = json.loads(open('./akado.json').read())
+    for station in filter(lambda s: s['wave'], data):
+        if not station['playlist']:
+            continue
+        radio = create_obj(db.Radio, {'title': station['title'], 'tag': {'source': 'akado'}})
+        print radio
+        for playlist in station['playlist']:
+            print create_obj(db.Playlist, {'radio_id': radio['id'], 'url': playlist})
 
 
 if __name__ == "__main__":

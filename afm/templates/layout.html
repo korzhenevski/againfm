@@ -43,13 +43,15 @@
         </div>
     </div>
 
-    {{% block content %}}{{% endblock %}}
+    <div class="centroid flash-message">
+       <p>
+       Коллективный радиоплеер.<br>
+       Вещатели добавляют и транслируют свое радио. Постоянные слушатели откладывают радио в избранное под паролем.
+       </p>
+       <span class="pseudo-link" ng-click="hideFlash()">Я в курсе</span>
+    </div>
 
-    <p class="centroid flash-message">
-       Again.FM это коллективный радиоплеер.<br> Посетители слушают и откладывают в избранное любимое радио.
-       Постоянные слушатели добавляют и транслируют свое радио.
-       <br> <span class="pseudo-link" ng-click="hideFlash()">Я в курсе</span>
-    </p>
+    {{% block content %}}{{% endblock %}}
 
     {# подвал #}
     <div class="footer centroid">

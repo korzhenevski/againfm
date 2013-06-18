@@ -174,11 +174,11 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             });
         });
 
-        if (history.isEmpty()) {
-            $scope.selectTab('featured');
-        } else {
-            $scope.selectTab('history');
-        }
+        //if (history.isEmpty()) {
+        $scope.selectTab('featured');
+        //} else {
+        //    $scope.selectTab('history');
+        //}
     };
 
     $scope.$on('playerFreePlay', function () {
@@ -192,7 +192,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $scope.isHistoryEmpty = function () {
-        return history.isEmpty();
+        return true;
+        //return history.isEmpty();
     };
 
     $scope.hasList = function () {

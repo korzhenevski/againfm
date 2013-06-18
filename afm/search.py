@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import pyes
 
 
-class Search(object):
-    def __init__(self):
-        # add configure
-        self.es = pyes.ES()
-        self.index_name = 'againfm'
+def search(query, index_dir):
+    query = unicode(query)
+    from whoosh.filedb.filestore import FileStorage
+    from whoosh.qparser import QueryParser
+    storage = FileStorage(index_dir)
+    ix = storage.open_index()
 
-    def index(self, doc, doc_type, object_id, **kwargs):
-        return self.es.index(doc, self.index_name, doc_type, id=object_id, **kwargs)
+    parser = QueryParser('title', ix.schema)
+    myquery = parser.parse(query)
 
-    def refresh(self):
-        self.es.indices.refresh(self.index_name)
+    with ix.searcher() as searcher:
+        return [hit.fields() for hit in searcher.search(myquery)]

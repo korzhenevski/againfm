@@ -298,9 +298,9 @@ ul.justified .block {
 
 .flash-message {
   background-color: rgba(75, 76, 91, 0.5);
-  padding: 15px 17px;
+  padding: 15px 18px;
   display: none;
-  margin-bottom: 20px;
+  margin-top: 15px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
@@ -308,9 +308,6 @@ ul.justified .block {
   border-radius: 10px;
 }
 
-.logo {
-  visibility: hidden;
-}
 .logo img {
   margin-top: 12px;
 }
@@ -473,7 +470,7 @@ ul.justified .block {
   position: relative;
   border: 1px solid transparent;
   width: 1043px;
-  margin-top: 40px;
+  margin-top: 35px;
 }
 .radio .top {
   position: absolute;
@@ -1096,7 +1093,7 @@ ul.justified .block {
   min-height: 470px;
   border: 3px solid #2b2b2b;
   overflow: hidden;
-  margin-top: 40px;
+  margin-top: 35px;
   margin-bottom: 18px;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;

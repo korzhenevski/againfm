@@ -60,3 +60,5 @@ VK = {
 }
 
 UPLOADS_DEFAULT_DEST = '/tmp'
+
+RADIO_INDEX = '/tmp/againfm_whoosh'

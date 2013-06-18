@@ -42,7 +42,7 @@ def admin_required(f):
     def decorated(*args, **kwargs):
         auth = request.authorization
         if not auth or not check_auth(auth.username, auth.password):
-            return Response('Login Required', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+            return Response('Login Required', 401, {'WWW-Authenticate': 'Basic realm="Area 52"'})
         return f(*args, **kwargs)
     return decorated
 
