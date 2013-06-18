@@ -93,12 +93,12 @@
 
                                     {# навигация #}
                                     <ul class="tabs justified">
-                                        <li>
+                                        <!--li>
                                             <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
                                         </li>
                                         <li ng-hide="isHistoryEmpty()">
                                             <span class="block" ng-class="tabClass('history')" ng-click="selectTab('history')">История</span>
-                                        </li>
+                                        </li-->
                                         <li ng-repeat="tab in tabs">
                                             <span class="block" ng-class="tabClass(tab.id)" ng-click="selectTab(tab.id)">{{ tab.title }}</span>
                                         </li>
@@ -112,7 +112,7 @@
                                                 <span class="playlist-link">{{ radio.title }}</span>
                                             </a>
                                         </li>
-                                        <li ng-hide="hasList()" class="ng-cloak not-found">
+                                        <li ng-show="noSearchResults()" class="ng-cloak not-found">
                                             <div class="block">Ничего не найдено</div>
                                         </li>
                                     </ul>

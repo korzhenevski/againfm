@@ -3,7 +3,7 @@
 
 import time
 import string
-from afm import app, db, search, login_manager
+from afm import app, db, login_manager
 
 try:
     from flask.ext.mongokit import Document
@@ -101,6 +101,8 @@ class AnonUser(AnonymousUser):
     def get_public(self, *args):
         return None
 
+    def can(self, permission):
+        return False
 
 login_manager.anonymous_user = AnonUser
 
@@ -121,7 +123,7 @@ class User(BaseDocument):
         'connect': dict,
         'is_active': bool,
         'is_admin': bool,
-        'settings': dict
+        'settings': dict,
     }
 
     indexes = [{'fields': 'id', 'unique': True}]
@@ -135,6 +137,13 @@ class User(BaseDocument):
         'is_active': True,
         'is_admin': False,
     }
+
+    admin_perms = ['blog.admin']
+
+    def can(self, permission):
+        if self.is_admin() and permission in self.admin_perms:
+            return True
+        return False
 
     def check_password(self, raw_password):
         if not self['password']:
@@ -372,7 +381,8 @@ class Radio(BaseDocument):
         return list(playlist.get_public() for playlist in db.Playlist.find({'radio_id': self['id'], 'deleted_at': 0}))
 
     def push_to_search(self):
-        return search.index(self.as_dict(), 'radio', self.id)
+        # TODO: rewrite
+        return None
 
     def modify(self, data):
         # TODO: пушить обновленные данные в поиск

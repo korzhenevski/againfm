@@ -174,11 +174,14 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
             });
         });
 
-        //if (history.isEmpty()) {
-        $scope.selectTab('featured');
-        //} else {
-        //    $scope.selectTab('history');
-        //}
+        $scope.selectTab($scope.tabs[0].id);
+        /*
+        if (history.isEmpty()) {
+            $scope.selectTab('featured');
+        } else {
+            $scope.selectTab('history');
+        }
+        */
     };
 
     $scope.$on('playerFreePlay', function () {
@@ -196,8 +199,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         //return history.isEmpty();
     };
 
-    $scope.hasList = function () {
-        return !!$scope.playlist.length;
+    $scope.noSearchResults = function () {
+        return $scope.currentTab && $scope.currentTab.indexOf('search') !== -1 && !$scope.playlist.length;
     };
 
     $scope.search = function (searchQuery) {

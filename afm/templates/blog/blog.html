@@ -4,11 +4,11 @@
 {{% block description %}}Новости проекта{{% endblock %}}
 
 {{% block topline %}}
+    {{% if current_user.can('blog.admin') %}}
     <div class="menu-item">
-        <p>
-            <a href="{{{ url_for('blog_admin') }}}">Управление блогом</a>
-        </p>
+        <p><a href="{{{ url_for('blog_admin') }}}">Управление блогом</a></p>
     </div>
+    {{% endif %}}
 {{% endblock %}}
 
 {{% block content %}}

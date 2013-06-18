@@ -12,7 +12,6 @@ from afm.helpers import get_onair, build_playlist
 # не показывать в истории эфира текущий трек
 # проверить что дни выводятся в человечной форме
 # перелинковка радиостанций
-# основные жанры: релакс, фон, рок, блюз, джаз, транс, драм, рэп, новости, прочее
 
 @app.route('/')
 def index():
@@ -86,9 +85,10 @@ def app_stats():
 
 @app.context_processor
 def app_context():
+    genres = [genre.get_public() for genre in db.RadioGenre.find({'is_public': True}).sort('id', -1)]
     return {
         'standalone': request.is_xhr,
-        'genres': [genre.get_public() for genre in db.RadioGenre.find({'is_public': True})],
+        'genres': genres,
         'year': datetime.now().year,
         'stats': app_stats(),
         'production': False,
