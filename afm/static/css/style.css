@@ -32,12 +32,13 @@ body {
   font-size: 14px;
   line-height: 20px;
   color: #efefef;
+  min-width: 1090px;
   background-color: #3f3943;
   background-image: url("/static/i/background.jpg");
-  -webkit-background-size: cov;
-  -moz-background-size: cov;
-  -o-background-size: cov;
-  background-size: cov;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 h1, h2, h3 {
