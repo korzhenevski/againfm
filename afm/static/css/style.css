@@ -33,6 +33,11 @@ body {
   line-height: 20px;
   color: #efefef;
   background-color: #3f3943;
+  background-image: url("/static/i/background.jpg");
+  -webkit-background-size: cov;
+  -moz-background-size: cov;
+  -o-background-size: cov;
+  background-size: cov;
 }
 
 h1, h2, h3 {

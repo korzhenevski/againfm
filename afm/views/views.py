@@ -6,12 +6,8 @@ from datetime import datetime
 
 from flask.ext.login import current_user
 from afm import db, app
-from afm.helpers import get_onair, build_playlist
+from afm.helpers import get_onair, build_playlist, benchmark
 
-# TODO
-# не показывать в истории эфира текущий трек
-# проверить что дни выводятся в человечной форме
-# перелинковка радиостанций
 
 @app.route('/')
 def index():
@@ -50,10 +46,16 @@ def badbrowser():
 
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):
-    radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
-    history = list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10))
-    current_air = get_onair(radio_id)
-    return render_template('radio.html', radio=radio, history=history, current_air=current_air)
+    with benchmark('radio page'):
+        data = {
+            'radio': db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0}),
+            'history': list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)),
+            'current_air': get_onair(radio_id),
+            'prev_radio': db.radio.find_one({'id': {'$lt': radio_id}}, fields=['id', 'title'], sort=[('id', -1)]),
+            'next_radio': db.radio.find_one({'id': {'$gt': radio_id}}, fields=['id', 'title'], sort=[('id', 1)]),
+        }
+
+    return render_template('radio.html', **data)
 
 
 @app.route('/radio/<int:radio_id>.pls')

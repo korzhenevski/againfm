@@ -90,8 +90,9 @@ def warm_cache():
 
     # Generate new ids set and replace existent
     redis.delete('radio:public_new')
-    for radio in db.Radio.find_public(fields=['id']):
+    for radio in db.Radio.find_public({'stream_type': 'audio/mpeg'}, fields=['id']):
         redis.sadd('radio:public_new', radio['id'])
+
     redis.rename('radio:public_new', 'radio:public')
     print redis.scard('radio:public'), 'public radio'
 

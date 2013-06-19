@@ -16,7 +16,7 @@ def save_start_time():
 
 @app.after_request
 def x_headers(response):
-    response.headers['X-Request-Time'] = int(round((time.time() - g.start) * 1000))
+    response.headers['X-Runtime'] = round(time.time() - g.start, 4)
     return response
 
 
