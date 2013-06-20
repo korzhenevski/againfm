@@ -11,9 +11,4 @@ Vagrant::Config.run do |config|
 
     config.vm.share_folder "v-app", "/var/www/againfm", ".", :create => true, :nfs => true
     config.vm.customize ["modifyvm", :id, "--memory", 1024]
-    config.vm.provision :chef_solo do |chef|
-        chef.cookbooks_path = "chef/cookbooks"
-        chef.roles_path = "chef/roles"
-        chef.add_role('vagrant')
-    end
 end
