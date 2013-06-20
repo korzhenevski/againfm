@@ -14,7 +14,7 @@ Misaka(app)
 
 app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
-app.config.from_envvar('AGAINFM_CONFIG', silent=True)
+app.config.from_envvar('AFM_CONFIG', silent=True)
 
 if app.debug:
     # show immediately template changes during debug
