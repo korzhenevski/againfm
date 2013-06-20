@@ -13,7 +13,7 @@ from hashlib import md5
 import random
 from datetime import datetime
 import pymongo.errors
-from flask_login import AnonymousUser
+from flask_login import AnonymousUserMixin
 from afm.helpers import naturalday
 
 
@@ -97,14 +97,14 @@ class BaseDocument(Document):
         return dict((key, self.json_schema.get(key)) for key in keys if key in self.json_schema)
 
 
-class AnonUser(AnonymousUser):
+class AnonymousUser(AnonymousUserMixin):
     def get_public(self, *args):
         return None
 
     def can(self, permission):
         return False
 
-login_manager.anonymous_user = AnonUser
+login_manager.anonymous_user = AnonymousUser
 
 
 @db.register
