@@ -2,6 +2,9 @@ Fabric==1.6.1
 Flask==0.10.1
 Flask-Login==0.2.3
 Flask-OAuth==0.12
+Flask-Misaka==0.1.1
+Flask-Script==0.5.1
+Flask-MongoKit==0.6
 Jinja2==2.7
 MarkupSafe==0.18
 Werkzeug==0.9.1
