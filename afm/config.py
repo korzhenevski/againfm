@@ -2,14 +2,10 @@
 # -*- coding: utf-8 -*-
 
 DEBUG = True
-ASSETS_DEBUG = False
+PRODUCTION = False
 SECRET_KEY = '8b7707cbf3ac84b95361319960654c77'
 SEND_MAIL = True
 
-PRODUCTION = False
-
-COMET_URL = 'http://comet.v2.again.fm/'
-SENTRY_DSN = 'https://b6ea77c550514e9bb69cd12d78ec985d:08b229e4517f4d04ac55a684db42d852@app.getsentry.com/741'
 
 LANG = 'ru'
 # максимальный размер загружаемого файла - 1 Мб
@@ -61,4 +57,8 @@ VK = {
 
 UPLOADS_DEFAULT_DEST = '/tmp'
 
+# whoosh search index
 RADIO_INDEX = '/tmp/againfm_whoosh'
+
+# production error log
+ERROR_LOG = '/tmp/againfm_error.log'

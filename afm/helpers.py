@@ -130,9 +130,9 @@ class benchmark(object):
         self.name = name
 
     def __enter__(self):
-        self.start = time.time()
+        self.start = time()
 
     def __exit__(self, ty, val, tb):
-        end = time.time()
+        end = time()
         print("%s : %0.3f seconds" % (self.name, end - self.start))
         return False

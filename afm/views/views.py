@@ -46,15 +46,13 @@ def badbrowser():
 
 @app.route('/radio/<int:radio_id>')
 def radio(radio_id):
-    with benchmark('radio page'):
-        data = {
-            'radio': db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0}),
-            'history': list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)),
-            'current_air': get_onair(radio_id),
-            'prev_radio': db.radio.find_one({'id': {'$lt': radio_id}}, fields=['id', 'title'], sort=[('id', -1)]),
-            'next_radio': db.radio.find_one({'id': {'$gt': radio_id}}, fields=['id', 'title'], sort=[('id', 1)]),
-        }
-
+    data = {
+        'radio': db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0}),
+        'history': list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(10)),
+        'current_air': get_onair(radio_id),
+        'prev_radio': db.radio.find_one({'id': {'$lt': radio_id}}, fields=['id', 'title'], sort=[('id', -1)]),
+        'next_radio': db.radio.find_one({'id': {'$gt': radio_id}}, fields=['id', 'title'], sort=[('id', 1)]),
+    }
     return render_template('radio.html', **data)
 
 
