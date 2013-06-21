@@ -3,7 +3,6 @@
 .sass-cache
 
 .webassets-cache
-afm/static/js/dist
 venv
 .vagrant
 .DS_Store
@@ -17,7 +16,7 @@ script.js/
 # Packages
 *.egg
 *.egg-info
-dist
+./dist
 build
 eggs
 parts

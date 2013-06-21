@@ -5,15 +5,7 @@ from datetime import datetime
 from fabric.api import env, local, run, lcd, cd, sudo, settings, put
 from fabric.contrib.files import exists, append
 from fabric.contrib.console import confirm
-
-
-def grunt():
-    with lcd('afm/static/js'):
-        local('grunt')
-
-
-def dump():
-    local('mongodump -d againfm')
+from os.path import exists
 
 
 def init():
@@ -26,6 +18,14 @@ def compass():
 
 def celery():
     local('celery worker --app=afm.celery -l info')
+
+
+def grunt():
+    if not exists('/usr/bin/grunt'):
+        local('sudo npm install -g grunt-cli')
+    with lcd('afm/static/js'):
+        local('npm install')
+        local('grunt')
 
 
 def player():
