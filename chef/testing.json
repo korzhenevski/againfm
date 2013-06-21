@@ -1,7 +1,0 @@
-{
-    "againfm": {
-        "host": "v2.again.fm",
-        "comet_host": "comet.v2.again.fm"
-    },
-    "run_list": ["role[base]"]
-}
