@@ -4,7 +4,8 @@
     <title>{{% block title %}}Again.FM{{% endblock %}}</title>
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}{{% endblock %}}" />
-    <meta name="og:url" content="http://again.fm/" />
+    <meta name="og:url" content="{{{ request.url_root }}}" />
+    <meta name="og:image" content="{{{ request.url_root }}}static/i/social-logo.png" />
 
     <meta http-equiv="X-Frame-Options" content="deny" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">

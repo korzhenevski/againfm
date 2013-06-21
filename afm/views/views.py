@@ -5,7 +5,7 @@ from flask import render_template, request, redirect, make_response, abort
 from datetime import datetime
 
 from flask.ext.login import current_user
-from afm import db, app
+from afm import db, app, redis
 from afm.helpers import get_onair, build_playlist, benchmark
 
 
@@ -79,9 +79,8 @@ def siberia():
 
 
 def app_stats():
-    radio_count = db.radio.find({'deleted_at': 0}).count()
     return {
-        'radio': radio_count
+        'radio': redis.scard('radio:public')
     }
 
 
@@ -93,5 +92,4 @@ def app_context():
         'genres': genres,
         'year': datetime.now().year,
         'stats': app_stats(),
-        'production': False,
     }
