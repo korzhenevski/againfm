@@ -88,28 +88,11 @@ def sitemap():
 def warm_cache():
     from afm import redis
 
-    # Generate new ids set and replace existent
-    redis.delete('radio:public_new')
+    redis.delete('radio:public')
     for radio in db.Radio.find_public({'stream_type': 'audio/mpeg'}, fields=['id']):
-        redis.sadd('radio:public_new', radio['id'])
+        redis.sadd('radio:public', radio['id'])
 
-    redis.rename('radio:public_new', 'radio:public')
     print redis.scard('radio:public'), 'public radio'
-
-
-@manager.command
-def get_icy_genre():
-    import string
-    from collections import Counter
-
-    c = Counter()
-    for stream in db.streams.find({'meta.genre': {'$exists': True}}):
-        genre = stream['meta']['genre']
-        for token in map(string.lower, genre.split(',')):
-            c[token.strip()] += 1
-
-    for k, v in c.most_common(100):
-        print k
 
 
 @manager.command
@@ -152,23 +135,6 @@ def convert_favs():
 
 
 @manager.command
-def group_radio():
-    from collections import defaultdict
-
-    agg = defaultdict(set)
-    for stream in db.Stream.find_public(fields=['id', 'url', 'radio_id']):
-        try:
-            h = fasthash(stream['url'])
-            agg[h].add(stream['radio_id'])
-        except UnicodeEncodeError:
-            pass
-
-    for h, radios in agg.iteritems():
-        if len(radios) > 1:
-            lead_id = radios
-
-
-@manager.command
 def xmlpipe():
     from afm.sphinx import SphinxPipe
 
@@ -183,7 +149,9 @@ def xmlpipe():
     print pipe.GetXml()
 
 @manager.command
-def index():
+def update_search():
+    import os
+
     from whoosh.fields import ID, TEXT, Schema, NUMERIC
     from whoosh.index import create_in
     from whoosh.analysis import NgramWordAnalyzer
@@ -192,43 +160,20 @@ def index():
     schema = Schema(
         id=NUMERIC(int, stored=True),
         title=TEXT(stored=True, analyzer=NgramAnalyzer(2)),
-        #description=TEXT(stored=True),
     )
+
+    print 'update index', app.config['RADIO_INDEX']
+    if not os.path.exists(app.config['RADIO_INDEX']):
+        os.mkdir(app.config['RADIO_INDEX'])
 
     ix = create_in(app.config['RADIO_INDEX'], schema)
     writer = ix.writer()
     cursor = db.radio.find({'deleted_at': 0, 'stream_type': 'audio/mpeg'}, fields={'id': 1, 'title': 1, '_id': 0})
     for radio in cursor:
-        #radio['id'] = unicode(radio['id'])
         writer.add_document(**radio)
 
     writer.commit(optimize=True)
     print cursor.count(), 'radio in index'
-
-
-@manager.command
-def search():
-    from time import time
-    from afm.search import search
-    ts = time()
-
-    pp(search('house', app.config['RADIO_INDEX']))
-
-    print time() - ts
-
-
-@manager.command
-def akado():
-    import ujson as json
-    from afm.models import create_obj
-    data = json.loads(open('./akado.json').read())
-    for station in filter(lambda s: s['wave'], data):
-        if not station['playlist']:
-            continue
-        radio = create_obj(db.Radio, {'title': station['title'], 'tag': {'source': 'akado'}})
-        print radio
-        for playlist in station['playlist']:
-            print create_obj(db.Playlist, {'radio_id': radio['id'], 'url': playlist})
 
 
 if __name__ == "__main__":

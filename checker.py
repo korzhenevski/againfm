@@ -13,7 +13,7 @@ from afm.helpers import get_ts
 from afm.tasks import check_stream_raw
 
 db = Connection(use_greenlets=True)['againfm']
-pool = Pool(size=30)
+pool = Pool(size=25)
 
 
 def check_stream(stream):
@@ -49,9 +49,8 @@ def update_check_info():
 
 def main():
     ts = time()
-    where = {'checked_at': {'$lte': get_ts() - 3600}, 'deleted_at': 0}
-    where = {'deleted_at': 0}
-    for stream in db.streams.find(where, fields=['id', 'url']):
+    where = {'checked_at': {'$lte': get_ts() - 600}, 'deleted_at': 0}
+    for stream in db.streams.find(where, fields=['id', 'url']).sort('checked_at', 1):
         pool.spawn(check_stream, stream)
     pool.join()
 
