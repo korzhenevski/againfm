@@ -3,13 +3,13 @@
 from flask import request, jsonify, abort, render_template
 from afm import app, db, redis
 from afm.helpers import raw_redirect, get_ts, get_onair
-from afm.search import search
+from afm.search import SearchIndex
 
 
 @app.route('/_radio/search')
-def player_radio_search_sphinx():
-    q = request.args.get('q', type=unicode)
-    objects = search(q, app.config['RADIO_INDEX'])
+def player_radio_search():
+    ix = SearchIndex(app.config['RADIO_INDEX'])
+    objects = ix.search(request.args.get('q', type=unicode))
     return jsonify({'objects': objects})
 
 

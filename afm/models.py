@@ -316,7 +316,7 @@ class Radio(BaseDocument):
         'description': unicode,
         'city': int,
         'website': unicode,
-        'genre': int,
+        'genre': [int],
         'group': dict,
         'owner_id': int,
         'is_channel': bool,
@@ -336,7 +336,7 @@ class Radio(BaseDocument):
         'description': u'',
         'city': 0,
         'website': u'',
-        'genre': 0,
+        'genre': [],
         'is_channel': False,
         'is_public': False,
         'check_at': 0,
@@ -373,16 +373,6 @@ class Radio(BaseDocument):
     }
 
     public = ['id', 'title', 'description']
-
-    def get_streams(self):
-        return list(stream.get_public() for stream in db.Stream.find({'radio_id': self['id'], 'deleted_at': 0}))
-
-    def get_playlists(self):
-        return list(playlist.get_public() for playlist in db.Playlist.find({'radio_id': self['id'], 'deleted_at': 0}))
-
-    def push_to_search(self):
-        # TODO: rewrite
-        return None
 
     def modify(self, data):
         # TODO: пушить обновленные данные в поиск

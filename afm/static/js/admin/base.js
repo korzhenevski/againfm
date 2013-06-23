@@ -98,6 +98,23 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     };
 })
 
+.directive('chosen',function(){
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = attrs['ngModel'];
+
+            scope.$watch(model, function () {
+                element.trigger('liszt:updated');
+            });
+
+            element.chosen({
+                width: '300px'
+            });
+        }
+    }
+})
+
 .filter('fromNow', function() {
     return function(dateString) {
         if (!dateString) {

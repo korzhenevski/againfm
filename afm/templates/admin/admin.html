@@ -53,15 +53,11 @@
                         </tr>
 
                         <tr>
-                            <td class="label">Город: </td>
-                            <td class="field"><input class="text" type="text" ng-model="radio.city" /></td>
-                        </tr>
-
-                        <tr>
                             <td class="label">Жанр: </td>
-                            <td class="field-text">
-                                <select ng-model="radio.genre" ng-options="genre.id as genre.title for genre in genres">
-                                    <option value="">- select genre -</option>
+                            <td>
+                                <select chosen ng-model="radio.genre" multiple data-placeholder="Не выбран"
+                                        ng-options="genre.id as genre.title for genre in genres">
+                                    <option value="">- не выбран -</option>
                                 </select>
                             </td>
                         </tr>
@@ -97,6 +93,7 @@
                                 </ul>
                             </td>
                         </tr>
+
                     </table>
                 </form>
             </div>
@@ -104,11 +101,18 @@
     </div>
 {{% endblock %}}
 
+{{% block pre_scripts %}}
+    <script src="/static/js/common/jquery.js"></script>
+    <script src="/static/chosen/chosen.jquery.js"></script>
+{{% endblock %}}
+
 {{% block styles %}}
     <link href="/static/css/admin.css" rel="stylesheet"/>
+    <link href="/static/chosen/chosen.css" rel="stylesheet"/>
 {{% endblock %}}
 
 {{% block scripts %}}
+
     <script src="/static/js/admin/base.js"></script>
     <script src="/static/js/common/moment.js"></script>
     <script>

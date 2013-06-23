@@ -89,7 +89,7 @@ def warm_cache():
     from afm import redis
 
     redis.delete('radio:public')
-    for radio in db.Radio.find_public({'stream_type': 'audio/mpeg'}, fields=['id']):
+    for radio in db.Radio.find_public({'stream_type': 'audio/mpeg', 'deleted_at': 0}, fields=['id']):
         redis.sadd('radio:public', radio['id'])
 
     print redis.scard('radio:public'), 'public radio'
@@ -97,9 +97,13 @@ def warm_cache():
 
 @manager.command
 def convert_genres():
-    for radio in db.radio.find({}, fields=['id', 'genres']):
-        genre = radio['genres'][0] if radio['genres'] else 0
-        db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
+    for radio in db.radio.find({}, fields=['id', 'genre']):
+        #print radio['genre']
+        #genre = [int(radio['genre'])] if radio['genre'] else []
+        #print genre
+        if not isinstance(radio['genre'], list):
+            print radio
+        #db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
         #print radio['id']
 
 
@@ -135,30 +139,15 @@ def convert_favs():
 
 
 @manager.command
-def xmlpipe():
-    from afm.sphinx import SphinxPipe
-
-    pipe = SphinxPipe()
-    pipe.AddField('title', attr='string')
-    pipe.AddField('description', attr='string')
-
-    for radio in db.radio.find({'deleted_at': 0}, fields=['id', 'title', 'description']):
-        doc = {'title': radio['title'], 'description': radio['description'] or ''}
-        pipe.AddDoc(radio['id'], doc)
-
-    print pipe.GetXml()
-
-@manager.command
 def update_search():
     import os
 
-    from whoosh.fields import ID, TEXT, Schema, NUMERIC
+    from whoosh.fields import TEXT, Schema, NUMERIC
     from whoosh.index import create_in
-    from whoosh.analysis import NgramWordAnalyzer
     from whoosh.analysis import NgramAnalyzer
 
     schema = Schema(
-        id=NUMERIC(int, stored=True),
+        id=NUMERIC(int, stored=True, unique=True),
         title=TEXT(stored=True, analyzer=NgramAnalyzer(2)),
     )
 

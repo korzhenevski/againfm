@@ -79,3 +79,11 @@
 .genres-admin td {
   padding: 3px 0;
 }
+
+.chzn-container {
+  margin-bottom: 10px;
+  color: #222222 !important;
+}
+.chzn-container a {
+  border: 0;
+}

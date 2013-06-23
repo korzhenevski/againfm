@@ -1107,6 +1107,9 @@ ul.justified .block {
   -o-border-radius: 8px;
   border-radius: 8px;
 }
+.page h1 {
+  text-shadow: black 0px 1px 1px;
+}
 .page a.link {
   color: #42d5f4;
   border-bottom: 1px solid #42d5f4;

@@ -26,7 +26,6 @@ else:
     logger.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     app.logger.addHandler(logger)
 
-
 app.jinja_env.variable_start_string = '{{{'
 app.jinja_env.variable_end_string = '}}}'
 app.jinja_env.block_start_string = '{{%'

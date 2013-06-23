@@ -6,14 +6,12 @@ PRODUCTION = False
 SECRET_KEY = '8b7707cbf3ac84b95361319960654c77'
 SEND_MAIL = True
 
-
-LANG = 'ru'
-# максимальный размер загружаемого файла - 1 Мб
-# больше - RequestEntityTooLarge
+# максимальный размер загружаемого файла
 MAX_CONTENT_LENGTH = 1024 * 1024
 
 AMAZON_SES_ACCESS_KEY = 'AKIAI35JFXNA25HR2T6A'
 AMAZON_SES_SECRET_KEY = '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'
+
 DEFAULT_MAIL_SENDER = 'Again.FM <mail@again.fm>'
 DEFAULT_MAIL_SUBJECT = 'Again.FM'
 ADMIN_EMAIL = 'yura.nevsky@gmail.com'
@@ -22,7 +20,6 @@ MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_DATABASE = 'againfm'
 
-# params passed to Redis constructor
 REDIS = {
     'host': 'localhost',
     'port': 6379,

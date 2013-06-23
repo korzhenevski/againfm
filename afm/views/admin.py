@@ -5,10 +5,13 @@ from flask import render_template, jsonify, request
 from afm import app, db
 from afm.models import list_public, create_obj, soft_delete
 from afm.views.user import admin_required
+from afm.search import SearchIndex
 
 
 def get_radio(radio_id):
-    return db.Radio.find_one({'id': radio_id}).as_dict()
+    fields = {key: True for key in ['id', 'title', 'website', 'description', 'genre', 'is_public', 'updated_at']}
+    fields['_id'] = False
+    return db.radio.find_one({'id': radio_id}, fields=fields)
 
 
 def get_genres():
@@ -78,9 +81,13 @@ def admin_radio(radio_id):
 @app.route('/_admin/radio/<int:radio_id>/save', methods=['POST'])
 @admin_required
 def admin_radio_save(radio_id):
+    update = request.json['radio']
     radio = db.Radio.find_one_or_404({'id': radio_id})
-    radio.modify(request.json['radio'])
-    return jsonify({'radio': get_radio(radio_id)})
+    radio.modify(update)
+    radio = get_radio(radio_id)
+    ix = SearchIndex(app.config['RADIO_INDEX'])
+    ix.update({k: v for k, v in radio.iteritems() if k in ['id', 'title']})
+    return jsonify({'radio': radio})
 
 
 @app.route('/_admin/radio/<int:radio_id>/delete', methods=['POST'])
