@@ -41,7 +41,7 @@ def format_timestamp_time(ts, fmt=None):
 
 @app.template_filter('trackname')
 def format_trackname(trackname):
-    return Markup(re.sub(r'(.*) - (.*)', r'<strong>\1</strong> - \2', escape(trackname)))
+    return Markup(re.sub(r'(.*) - (.*)', r'<strong>\1</strong> - \2', unicode(escape(trackname))))
 
 
 from . import views, user, player, admin, pages
