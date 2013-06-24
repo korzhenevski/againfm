@@ -20,7 +20,7 @@
                 <input type="submit" value="Сохранить" class="btn" />
                 {{% if page.id %}}
                     <a href="{{{ url_for('admin_pages_remove', page_id=page.id) }}}" class="action-link">удалить</a>
-                    <a href="{{{ url_for('page', path=page.path) }}}" target="_blank" class="action-link">на сайте</a>
+                    <a href="{{{ url_for('page', path=page.path) }}}" target="_blank" class="action-link">показать на сайте</a>
                 {{% endif %}}
             </p>
         </form>

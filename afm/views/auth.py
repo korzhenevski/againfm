@@ -7,6 +7,8 @@ from flask import session
 from afm import app
 from afm.oauth import vk
 
+# TODO
+# авторизация через социальные сети
 
 @vk.tokengetter
 def get_vk_token(token=None):

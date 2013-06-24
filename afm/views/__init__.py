@@ -4,7 +4,7 @@
 import re
 import time
 import ujson as json
-from flask import g, request, jsonify, render_template, Markup
+from flask import g, request, jsonify, render_template, Markup, escape
 from jinja2 import escape
 from datetime import datetime
 from afm import app
@@ -41,6 +41,7 @@ def format_timestamp_time(ts, fmt=None):
 
 @app.template_filter('trackname')
 def format_trackname(trackname):
-    return Markup(re.sub(r'(.*) - (.*)', r'<strong>\1</strong> - \2', trackname))
+    return Markup(re.sub(r'(.*) - (.*)', r'<strong>\1</strong> - \2', escape(trackname)))
+
 
 from . import views, user, player, admin, pages
