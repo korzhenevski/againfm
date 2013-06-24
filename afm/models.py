@@ -123,6 +123,7 @@ class User(BaseDocument):
         'password': unicode,
         'new_password': unicode,
         'avatar_url': unicode,
+        'favorites': dict,
         'connect': dict,
         'is_active': bool,
         'is_admin': bool,
@@ -137,6 +138,7 @@ class User(BaseDocument):
         'avatar_url': u'',
         'email': u'',
         'connect': {},
+        'favorites': {},
         'is_active': True,
         'is_admin': False,
     }
