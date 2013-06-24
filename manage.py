@@ -165,5 +165,13 @@ def update_search():
     print cursor.count(), 'radio in index'
 
 
+@manager.command
+def obj_ids():
+    for klass in ['radio', 'streams', 'playlist', 'users', 'pages']:
+        max_id = db[klass].find_one(fields=['id'], sort=[('id', -1)])['id'] + 1
+        print klass, max_id
+        db.object_ids.insert({'_id': klass, 'next': int(max_id)})
+
+
 if __name__ == "__main__":
     manager.run()
