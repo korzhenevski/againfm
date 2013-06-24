@@ -9,7 +9,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
     }
 })
 
-.directive('flashMessage', function(storage){
+.directive('flashMessage', function(storage, $window){
     return {
         restrict: 'C',
         link: function($scope, element) {
@@ -18,7 +18,12 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
                 storage.put('hideFlashMessage', true);
             };
 
-            element.css('display', storage.get('hideFlashMessage') ? 'none' : 'block');
+            $scope.nav = function(loc) {
+                $scope.hideFlash();
+                $window.location = loc;
+            };
+
+            element.css('display', storage.get('hideFlashMessage') ? 'none' : 'inline-block');
         }
     }
 })

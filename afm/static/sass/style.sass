@@ -262,13 +262,22 @@ ul.justified
   display: none
   margin-top: 15px
   +border-radius(10px)
+  display: inline-block
+  .close
+    width: 17px
+    height: 17px
+    cursor: pointer
+    display: inline-block
+    position: relative
+    top: 4px
+    @include common-icons-sprite(modal-close)
 
 .logo
-  visibility: hidden
   img
-    margin-top: 11px
+    margin-top: 10px
   a
     border: none !important
+    margin-right: 7px !important
 
 .topline
   border-top: 1px solid #525362
@@ -284,6 +293,15 @@ ul.justified
   .username
     color: #c6c5c8
     margin-right: 15px
+
+  .slogan
+    p
+      margin: 14px 0
+    float: left
+    font-style: italic
+    font-weight: 100
+    font-size: 13px
+    color: #c6c5c8
 
   .menu-item
     p
@@ -499,7 +517,7 @@ ul.justified
       position: relative
       font-size: 19px
       line-height: 27px
-      font-weight: 300
+      font-weight: 400
       .overflow
         white-space: nowrap
         width: 242px

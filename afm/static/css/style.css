@@ -6,7 +6,7 @@
   background: url('/static/i/display-controls-s5b2974258f.png') no-repeat;
 }
 
-.common-icons-sprite, .modal .header .close, .radio-box .favorites .signage {
+.common-icons-sprite, .modal .header .close, .flash-message .close, .radio-box .favorites .signage {
   background: url('/static/i/common-icons-sa4baa05130.png') no-repeat;
 }
 
@@ -313,16 +313,24 @@ ul.justified .block {
   -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
+  display: inline-block;
+}
+.flash-message .close {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  top: 4px;
+  background-position: 0 -106px;
 }
 
-.logo {
-  visibility: hidden;
-}
 .logo img {
-  margin-top: 11px;
+  margin-top: 10px;
 }
 .logo a {
   border: none !important;
+  margin-right: 7px !important;
 }
 
 .topline {
@@ -346,6 +354,16 @@ ul.justified .block {
 .topmenu .username {
   color: #c6c5c8;
   margin-right: 15px;
+}
+.topmenu .slogan {
+  float: left;
+  font-style: italic;
+  font-weight: 100;
+  font-size: 13px;
+  color: #c6c5c8;
+}
+.topmenu .slogan p {
+  margin: 14px 0;
 }
 .topmenu .menu-item {
   margin-left: 20px;
@@ -612,7 +630,7 @@ ul.justified .block {
   position: relative;
   font-size: 19px;
   line-height: 27px;
-  font-weight: 300;
+  font-weight: 400;
 }
 .radio-box .display .title .overflow {
   white-space: nowrap;

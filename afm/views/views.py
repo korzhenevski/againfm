@@ -6,7 +6,7 @@ from datetime import datetime
 
 from flask.ext.login import current_user
 from afm import db, app, redis
-from afm.helpers import get_onair, build_playlist, benchmark
+from afm.helpers import get_onair, build_playlist
 
 
 @app.route('/')
@@ -27,16 +27,6 @@ def user_actions():
 def listen(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
     return render_template('player.html', radio=radio)
-
-
-@app.route('/about')
-def about():
-    return render_template('pages/about.html')
-
-
-@app.route('/jobs')
-def jobs():
-    return render_template('pages/jobs.html')
 
 
 @app.route('/badbrowser')

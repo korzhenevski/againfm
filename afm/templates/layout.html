@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:og="http://ogp.me/ns#">
 <head>
-    <title>{{% block title %}}Again.FM{{% endblock %}}</title>
+    <title>{{% block title %}}Эгейн.FM{{% endblock %}}</title>
     <meta charset="utf-8" />
     <meta name="description" content="{{% block description %}}{{% endblock %}}" />
     <meta name="og:url" content="{{{ request.url_root }}}" />
@@ -35,7 +35,7 @@
             <div class="topmenu">
                 <div class="menu-item logo">
                     <a href="/" target="_self">
-                        <img src="/static/i/logo.png" width="132" height="31" alt="Радиоплеер Эгейн" />
+                        <img src="/static/i/logo.png" width="132" height="31" alt="Радиоплеер Эгейн.FM" />
                     </a>
                 </div>
 
@@ -44,12 +44,11 @@
         </div>
     </div>
 
-    <div class="centroid flash-message">
-       <p>
-       Коллективный радиоплеер.<br>
-       Пользователи добавляют и транслируют радио. Постоянные слушатели откладывают радиостанции в избранное под паролем.
-       </p>
-       <span class="pseudo-link" ng-click="hideFlash()">Я в курсе</span>
+    <div class="centroid ng-cloak">
+        <div class="flash-message">
+           <a href="/changelog" ng-click="nav('/changelog')">Летние нововведения</a> на Эгейне
+           <i class="close" ng-click="hideFlash()"></i>
+        </div>
     </div>
 
     {{% block content %}}{{% endblock %}}
@@ -63,10 +62,6 @@
 
             {{% if request.path != '/feedback' %}}
                 <li class="item"><a href="{{{ url_for('feedback') }}}" target="_self">обратная связь</a></li>
-            {{% endif %}}
-
-            {{% if request.path != '/blog' %}}
-                <li class="item"><a href="/blog" target="_self">блог</a></li>
             {{% endif %}}
 
             {{% block footer %}}{{% endblock %}}
