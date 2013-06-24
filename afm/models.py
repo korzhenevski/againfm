@@ -104,6 +104,9 @@ class AnonymousUser(AnonymousUserMixin):
     def can(self, permission):
         return False
 
+    def is_admin(self):
+        return False
+
 login_manager.anonymous_user = AnonymousUser
 
 
@@ -513,6 +516,9 @@ class Page(BaseDocument):
     }
 
     default_values = {
+        'path': u'',
+        'title': u'',
+        'content': u'',
         'created_at': get_ts,
         'updated_at': 0,
         'deleted_at': 0

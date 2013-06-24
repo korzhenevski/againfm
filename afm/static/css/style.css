@@ -1326,19 +1326,19 @@ p.large {
   color: #f3f3f3;
 }
 
-.blog h2 {
+.action-link {
+  margin-left: 1em;
+}
+
+.site-page h2 {
   margin-top: 0.8em;
   margin-bottom: 0.3em;
   font-weight: 400;
 }
-.blog .page-time {
+.site-page .time {
   font-size: 12px;
+  font-style: italic;
 }
-.blog .post-content {
+.site-page .inner {
   margin-bottom: 2em;
-}
-
-.blog-admin #editor {
-  width: 600px;
-  height: 300px;
 }

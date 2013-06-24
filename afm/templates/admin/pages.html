@@ -1,0 +1,31 @@
+{{% extends "admin/layout.html" %}}
+
+{{% block title %}}Страницы{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid pages-admin">
+        <h1>Страницы</h1>
+
+        <p><a href="/admin/pages/new">добавить</a></p>
+        <table class="pages-list">
+            <tr>
+                <th>ID</th>
+                <th>Путь</th>
+                <th>Заголовок</th>
+                <th>&mdash;</th>
+            </tr>
+            {{% for page in pages %}}
+            <tr>
+                <td>{{{ page.id }}}</td>
+                <td>{{{ page.path }}}</td>
+                <td><a href="{{{ url_for('page', path=page.path) }}}">{{{ page.title }}}</a></td>
+                <td>
+                    <a href="{{{ url_for('admin_pages_edit', page_id=page.id) }}}">редактировать</a>
+                    <a href="{{{ url_for('admin_pages_remove', page_id=page.id) }}}" class="action-link">удалить</a>
+                </td>
+            </tr>
+            {{% endfor %}}
+        </table>
+    </div>
+{{% endblock %}}
+

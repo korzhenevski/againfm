@@ -2,18 +2,26 @@
 
 {{% block topline %}}
     <div class="menu-item">
-        <p><a href="/admin">Правление</a></p>
+        <p><a href="{{{ url_for('admin_index') }}}">Управление</a></p>
     </div>
 
     <div class="menu-item">
-        <p><a href="/admin/genres">Редактор жанров</a></p>
+        <p><a href="{{{ url_for('admin_genres') }}}">Жанры</a></p>
     </div>
 
     <div class="menu-item">
-        <p><a href="/admin/editor">Вселенная</a></p>
+        <p><a href="{{{ url_for('admin_radio') }}}">Радио</a></p>
     </div>
 
     <div class="menu-item">
         <p><a href="/admin/users">Пользователи</a></p>
     </div>
+
+    <div class="menu-item">
+        <p><a href="{{{ url_for('admin_pages') }}}">Страницы</a></p>
+    </div>
+{{% endblock %}}
+
+{{% block styles %}}
+    <link href="/static/css/admin.css" rel="stylesheet"/>
 {{% endblock %}}
