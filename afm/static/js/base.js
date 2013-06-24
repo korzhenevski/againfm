@@ -354,7 +354,7 @@ angular.module('afm.base', ['ngResource', 'ngCookies', 'ui.state'])
             };
 
             $scope.$on('$stateChangeStart', function(ev, to, toParams, from, fromParams){
-                if (angular.isUndefined(from.templateUrl) && angular.isDefined(to.templateUrl)) {
+                if (angular.isUndefined(from.templateUrl) && (angular.isDefined(to.templateUrl) || angular.isDefined(to.templateProvider))) {
                     backTo = {name: from.name, params: fromParams};
                 }
             });

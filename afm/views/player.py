@@ -5,6 +5,8 @@ from afm import app, db, redis
 from afm.helpers import raw_redirect, get_ts, get_onair
 from afm.search import SearchIndex
 
+# play_redirect?codecs=mp3,ogg&radio_id=1488&listener_id=<hash>&format=low|high
+# playtime?radio_id=1488&state=paused|playing|
 
 @app.route('/_radio/search')
 def player_radio_search():
@@ -19,7 +21,7 @@ def player_radio_featured():
         'is_public': True,
         'stream_type': 'audio/mpeg',
     }
-    objects = [radio.get_public() for radio in db.Radio.find_public(where).limit(30)]
+    objects = [radio.get_public() for radio in db.Radio.find_public(where).sort([('air.listeners', -1), ('id', -1)]).limit(30)]
     return jsonify({'objects': objects})
 
 
@@ -84,8 +86,12 @@ def player_radio(radio_id):
 @app.route('/_radio/<int:radio_id>/onair_history')
 def player_radio_onair(radio_id):
     radio = db.Radio.find_one_or_404({'id': radio_id, 'deleted_at': 0})
-    history = list(db.Air.find({'radio_id': radio_id}).sort('ts', -1).limit(20))
-    return render_template('radio_onair.html', radio=radio, history=history, current_onair=get_onair(radio_id))
+    onair = get_onair(radio_id)
+    history = list(db.Air.find({
+        'id': {'$ne': onair.get('id', -1)},
+        'radio_id': radio_id
+    }).sort('ts', -1).limit(250))
+    return render_template('radio_onair.html', radio=radio, history=history, current_onair=onair)
 
 
 @app.route('/_radio/<int:radio_id>/stream')

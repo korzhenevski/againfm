@@ -4,6 +4,10 @@
 
 {{% block description %}}Коллективный радиоплеер интернет-радиостанций{{% endblock %}}
 
+{#
+ горизонтальный плейлист
+ #}
+
 {{% block top_content %}}
     {# индикатор загрузки на CSS3 #}
     <script type="text/ng-template" id="spinner.html">
@@ -28,7 +32,7 @@
         </p>
         <p ng-show="user.isLogged()">
             <span class="username">{{ user.get().email }}</span>
-            <span class="pseudo-link" ng-click="logout()">выйти</span>
+            <span class="pseudo-link" ng-click="logout()">выход</span>
         </p>
     </div>
 {{% endblock %}}
@@ -83,7 +87,7 @@
                         {# плейлист #}
                         <td rowspan="3">
                             <div class="radio-table" ng-init='genres={{{ genres|json }}}'>
-                                <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="initTabs()">
+                                <div class="table-inner" ng-controller="PlaylistCtrl" ng-init="addTab('featured', 'Слушают сейчас'); initTabs()">
                                     <div class="group">
                                         <div class="search">
                                             <input type="search" placeholder="Поиск" class="search-field" ng-model="searchQuery" />

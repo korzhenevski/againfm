@@ -321,9 +321,9 @@ class Radio(BaseDocument):
         'owner_id': int,
         'is_channel': bool,
         'is_public': bool,
-        'air_history': bool,
         'air_record': bool,
         'tag': dict,
+        'air': dict,
         'stream_type': list,
         'check_at': int,
         'created_at': int,
@@ -340,11 +340,13 @@ class Radio(BaseDocument):
         'is_channel': False,
         'is_public': False,
         'check_at': 0,
+        'air': {
+            'track': False,
+            'min': 5
+        },
         'created_at': get_ts,
         'deleted_at': 0,
         'updated_at': 0,
-        'air_history': False,
-        'air_record': False,
     }
 
     json_schema = {
@@ -497,11 +499,12 @@ class Air(BaseDocument):
 
 
 @db.register
-class BlogPost(BaseDocument):
-    __collection__ = 'blog_post'
+class Page(BaseDocument):
+    __collection__ = 'pages'
 
     structure = {
         'id': int,
+        'path': unicode,
         'title': unicode,
         'content': unicode,
         'created_at': int,

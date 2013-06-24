@@ -21,9 +21,9 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 
     $stateProvider.state('onair', {
-        templateProvider: function(Radio, $http, $templateCache){
+        templateProvider: function(Radio, $http){
             var url = '/_radio/' + Radio.cur.id + '/onair_history';
-            return $http.get(url, { cache: $templateCache }).then(function(response) { return response.data; });
+            return $http.get(url).then(function(response) { return response.data; });
         }
     });
 })
@@ -75,6 +75,8 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
                 $http.get('/_radio/' + radio.id + '/stream').success(function(stream){
                     self.stream = stream;
                     player.play(stream.url);
+                }).error(function (resp, statusCode) {
+                    $rootScope.$broadcast('radioListenError', statusCode);
                 });
             }
 
@@ -166,12 +168,13 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.tabs = [];
     $scope.playlist = [];
 
+    $scope.addTab = function(id, title) {
+        $scope.tabs.push({id: id, title: title});
+    };
+
     $scope.initTabs = function () {
         angular.forEach($scope.genres, function (genre) {
-            $scope.tabs.push({
-                id: 'genre/' + genre.id,
-                title: genre.title
-            });
+            $scope.addTab('genre/' + genre.id, genre.title);
         });
 
         $scope.selectTab($scope.tabs[0].id);

@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from fabric.api import env, local, run, lcd, cd, sudo, settings, put
-from fabric.contrib.files import exists, append
-from fabric.contrib.console import confirm
-from os.path import exists
+from fabric.api import env, local, run, lcd
+from fabric.contrib.files import exists
 
 
 def init():

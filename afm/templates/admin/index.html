@@ -1,0 +1,46 @@
+{{% extends "admin/layout.html" %}}
+
+{{% block title %}}Правление{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid admin-index">
+        <h1>Прямо сейчас</h1>
+        <table ng-controller="StatsCtrl">
+            <tr>
+                <td class="metric">
+                    {{ stats.nowListen }}
+                    <span class="label">Now Listen</span>
+                </td>
+                <td class="metric">
+                    {{ stats.userCount }}
+                    <span class="label">Users</span>
+                </td>
+                <td class="metric">
+                    {{ stats.radioCount }}
+                    <span class="label">Radio</span>
+                </td>
+                <td class="metric">
+                    {{ stats.streamCount }}
+                    <span class="label">Stream</span>
+                </td>
+                <td class="metric">
+                    {{ stats.airCount }}
+                    <span class="label">Air Track</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+{{% endblock %}}
+
+{{% block styles %}}
+    <link href="/static/css/admin.css" rel="stylesheet"/>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script src="/static/js/admin/base.js"></script>
+    <script>
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm.admin']);
+        });
+    </script>
+{{% endblock %}}

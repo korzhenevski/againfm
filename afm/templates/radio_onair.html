@@ -1,6 +1,6 @@
 <div modal="onair" title="{{{ radio.title }}}">
-    {{% if current_onair %}}
-    <p class="text-overflow">Сейчас играет: {{{ current_onair.title }}}</p>
+    {{% if current_onair.title %}}
+    <p class="text-overflow">Сейчас играет: {{{ current_onair.title|trackname }}}</p>
     {{% endif %}}
 
     {{% if history %}}
@@ -13,7 +13,7 @@
                 {{% for air in group.list|sort(attribute='time', reverse=True) %}}
                 <tr>
                     <td class="time">{{{ air.time.strftime('%H:%M') }}}</td>
-                    <td class="title text-overflow">{{{ air.title }}}</td>
+                    <td class="title">{{{ air.title|trackname }}}</td>
                 </tr>
                 {{% endfor %}}
             {{% endfor %}}

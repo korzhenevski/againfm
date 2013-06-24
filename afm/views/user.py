@@ -31,18 +31,11 @@ def unauthorized():
     return redirect(url_for('index'))
 
 
-def check_auth(login, password):
-    user = db.User.find_login(login)
-    if user and user.is_admin():
-        return user.check_password(password)
-
-
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return Response('Login Required', 401, {'WWW-Authenticate': 'Basic realm="Area 52"'})
+        if not (current_user.is_authenticated() and current_user.is_admin()):
+            return redirect('/login')
         return f(*args, **kwargs)
     return decorated
 

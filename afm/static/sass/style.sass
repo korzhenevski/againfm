@@ -194,7 +194,7 @@ ul.justified
   width: 320px
 
 .modal-onair
-  width: 740px
+  width: 540px
   min-height: 493px
   color: #cccccf
 
@@ -207,20 +207,21 @@ ul.justified
 
 .air-history
   color: #cccccf
-  width: 100%
-
-  .title
-    color: #efefef
-    padding: 3px
-
-  .time
-    width: 50px
-    padding-left: 3px
+  width: 555px
 
   .day
     font-size: 14px
     font-weight: bold
     margin-bottom: 0
+
+  .time
+    width: 50px
+    padding-left: 3px
+
+  .title
+    color: #efefef
+    padding: 3px
+    width: 500px
 
 
 .modal-radio-share
@@ -263,8 +264,9 @@ ul.justified
   +border-radius(10px)
 
 .logo
+  visibility: hidden
   img
-    margin-top: 12px
+    margin-top: 11px
   a
     border: none !important
 
@@ -285,7 +287,7 @@ ul.justified
 
   .menu-item
     p
-      margin: 11px 0
+      margin: 12px 0
     margin-left: 20px
     float: left
 
@@ -496,8 +498,8 @@ ul.justified
       margin: 0
       position: relative
       font-size: 19px
-      line-height: 26px
-      font-weight: 450
+      line-height: 27px
+      font-weight: 300
       .overflow
         white-space: nowrap
         width: 242px
@@ -785,7 +787,7 @@ ul.justified
     +opacity(0.8)
     +border-radius(3px)
     +box-shadow(#624c28 0 2px 4px 1px inset, #e9d6a0 0 1px 1px 0px)
-    @include placeholder-color(#ccc)
+    @include placeholder-color(#f3f3f3)
     &:focus
       outline: none
 
@@ -973,86 +975,6 @@ p.large
 .b-share-popup a
   border: none
 
-#vk-like
-  display: inline-block
-  margin-right: -20px
-
-
-/* radio static */
-$control-group-width: 120px
-.control-group
-  dt
-    width: $control-group-width
-    float: left
-    clear: left
-    overflow: hidden
-    text-align: right
-    padding-top: 6px
-    color: #aaa
-  dd
-    margin-left: $control-group-width + 10
-  .help
-    color: #aaa
-    margin-top: 0.3em
-
-
-.tabbable
-  overflow: hidden
-  .pane
-    display: none
-    float: left
-    overflow: hidden
-
-  .nav
-    li
-      margin-right: 1em
-    a
-      border-bottom: 1px dotted #a49ca3
-    .active a
-      border: none
-
-  .pane.active
-    display: block
-
-.radio-edit
-  width: 550px
-  margin-top: 2em
-
-  .text
-    width: 70%
-
-  .pane
-    width: 100%
-    margin: 1em 0
-
-  .valign-top
-    padding: 0
-
-  .controls
-    margin-left: $control-group-width + 10
-
-  .text-error
-    margin-top: 0
-
-.radio-admin-table
-  width: 60%
-  td
-    padding-bottom: 1em
-  .controls
-    text-align: right
-    width: 100px
-
-
-.genres-edit
-  margin: 10px 0
-  font-size: 12px
-  td
-    padding: 5px 0
-    padding-left: 10px
-  .private
-    color: #90919e
-    text-decoration: line-through
-/* radio static end */
 
 .pseudo-link
   color: #c6c5c8
@@ -1067,7 +989,7 @@ $control-group-width: 120px
     margin-bottom: 0.3em
     font-weight: 400
 
-  .post-time
+  .page-time
     font-size: 12px
 
   .post-content

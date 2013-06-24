@@ -86,6 +86,27 @@ angular.module('afm.admin', ['afm.base', 'afm.user'])
     $scope.loadGenres();
 })
 
+.controller('StatsCtrl', function($scope, $http, $timeout){
+    $scope.stats = {};
+
+    $scope.fetchStats = function() {
+        return $http.get('/_admin/stats').success(function(resp){
+            $scope.stats = resp.stats;
+        });
+    };
+
+    function updateLater() {
+        $timeout(function () {
+            $scope.fetchStats();
+            updateLater();
+        }, 5000);
+    }
+
+    $scope.fetchStats().success(function(){
+        updateLater();
+    });
+})
+
 .directive('inlineEdit', function() {
     return {
         restrict: 'E',

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, jsonify, request
-from afm import app, db
+from afm import app, db, redis
 from afm.models import list_public, create_obj, soft_delete
 from afm.views.user import admin_required
 from afm.search import SearchIndex
@@ -18,16 +18,35 @@ def get_genres():
     return list_public(db.RadioGenre.find_public().sort('id', -1), fields=['id', 'title', 'is_public'])
 
 
-@app.route('/admin')
+@app.route('/admin/editor')
 @admin_required
-def admin():
-    return render_template('admin/admin.html')
+def admin_editor():
+    return render_template('admin/editor.html')
 
 
 @app.route('/admin/genres')
 @admin_required
 def genres_admin():
     return render_template('admin/genres.html')
+
+
+@app.route('/admin')
+@admin_required
+def admin_index():
+    return render_template('admin/index.html')
+
+
+@app.route('/_admin/stats')
+@admin_required
+def admin_stats():
+    stats = {
+        'nowListen': redis.zcard('radio:now_listen'),
+        'userCount': db.users.count(),
+        'radioCount': db.Radio.find_public().count(),
+        'streamCount': db.Stream.find_public().count(),
+        'airCount': db.air.count(),
+    }
+    return jsonify(stats=stats)
 
 
 @app.route('/_admin/genres')

@@ -31,7 +31,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
-  color: #efefef;
+  color: #f3f3f3;
   min-width: 1090px;
   background-color: #3f3943;
   background-image: url("/static/i/background.jpg");
@@ -235,7 +235,7 @@ ul.justified .block {
 }
 
 .modal-onair {
-  width: 740px;
+  width: 540px;
   min-height: 493px;
   color: #cccccf;
 }
@@ -248,20 +248,21 @@ ul.justified .block {
 
 .air-history {
   color: #cccccf;
-  width: 100%;
-}
-.air-history .title {
-  color: #efefef;
-  padding: 3px;
-}
-.air-history .time {
-  width: 50px;
-  padding-left: 3px;
+  width: 555px;
 }
 .air-history .day {
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 0;
+}
+.air-history .time {
+  width: 50px;
+  padding-left: 3px;
+}
+.air-history .title {
+  color: #efefef;
+  padding: 3px;
+  width: 500px;
 }
 
 .modal-radio-share {
@@ -314,8 +315,11 @@ ul.justified .block {
   border-radius: 10px;
 }
 
+.logo {
+  visibility: hidden;
+}
 .logo img {
-  margin-top: 12px;
+  margin-top: 11px;
 }
 .logo a {
   border: none !important;
@@ -348,7 +352,7 @@ ul.justified .block {
   float: left;
 }
 .topmenu .menu-item p {
-  margin: 11px 0;
+  margin: 12px 0;
 }
 .topmenu .side-item {
   float: right;
@@ -607,8 +611,8 @@ ul.justified .block {
   margin: 0;
   position: relative;
   font-size: 19px;
-  line-height: 26px;
-  font-weight: 450;
+  line-height: 27px;
+  font-weight: 300;
 }
 .radio-box .display .title .overflow {
   white-space: nowrap;
@@ -1017,16 +1021,16 @@ ul.justified .block {
   box-shadow: #624c28 0 2px 4px 1px inset, #e9d6a0 0 1px 1px 0px;
 }
 .radio-table .search-field.placeholder {
-  color: #cccccc;
+  color: #f3f3f3;
 }
 .radio-table .search-field::-webkit-input-placeholder {
-  color: #cccccc;
+  color: #f3f3f3;
 }
 .radio-table .search-field:-moz-placeholder {
-  color: #cccccc;
+  color: #f3f3f3;
 }
 .radio-table .search-field:-ms-input-placeholder {
-  color: #cccccc;
+  color: #f3f3f3;
 }
 .radio-table .search-field:focus {
   outline: none;
@@ -1313,96 +1317,6 @@ p.large {
   border: none;
 }
 
-#vk-like {
-  display: inline-block;
-  margin-right: -20px;
-}
-
-/* radio static */
-.control-group dt {
-  width: 120px;
-  float: left;
-  clear: left;
-  overflow: hidden;
-  text-align: right;
-  padding-top: 6px;
-  color: #aaaaaa;
-}
-.control-group dd {
-  margin-left: 130px;
-}
-.control-group .help {
-  color: #aaaaaa;
-  margin-top: 0.3em;
-}
-
-.tabbable {
-  overflow: hidden;
-}
-.tabbable .pane {
-  display: none;
-  float: left;
-  overflow: hidden;
-}
-.tabbable .nav li {
-  margin-right: 1em;
-}
-.tabbable .nav a {
-  border-bottom: 1px dotted #a49ca3;
-}
-.tabbable .nav .active a {
-  border: none;
-}
-.tabbable .pane.active {
-  display: block;
-}
-
-.radio-edit {
-  width: 550px;
-  margin-top: 2em;
-}
-.radio-edit .text {
-  width: 70%;
-}
-.radio-edit .pane {
-  width: 100%;
-  margin: 1em 0;
-}
-.radio-edit .valign-top {
-  padding: 0;
-}
-.radio-edit .controls {
-  margin-left: 130px;
-}
-.radio-edit .text-error {
-  margin-top: 0;
-}
-
-.radio-admin-table {
-  width: 60%;
-}
-.radio-admin-table td {
-  padding-bottom: 1em;
-}
-.radio-admin-table .controls {
-  text-align: right;
-  width: 100px;
-}
-
-.genres-edit {
-  margin: 10px 0;
-  font-size: 12px;
-}
-.genres-edit td {
-  padding: 5px 0;
-  padding-left: 10px;
-}
-.genres-edit .private {
-  color: #90919e;
-  text-decoration: line-through;
-}
-
-/* radio static end */
 .pseudo-link {
   color: #c6c5c8;
   border-bottom: 1px dotted #a49ca3;
@@ -1417,7 +1331,7 @@ p.large {
   margin-bottom: 0.3em;
   font-weight: 400;
 }
-.blog .post-time {
+.blog .page-time {
   font-size: 12px;
 }
 .blog .post-content {
