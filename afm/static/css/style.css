@@ -235,7 +235,7 @@ ul.justified .block {
 }
 
 .modal-onair {
-  width: 540px;
+  width: 660px;
   min-height: 493px;
   color: #cccccf;
 }
@@ -248,7 +248,7 @@ ul.justified .block {
 
 .air-history {
   color: #cccccf;
-  width: 555px;
+  width: 655px;
 }
 .air-history .day {
   font-size: 14px;
@@ -262,7 +262,7 @@ ul.justified .block {
 .air-history .title {
   color: #efefef;
   padding: 3px;
-  width: 500px;
+  width: 600px;
 }
 
 .modal-radio-share {
@@ -358,7 +358,7 @@ ul.justified .block {
 .topmenu .slogan {
   float: left;
   font-style: italic;
-  font-weight: 100;
+  font-weight: 200;
   font-size: 13px;
   color: #c6c5c8;
 }
