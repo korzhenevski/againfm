@@ -11,7 +11,6 @@
         {{% if current_user.is_admin() %}}
             <p><a href="{{{ url_for('admin_pages_edit', page_id=page.id) }}}">редактировать</a></p>
         {{% endif %}}
-        <p class="text-muted time">{{{ page.created_at|ts }}}</p>
     </div>
 {{% endblock %}}
 

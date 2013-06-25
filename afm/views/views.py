@@ -61,9 +61,9 @@ def feedback():
     return render_template('user/feedback.html')
 
 
-@app.route('/siberia')
-def siberia():
-    return render_template('siberia.html')
+@app.route('/area51')
+def area51():
+    return render_template('pages/area51.html')
 
 
 def app_stats():

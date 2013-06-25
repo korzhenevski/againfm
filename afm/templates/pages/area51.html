@@ -1,0 +1,25 @@
+{{% extends "layout.html" %}}
+
+{{% block title %}}Area51{{% endblock %}}
+
+{{% block content %}}
+    <div class="page centroid" ng-controller="AreaFiftyOneCtrl">
+        <h1>Area51</h1>
+        <pre>{{ data|json }}</pre>
+        <div class="flash-engine" id="flash-player-engine" data-src="/static/swf/player.swf"></div>
+    </div>
+{{% endblock %}}
+
+{{% block scripts %}}
+    <script src="/static/js/common/swfobject.js"></script>
+    <script src="/static/js/common/comet.js"></script>
+
+    <script src="/static/js/sound.js"></script>
+
+    <script src="/static/js/area51.js"></script>
+    <script>
+        angular.element(document).ready(function(){
+            angular.bootstrap(document, ['afm.area51']);
+        });
+    </script>
+{{% endblock %}}

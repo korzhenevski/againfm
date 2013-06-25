@@ -1,6 +1,6 @@
 angular.module('afm.sound', ['afm.base'])
 
-.factory('player', function($rootScope, storage, audioEngine, flash, config){
+.factory('player', function($rootScope, $log, storage, audioEngine, flash, config){
     var obj = {
         url: null,
         player: null,
@@ -98,7 +98,7 @@ angular.module('afm.sound', ['afm.base'])
         tryHtml5Fallback: function() {
             var player = audioEngine(_.bind(this.callback, this));
             if (player && player.canPlayType('audio/mpeg')) {
-                console.log('use html5 fallback');
+                $log.log('use html5 fallback');
                 this.player = player;
             } else {
                 this.player = null;

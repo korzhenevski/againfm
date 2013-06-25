@@ -176,7 +176,6 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
         angular.forEach($scope.genres, function (genre) {
             $scope.addTab('genre/' + genre.id, genre.title);
         });
-
         $scope.selectTab($scope.tabs[0].id);
         /*
         if (history.isEmpty()) {
