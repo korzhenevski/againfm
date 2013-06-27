@@ -37,6 +37,7 @@ def admin_required(f):
         if not (current_user.is_authenticated() and current_user.is_admin()):
             return redirect('/login')
         return f(*args, **kwargs)
+
     return decorated
 
 

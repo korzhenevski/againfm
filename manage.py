@@ -3,8 +3,6 @@
 
 from flask.ext.script import Manager
 from afm import app, db, models
-from afm.helpers import fasthash
-from pprint import pprint as pp
 
 manager = Manager(app)
 
@@ -123,12 +121,30 @@ def update_search():
 
 
 @manager.command
-def obj_ids():
+def init_ids():
     for klass in ['radio', 'streams', 'playlist', 'users', 'pages']:
         max_id = db[klass].find_one(fields=['id'], sort=[('id', -1)])['id'] + 1
         print klass, max_id
         db.object_ids.insert({'_id': klass, 'next': int(max_id)})
 
+
+@manager.command
+def smoke():
+    import requests
+    print 'run smoke test'
+
+    def req(uri):
+        resp = requests.get('http://againfm.dev' + uri, allow_redirects=False)
+        #print resp.content
+        return resp.status_code
+
+    assert req('/') == 200
+    assert req('/radio/1') == 404
+    assert req('/radio/3') == 200
+    assert req('/admin') == 302
+
+    #requests.post('/_user/login', data={'login': 'test', ''})
+    # TODO: to be completed
 
 if __name__ == "__main__":
     manager.run()

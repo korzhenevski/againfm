@@ -15,17 +15,6 @@ app.config.from_pyfile('config.py')
 app.config.from_pyfile('local_config.py', silent=True)
 app.config.from_envvar('AFM_CONFIG', silent=True)
 
-if app.debug:
-    # show immediately template changes during debug
-    app.jinja_env.cache.clear()
-else:
-    import logging
-    from logging.handlers import RotatingFileHandler
-    logger = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024*1024*10, backupCount=20)
-    logger.setLevel(logging.ERROR)
-    logger.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    app.logger.addHandler(logger)
-
 app.jinja_env.variable_start_string = '{{{'
 app.jinja_env.variable_end_string = '}}}'
 app.jinja_env.block_start_string = '{{%'

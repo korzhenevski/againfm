@@ -107,6 +107,7 @@ class AnonymousUser(AnonymousUserMixin):
     def is_admin(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
 
 

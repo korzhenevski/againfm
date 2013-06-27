@@ -5,19 +5,27 @@ import re
 import time
 import ujson as json
 from flask import g, request, jsonify, render_template, Markup, escape
-from jinja2 import escape
 from datetime import datetime
 from afm import app
 
-@app.before_request
-def save_start_time():
-    g.start = time.time()
+if not app.debug:
+    import logging
+    from logging.handlers import RotatingFileHandler
+
+    logger = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024 * 1024 * 10, backupCount=20)
+    logger.setLevel(logging.ERROR)
+    logger.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    app.logger.addHandler(logger)
+
+    @app.before_request
+    def save_start_time():
+        g.start = time.time()
 
 
-@app.after_request
-def x_headers(response):
-    response.headers['X-Runtime'] = round(time.time() - g.start, 4)
-    return response
+    @app.after_request
+    def x_headers(response):
+        response.headers['X-Runtime'] = round(time.time() - g.start, 4)
+        return response
 
 
 @app.errorhandler(404)

@@ -21,7 +21,8 @@ def player_radio_featured():
         'is_public': True,
         'stream_type': 'audio/mpeg',
     }
-    objects = [radio.get_public() for radio in db.Radio.find_public(where).sort([('air.listeners', -1), ('id', -1)]).limit(30)]
+    objects = [radio.get_public() for radio in
+               db.Radio.find_public(where).sort([('air.listeners', -1), ('id', -1)]).limit(30)]
     return jsonify({'objects': objects})
 
 

@@ -7,6 +7,7 @@ from afm.models import list_public, create_obj, soft_delete
 from afm.views.user import admin_required
 from afm.search import SearchIndex
 
+
 def get_radio(radio_id):
     fields = {key: True for key in ['id', 'title', 'website', 'description', 'genre', 'is_public', 'updated_at']}
     fields['_id'] = False
