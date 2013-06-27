@@ -8,6 +8,8 @@ from flask.ext.login import current_user
 from afm import db, app, redis
 from afm.helpers import get_onair, build_playlist
 
+# TODO
+# ссылка с хешом ломает сайт
 
 @app.route('/')
 def index():

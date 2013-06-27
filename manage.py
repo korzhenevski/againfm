@@ -96,49 +96,6 @@ def warm_cache():
 
 
 @manager.command
-def convert_genres():
-    for radio in db.radio.find({}, fields=['id', 'genre']):
-        #print radio['genre']
-        #genre = [int(radio['genre'])] if radio['genre'] else []
-        #print genre
-        if not isinstance(radio['genre'], list):
-            print radio
-        #db.radio.update({'id': radio['id']}, {'$set': {'genre': genre}})
-        #print radio['id']
-
-
-@manager.command
-def convert():
-    from afm.models import get_next_id
-
-    ids = set([3, 4, 5, 7, 17, 21, 32, 34, 40, 41, 43, 28340, 28344, 28345, 58, 28351, 65, 28354, 69, 72, 28361, 86])
-
-    db.object_ids.update({'_id': 'radio'}, {'$set': {'next': 50000}})
-
-    for radio in db.radio.find(fields=['id', 'tag.old_id']):
-        old_id = radio['tag'].get('old_id')
-        if old_id in ids:
-            new_id = old_id
-        else:
-            new_id = get_next_id('radio')
-
-        db.radio.update({'id': radio['id']}, {'$set': {'id': new_id, 'tag.ng_id': radio['id']}})
-
-        db.playlist.update({'radio_id': radio['id']}, {'$set': {'radio_id': new_id}}, multi=True)
-        db.streams.update({'radio_id': radio['id']}, {'$set': {'radio_id': new_id}}, multi=True)
-
-
-@manager.command
-def convert_favs():
-    for fav in db.favorite_stations.find():
-        radio = db.radio.find_one({'tag.old_id': fav['station_id']}, fields=['id'])
-        if radio:
-            print 'adding', fav['user_id'], radio['id']
-            key = 'favorites.{}'.format(radio['id'])
-            db.users.update({'id': fav['user_id']}, {'$set': {key: fav['created_at']}})
-
-
-@manager.command
 def update_search():
     import os
 
