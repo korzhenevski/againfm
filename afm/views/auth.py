@@ -7,6 +7,8 @@ from flask import session
 from afm import app
 from afm.oauth import vk
 
+import requests
+
 # TODO
 # авторизация через социальные сети
 
@@ -27,12 +29,11 @@ def oauth(resp):
     if resp is None:
         return redirect(next_url)
     session['vk'] = resp
+    user = requests.get('https://api.vk.com/method/audio.get', params={'access_token': get_vk_token()})
     return jsonify({'resp': resp})
 
 
 @app.route('/vk/audio')
 def vk_audio():
-    import requests
-
     resp = requests.get('https://api.vk.com/method/audio.get', params={'access_token': get_vk_token()})
     return jsonify({'data': resp.json()})
