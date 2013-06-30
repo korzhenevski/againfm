@@ -28,7 +28,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     });
 })
 
-.controller('ListenCtrl', function ($rootScope, $stateParams, $http, Radio) {
+.controller('ListenCtrl', function ($rootScope, $stateParams, $http, Radio, trackEvent) {
     if (Radio.cur.id == $stateParams.radioId) {
         return;
     }
@@ -37,6 +37,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $http.get('/_radio/' + $stateParams.radioId).success(function (radio) {
         Radio.listen(radio);
     }).error(function (resp, statusCode) {
+        trackEvent('player', {act: 'listen_error', rid: parseInt($stateParams.radioId)});
         $rootScope.$broadcast('radioListenError', statusCode);
     });
 })
@@ -356,12 +357,12 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     var playStart = 0;
     $scope.$on('playerPlaying', function(){
         playStart = ts();
-        trackEvent('radio', {act: 'play', sid: Radio.stream.id});
+        trackEvent('player', {act: 'play', sid: Radio.stream.id});
     });
 
     $scope.$on('playerStopped', function(){
         if (playStart) {
-            trackEvent('radio', {act: 'stop', dur: ts() - playStart});
+            trackEvent('player', {act: 'stop', dur: ts() - playStart});
         }
         playStart = 0;
     });
@@ -386,6 +387,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
 
     $scope.randomRadio = function () {
         $http.get('/_radio/random').success(function (radio) {
+            trackEvent('player', {act: 'random', rid: radio.id});
             $scope.selectRadio(radio);
         });
     };
@@ -393,7 +395,7 @@ angular.module('afm.player', ['afm.base', 'afm.sound', 'afm.comet', 'afm.user'])
     $scope.previousRadio = function () {
         var radio = history.getPrevious();
         if (radio) {
-            trackEvent('radio', {act: 'select_prev', id: radio.id});
+            trackEvent('player', {act: 'previous', rid: radio.id});
             $scope.selectRadio(radio);
         }
     };

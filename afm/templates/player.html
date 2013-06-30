@@ -5,6 +5,7 @@
 {{% block description %}}Коллективный радиоплеер интернет-радиостанций{{% endblock %}}
 
 {#
+ TODO:
  горизонтальный плейлист
  #}
 
@@ -30,13 +31,14 @@
     </div>
 
     <div class="menu-item side-item ng-cloak">
-        <p ng-hide="user.isLogged()">
+        <p>
+        {{% if current_user.is_authenticated() %}}
+            <span class="username">{{{ current_user.email }}}</span>
+            <span class="pseudo-link" ng-click="logout()">выход</span>
+        {{% else %}}
             <a href="/login">Войти с паролем</a>
             <a href="/signup">Стать постоянным слушателем</a>
-        </p>
-        <p ng-show="user.isLogged()">
-            <span class="username">{{ user.get().email }}</span>
-            <span class="pseudo-link" ng-click="logout()">выход</span>
+        {{% endif %}}
         </p>
     </div>
 {{% endblock %}}
@@ -101,12 +103,6 @@
 
                                     {# навигация #}
                                     <ul class="tabs justified">
-                                        <!--li>
-                                            <span class="block" ng-class="tabClass('featured')" ng-click="selectTab('featured')">Подборка</span>
-                                        </li>
-                                        <li ng-hide="isHistoryEmpty()">
-                                            <span class="block" ng-class="tabClass('history')" ng-click="selectTab('history')">История</span>
-                                        </li-->
                                         <li ng-repeat="tab in tabs">
                                             <span class="block" ng-class="tabClass(tab.id)" ng-click="selectTab(tab.id)">{{ tab.title }}</span>
                                         </li>

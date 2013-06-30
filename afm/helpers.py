@@ -85,6 +85,7 @@ def safe_input(schema, data=None, **kwargs):
         abort(400)
     return None
 
+
 # адрес почтового инбокса по домену провайдера
 def get_email_provider(email):
     email_domain = email.split('@')[1].lower()

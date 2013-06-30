@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import request, jsonify, abort, render_template
 from afm import app, db, redis
-from afm.helpers import raw_redirect, get_ts, get_onair
+from afm.helpers import raw_redirect, get_ts, get_onair, safe_input_object
 from afm.search import SearchIndex
 
 # play_redirect?codecs=mp3,ogg&radio_id=1488&listener_id=<hash>&format=low|high
@@ -117,6 +117,19 @@ def player_radio_random():
     return jsonify(radio.get_public())
 
 
-@app.route('/_event/radio', methods=['POST'])
-def player_event_radio():
+@app.route('/_event/player', methods=['POST'])
+def player_event():
+    event = safe_input_object({
+        'act': {'type': 'string', 'enum': ['play', 'stop', 'random', 'previous', 'listen_error']},
+        'rid': {'type': 'integer', 'required': False, 'dependencies': 'act'},
+        'sid': {'type': 'integer', 'required': False, 'dependencies': 'act'},
+        'dur': {'type': 'integer', 'required': False, 'dependencies': 'act'},
+        'uid': {'type': 'integer', 'required': False, 'dependencies': 'act'},
+    })
+
+    event['ua'] = request.user_agent.string
+    event['ip'] = request.remote_addr
+    event['ts'] = get_ts()
+
+    db.player_events.insert(event)
     return jsonify({'ok': 1})
