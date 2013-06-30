@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, redirect, make_response, abort
+import os
+from flask import render_template, request, redirect, make_response, abort, url_for
 from datetime import datetime
 
 from flask.ext.login import current_user
@@ -82,4 +83,15 @@ def app_context():
         'genres': genres,
         'year': datetime.now().year,
         'stats': app_stats(),
+        'url_for': versioned_url_for,
     }
+
+
+def versioned_url_for(endpoint, **values):
+    if endpoint == 'static':
+        filename = values.get('filename', None)
+        if filename:
+            file_path = os.path.join(app.root_path,
+                                     endpoint, filename)
+            values['v'] = int(os.stat(file_path).st_mtime)
+    return url_for(endpoint, **values)

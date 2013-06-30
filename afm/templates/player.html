@@ -223,7 +223,7 @@
     </script>
 
     {{% if config.PRODUCTION %}}
-        <script src="/static/js/dist/player.js"></script>
+        <script src="{{{ url_for('static', filename='js/dist/player.js') }}}"></script>
     {{% else %}}
         <script src="/static/js/common/swfobject.js"></script>
         <script src="/static/js/common/comet.js"></script>

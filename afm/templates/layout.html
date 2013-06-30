@@ -72,7 +72,7 @@
 
 {# базовые скрипты #}
 {{% if config.PRODUCTION %}}
-    <script src="/static/js/dist/core.js"></script>
+    <script src="{{{ url_for('static', filename='js/dist/core.js') }}}"></script>
 {{% else %}}
     {{% for name in ('angular', 'angular-cookies', 'angular-resource', 'lodash.custom', 'angular-ui-states', 'angular-locale_ru') %}}
         <script src="/static/js/core/{{{ name }}}.js"></script>
