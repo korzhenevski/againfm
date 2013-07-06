@@ -57,6 +57,17 @@ def agg(key):
 
 
 @manager.command
+@manager.option('-key', '--key', dest='key')
+def field(key):
+    collection, field = key.split('/')
+    for row in db[collection].find({}, fields={field: True, '_id': False}):
+        try:
+            print row[field]
+        except UnicodeError:
+            pass
+
+
+@manager.command
 def update_playlist():
     from afm.tasks import update_playlist
 

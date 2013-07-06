@@ -1,17 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import ujson as json
 from flask import request, jsonify, abort, render_template
 from afm import app, db, redis
 from afm.helpers import raw_redirect, get_ts, get_onair, safe_input_object
 from afm.search import SearchIndex
+from time import time
 
 # play_redirect?codecs=mp3,ogg&radio_id=1488&listener_id=<hash>&format=low|high
 # playtime?radio_id=1488&state=paused|playing|
 
 @app.route('/_radio/search')
 def player_radio_search():
+    ts = time()
+
     ix = SearchIndex(app.config['RADIO_INDEX'])
-    objects = ix.search(request.args.get('q', type=unicode))
+    q = request.args.get('q', type=unicode)
+    objects = ix.search(q)
+
+    if app.config['SEARCH_LOG']:
+        with open(app.config['SEARCH_LOG'], 'a') as log:
+            fmt = '{ts} {timing} {found} "{q}"\n'
+            timing = round(time() - ts, 4)
+            log.write(fmt.format(ts=get_ts(), timing=timing, q=q.replace('"', r'\"'), found=len(objects)))
+
     return jsonify({'objects': objects})
 
 
