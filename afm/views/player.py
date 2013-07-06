@@ -19,10 +19,12 @@ def player_radio_search():
     objects = ix.search(q)
 
     if app.config['SEARCH_LOG']:
-        with open(app.config['SEARCH_LOG'], 'a') as log:
-            fmt = '{ts} {timing} {found} "{q}"\n'
-            timing = round(time() - ts, 4)
-            log.write(fmt.format(ts=get_ts(), timing=timing, q=q.replace('"', r'\"'), found=len(objects)))
+        db.search_log.insert({
+            'q': q,
+            'ts': get_ts(),
+            'timing': round(time() - ts, 4),
+            'found': len(objects)
+        })
 
     return jsonify({'objects': objects})
 

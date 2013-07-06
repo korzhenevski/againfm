@@ -60,4 +60,4 @@ RADIO_INDEX = '/tmp/againfm_whoosh'
 # production error log
 ERROR_LOG = '/tmp/againfm_error.log'
 
-SEARCH_LOG = '/tmp/againfm_search.log'
+SEARCH_LOG = True
